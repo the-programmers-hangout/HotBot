@@ -1,5 +1,7 @@
 package me.aberrantfox.aegeus.commandframework
 
+import me.aberrantfox.aegeus.businessobjects.Configuration
+import net.dv8tion.jda.core.entities.Role
 import org.reflections.Reflections
 import org.reflections.scanners.MethodAnnotationsScanner
 import java.lang.reflect.Method
@@ -27,4 +29,16 @@ fun produceCommandMap(): HashMap<String, Method> {
     commands.forEach { map[it.name] = it }
 
     return map
+}
+
+fun getHighestPermissionLevel(roles: List<Role>, config: Configuration): Permission {
+    val roleNames = roles.map { it.name }
+
+    when {
+        roleNames.contains(config.rolePermissions.ownerRole) -> return Permission.OWNER
+        roleNames.any { config.rolePermissions.adminRoles.contains(it) } -> return  Permission.ADMIN
+        roleNames.any { config.rolePermissions.moderatorRoles.contains(it) } -> return  Permission.MODERATOR
+    }
+
+    return Permission.GUEST
 }
