@@ -1,6 +1,7 @@
 package me.aberrantfox.aegeus.listeners
 
 import me.aberrantfox.aegeus.businessobjects.Configuration
+import me.aberrantfox.aegeus.commandframework.getHighestPermissionLevel
 import net.dv8tion.jda.core.JDA
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent
 import net.dv8tion.jda.core.hooks.ListenerAdapter
@@ -16,6 +17,12 @@ data class CommandListener(val jda: JDA,
             val commandName = getCommandName(rawMessage).toLowerCase()
 
             if(commandMap.containsKey(commandName)) {
+                val method = commandMap[commandName]
+
+                when (method?.parameterCount) {
+                    1 -> method?.invoke(null, event)
+                    2 -> method?.invoke(null, event, config)
+                }
 
             } else {
                 event.channel.sendMessage(":wrong_again_idiot:").queue()
