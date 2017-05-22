@@ -18,6 +18,17 @@ data class CommandListener(val jda: JDA,
 
             if(commandMap.containsKey(commandName)) {
                 val method = commandMap[commandName]
+                val userPermissionLevel = getHighestPermissionLevel(event.member.roles, config)
+                val commandPermissionLevel = config.commandPermissionMap[commandName]
+
+                if(commandPermissionLevel == null) {
+                    return
+                }
+
+                if(userPermissionLevel < commandPermissionLevel) {
+                    event.channel.sendMessage(":wrong_again_idiot: Do you really think I would let you do that").queue()
+                    return
+                }
 
                 when (method?.parameterCount) {
                     1 -> method?.invoke(null, event)
