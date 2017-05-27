@@ -28,15 +28,15 @@ fun add(event: MessageReceivedEvent, args: List<Any>) {
     event.channel.sendMessage("Result: ${left + right}").queue()
 }
 
-@Command(ArgumentType.STRING)
+@Command
 fun exit(event: MessageReceivedEvent, args: List<Any>, config: Configuration) {
-    val saveConfiguration = args[0] as String
-
-    if(saveConfiguration.toLowerCase() == "true") {
-        saveConfigurationFile(config)
-    }
-
+    saveConfigurationFile(config)
     event.channel.sendMessage("Exiting").queue()
+    System.exit(0)
+}
 
+@Command
+fun kill(event: MessageReceivedEvent) {
+    event.channel.sendMessage("Killing process, configurations will not be saved.").queue()
     System.exit(0)
 }
