@@ -16,9 +16,11 @@ data class PermissionRoles(val moderatorRoles: Array<String> = arrayOf("moderato
                            val adminRoles: Array<String> = arrayOf("admin"),
                            val ownerRole: String = "owner")
 
+val configLocation = "config.json"
+
 fun produceConfigOrFail(commandMap: HashMap<String, Method>): Configuration {
-    val configFile: File = File("config.json")
-    val gson: Gson = Gson()
+    val configFile = File(configLocation)
+    val gson = Gson()
 
     if(!configFile.exists()) {
         val jsonData: String = gson.toJson(Configuration())
@@ -29,7 +31,7 @@ fun produceConfigOrFail(commandMap: HashMap<String, Method>): Configuration {
         System.exit(0)
     }
 
-    val json: String = configFile.readLines().stream().reduce("", { a: String, b: String -> a + b })
+    val json = configFile.readLines().stream().reduce("", { a: String, b: String -> a + b })
     val configuration = gson.fromJson<Configuration>(json)
 
     commandMap.keys.filter { !configuration.commandPermissionMap.containsKey(it) }
@@ -38,5 +40,12 @@ fun produceConfigOrFail(commandMap: HashMap<String, Method>): Configuration {
     return configuration
 }
 
+fun saveConfigurationFile(config: Configuration) {
+    val file = File(configLocation)
+    val gson = Gson()
+    val json = gson.toJson(config)
 
+    file.delete()
+    file.printWriter().use { it.print(json) }
+}
 
