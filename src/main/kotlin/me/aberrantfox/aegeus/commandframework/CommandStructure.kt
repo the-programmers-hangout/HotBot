@@ -8,15 +8,6 @@ import java.lang.reflect.Method
 
 enum class Permission {
     GUEST, MODERATOR, ADMIN, OWNER;
-
-    fun matchStringToItem(choice: String): Permission? =
-            when (choice.toLowerCase()) {
-                "guest" -> GUEST
-                "moderator" -> MODERATOR
-                "admin" -> ADMIN
-                "owner" -> OWNER
-                else -> null
-            }
 }
 
 annotation class Command(vararg val expectedArgs: ArgumentType = arrayOf())
@@ -26,6 +17,7 @@ fun produceCommandMap(): HashMap<String, Method> {
     val commands = reflections.getMethodsAnnotatedWith(Command::class.java)
     val map: HashMap<String, Method> = HashMap()
 
+    commands.forEach { map[it.name.toLowerCase()] = it }
 
     return map
 }
@@ -41,3 +33,12 @@ fun getHighestPermissionLevel(roles: List<Role>, config: Configuration): Permiss
 
     return Permission.GUEST
 }
+
+fun stringToPermission(choice: String): Permission? =
+        when (choice.toLowerCase()) {
+            "guest" -> Permission.GUEST
+            "moderator" -> Permission.MODERATOR
+            "admin" -> Permission.ADMIN
+            "owner" -> Permission.OWNER
+            else -> null
+        }
