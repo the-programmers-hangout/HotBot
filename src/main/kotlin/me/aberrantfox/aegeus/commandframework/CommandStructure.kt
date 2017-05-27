@@ -10,23 +10,22 @@ enum class Permission {
     GUEST, MODERATOR, ADMIN, OWNER;
 
     fun matchStringToItem(choice: String): Permission? =
-            when(choice.toLowerCase()) {
+            when (choice.toLowerCase()) {
                 "guest" -> GUEST
                 "moderator" -> MODERATOR
                 "admin" -> ADMIN
                 "owner" -> OWNER
-                 else -> null
+                else -> null
             }
 }
 
-annotation class Command
+annotation class Command(vararg val expectedArgs: ArgumentType = arrayOf())
 
 fun produceCommandMap(): HashMap<String, Method> {
     val reflections = Reflections("me.aberrantfox.aegeus.commandframework.commands", MethodAnnotationsScanner())
     val commands = reflections.getMethodsAnnotatedWith(Command::class.java)
     val map: HashMap<String, Method> = HashMap()
 
-    commands.forEach { map[it.name] = it }
 
     return map
 }
@@ -36,8 +35,8 @@ fun getHighestPermissionLevel(roles: List<Role>, config: Configuration): Permiss
 
     when {
         roleNames.contains(config.rolePermissions.ownerRole) -> return Permission.OWNER
-        roleNames.any { config.rolePermissions.adminRoles.contains(it) } -> return  Permission.ADMIN
-        roleNames.any { config.rolePermissions.moderatorRoles.contains(it) } -> return  Permission.MODERATOR
+        roleNames.any { config.rolePermissions.adminRoles.contains(it) } -> return Permission.ADMIN
+        roleNames.any { config.rolePermissions.moderatorRoles.contains(it) } -> return Permission.MODERATOR
     }
 
     return Permission.GUEST
