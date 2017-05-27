@@ -1,7 +1,10 @@
 package me.aberrantfox.aegeus.listeners
 
 import me.aberrantfox.aegeus.businessobjects.Configuration
+import me.aberrantfox.aegeus.commandframework.Command
+import me.aberrantfox.aegeus.commandframework.getCommandStruct
 import me.aberrantfox.aegeus.commandframework.getHighestPermissionLevel
+import me.aberrantfox.aegeus.commandframework.convertArguments
 import net.dv8tion.jda.core.JDA
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent
 import net.dv8tion.jda.core.hooks.ListenerAdapter
@@ -14,40 +17,38 @@ data class CommandListener(val jda: JDA,
     override fun onMessageReceived(event: MessageReceivedEvent?) {
         if(event != null && event.message != null && event.message.rawContent.startsWith(config.prefix)) {
             val rawMessage = event.message.rawContent
-            val commandName = getCommandName(rawMessage).toLowerCase()
+            val (commandName, actualArgs) = getCommandStruct(rawMessage, config)
 
             if(commandMap.containsKey(commandName)) {
-                val method = commandMap[commandName]
+                val method = commandMap[commandName]?: return
                 val userPermissionLevel = getHighestPermissionLevel(event.member.roles, config)
-                val commandPermissionLevel = config.commandPermissionMap[commandName]
-
-                if(commandPermissionLevel == null) {
-                    return
-                }
+                val commandPermissionLevel = config.commandPermissionMap[commandName] ?: return
+                val annotation = method.getAnnotation(Command::class.java)
 
                 if(userPermissionLevel < commandPermissionLevel) {
                     event.channel.sendMessage(":wrong_again_idiot: Do you really think I would let you do that").queue()
                     return
                 }
 
-                when (method?.parameterCount) {
-                    1 -> method?.invoke(null, event)
-                    2 -> method?.invoke(null, event, config)
+                val convertedArguments = convertArguments(actualArgs, annotation.expectedArgs)
+
+                if( convertedArguments == null ) {
+                    event.channel.sendMessage(":wrong_again_idiot: Yea, you'll need to learn how to use that properly.").queue()
+                    return
+                }
+
+                when (method.parameterCount) {
+                    0 -> method.invoke(null)
+                    1 -> method.invoke(null, event)
+                    2 -> method.invoke(null, event, convertedArguments)
+                    3 -> method.invoke(null, event, convertedArguments, config)
                 }
 
             } else {
-                event.channel.sendMessage(":wrong_again_idiot:").queue()
+                event.channel.sendMessage(":wrong_again_idiot: I don't know what that command is").queue()
             }
         }
     }
 
-    fun getCommandName(message: String): String {
-        val trimmedMessage = message.substring(config.prefix.length)
 
-        if(! (message.contains(" ")) ) {
-            return trimmedMessage
-        }
-
-        return message.substring(0, message.indexOf(" "))
-    }
 }
