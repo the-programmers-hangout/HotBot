@@ -29,7 +29,7 @@ fun convertArguments(actual: List<String>, expected: Array<out ArgumentType>): L
         when(it.second) {
             ArgumentType.INTEGER -> it.first.toInt()
             ArgumentType.DOUBLE -> it.first.toDouble()
-            else -> it.second
+            else -> it.first
         }
     }
 
