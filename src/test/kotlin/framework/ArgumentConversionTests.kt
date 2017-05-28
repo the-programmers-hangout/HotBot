@@ -76,4 +76,18 @@ class ArgumentConversionTests {
             fail("Failed to convert arguments to String, returned null instead")
         }
     }
+
+    @Test fun manualShouldBeIgnored() {
+        val actual = listOf("1", "abc", "123")
+        var expected = arrayOf(ArgumentType.MANUAL)
+
+        val converted = convertArguments(actual, expected)
+
+        if(converted == null) {
+            fail("Failed to ignore arguments as Manual, returned null instead")
+            return
+        }
+
+        assertTrue(converted.zip(actual).all { it.first == it.second })
+    }
 }
