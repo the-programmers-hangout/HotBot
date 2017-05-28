@@ -3,7 +3,7 @@ package me.aberrantfox.aegeus.commandframework
 import me.aberrantfox.aegeus.businessobjects.Configuration
 
 enum class ArgumentType {
-    INTEGER, DOUBLE, STRING
+    INTEGER, DOUBLE, STRING, BOOLEAN, MANUAL
 }
 
 data class CommandStruct(val commandName: String, val commandArgs: List<String> = listOf())
@@ -13,10 +13,15 @@ fun convertArguments(actual: List<String>, expected: Array<out ArgumentType>): L
         return null
     }
 
+    if(expected.contains(ArgumentType.MANUAL)) {
+        return actual
+    }
+
     val allMatch = actual.zip(expected).all {
         when (it.second) {
             ArgumentType.INTEGER -> it.first.isInteger()
             ArgumentType.DOUBLE -> it.first.isDouble()
+            ArgumentType.BOOLEAN -> it.first.isBooleanValue()
             else -> true
         }
     }
@@ -29,6 +34,7 @@ fun convertArguments(actual: List<String>, expected: Array<out ArgumentType>): L
         when(it.second) {
             ArgumentType.INTEGER -> it.first.toInt()
             ArgumentType.DOUBLE -> it.first.toDouble()
+            ArgumentType.BOOLEAN -> it.first.toBooleanValue()
             else -> it.first
         }
     }
@@ -62,4 +68,21 @@ fun String.isDouble(): Boolean =
             true
         } catch (e: NumberFormatException) {
             false
+        }
+
+
+fun String.isBooleanValue(): Boolean =
+        when(this.toLowerCase()) {
+            "true" -> true
+            "false" -> true
+            "t" -> true
+            "f" -> true
+            else -> false
+        }
+
+fun String.toBooleanValue(): Boolean =
+        when(this.toLowerCase()) {
+            "true" -> true
+            "t" -> true
+            else -> false
         }
