@@ -35,3 +35,12 @@ fun getPerm(event: MessageReceivedEvent, args: List<Any>, config: Configuration)
 
     event.channel.sendMessage("Current permission level: ${config.commandPermissionMap[commandName]}").queue()
 }
+
+@Command
+fun listCommands(event: MessageReceivedEvent, args: List<Any>, config: Configuration) {
+    val messageBuilder = StringBuilder()
+    config.commandPermissionMap.keys.forEach { messageBuilder.append(it).append(", ") }
+
+    val message = messageBuilder.substring(0, messageBuilder.length -  2)
+    event.channel.sendMessage("Currently there are the following commands: $message.").queue()
+}
