@@ -9,12 +9,12 @@ enum class ArgumentType {
 data class CommandStruct(val commandName: String, val commandArgs: List<String> = listOf())
 
 fun convertArguments(actual: List<String>, expected: Array<out ArgumentType>): List<Any>? {
-    if (actual.size != expected.size) {
-        return null
-    }
-
     if(expected.contains(ArgumentType.MANUAL)) {
         return actual
+    }
+    
+    if (actual.size != expected.size) {
+        return null
     }
 
     val allMatch = actual.zip(expected).all {
