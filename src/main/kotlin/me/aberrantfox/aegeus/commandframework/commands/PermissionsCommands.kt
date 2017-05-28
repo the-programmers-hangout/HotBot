@@ -10,7 +10,7 @@ fun setPerm(event: MessageReceivedEvent, args: List<Any>,  config: Configuration
     val desiredPermission = args[1] as String
     
     if( !(config.commandPermissionMap.contains(commandName)) ) {
-        event.channel.sendMessage("Dunno what the command:$commandName is - run the help command?").queue()
+        event.channel.sendMessage("Dunno what the command: $commandName is - run the help command?").queue()
         return
     }
 
@@ -22,4 +22,16 @@ fun setPerm(event: MessageReceivedEvent, args: List<Any>,  config: Configuration
     }
 
     config.commandPermissionMap[commandName] = permission
+}
+
+@Command(ArgumentType.STRING)
+fun getPerm(event: MessageReceivedEvent, args: List<Any>, config: Configuration) {
+    val commandName = args[0] as String
+
+    if( !(config.commandPermissionMap.containsKey(commandName)) ) {
+        event.channel.sendMessage("What command is that, exactly?").queue()
+        return
+    }
+
+    event.channel.sendMessage("Current permission level: ${config.commandPermissionMap[commandName]}").queue()
 }
