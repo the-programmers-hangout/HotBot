@@ -12,14 +12,14 @@ data class Configuration(val token: String = "insert-token",
                          val commandPermissionMap: MutableMap<String, Permission> = HashMap(),
                          val rolePermissions: PermissionRoles = PermissionRoles())
 
-data class PermissionRoles(val moderatorRoles: Array<String> = arrayOf("moderator"),
+class PermissionRoles(val moderatorRoles: Array<String> = arrayOf("moderator"),
                            val adminRoles: Array<String> = arrayOf("admin"),
                            val ownerRole: String = "owner")
 
 val configLocation = "config.json"
 
-fun produceConfigOrFail(commandMap: HashMap<String, Method>): Configuration {
-    val configFile = File(configLocation)
+fun produceConfigOrFail(commandMap: MutableMap<String, Method>, location: String = configLocation): Configuration {
+    val configFile = File(location)
     val gson = Gson()
 
     if(!configFile.exists()) {
@@ -40,8 +40,8 @@ fun produceConfigOrFail(commandMap: HashMap<String, Method>): Configuration {
     return configuration
 }
 
-fun saveConfigurationFile(config: Configuration) {
-    val file = File(configLocation)
+fun saveConfigurationFile(config: Configuration, location: String = configLocation) {
+    val file = File(location)
     val gson = Gson()
     val json = gson.toJson(config)
 
