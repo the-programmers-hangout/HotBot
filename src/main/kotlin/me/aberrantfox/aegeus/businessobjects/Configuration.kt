@@ -18,17 +18,15 @@ class PermissionRoles(val moderatorRoles: Array<String> = arrayOf("moderator"),
 
 val configLocation = "config.json"
 
-fun produceConfigOrFail(commandMap: MutableMap<String, Method>, location: String = configLocation): Configuration {
+fun produceConfigOrFail(commandMap: MutableMap<String, Method>, location: String = configLocation): Configuration? {
     val configFile = File(location)
     val gson = Gson()
 
     if(!configFile.exists()) {
-        val jsonData: String = gson.toJson(Configuration())
+        val jsonData = gson.toJson(Configuration())
         configFile.printWriter().use { it.print(jsonData) }
 
-        println("The default configuration has been generated." +
-                " Please fill in this configuration in order to use the bot.")
-        System.exit(0)
+        return null
     }
 
     val json = configFile.readLines().stream().reduce("", { a: String, b: String -> a + b })
