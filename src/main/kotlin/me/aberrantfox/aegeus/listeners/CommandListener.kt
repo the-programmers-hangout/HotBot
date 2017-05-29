@@ -16,6 +16,11 @@ data class CommandListener(val jda: JDA,
 
     override fun onMessageReceived(event: MessageReceivedEvent?) {
         if(event != null && event.message != null && event.message.rawContent.startsWith(config.prefix)) {
+
+            if(event.author.isBot) {
+                return
+            }
+
             val rawMessage = event.message.rawContent
             val (commandName, actualArgs) = getCommandStruct(rawMessage, config)
 
