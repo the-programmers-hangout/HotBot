@@ -1,15 +1,15 @@
-###Aegeus
+### Aegeus
 This is a small, extensible bot which is design with kotlin, intended to run on one guild and one guild only.
 You may fork it and use it as you like. The focus of this project is learning. 
 
-###Help information
+### Help information
 This is to come later, not sure if I want this to be built onto a webservice or simply to use embeds.
 
-###Contact 
+### Contact 
 You can freely contact me about this bot through the server it is intended to be used on, here: 
 https://discord.gg/BQN6BYE
 
-###License
+### License
 MIT License
 
 Copyright (c) 2017 AberrantFox
