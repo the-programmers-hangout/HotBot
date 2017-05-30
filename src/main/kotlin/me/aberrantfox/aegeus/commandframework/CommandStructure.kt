@@ -35,10 +35,8 @@ fun getHighestPermissionLevel(roles: List<Role>, config: Configuration): Permiss
 }
 
 fun stringToPermission(choice: String): Permission? =
-        when (choice.toLowerCase()) {
-            "guest" -> Permission.GUEST
-            "moderator" -> Permission.MODERATOR
-            "admin" -> Permission.ADMIN
-            "owner" -> Permission.OWNER
-            else -> null
+        try {
+            enumValueOf<Permission>(choice)
+        } catch (e: IllegalArgumentException) {
+            null
         }
