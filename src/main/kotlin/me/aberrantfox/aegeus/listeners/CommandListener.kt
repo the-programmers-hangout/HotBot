@@ -1,17 +1,15 @@
 package me.aberrantfox.aegeus.listeners
 
-import me.aberrantfox.aegeus.businessobjects.Configuration
+import me.aberrantfox.aegeus.services.Configuration
 import me.aberrantfox.aegeus.commandframework.Command
 import me.aberrantfox.aegeus.commandframework.getCommandStruct
 import me.aberrantfox.aegeus.commandframework.getHighestPermissionLevel
 import me.aberrantfox.aegeus.commandframework.convertArguments
-import net.dv8tion.jda.core.JDA
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent
 import net.dv8tion.jda.core.hooks.ListenerAdapter
 import java.lang.reflect.Method
 
-data class CommandListener(val jda: JDA,
-                           val config: Configuration,
+data class CommandListener(val config: Configuration,
                            val commandMap: Map<String, Method>): ListenerAdapter() {
 
     override fun onMessageReceived(event: MessageReceivedEvent?) {
