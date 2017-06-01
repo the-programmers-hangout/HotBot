@@ -1,6 +1,6 @@
 package me.aberrantfox.aegeus.commandframework
 
-import me.aberrantfox.aegeus.businessobjects.Configuration
+import me.aberrantfox.aegeus.services.Configuration
 import net.dv8tion.jda.core.entities.Role
 import org.reflections.Reflections
 import org.reflections.scanners.MethodAnnotationsScanner

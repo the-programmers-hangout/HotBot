@@ -1,6 +1,6 @@
 package me.aberrantfox.aegeus.commandframework.commands
 
-import me.aberrantfox.aegeus.businessobjects.Configuration
+import me.aberrantfox.aegeus.services.Configuration
 import me.aberrantfox.aegeus.commandframework.*
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent
 

@@ -1,6 +1,6 @@
 package config
 
-import me.aberrantfox.aegeus.businessobjects.produceConfigOrFail
+import me.aberrantfox.aegeus.services.produceConfigOrFail
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before

@@ -1,6 +1,6 @@
 package me.aberrantfox.aegeus.commandframework
 
-import me.aberrantfox.aegeus.businessobjects.Configuration
+import me.aberrantfox.aegeus.services.Configuration
 
 enum class ArgumentType {
     INTEGER, DOUBLE, STRING, BOOLEAN, MANUAL
