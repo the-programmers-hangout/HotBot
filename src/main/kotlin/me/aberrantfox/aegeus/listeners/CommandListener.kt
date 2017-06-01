@@ -12,45 +12,43 @@ import java.lang.reflect.Method
 data class CommandListener(val config: Configuration,
                            val commandMap: Map<String, Method>): ListenerAdapter() {
 
-    override fun onMessageReceived(event: MessageReceivedEvent?) {
-        if(event != null && event.message != null && event.message.rawContent.startsWith(config.prefix)) {
+    override fun onMessageReceived(event: MessageReceivedEvent) {
+        if(event.author.isBot) {
+            return
+        }
 
-            if(event.author.isBot) {
+        val rawMessage = event.message.rawContent
+        val (commandName, actualArgs) = getCommandStruct(rawMessage, config)
+
+        if(commandMap.containsKey(commandName)) {
+            val method = commandMap[commandName]?: return
+            val userPermissionLevel = getHighestPermissionLevel(event.member.roles, config)
+            val commandPermissionLevel = config.commandPermissionMap[commandName] ?: return
+            val annotation = method.getAnnotation(Command::class.java)
+
+            if(userPermissionLevel < commandPermissionLevel) {
+                event.channel.sendMessage(":wrong_again_idiot: Do you really think I would let you do that").queue()
                 return
             }
 
-            val rawMessage = event.message.rawContent
-            val (commandName, actualArgs) = getCommandStruct(rawMessage, config)
+            val convertedArguments = convertArguments(actualArgs, annotation.expectedArgs)
 
-            if(commandMap.containsKey(commandName)) {
-                val method = commandMap[commandName]?: return
-                val userPermissionLevel = getHighestPermissionLevel(event.member.roles, config)
-                val commandPermissionLevel = config.commandPermissionMap[commandName] ?: return
-                val annotation = method.getAnnotation(Command::class.java)
-
-                if(userPermissionLevel < commandPermissionLevel) {
-                    event.channel.sendMessage(":wrong_again_idiot: Do you really think I would let you do that").queue()
-                    return
-                }
-
-                val convertedArguments = convertArguments(actualArgs, annotation.expectedArgs)
-
-                if( convertedArguments == null ) {
-                    event.channel.sendMessage(":wrong_again_idiot: Yea, you'll need to learn how to use that properly.").queue()
-                    return
-                }
-
-                when (method.parameterCount) {
-                    0 -> method.invokeStatic()
-                    1 -> method.invokeStatic(event)
-                    2 -> method.invokeStatic(event, convertedArguments)
-                    3 -> method.invokeStatic(event, convertedArguments, config)
-                }
-
-            } else {
-                event.channel.sendMessage(":wrong_again_idiot: I don't know what that command is").queue()
+            if( convertedArguments == null ) {
+                event.channel.sendMessage(":wrong_again_idiot: Yea, you'll need to learn how to use that properly.").queue()
+                return
             }
+
+            when (method.parameterCount) {
+                0 -> method.invokeStatic()
+                1 -> method.invokeStatic(event)
+                2 -> method.invokeStatic(event, convertedArguments)
+                3 -> method.invokeStatic(event, convertedArguments, config)
+            }
+
+        } else {
+            event.channel.sendMessage(":wrong_again_idiot: I don't know what that command is").queue()
         }
+
     }
 }
 
