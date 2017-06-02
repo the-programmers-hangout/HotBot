@@ -53,6 +53,10 @@ val startTime = Date()
             "List the permission of a particular command",
             false)
 
+    builder.addField("${config.prefix}Uptime",
+            "Display how long the bot has been online",
+            false)
+
     event.channel.sendMessage(builder.build()).queue()
 }
 
