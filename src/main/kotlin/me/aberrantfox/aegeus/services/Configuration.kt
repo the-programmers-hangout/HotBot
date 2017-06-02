@@ -9,7 +9,6 @@ import java.lang.reflect.Method
 data class Configuration(val token: String = "insert-token",
                          val ownerID: String = "insert-id",
                          val prefix: String = "insert-prefix",
-                         val watchTime: Long = 30,
                          val welcomeMessage: String = "Welcome to %servername%, %name%! Be sure to check",
                          val lockDownMode: Boolean = false,
                          val commandPermissionMap: MutableMap<String, Permission> = HashMap(),
