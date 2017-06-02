@@ -39,10 +39,10 @@ data class CommandListener(val config: Configuration,
             }
 
             when (method.parameterCount) {
-                0 -> method.invokeStatic()
-                1 -> method.invokeStatic(event)
-                2 -> method.invokeStatic(event, convertedArguments)
-                3 -> method.invokeStatic(event, convertedArguments, config)
+                0 -> method.invoke(null)
+                1 -> method.invoke(null, event)
+                2 -> method.invoke(null, event, convertedArguments)
+                3 -> method.invoke(null, event, convertedArguments, config)
             }
 
         } else {
@@ -51,5 +51,3 @@ data class CommandListener(val config: Configuration,
 
     }
 }
-
-fun Method.invokeStatic(vararg args: Any): Any = this.invoke(null, args)
