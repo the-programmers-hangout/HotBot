@@ -57,6 +57,9 @@ val startTime = Date()
             "Display how long the bot has been online",
             false)
 
+    builder.addField("${config.prefix}Nuke {amount}",
+            "Delete the last X messages. Note, amount must be greater than 0",
+            false)
     event.channel.sendMessage(builder.build()).queue()
 }
 
@@ -84,7 +87,7 @@ fun kill(event: MessageReceivedEvent) {
 fun nuke(event: MessageReceivedEvent, args: List<Any>) {
     val amount = args[0] as Int
 
-    if(amount == 0) {
+    if(amount <= 0) {
         event.channel.sendMessage("Yea, what exactly is the point in nuking nothing... ?").queue()
         return
     }
