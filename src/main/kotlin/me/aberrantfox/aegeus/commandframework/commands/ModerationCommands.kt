@@ -25,8 +25,6 @@ fun nuke(event: GuildMessageReceivedEvent, args: List<Any>) {
 fun ignore(event: GuildMessageReceivedEvent, args: List<Any>, config: Configuration) {
     val target = args[0] as String
 
-    println(event.channel.name)
-
     if(config.ignoredChannels.contains(target)) {
         config.ignoredChannels.remove(target)
         event.channel.sendMessage("Now accepting commands in #$target again.").queue()
