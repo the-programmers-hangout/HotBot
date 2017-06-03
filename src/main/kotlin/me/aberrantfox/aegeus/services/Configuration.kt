@@ -12,7 +12,8 @@ data class Configuration(val token: String = "insert-token",
                          val welcomeMessage: String = "Welcome to %servername%, %name%! Be sure to check",
                          val lockDownMode: Boolean = false,
                          val commandPermissionMap: MutableMap<String, Permission> = HashMap(),
-                         val rolePermissions: PermissionRoles = PermissionRoles())
+                         val rolePermissions: PermissionRoles = PermissionRoles(),
+                         val ignoredChannels: MutableSet<String> = mutableSetOf())
 
 class PermissionRoles(val moderatorRoles: Array<String> = arrayOf("moderator"),
                            val adminRoles: Array<String> = arrayOf("admin"),
