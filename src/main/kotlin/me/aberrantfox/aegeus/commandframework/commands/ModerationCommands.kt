@@ -3,11 +3,11 @@ package me.aberrantfox.aegeus.commandframework.commands
 import me.aberrantfox.aegeus.commandframework.ArgumentType
 import me.aberrantfox.aegeus.commandframework.Command
 import me.aberrantfox.aegeus.services.Configuration
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent
+import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent
 
 
 @Command(ArgumentType.INTEGER)
-fun nuke(event: MessageReceivedEvent, args: List<Any>) {
+fun nuke(event: GuildMessageReceivedEvent, args: List<Any>) {
     val amount = args[0] as Int
 
     if(amount <= 0) {
@@ -22,7 +22,7 @@ fun nuke(event: MessageReceivedEvent, args: List<Any>) {
 }
 
 @Command(ArgumentType.STRING)
-fun ignore(event: MessageReceivedEvent, args: List<Any>, config: Configuration) {
+fun ignore(event: GuildMessageReceivedEvent, args: List<Any>, config: Configuration) {
     val target = args[0] as String
 
     println(event.channel.name)

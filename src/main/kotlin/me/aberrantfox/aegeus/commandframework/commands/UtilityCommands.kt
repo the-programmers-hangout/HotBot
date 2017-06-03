@@ -6,15 +6,16 @@ import me.aberrantfox.aegeus.commandframework.ArgumentType
 import me.aberrantfox.aegeus.commandframework.Command
 import net.dv8tion.jda.core.EmbedBuilder
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent
+import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent
 import java.awt.Color
 import java.time.LocalDateTime.now
 import java.util.*
 
 val startTime = Date()
 
-@Command fun ping(event: MessageReceivedEvent) = event.channel.sendMessage("Pong!").queue()
+@Command fun ping(event: GuildMessageReceivedEvent) = event.channel.sendMessage("Pong!").queue()
 
-@Command fun help(event: MessageReceivedEvent, args: List<Any>, config: Configuration) {
+@Command fun help(event: GuildMessageReceivedEvent, args: List<Any>, config: Configuration) {
     val builder = EmbedBuilder()
     builder.setTitle("HotBot Help Menu")
             .setColor(Color.MAGENTA)
@@ -63,7 +64,7 @@ val startTime = Date()
     event.channel.sendMessage(builder.build()).queue()
 }
 
-@Command fun uptime(event: MessageReceivedEvent) {
+@Command fun uptime(event: GuildMessageReceivedEvent) {
     val minutes = Date().time - startTime.time / 1000 / 60
     val currentDate = startTime.toString()
 
@@ -71,14 +72,14 @@ val startTime = Date()
 }
 
 @Command
-fun exit(event: MessageReceivedEvent, args: List<Any>, config: Configuration) {
+fun exit(event: GuildMessageReceivedEvent, args: List<Any>, config: Configuration) {
     saveConfigurationFile(config)
     event.channel.sendMessage("Exiting").queue()
     System.exit(0)
 }
 
 @Command
-fun kill(event: MessageReceivedEvent) {
+fun kill(event: GuildMessageReceivedEvent) {
     event.channel.sendMessage("Killing process, configurations will not be saved.").queue()
     System.exit(0)
 }

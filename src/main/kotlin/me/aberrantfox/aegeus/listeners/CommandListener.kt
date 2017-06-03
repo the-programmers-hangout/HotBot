@@ -6,13 +6,14 @@ import me.aberrantfox.aegeus.commandframework.getCommandStruct
 import me.aberrantfox.aegeus.commandframework.getHighestPermissionLevel
 import me.aberrantfox.aegeus.commandframework.convertArguments
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent
+import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent
 import net.dv8tion.jda.core.hooks.ListenerAdapter
 import java.lang.reflect.Method
 
 data class CommandListener(val config: Configuration,
                            val commandMap: Map<String, Method>): ListenerAdapter() {
 
-    override fun onMessageReceived(event: MessageReceivedEvent) {
+    override fun onGuildMessageReceived(event: GuildMessageReceivedEvent) {
         if(event.author.isBot) {
             return
         }

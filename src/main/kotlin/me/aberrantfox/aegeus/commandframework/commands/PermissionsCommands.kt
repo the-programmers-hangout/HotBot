@@ -2,10 +2,10 @@ package me.aberrantfox.aegeus.commandframework.commands
 
 import me.aberrantfox.aegeus.services.Configuration
 import me.aberrantfox.aegeus.commandframework.*
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent
+import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent
 
 @Command(ArgumentType.STRING, ArgumentType.STRING)
-fun setPerm(event: MessageReceivedEvent, args: List<Any>,  config: Configuration) {
+fun setPerm(event: GuildMessageReceivedEvent, args: List<Any>, config: Configuration) {
     val commandName = args[0] as String
     val desiredPermission = args[1] as String
     
@@ -25,7 +25,7 @@ fun setPerm(event: MessageReceivedEvent, args: List<Any>,  config: Configuration
 }
 
 @Command(ArgumentType.STRING)
-fun getPerm(event: MessageReceivedEvent, args: List<Any>, config: Configuration) {
+fun getPerm(event: GuildMessageReceivedEvent, args: List<Any>, config: Configuration) {
     val commandName = args[0] as String
 
     if( !(config.commandPermissionMap.containsKey(commandName)) ) {
@@ -37,7 +37,7 @@ fun getPerm(event: MessageReceivedEvent, args: List<Any>, config: Configuration)
 }
 
 @Command
-fun listCommands(event: MessageReceivedEvent, args: List<Any>, config: Configuration) {
+fun listCommands(event: GuildMessageReceivedEvent, args: List<Any>, config: Configuration) {
     val messageBuilder = StringBuilder()
     config.commandPermissionMap.keys.forEach { messageBuilder.append(it).append(", ") }
 
