@@ -61,6 +61,22 @@ val startTime = Date()
     builder.addField("${config.prefix}Nuke {amount}",
             "Delete the last X messages. Note, amount must be greater than 0",
             false)
+
+    builder.addField("${config.prefix}Ball [Your question here]",
+            "Ask the 8ball api a question.",
+            false)
+
+    builder.addField("${config.prefix}Flip",
+            "Flip a coin",
+            false)
+
+    builder.addField("${config.prefix}Ignore {channel-name}",
+            "Force the bot to ignore commands from a particular channel",
+            false)
+
+    builder.addField("${config.prefix}Cat",
+            "Display a picture of a kat",
+            false)
     event.channel.sendMessage(builder.build()).queue()
 }
 
