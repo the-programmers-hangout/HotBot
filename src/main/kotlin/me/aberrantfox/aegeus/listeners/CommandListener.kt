@@ -14,6 +14,10 @@ data class CommandListener(val config: Configuration,
                            val commandMap: Map<String, Method>): ListenerAdapter() {
 
     override fun onGuildMessageReceived(event: GuildMessageReceivedEvent) {
+        if(config.ignoredChannels.contains(event.channel.name)) {
+            return
+        }
+
         if(event.author.isBot) {
             return
         }
