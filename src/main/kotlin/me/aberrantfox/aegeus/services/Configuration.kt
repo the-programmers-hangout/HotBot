@@ -1,10 +1,12 @@
 package me.aberrantfox.aegeus.services
 
 import com.github.salomonbrys.kotson.fromJson
+import com.google.common.collect.ConcurrentHashMultiset
 import com.google.gson.Gson
 import me.aberrantfox.aegeus.commandframework.Permission
 import java.io.File
 import java.lang.reflect.Method
+import java.util.*
 
 data class Configuration(val token: String = "insert-token",
                          val ownerID: String = "insert-id",
@@ -13,7 +15,8 @@ data class Configuration(val token: String = "insert-token",
                          val lockDownMode: Boolean = false,
                          val commandPermissionMap: MutableMap<String, Permission> = HashMap(),
                          val rolePermissions: PermissionRoles = PermissionRoles(),
-                         val ignoredChannels: MutableSet<String> = mutableSetOf())
+                         val ignoredChannels: MutableSet<String> = mutableSetOf(),
+                         val mutedMembers: Vector<String> = Vector())
 
 class PermissionRoles(val moderatorRoles: Array<String> = arrayOf("moderator"),
                            val adminRoles: Array<String> = arrayOf("admin"),
