@@ -4,6 +4,7 @@ import me.aberrantfox.aegeus.commandframework.ArgumentType
 import me.aberrantfox.aegeus.commandframework.Command
 import me.aberrantfox.aegeus.services.Configuration
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent
+import java.util.*
 
 
 @Command(ArgumentType.INTEGER)
@@ -32,5 +33,26 @@ fun ignore(event: GuildMessageReceivedEvent, args: List<Any>, config: Configurat
         config.ignoredChannels.add(target)
         event.channel.sendMessage("I will no longer accept commands from #$target.").queue()
     }
+}
 
+@Command(ArgumentType.INTEGER, ArgumentType.STRING)
+fun mute(event: GuildMessageReceivedEvent, args: List<Any>, config: Configuration) {
+    val minutes = args[0] as Int
+    val target = args[1] as String
+    val targetID = event.message.mentionedUsers.map { it.id }.first()
+    val time = minutes.toLong() * 1000 * 60
+
+    config.mutedMembers.add(targetID)
+    event.channel.sendMessage("$target is now muted for $minutes minutes").queue()
+
+    println(targetID)
+
+    val timer = Timer()
+    timer.schedule(object: TimerTask() {
+        override fun run() {
+            config.mutedMembers.remove(targetID)
+            event.channel.sendMessage("$target - you have been unmuted. Please respect our rules to prevent" +
+                    " further infractions.").queue()
+        }
+    }, time)
 }
