@@ -81,7 +81,8 @@ val startTime = Date()
 }
 
 @Command fun uptime(event: GuildMessageReceivedEvent) {
-    val minutes = Date().time - startTime.time / 1000 / 60
+    val uptime = Date().time - startTime.time
+    val minutes = uptime / 1000 / 60
     val currentDate = startTime.toString()
 
     event.channel.sendMessage("I've been awake since ${currentDate}, so like... ${minutes} minutes").queue()
