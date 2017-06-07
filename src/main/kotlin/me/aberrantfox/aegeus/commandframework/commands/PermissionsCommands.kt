@@ -7,7 +7,7 @@ import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent
 @Command(ArgumentType.STRING, ArgumentType.STRING)
 fun setPerm(event: GuildMessageReceivedEvent, args: List<Any>, config: Configuration) {
     val commandName = args[0] as String
-    val desiredPermission = args[1] as String
+    val desiredPermission = (args[1] as String).toUpperCase()
     
     if( !(config.commandPermissionMap.contains(commandName)) ) {
         event.channel.sendMessage("Dunno what the command: $commandName is - run the help command?").queue()
