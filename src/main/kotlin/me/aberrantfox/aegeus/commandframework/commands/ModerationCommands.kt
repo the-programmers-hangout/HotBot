@@ -26,12 +26,12 @@ fun nuke(event: GuildMessageReceivedEvent, args: List<Any>) {
 fun ignore(event: GuildMessageReceivedEvent, args: List<Any>, config: Configuration) {
     val target = args[0] as String
 
-    if(config.ignoredChannels.contains(target)) {
-        config.ignoredChannels.remove(target)
-        event.channel.sendMessage("Now accepting commands in #$target again.").queue()
+    if(config.ignoredIDs.contains(target)) {
+        config.ignoredIDs.remove(target)
+        event.channel.sendMessage("Unignored $target").queue()
     } else {
-        config.ignoredChannels.add(target)
-        event.channel.sendMessage("I will no longer accept commands from #$target.").queue()
+        config.ignoredIDs.add(target)
+        event.channel.sendMessage("$target? Who? What? Don't know what that is. ;)").queue()
     }
 }
 
@@ -55,4 +55,10 @@ fun mute(event: GuildMessageReceivedEvent, args: List<Any>, config: Configuratio
                     " further infractions.").queue()
         }
     }, time)
+}
+
+@Command
+fun lockdown(event: GuildMessageReceivedEvent, args: List<Any>, config: Configuration) {
+    config.lockDownMode = !config.lockDownMode
+    event.channel.sendMessage("Lockdown mode is now set to: ${config.lockDownMode}.").queue()
 }

@@ -25,59 +25,81 @@ val startTime = Date()
             .setFooter("Bot by Fox, made with Kotlin", "http://i.imgur.com/SJPggeJ.png")
             .setThumbnail("http://i.imgur.com/DFoaG7k.png")
             .setTimestamp(now())
+            .addField("${config.prefix}Help",
+                    "Displays a help menu",
+                    false)
+            .addField("${config.prefix}Ping",
+                    "Check if the bot is alive",
+                    false)
+            .addField("${config.prefix}Exit",
+                    "Gracefully shut down the bot, saving configurations",
+                    false)
+            .addField("${config.prefix}Kill",
+                    "Forcefully stop the bot, doesn't save configurations",
+                    false)
+            .addField("${config.prefix}ListCommands",
+                    "List all currently registerd commands",
+                    false)
+            .addField("${config.prefix}SetPerm {Command Name} {Guest|Moderator|Admin|Owner}",
+                    "Set the permission of a particular command",
+                    false)
+            .addField("${config.prefix}GetPerm {Command Name}",
+                    "List the permission of a particular command",
+                    false)
+            .addField("${config.prefix}Uptime",
+                    "Display how long the bot has been online",
+                    false)
+            .addField("${config.prefix}Nuke {amount}",
+                    "Delete the last X messages. Note, amount must be greater than 0",
+                    false)
+            .addField("${config.prefix}Ball [Your question here]",
+                    "Ask the 8ball api a question.",
+                    false)
+            .addField("${config.prefix}Flip",
+                    "Flip a coin",
+                    false)
+            .addField("${config.prefix}Ignore {channel-name}",
+                    "Force the bot to ignore commands from a particular channel",
+                    false)
+            .addField("${config.prefix}Cat",
+                    "Display a picture of a kat",
+                    false)
+            .addField("${config.prefix}ListMacros",
+                    "List all available macro commands",
+                    false)
+            .addField("${config.prefix}AddMacro {macro name} [response]",
+                    "Add a macro which can be invoked using \$macroname",
+                    false)
+            .addField("${config.prefix}Serverinfo",
+                    "Display server stats",
+                    false)
+            .addField("${config.prefix}SaveConfigurations",
+                    "Save any configuration changes immediately",
+                    false)
+            .addField("${config.prefix}ListAvailableCommands",
+                    "List these commands",
+                    false)
+            .addField("${config.prefix}Listavailable",
+                    "List what commands are available to you.",
+                    false)
+            .addField("${config.prefix}Listperms",
+                    "List the permisison levels.",
+                    false)
+            .addField("${config.prefix}ListCommandPerms",
+                    "Display a mapping of commands to respective permissions",
+                    false)
+            .addField("${config.prefix}SendInfoMessage",
+                    "Display the bot info",
+                    false)
+            .addField("${config.prefix}Lockdown",
+                    "Only runnable by server owner, forces me to ignore all other inputs until re-triggered.",
+                    false)
 
-    builder.addField("${config.prefix}Help",
-            "Displays a help menu",
-            false)
+    event.author.openPrivateChannel().queue {
+        it.sendMessage(builder.build()).queue()
+    }
 
-    builder.addField("${config.prefix}Ping",
-            "Check if the bot is alive",
-            false)
-
-    builder.addField("${config.prefix}Exit",
-            "Gracefully shut down the bot, saving configurations",
-            false)
-
-    builder.addField("${config.prefix}Kill",
-            "Forcefully stop the bot, doesn't save configurations",
-            false)
-
-    builder.addField("${config.prefix}ListCommands",
-            "List all currently registerd commands",
-            false)
-
-    builder.addField("${config.prefix}SetPerm {Command Name} {Guest|Moderator|Admin|Owner}",
-            "Set the permission of a particular command",
-            false)
-
-    builder.addField("${config.prefix}GetPerm {Command Name}",
-            "List the permission of a particular command",
-            false)
-
-    builder.addField("${config.prefix}Uptime",
-            "Display how long the bot has been online",
-            false)
-
-    builder.addField("${config.prefix}Nuke {amount}",
-            "Delete the last X messages. Note, amount must be greater than 0",
-            false)
-
-    builder.addField("${config.prefix}Ball [Your question here]",
-            "Ask the 8ball api a question.",
-            false)
-
-    builder.addField("${config.prefix}Flip",
-            "Flip a coin",
-            false)
-
-    builder.addField("${config.prefix}Ignore {channel-name}",
-            "Force the bot to ignore commands from a particular channel",
-            false)
-
-    builder.addField("${config.prefix}Cat",
-            "Display a picture of a kat",
-            false)
-    event.channel.sendMessage(builder.build()).queue()
+    event.message.delete().queue()
 }
 
 @Command
@@ -90,8 +112,10 @@ fun serverinfo(event: GuildMessageReceivedEvent) {
             .setFooter("Guild creation date: ${event.guild.creationTime}", "http://i.imgur.com/iwwEprG.png")
             .setThumbnail("http://i.imgur.com/DFoaG7k.png")
 
-    builder.addField("Users","${event.guild.members.filter {
-        m -> m.onlineStatus != OnlineStatus.OFFLINE }.size
+    builder.addField("Users", "${event.guild.members.filter {
+        m ->
+        m.onlineStatus != OnlineStatus.OFFLINE
+    }.size
     }/${event.guild.members.size}", true)
     builder.addField("Total Roles", "${event.guild.roles.size}", true)
     builder.addField("Owner", "${event.guild.owner.effectiveName}", true)

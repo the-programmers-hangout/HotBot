@@ -14,9 +14,11 @@ data class CommandListener(val config: Configuration,
                            val commandMap: Map<String, Method>): ListenerAdapter() {
 
     override fun onGuildMessageReceived(event: GuildMessageReceivedEvent) {
+        if(config.lockDownMode && event.author.id != config.ownerID) return
+
         if( !(event.message.rawContent.startsWith(config.prefix)) ) return
 
-        if(config.ignoredChannels.contains(event.channel.id)) return
+        if(config.ignoredIDs.contains(event.channel.id) || config.ignoredIDs.contains(event.author.id)) return
 
         if(event.author.isBot) return
 

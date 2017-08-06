@@ -15,10 +15,10 @@ data class Configuration(val token: String = "insert-token",
                          val leaveMessage: String = "%name% left... :wave: ... noob",
                          val welcomeChannel: String = "insert-id",
                          val leaveChannel: String = "insert-id",
-                         val lockDownMode: Boolean = false,
+                         var lockDownMode: Boolean = false,
                          val commandPermissionMap: MutableMap<String, Permission> = HashMap(),
                          val rolePermissions: PermissionRoles = PermissionRoles(),
-                         val ignoredChannels: MutableSet<String> = mutableSetOf(),
+                         val ignoredIDs: MutableSet<String> = mutableSetOf(),
                          val mutedMembers: Vector<String> = Vector(),
                          val ignoredMembers: Vector<String> = Vector())
 
