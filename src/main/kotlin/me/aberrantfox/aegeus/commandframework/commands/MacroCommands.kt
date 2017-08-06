@@ -2,14 +2,13 @@ package me.aberrantfox.aegeus.commandframework.commands
 
 import com.google.common.reflect.TypeToken
 import com.google.gson.Gson
-import com.google.gson.GsonBuilder
 import me.aberrantfox.aegeus.commandframework.ArgumentType
 import me.aberrantfox.aegeus.commandframework.Command
 import me.aberrantfox.aegeus.services.Configuration
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent
 import java.io.File
 
-private val macroMap = loadMacroMap()
+val macroMap = loadMacroMap()
 private val mapLocation = "macros.json"
 
 @Command(ArgumentType.Manual)

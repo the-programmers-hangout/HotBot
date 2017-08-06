@@ -2,6 +2,7 @@ package me.aberrantfox.aegeus.listeners
 
 import me.aberrantfox.aegeus.services.Configuration
 import me.aberrantfox.aegeus.commandframework.Command
+import me.aberrantfox.aegeus.commandframework.commands.macroMap
 import me.aberrantfox.aegeus.commandframework.getCommandStruct
 import me.aberrantfox.aegeus.commandframework.getHighestPermissionLevel
 import me.aberrantfox.aegeus.commandframework.convertArguments
@@ -48,6 +49,9 @@ data class CommandListener(val config: Configuration,
                 3 -> method.invoke(null, event, convertedArguments, config)
             }
 
+            return
+        } else if (macroMap.containsKey(commandName)) {
+            event.channel.sendMessage(macroMap[commandName]).queue()
             return
         }
 
