@@ -3,6 +3,7 @@ package me.aberrantfox.aegeus
 import me.aberrantfox.aegeus.services.loadConfig
 import me.aberrantfox.aegeus.commandframework.produceCommandMap
 import me.aberrantfox.aegeus.listeners.CommandListener
+import me.aberrantfox.aegeus.listeners.MemberListener
 import me.aberrantfox.aegeus.listeners.MuteListener
 import net.dv8tion.jda.core.AccountType
 import net.dv8tion.jda.core.JDABuilder
@@ -24,4 +25,5 @@ fun main(args: Array<String>) {
     val jda  = JDABuilder(AccountType.BOT).setToken(config.token).buildBlocking()
     jda.addEventListener(CommandListener(config, commandMap))
     jda.addEventListener(MuteListener(config))
+    jda.addEventListener(MemberListener(config))
 }

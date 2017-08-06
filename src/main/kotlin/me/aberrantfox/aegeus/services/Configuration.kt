@@ -12,11 +12,15 @@ data class Configuration(val token: String = "insert-token",
                          val ownerID: String = "insert-id",
                          val prefix: String = "insert-prefix",
                          val welcomeMessage: String = "Welcome to %servername%, %name%! Be sure to check",
+                         val leaveMessage: String = "%name% left... :wave: ... noob",
+                         val welcomeChannel: String = "insert-id",
+                         val leaveChannel: String = "insert-id",
                          val lockDownMode: Boolean = false,
                          val commandPermissionMap: MutableMap<String, Permission> = HashMap(),
                          val rolePermissions: PermissionRoles = PermissionRoles(),
                          val ignoredChannels: MutableSet<String> = mutableSetOf(),
-                         val mutedMembers: Vector<String> = Vector())
+                         val mutedMembers: Vector<String> = Vector(),
+                         val ignoredMembers: Vector<String> = Vector())
 
 class PermissionRoles(val moderatorRoles: Array<String> = arrayOf("moderator"),
                       val adminRoles: Array<String> = arrayOf("admin"),
@@ -25,8 +29,8 @@ class PermissionRoles(val moderatorRoles: Array<String> = arrayOf("moderator"),
 private val configLocation = "config.json"
 private val gson = Gson()
 
-fun loadConfig(commandMap: MutableMap<String, Method>, location: String = configLocation): Configuration? {
-    val configFile = File(location)
+fun loadConfig(commandMap: MutableMap<String, Method>): Configuration? {
+    val configFile = File(configLocation)
 
     if(!configFile.exists()) {
         val jsonData = gson.toJson(Configuration())
@@ -44,8 +48,8 @@ fun loadConfig(commandMap: MutableMap<String, Method>, location: String = config
     return configuration
 }
 
-fun saveConfig(config: Configuration, location: String = configLocation) {
-    val file = File(location)
+fun saveConfig(config: Configuration) {
+    val file = File(configLocation)
     val json = gson.toJson(config)
 
     file.delete()

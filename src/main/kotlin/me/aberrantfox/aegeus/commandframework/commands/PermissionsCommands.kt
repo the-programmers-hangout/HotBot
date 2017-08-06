@@ -3,6 +3,7 @@ package me.aberrantfox.aegeus.commandframework.commands
 import me.aberrantfox.aegeus.services.Configuration
 import me.aberrantfox.aegeus.commandframework.*
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent
+import java.util.*
 
 @Command(ArgumentType.String, ArgumentType.String)
 fun setPerm(event: GuildMessageReceivedEvent, args: List<Any>, config: Configuration) {
@@ -22,6 +23,7 @@ fun setPerm(event: GuildMessageReceivedEvent, args: List<Any>, config: Configura
     }
 
     config.commandPermissionMap[commandName] = permission
+    event.channel.sendMessage("Permission of $commandName is now $permission").queue()
 }
 
 @Command(ArgumentType.String)
@@ -43,4 +45,27 @@ fun listCommands(event: GuildMessageReceivedEvent, args: List<Any>, config: Conf
 
     val message = messageBuilder.substring(0, messageBuilder.length -  2)
     event.channel.sendMessage("Currently there are the following commands: $message.").queue()
+}
+
+@Command
+fun listAvailable(event: GuildMessageReceivedEvent, args: List<Any>, config: Configuration) {
+    val permLevel = getHighestPermissionLevel(event.member.roles, config)
+    val available = config.commandPermissionMap.filter { it.value <= permLevel }.keys.reduce { acc, s -> "$acc, $s" }
+
+    event.channel.sendMessage("Commands available to you based on your permission level($permLevel): $available.").queue()
+}
+
+
+@Command
+fun listPerms(event: GuildMessageReceivedEvent) {
+    event.channel.sendMessage(Permission.values().map { it.name }.reduceRight{
+        acc, s -> "$acc, $s"
+    } + ".").queue()
+}
+
+@Command
+fun listCommandPerms(event: GuildMessageReceivedEvent, args: List<Any>, config: Configuration) {
+    val joiner = StringJoiner("\n")
+    config.commandPermissionMap.entries.forEach { joiner.add("${it.key} :: ${it.value}") }
+    event.channel.sendMessage(joiner.toString()).queue()
 }
