@@ -7,7 +7,7 @@ import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent
 import java.util.*
 
 
-@Command(ArgumentType.INTEGER)
+@Command(ArgumentType.Integer)
 fun nuke(event: GuildMessageReceivedEvent, args: List<Any>) {
     val amount = args[0] as Int
 
@@ -22,7 +22,7 @@ fun nuke(event: GuildMessageReceivedEvent, args: List<Any>) {
     })
 }
 
-@Command(ArgumentType.STRING)
+@Command(ArgumentType.String)
 fun ignore(event: GuildMessageReceivedEvent, args: List<Any>, config: Configuration) {
     val target = args[0] as String
 
@@ -35,7 +35,7 @@ fun ignore(event: GuildMessageReceivedEvent, args: List<Any>, config: Configurat
     }
 }
 
-@Command(ArgumentType.INTEGER, ArgumentType.STRING)
+@Command(ArgumentType.Integer, ArgumentType.String)
 fun mute(event: GuildMessageReceivedEvent, args: List<Any>, config: Configuration) {
     val minutes = args[0] as Int
     val target = args[1] as String

@@ -12,7 +12,7 @@ fun cat(event: GuildMessageReceivedEvent) {
     event.channel.sendMessage(json.getString("file")).queue()
 }
 
-@Command(ArgumentType.MANUAL)
+@Command(ArgumentType.Manual)
 fun ball(event: GuildMessageReceivedEvent) {
     val json = get("https://8ball.delegator.com/magic/JSON/abc").jsonObject
     event.channel.sendMessage(json.getJSONObject("magic").getString("answer")).queue()

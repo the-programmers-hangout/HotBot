@@ -4,7 +4,7 @@ import me.aberrantfox.aegeus.services.Configuration
 import me.aberrantfox.aegeus.commandframework.*
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent
 
-@Command(ArgumentType.STRING, ArgumentType.STRING)
+@Command(ArgumentType.String, ArgumentType.String)
 fun setPerm(event: GuildMessageReceivedEvent, args: List<Any>, config: Configuration) {
     val commandName = args[0] as String
     val desiredPermission = (args[1] as String).toUpperCase()
@@ -24,7 +24,7 @@ fun setPerm(event: GuildMessageReceivedEvent, args: List<Any>, config: Configura
     config.commandPermissionMap[commandName] = permission
 }
 
-@Command(ArgumentType.STRING)
+@Command(ArgumentType.String)
 fun getPerm(event: GuildMessageReceivedEvent, args: List<Any>, config: Configuration) {
     val commandName = args[0] as String
 

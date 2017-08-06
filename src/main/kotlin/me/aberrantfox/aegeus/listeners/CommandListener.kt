@@ -14,17 +14,11 @@ data class CommandListener(val config: Configuration,
                            val commandMap: Map<String, Method>): ListenerAdapter() {
 
     override fun onGuildMessageReceived(event: GuildMessageReceivedEvent) {
-        if( !(event.message.rawContent.startsWith(config.prefix)) ) {
-            return
-        }
+        if( !(event.message.rawContent.startsWith(config.prefix)) ) return
 
-        if(config.ignoredChannels.contains(event.channel.name)) {
-            return
-        }
+        if(config.ignoredChannels.contains(event.channel.id)) return
 
-        if(event.author.isBot) {
-            return
-        }
+        if(event.author.isBot) return
 
         val rawMessage = event.message.rawContent
         val (commandName, actualArgs) = getCommandStruct(rawMessage, config)
@@ -36,14 +30,14 @@ data class CommandListener(val config: Configuration,
             val annotation = method.getAnnotation(Command::class.java)
 
             if(userPermissionLevel < commandPermissionLevel) {
-                event.channel.sendMessage(":wrong_again_idiot: Do you really think I would let you do that").queue()
+                event.channel.sendMessage(":unamused: Do you really think I would let you do that").queue()
                 return
             }
 
             val convertedArguments = convertArguments(actualArgs, annotation.expectedArgs)
 
             if( convertedArguments == null ) {
-                event.channel.sendMessage(":wrong_again_idiot: Yea, you'll need to learn how to use that properly.").queue()
+                event.channel.sendMessage(":unamused: Yea, you'll need to learn how to use that properly.").queue()
                 return
             }
 
@@ -54,9 +48,9 @@ data class CommandListener(val config: Configuration,
                 3 -> method.invoke(null, event, convertedArguments, config)
             }
 
-        } else {
-            event.channel.sendMessage(":wrong_again_idiot: I don't know what that command is").queue()
+            return
         }
 
+        event.channel.sendMessage(":unamused: I don't know what that command is").queue()
     }
 }

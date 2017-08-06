@@ -9,14 +9,14 @@ class ArgumentConversionTests {
 
     @Test fun incorrectLengthsShouldReturnNull() {
         val actual = listOf("2", "2.22", "abc", "true")
-        val expected = arrayOf(ArgumentType.INTEGER, ArgumentType.DOUBLE, ArgumentType.STRING)
+        val expected = arrayOf(ArgumentType.Integer, ArgumentType.Double, ArgumentType.String)
 
         assertNull(convertArguments(actual, expected))
     }
 
     @Test fun integerShouldParseToInt() {
         val actual = listOf("1")
-        val expected = arrayOf(ArgumentType.INTEGER)
+        val expected = arrayOf(ArgumentType.Integer)
 
         val converted = convertArguments(actual, expected)
 
@@ -30,7 +30,7 @@ class ArgumentConversionTests {
 
     @Test fun doubleShouldParseToDouble() {
         val actual = listOf("1")
-        val expected = arrayOf(ArgumentType.DOUBLE)
+        val expected = arrayOf(ArgumentType.Double)
 
         val converted = convertArguments(actual, expected)
 
@@ -44,7 +44,7 @@ class ArgumentConversionTests {
 
     @Test fun booleanOfAllStylesShouldParseToBooleanCorrectly() {
         val actual = listOf("t", "true", "f", "false")
-        val expected = arrayOf(ArgumentType.BOOLEAN, ArgumentType.BOOLEAN, ArgumentType.BOOLEAN, ArgumentType.BOOLEAN)
+        val expected = arrayOf(ArgumentType.Boolean, ArgumentType.Boolean, ArgumentType.Boolean, ArgumentType.Boolean)
         val converted = convertArguments(actual, expected)
 
         if(converted == null) {
@@ -68,7 +68,7 @@ class ArgumentConversionTests {
 
     @Test fun stringShouldParseToString() {
         val actual = listOf("abc", "1", "1.23", "false")
-        val expected = arrayOf(ArgumentType.STRING, ArgumentType.STRING, ArgumentType.STRING, ArgumentType.STRING)
+        val expected = arrayOf(ArgumentType.String, ArgumentType.String, ArgumentType.String, ArgumentType.String)
 
         val converted = convertArguments(actual, expected)
 
@@ -79,7 +79,7 @@ class ArgumentConversionTests {
 
     @Test fun manualShouldBeIgnored() {
         val actual = listOf("1", "abc", "123")
-        var expected = arrayOf(ArgumentType.MANUAL)
+        var expected = arrayOf(ArgumentType.Manual)
 
         val converted = convertArguments(actual, expected)
 

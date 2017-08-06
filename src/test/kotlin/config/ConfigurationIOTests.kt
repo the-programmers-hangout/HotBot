@@ -1,6 +1,6 @@
 package config
 
-import me.aberrantfox.aegeus.services.produceConfigOrFail
+import me.aberrantfox.aegeus.services.loadConfig
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
@@ -20,23 +20,25 @@ class ConfigurationIOTests {
         sleep(100)
     }
 
-    @Test fun configShouldBeCreatedIfNotExists() {
+    @Test
+    fun configShouldBeCreatedIfNotExists() {
         val mockMap = mutableMapOf("test" to dummyMethod)
-        val config = produceConfigOrFail(mockMap, fileLocation)
+        val config = loadConfig(mockMap, fileLocation)
 
         assertNull(config)
     }
 
-    @Test fun configShouldNotBeNullAfterCreation() {
+    @Test
+    fun configShouldNotBeNullAfterCreation() {
         val mockMap = mutableMapOf("test" to dummyMethod)
-        val config = produceConfigOrFail(mockMap, fileLocation)
+        val config = loadConfig(mockMap, fileLocation)
 
         if(config != null) {
             fail("Config did not exist, but returned a non-null value")
             return
         }
 
-        val actualConfig = produceConfigOrFail(mockMap, fileLocation)
+        val actualConfig = loadConfig(mockMap, fileLocation)
         assertNotNull(actualConfig)
     }
 }

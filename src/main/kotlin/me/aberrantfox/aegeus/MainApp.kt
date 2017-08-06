@@ -1,6 +1,6 @@
 package me.aberrantfox.aegeus
 
-import me.aberrantfox.aegeus.services.produceConfigOrFail
+import me.aberrantfox.aegeus.services.loadConfig
 import me.aberrantfox.aegeus.commandframework.produceCommandMap
 import me.aberrantfox.aegeus.listeners.CommandListener
 import me.aberrantfox.aegeus.listeners.MuteListener
@@ -12,11 +12,11 @@ fun main(args: Array<String>) {
     println("Starting to load Aegeus bot.")
 
     val commandMap = produceCommandMap()
-    val config = produceConfigOrFail(commandMap)
+    val config = loadConfig(commandMap)
 
     if(config == null) {
-        println("The default configuration has been generated." +
-                " Please fill in this configuration in order to use the bot.")
+        println("""The default configuration has been generated."
+                   Please fill in this configuration in order to use the bot.""")
         System.exit(0)
         return
     }

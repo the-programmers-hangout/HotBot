@@ -1,11 +1,9 @@
 package me.aberrantfox.aegeus.commandframework.commands
 
 import me.aberrantfox.aegeus.services.Configuration
-import me.aberrantfox.aegeus.services.saveConfigurationFile
-import me.aberrantfox.aegeus.commandframework.ArgumentType
+import me.aberrantfox.aegeus.services.saveConfig
 import me.aberrantfox.aegeus.commandframework.Command
 import net.dv8tion.jda.core.EmbedBuilder
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent
 import java.awt.Color
 import java.time.LocalDateTime.now
@@ -80,7 +78,8 @@ val startTime = Date()
     event.channel.sendMessage(builder.build()).queue()
 }
 
-@Command fun uptime(event: GuildMessageReceivedEvent) {
+@Command
+fun uptime(event: GuildMessageReceivedEvent) {
     val uptime = Date().time - startTime.time
     val minutes = uptime / 1000 / 60
     val currentDate = startTime.toString()
@@ -90,7 +89,7 @@ val startTime = Date()
 
 @Command
 fun exit(event: GuildMessageReceivedEvent, args: List<Any>, config: Configuration) {
-    saveConfigurationFile(config)
+    saveConfig(config)
     event.channel.sendMessage("Exiting").queue()
     System.exit(0)
 }
