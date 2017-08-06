@@ -2,3 +2,6 @@
 target/**
 Aegeus.iml
 config.json
+macros.json
+..gitignore.un~
+.gitignore~
