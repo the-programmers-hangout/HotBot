@@ -62,3 +62,12 @@ fun lockdown(event: GuildMessageReceivedEvent, args: List<Any>, config: Configur
     config.lockDownMode = !config.lockDownMode
     event.channel.sendMessage("Lockdown mode is now set to: ${config.lockDownMode}.").queue()
 }
+
+@Command(ArgumentType.String)
+fun prefix(event: GuildMessageReceivedEvent, args: List<Any>, config: Configuration) {
+    val newPrefix = args[0] as String
+    config.prefix = newPrefix
+    event.channel.sendMessage("Prefix is now $newPrefix. Please invoke commands using that prefix in the future. " +
+            "To save this configuration, use the saveconfigurations command.").queue()
+
+}
