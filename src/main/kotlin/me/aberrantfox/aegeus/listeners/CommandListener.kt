@@ -31,6 +31,12 @@ data class CommandListener(val config: Configuration,
             val commandPermissionLevel = config.commandPermissionMap[commandName] ?: return
             val annotation = method.getAnnotation(Command::class.java)
 
+            if(userPermissionLevel < config.mentionFilterLevel
+                    && (event.message.mentionsEveryone() || event.message.mentionedUsers.size > 0 || event.message.mentionedRoles.size > 0)) {
+                event.channel.sendMessage("Your permission level is below the required level to use a command mention.").queue()
+                return
+            }
+
             if(userPermissionLevel < commandPermissionLevel) {
                 event.channel.sendMessage(":unamused: Do you really think I would let you do that").queue()
                 return

@@ -2,6 +2,8 @@ package me.aberrantfox.aegeus.commandframework.commands
 
 import me.aberrantfox.aegeus.commandframework.ArgumentType
 import me.aberrantfox.aegeus.commandframework.Command
+import me.aberrantfox.aegeus.commandframework.Permission
+import me.aberrantfox.aegeus.commandframework.stringToPermission
 import me.aberrantfox.aegeus.services.Configuration
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent
 import java.util.*
@@ -69,5 +71,17 @@ fun prefix(event: GuildMessageReceivedEvent, args: List<Any>, config: Configurat
     config.prefix = newPrefix
     event.channel.sendMessage("Prefix is now $newPrefix. Please invoke commands using that prefix in the future. " +
             "To save this configuration, use the saveconfigurations command.").queue()
+}
 
+@Command(ArgumentType.String)
+fun setFilter(event: GuildMessageReceivedEvent, args: List<Any>, config: Configuration) {
+    val desiredLevel = stringToPermission((args[0] as String).toUpperCase())
+
+    if (desiredLevel == null) {
+        event.channel.sendMessage("Don't know that permission level boss... ").queue()
+        return
+    }
+
+    config.mentionFilterLevel = desiredLevel
+    event.channel.sendMessage("Permission level now set to: ${desiredLevel.name} ; be sure to save configurations.").queue()
 }
