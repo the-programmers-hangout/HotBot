@@ -12,7 +12,7 @@ class InviteListener(val config: Configuration) : ListenerAdapter() {
         if(event.message.rawContent.matches(Regex("(.|\n)*(https://discord.gg/)+(.|\n)*"))) {
             event.message.delete().queue()
             event.guild.textChannels.findLast { it.id == config.leaveChannel }
-                    ?.sendMessage("Deleted message: ${event.message.rawContent}")
+                    ?.sendMessage("Deleted message: ${event.message.rawContent} by ${event.author.asMention}")
                     ?.queue()
         }
     }
