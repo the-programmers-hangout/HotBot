@@ -76,9 +76,6 @@ val startTime = Date()
             .addField("${config.prefix}SaveConfigurations",
                     "Save any configuration changes immediately",
                     false)
-            .addField("${config.prefix}ListAvailableCommands",
-                    "List these commands",
-                    false)
             .addField("${config.prefix}Listavailable",
                     "List what commands are available to you.",
                     false)

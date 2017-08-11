@@ -5,6 +5,8 @@ import me.aberrantfox.aegeus.commandframework.Command
 import me.aberrantfox.aegeus.commandframework.Permission
 import me.aberrantfox.aegeus.commandframework.stringToPermission
 import me.aberrantfox.aegeus.services.Configuration
+import net.dv8tion.jda.core.entities.Message
+import net.dv8tion.jda.core.entities.TextChannel
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent
 import java.util.*
 
@@ -13,7 +15,7 @@ import java.util.*
 fun nuke(event: GuildMessageReceivedEvent, args: List<Any>) {
     val amount = args[0] as Int
 
-    if(amount <= 0) {
+    if (amount <= 0) {
         event.channel.sendMessage("Yea, what exactly is the point in nuking nothing... ?").queue()
         return
     }
@@ -28,7 +30,7 @@ fun nuke(event: GuildMessageReceivedEvent, args: List<Any>) {
 fun ignore(event: GuildMessageReceivedEvent, args: List<Any>, config: Configuration) {
     val target = args[0] as String
 
-    if(config.ignoredIDs.contains(target)) {
+    if (config.ignoredIDs.contains(target)) {
         config.ignoredIDs.remove(target)
         event.channel.sendMessage("Unignored $target").queue()
     } else {
@@ -50,7 +52,7 @@ fun mute(event: GuildMessageReceivedEvent, args: List<Any>, config: Configuratio
     println(targetID)
 
     val timer = Timer()
-    timer.schedule(object: TimerTask() {
+    timer.schedule(object : TimerTask() {
         override fun run() {
             config.mutedMembers.remove(targetID)
             event.channel.sendMessage("$target - you have been unmuted. Please respect our rules to prevent" +
@@ -85,3 +87,56 @@ fun setFilter(event: GuildMessageReceivedEvent, args: List<Any>, config: Configu
     config.mentionFilterLevel = desiredLevel
     event.channel.sendMessage("Permission level now set to: ${desiredLevel.name} ; be sure to save configurations.").queue()
 }
+
+//move id,id,id,id amount, chan
+
+@Command(ArgumentType.String, ArgumentType.Integer, ArgumentType.String)
+fun move(event: GuildMessageReceivedEvent, args: List<Any>) {
+    val targets = getTargets((args[0] as String))
+    val searchSpace = args[1] as Int
+    val chan = args[2] as String
+
+    event.message.delete().queue()
+
+    if (searchSpace < 0) {
+        event.channel.sendMessage("... move what").queue()
+        return
+    }
+
+    if(searchSpace > 99) {
+        event.channel.sendMessage("Yea buddy, I'm not moving the entire channel into another, 99 messages or less").queue()
+        return
+    }
+
+    val channel = event.guild.textChannels.filter { it.id == chan }.first()
+
+    if (channel == null) {
+        event.channel.sendMessage("... to where?").queue()
+        return
+    }
+
+    event.channel.history.retrievePast(searchSpace + 1).queue {
+        handleResponse(it, channel, targets, event.channel)
+    }
+}
+
+private fun handleResponse(past: List<Message>, channel: TextChannel, targets: List<String>, error: TextChannel) {
+    val messages = past.subList(1, past.size).filter { targets.contains(it.author.id) }
+    if (messages.isEmpty()) {
+        error.sendMessage("No messages found").queue()
+        return
+    }
+
+    val response = messages
+            .map { "${it.author.asMention} said ${it.rawContent}" }
+            .reduce { a, b -> "$a\n$b" }
+
+    channel.sendMessage(response).queue{ messages.forEach { it.delete().queue() }}
+}
+
+private fun getTargets(msg: String): List<String> =
+        if (msg.contains(",")) {
+            msg.split(",")
+        } else {
+            listOf(msg)
+        }

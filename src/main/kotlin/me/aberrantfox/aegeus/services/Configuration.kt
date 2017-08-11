@@ -20,7 +20,6 @@ data class Configuration(val token: String = "insert-token",
                          val rolePermissions: PermissionRoles = PermissionRoles(),
                          val ignoredIDs: MutableSet<String> = mutableSetOf(),
                          val mutedMembers: Vector<String> = Vector(),
-                         val ignoredMembers: Vector<String> = Vector(),
                          var mentionFilterLevel: Permission = Permission.GUEST)
 
 class PermissionRoles(val moderatorRoles: Array<String> = arrayOf("moderator"),
