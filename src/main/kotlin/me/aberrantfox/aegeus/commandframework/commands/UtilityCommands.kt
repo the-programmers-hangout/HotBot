@@ -91,6 +91,9 @@ val startTime = Date()
             .addField("${config.prefix}Lockdown",
                     "Only runnable by server owner, forces me to ignore all other inputs until re-triggered.",
                     false)
+            .addField("${config.prefix}Move {id,id,id...} {searchSpace} {targetChannelId}",
+                    "Move any messages in the last searchSpace send by the specified ids messages to the target channel.",
+                    false)
 
     event.author.openPrivateChannel().queue {
         it.sendMessage(builder.build()).queue()
