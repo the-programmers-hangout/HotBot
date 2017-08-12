@@ -1,5 +1,11 @@
 package me.aberrantfox.aegeus.commandframework.util
 
+import java.security.SecureRandom
+
+fun randomInt(min: Int, max: Int): Int {
+    val random = SecureRandom()
+    return random.nextInt(max + 1 - min) + min
+}
 
 fun String.isInteger(): Boolean =
         try {
