@@ -3,8 +3,11 @@ package me.aberrantfox.aegeus
 import me.aberrantfox.aegeus.services.loadConfig
 import me.aberrantfox.aegeus.commandframework.produceCommandMap
 import me.aberrantfox.aegeus.listeners.*
+import me.aberrantfox.aegeus.services.setupDatabaseSchema
 import net.dv8tion.jda.core.AccountType
 import net.dv8tion.jda.core.JDABuilder
+import net.dv8tion.jda.core.OnlineStatus
+import net.dv8tion.jda.core.entities.Game
 
 
 fun main(args: Array<String>) {
@@ -20,6 +23,8 @@ fun main(args: Array<String>) {
         return
     }
 
+    setupDatabaseSchema(config)
+
     val jda  = JDABuilder(AccountType.BOT).setToken(config.token).buildBlocking()
     jda.addEventListener(
             CommandListener(config, commandMap),
@@ -27,4 +32,6 @@ fun main(args: Array<String>) {
             MemberListener(config),
             InviteListener(config),
             ResponseListener(config))
+
+    jda.presence.setPresence(OnlineStatus.ONLINE, Game.of("${config.prefix}help"))
 }
