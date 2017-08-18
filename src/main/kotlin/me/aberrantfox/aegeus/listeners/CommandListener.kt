@@ -42,7 +42,7 @@ data class CommandListener(val config: Configuration,
                 return
             }
 
-            val convertedArguments = convertArguments(actualArgs, annotation.expectedArgs)
+            val convertedArguments = convertArguments(actualArgs, annotation.expectedArgs, event.jda)
 
             if( convertedArguments == null ) {
                 event.channel.sendMessage(":unamused: Yea, you'll need to learn how to use that properly.").queue()
