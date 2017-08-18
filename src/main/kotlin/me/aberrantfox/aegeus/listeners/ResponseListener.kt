@@ -7,6 +7,7 @@ import net.dv8tion.jda.core.hooks.ListenerAdapter
 
 class ResponseListener(val config: Configuration) : ListenerAdapter() {
     override fun onGuildMessageReceived(event: GuildMessageReceivedEvent) {
+        if(event.author.isBot) return
         if(config.ignoredIDs.contains(event.channel.id)) return
 
         val content = event.message.rawContent

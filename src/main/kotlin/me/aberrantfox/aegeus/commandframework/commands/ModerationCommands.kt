@@ -5,6 +5,8 @@ import me.aberrantfox.aegeus.commandframework.Command
 import me.aberrantfox.aegeus.commandframework.Permission
 import me.aberrantfox.aegeus.commandframework.stringToPermission
 import me.aberrantfox.aegeus.services.Configuration
+import net.dv8tion.jda.core.OnlineStatus
+import net.dv8tion.jda.core.entities.Game
 import net.dv8tion.jda.core.entities.Message
 import net.dv8tion.jda.core.entities.TextChannel
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent
@@ -73,6 +75,7 @@ fun prefix(event: GuildMessageReceivedEvent, args: List<Any>, config: Configurat
     config.prefix = newPrefix
     event.channel.sendMessage("Prefix is now $newPrefix. Please invoke commands using that prefix in the future. " +
             "To save this configuration, use the saveconfigurations command.").queue()
+    event.jda.presence.setPresence(OnlineStatus.ONLINE, Game.of("${config.prefix}help"))
 }
 
 @Command(ArgumentType.String)
@@ -116,11 +119,12 @@ fun move(event: GuildMessageReceivedEvent, args: List<Any>) {
     }
 
     event.channel.history.retrievePast(searchSpace + 1).queue {
-        handleResponse(it, channel, targets, event.channel)
+        handleResponse(it, channel, targets, event.channel, event.author.asMention)
     }
 }
 
-private fun handleResponse(past: List<Message>, channel: TextChannel, targets: List<String>, error: TextChannel) {
+private fun handleResponse(past: List<Message>, channel: TextChannel, targets: List<String>, error: TextChannel,
+                           source: String) {
     val messages = past.subList(1, past.size).filter { targets.contains(it.author.id) }
     if (messages.isEmpty()) {
         error.sendMessage("No messages found").queue()
@@ -131,7 +135,8 @@ private fun handleResponse(past: List<Message>, channel: TextChannel, targets: L
             .map { "${it.author.asMention} said ${it.rawContent}" }
             .reduce { a, b -> "$a\n$b" }
 
-    channel.sendMessage(response).queue{ messages.forEach { it.delete().queue() }}
+    channel.sendMessage("==Messages moved from ${channel.name} to here by $source\n$response")
+            .queue{ messages.forEach { it.delete().queue() }}
 }
 
 private fun getTargets(msg: String): List<String> =

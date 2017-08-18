@@ -20,11 +20,14 @@ data class Configuration(val token: String = "insert-token",
                          val rolePermissions: PermissionRoles = PermissionRoles(),
                          val ignoredIDs: MutableSet<String> = mutableSetOf(),
                          val mutedMembers: Vector<String> = Vector(),
-                         var mentionFilterLevel: Permission = Permission.GUEST)
+                         var mentionFilterLevel: Permission = Permission.GUEST,
+                         val databaseCredentials: DatabaseCredentials = DatabaseCredentials())
 
 class PermissionRoles(val moderatorRoles: Array<String> = arrayOf("moderator"),
                       val adminRoles: Array<String> = arrayOf("admin"),
                       val ownerRole: String = "owner")
+
+data class DatabaseCredentials(val username: String = "db-user", val password: String = "db-password")
 
 private val configLocation = "config.json"
 private val gson = Gson()
