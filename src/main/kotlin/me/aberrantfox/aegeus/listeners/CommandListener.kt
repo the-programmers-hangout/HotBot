@@ -1,11 +1,8 @@
 package me.aberrantfox.aegeus.listeners
 
+import me.aberrantfox.aegeus.commandframework.*
 import me.aberrantfox.aegeus.services.Configuration
-import me.aberrantfox.aegeus.commandframework.Command
 import me.aberrantfox.aegeus.commandframework.commands.macroMap
-import me.aberrantfox.aegeus.commandframework.getCommandStruct
-import me.aberrantfox.aegeus.commandframework.getHighestPermissionLevel
-import me.aberrantfox.aegeus.commandframework.convertArguments
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent
 import net.dv8tion.jda.core.hooks.ListenerAdapter
 import java.lang.reflect.Method
@@ -41,6 +38,19 @@ data class CommandListener(val config: Configuration,
                 event.channel.sendMessage(":unamused: Do you really think I would let you do that").queue()
                 return
             }
+
+            if (annotation.expectedArgs.contains(ArgumentType.Joiner)) {
+                if(actualArgs.size < annotation.expectedArgs.size) {
+                    event.channel.sendMessage("You didn't enter the minimum amount of required arguments.").queue()
+                    return
+                }
+            } else {
+                if(actualArgs.size != annotation.expectedArgs.size) {
+                    event.channel.sendMessage("This command requires ${annotation.expectedArgs.size} arguments.").queue()
+                    return
+                }
+            }
+
 
             val convertedArguments = convertArguments(actualArgs, annotation.expectedArgs, event.jda)
 
