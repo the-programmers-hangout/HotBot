@@ -49,7 +49,7 @@ fun mute(event: GuildMessageReceivedEvent, args: List<Any>, config: Configuratio
     val reason = args[2] as String
     val guild = event.guild
 
-    muteMember(guild, user, time, reason, config)
+    muteMember(guild, user, time, reason, config, event.author)
 }
 
 @Command
