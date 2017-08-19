@@ -19,15 +19,21 @@ data class Configuration(val token: String = "insert-token",
                          val commandPermissionMap: MutableMap<String, Permission> = HashMap(),
                          val rolePermissions: PermissionRoles = PermissionRoles(),
                          val ignoredIDs: MutableSet<String> = mutableSetOf(),
-                         val mutedMembers: Vector<String> = Vector(),
+                         val mutedMembers: HashMap<String, Long> = HashMap(),
                          var mentionFilterLevel: Permission = Permission.GUEST,
-                         val databaseCredentials: DatabaseCredentials = DatabaseCredentials())
+                         val databaseCredentials: DatabaseCredentials = DatabaseCredentials(),
+                         val infractionActionMap: HashMap<Int, InfractionAction> = HashMap(),
+                         val mutedRole: String = "Muted")
 
-class PermissionRoles(val moderatorRoles: Array<String> = arrayOf("moderator"),
-                      val adminRoles: Array<String> = arrayOf("admin"),
-                      val ownerRole: String = "owner")
+class PermissionRoles(val moderatorRoles: Array<String> = arrayOf("Moderator"),
+                      val adminRoles: Array<String> = arrayOf("Admin"),
+                      val ownerRole: String = "Owner")
 
 data class DatabaseCredentials(val username: String = "db-user", val password: String = "db-password")
+
+enum class InfractionAction {
+    Warn, Mute, Kick, Ban
+}
 
 private val configLocation = "config.json"
 private val gson = Gson()
