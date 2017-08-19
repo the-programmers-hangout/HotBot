@@ -4,19 +4,19 @@ import me.aberrantfox.aegeus.commandframework.ArgumentType
 import me.aberrantfox.aegeus.commandframework.Command
 import me.aberrantfox.aegeus.commandframework.util.idToName
 import me.aberrantfox.aegeus.commandframework.util.idToUser
-import me.aberrantfox.aegeus.services.getHistory
-import me.aberrantfox.aegeus.services.insertInfraction
-import me.aberrantfox.aegeus.services.removeInfraction
+import me.aberrantfox.aegeus.services.*
 import net.dv8tion.jda.core.EmbedBuilder
+import net.dv8tion.jda.core.entities.User
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent
 import java.awt.Color
 
 
 @Command(ArgumentType.UserID, ArgumentType.Joiner)
-fun warn(event: GuildMessageReceivedEvent, args: List<Any>) = strike(event, listOf(args[0], 0, args[1]))
+fun warn(event: GuildMessageReceivedEvent, args: List<Any>, config: Configuration) =
+        strike(event, listOf(args[0], 0, args[1]), config)
 
 @Command(ArgumentType.UserID, ArgumentType.Integer, ArgumentType.Joiner)
-fun strike(event: GuildMessageReceivedEvent, args: List<Any>) {
+fun strike(event: GuildMessageReceivedEvent, args: List<Any>, config: Configuration) {
     val target = args[0] as String
     val strikeQuantity = args[1] as Int
     val reason = args[2] as String
@@ -38,12 +38,7 @@ fun strike(event: GuildMessageReceivedEvent, args: List<Any>) {
                 "with reason $reason.").queue()
     }
 
-    target.idToUser(event.jda).openPrivateChannel().queue {
-        it.sendMessage("${it.user.asMention}, you have been infracted. Infractions are formal warnings from staff members" +
-                " on TPH. The infraction you just received was a $strikeQuantity strike infraction," +
-                " and you received it for reason: **$reason** -- Please take a good read of the rules in order to avoid" +
-                " further infractions. Good day.").queue()
-    }
+    administerPunishment(config, target.idToUser(event.jda), strikeQuantity, reason, event)
 }
 
 @Command(ArgumentType.UserID)
@@ -72,4 +67,37 @@ fun removeStrike(event: GuildMessageReceivedEvent, args: List<Any>) {
     val amountRemoved = removeInfraction(strikeID)
 
     event.channel.sendMessage("Deleted $amountRemoved strike records.").queue()
+}
+
+private fun administerPunishment(config: Configuration, user: User, strikeQuantity: Int, reason: String,
+                                 event: GuildMessageReceivedEvent) {
+    user.openPrivateChannel().queue {
+        it.sendMessage("${it.user.asMention}, you have been infracted. Infractions are formal warnings from staff members" +
+                " on TPH. The infraction you just received was a $strikeQuantity strike infraction," +
+                " and you received it for reason: **$reason**").queue()
+
+        val punishmentAction = config.infractionActionMap[strikeQuantity]
+
+        it.sendMessage("The assigned punishment for this infraction is: $punishmentAction").queue()
+
+        when (config.infractionActionMap[strikeQuantity]) {
+            InfractionAction.Warn -> {
+                it.sendMessage("This is your warning - Do not break the rules again.").queue()
+            }
+            InfractionAction.Kick -> {
+                it.sendMessage("You may return via this: https://discord.gg/BQN6BYE - please be mindful of the rules next time.")
+                        .queue()
+                event.guild.controller.kick(user.id, reason).queue()
+            }
+            InfractionAction.Mute -> {
+                it.sendMessage("You have been muted. Please read the rules.").queue()
+
+            }
+            InfractionAction.Ban -> {
+                it.sendMessage("Well... that happened. There may be an appeal system in the future. But for now, you're" +
+                        "permanently banned. Sorry about that :) ").queue()
+                event.guild.controller.ban(user.id, 0, reason).queue()
+            }
+        }
+    }
 }
