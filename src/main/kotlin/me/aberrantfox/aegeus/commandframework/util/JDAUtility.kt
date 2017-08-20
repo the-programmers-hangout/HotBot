@@ -21,15 +21,20 @@ fun Long.convertToTimeString(): String {
     val hours = minutes / 60
     val days = hours / 24
 
-    return "$days:${hours % 24}:${minutes % 60}:${seconds % 60}"
+    return "$days days, ${hours % 24} hours, ${minutes % 60} minutes, ${seconds % 60} seconds"
 }
 
-fun muteMember(guild: Guild, user: User, time: Long, reason: String, config: Configuration) {
+fun muteMember(guild: Guild, user: User, time: Long, reason: String, config: Configuration, moderator: User) {
     guild.controller.addRolesToMember(guild.getMemberById(user.id), guild.getRolesByName(config.mutedRole, true)).queue()
+    val timeString = time.convertToTimeString()
 
     user.openPrivateChannel().queue {
-        it.sendMessage("You have been muted for ${time.convertToTimeString()} minutes, reason: $reason").queue()
+        it.sendMessage("You have been muted for $timeString, reason: $reason").queue()
         unmute(guild, user, config, time)
+    }
+
+    moderator.openPrivateChannel().queue {
+        it.sendMessage("User ${user.asMention} has been muted for $timeString.").queue()
     }
 }
 
