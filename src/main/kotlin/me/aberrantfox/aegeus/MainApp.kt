@@ -2,15 +2,19 @@ package me.aberrantfox.aegeus
 
 import me.aberrantfox.aegeus.services.loadConfig
 import me.aberrantfox.aegeus.commandframework.produceCommandMap
+import me.aberrantfox.aegeus.commandframework.util.MuteRecord
 import me.aberrantfox.aegeus.commandframework.util.hasRole
+import me.aberrantfox.aegeus.commandframework.util.timeToDifference
+import me.aberrantfox.aegeus.commandframework.util.unmute
 import me.aberrantfox.aegeus.listeners.*
+import me.aberrantfox.aegeus.services.Configuration
 import me.aberrantfox.aegeus.services.setupDatabaseSchema
-import net.dv8tion.jda.core.AccountType
-import net.dv8tion.jda.core.JDABuilder
-import net.dv8tion.jda.core.OnlineStatus
-import net.dv8tion.jda.core.Permission
+import net.dv8tion.jda.core.*
 import net.dv8tion.jda.core.entities.Game
 import net.dv8tion.jda.core.entities.Guild
+import net.dv8tion.jda.core.entities.User
+import org.joda.time.DateTime
+import java.util.*
 
 
 fun main(args: Array<String>) {
@@ -37,10 +41,12 @@ fun main(args: Array<String>) {
 
     jda.presence.setPresence(OnlineStatus.ONLINE, Game.of("${config.prefix}help"))
     jda.guilds.forEach { setupMutedRole(it, config.mutedRole) }
+
+    handleLTSMutes(config, jda)
 }
 
 private fun setupMutedRole(guild: Guild, roleName: String) {
-    if(!guild.hasRole(roleName)) {
+    if (!guild.hasRole(roleName)) {
         guild.controller.createRole().setName(roleName).queue {
             handleRole(guild, roleName)
         }
@@ -58,6 +64,16 @@ private fun handleRole(guild: Guild, roleName: String) {
             it.role.name.toLowerCase() == roleName
         }
 
-        if(!hasOverride) it.createPermissionOverride(role).setDeny(Permission.MESSAGE_WRITE).queue()
+        if (!hasOverride) it.createPermissionOverride(role).setDeny(Permission.MESSAGE_WRITE).queue()
+    }
+}
+
+private fun handleLTSMutes(config: Configuration, jda: JDA) {
+    config.mutedMembers.forEach {
+        val difference = timeToDifference(it.unmuteTime)
+        val guild = jda.getGuildById(it.guildId)
+        val user = guild.getMemberById(it.user)
+
+        unmute(guild, user.user, config, difference, it)
     }
 }

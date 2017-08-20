@@ -4,6 +4,7 @@ import com.github.salomonbrys.kotson.fromJson
 import com.google.common.collect.ConcurrentHashMultiset
 import com.google.gson.Gson
 import me.aberrantfox.aegeus.commandframework.Permission
+import me.aberrantfox.aegeus.commandframework.util.MuteRecord
 import java.io.File
 import java.lang.reflect.Method
 import java.util.*
@@ -19,7 +20,7 @@ data class Configuration(val token: String = "insert-token",
                          val commandPermissionMap: MutableMap<String, Permission> = HashMap(),
                          val rolePermissions: PermissionRoles = PermissionRoles(),
                          val ignoredIDs: MutableSet<String> = mutableSetOf(),
-                         val mutedMembers: HashMap<String, Long> = HashMap(),
+                         val mutedMembers: ArrayList<MuteRecord> = ArrayList(),
                          var mentionFilterLevel: Permission = Permission.GUEST,
                          val databaseCredentials: DatabaseCredentials = DatabaseCredentials(),
                          val infractionActionMap: HashMap<Int, InfractionAction> = HashMap(),

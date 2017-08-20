@@ -1,6 +1,22 @@
 package me.aberrantfox.aegeus.commandframework.util
 
+import org.joda.time.DateTime
 import java.security.SecureRandom
+
+fun futureTime(timeToAdd: Long): Long {
+    val now = DateTime.now()
+    return now.plus(timeToAdd).millis
+}
+
+fun millisToDateString(time: Long): String {
+    val time = DateTime(time)
+    return time.toString()
+}
+
+fun timeToDifference(time: Long): Long {
+    val now = DateTime.now()
+    return time - now.millis
+}
 
 fun randomInt(min: Int, max: Int): Int {
     val random = SecureRandom()
