@@ -23,7 +23,8 @@ data class Configuration(val token: String = "insert-token",
                          var mentionFilterLevel: Permission = Permission.GUEST,
                          val databaseCredentials: DatabaseCredentials = DatabaseCredentials(),
                          val infractionActionMap: HashMap<Int, InfractionAction> = HashMap(),
-                         val mutedRole: String = "Muted")
+                         val mutedRole: String = "Muted",
+                         val strikeCeil: Int = 3)
 
 class PermissionRoles(val moderatorRoles: Array<String> = arrayOf("Moderator"),
                       val adminRoles: Array<String> = arrayOf("Admin"),

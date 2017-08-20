@@ -43,6 +43,8 @@ fun removeInfraction(infractionID: Int): Int =
             amountDeleted
         }
 
+fun getMaxStrikes(userId: String) = getHistory(userId).map { it.strikes }.reduce{ a, b -> a + b }
+
 fun setupDatabaseSchema(config: Configuration) {
     Database.connect(
             url = "jdbc:mysql://localhost/hotbot?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC&nullNamePatternMatchesAll=true",
