@@ -10,7 +10,6 @@ import net.dv8tion.jda.core.EmbedBuilder
 import net.dv8tion.jda.core.entities.User
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent
 import java.awt.Color
-import java.util.*
 
 
 @Command(ArgumentType.UserID, ArgumentType.Joiner)
@@ -73,6 +72,14 @@ fun removeStrike(event: GuildMessageReceivedEvent, args: List<Any>) {
     val amountRemoved = removeInfraction(strikeID)
 
     event.channel.sendMessage("Deleted $amountRemoved strike records.").queue()
+}
+
+@Command(ArgumentType.UserID)
+fun cleanse(event: GuildMessageReceivedEvent, args: List<Any>) {
+    val userId = args[0] as String
+    val amount = removeAllInfractions(userId)
+
+    event.channel.sendMessage("Infractions for ${userId.idToUser(event.jda).asMention} have been wiped. Total removed: $amount").queue()
 }
 
 private fun administerPunishment(config: Configuration, user: User, strikeQuantity: Int, reason: String,

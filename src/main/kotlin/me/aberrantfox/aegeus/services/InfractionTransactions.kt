@@ -43,6 +43,15 @@ fun removeInfraction(infractionID: Int): Int =
             amountDeleted
         }
 
+fun removeAllInfractions(userId: String): Int =
+        transaction {
+            val amountDeleted = Strikes.deleteWhere {
+                Op.build { Strikes.member eq userId }
+            }
+
+            amountDeleted
+        }
+
 fun getMaxStrikes(userId: String) = getHistory(userId).map { it.strikes }.reduce{ a, b -> a + b }
 
 fun setupDatabaseSchema(config: Configuration) {
