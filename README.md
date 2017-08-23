@@ -3,31 +3,32 @@ This is a small, extensible bot which is design with kotlin, intended to run on 
 You may fork it and use it as you like. The focus of this project is learning. 
 
 ### Help information
-This is to come later, not sure if I want this to be built onto a webservice or simply to use embeds.
+Currently the help menu is in a very alpha state, it doesn't label all commands. Use $Help or $listavailable.
 
-### Contact 
-You can freely contact me about this bot through the server it is intended to be used on, here: 
-https://discord.gg/BQN6BYE
 
-### License
-MIT License
+### Roadmap
+##### Bot current Version
+1.0.0
 
-Copyright (c) 2017 AberrantFox
+##### Next release candidate
+1.1.0
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+##### New system changes
+Strike and Warn system, other minor changes
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+##### Future Release
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+ - 1.2 - Much improved help menu system
+ - 1.3 - $commend and $resource <tag> 
+ - 1.4 - Spam prevention and improved logging
+
+
+##### Unplanned but desired feature list
+
+ - $suggestion command for loggin suggestions
+ - improved welcome messages
+ - sentiment analysis (distant future, if at all)
+ - website integration
+ - security mode
+ - Log export
+ - Eval (Kotlin, Js, Java) (Admin only)
