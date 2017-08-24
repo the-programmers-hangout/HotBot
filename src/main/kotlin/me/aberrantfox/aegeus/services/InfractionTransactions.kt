@@ -3,6 +3,7 @@ package me.aberrantfox.aegeus.services
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.SchemaUtils.create
+import org.joda.time.DateTime
 
 fun insertInfraction(member: String, moderator: String, strikes: Int, reason: String) =
         transaction {
@@ -11,6 +12,7 @@ fun insertInfraction(member: String, moderator: String, strikes: Int, reason: St
                 it[Strikes.moderator] = moderator
                 it[Strikes.strikes] = strikes
                 it[Strikes.reason] = reason
+                it[Strikes.date] = DateTime.now()
             }
         }
 
@@ -28,7 +30,9 @@ fun getHistory(userId: String): List<StrikeRecord> =
                         it[Strikes.moderator],
                         it[Strikes.member],
                         it[Strikes.strikes],
-                        it[Strikes.reason]))
+                        it[Strikes.reason],
+                        it[Strikes.date],
+                        isExpired(it[Strikes.id])))
             }
 
             records
@@ -52,7 +56,17 @@ fun removeAllInfractions(userId: String): Int =
             amountDeleted
         }
 
-fun getMaxStrikes(userId: String) = getHistory(userId).map { it.strikes }.reduce{ a, b -> a + b }
+fun isExpired(infractionID: Int): Boolean =
+        transaction {
+            val rows = Strikes.select {
+                Op.build { Strikes.id eq infractionID }
+            }
+            val date = rows.first()[Strikes.date]
+
+            DateTime.now().isAfter(date.plusDays(30))
+        }
+
+fun getMaxStrikes(userId: String) = getHistory(userId).filter { !it.isExpired }.map { it.strikes }.reduce{ a, b -> a + b }
 
 fun setupDatabaseSchema(config: Configuration) {
     Database.connect(
@@ -68,7 +82,13 @@ fun setupDatabaseSchema(config: Configuration) {
     }
 }
 
-data class StrikeRecord(val id: Int, val moderator: String, val member: String, val strikes: Int, val reason: String)
+data class StrikeRecord(val id: Int,
+                        val moderator: String,
+                        val member: String,
+                        val strikes: Int,
+                        val reason: String,
+                        val dateTime: DateTime,
+                        val isExpired: Boolean)
 
 private object Strikes : Table() {
     val id = integer("id").autoIncrement().primaryKey()
@@ -76,4 +96,5 @@ private object Strikes : Table() {
     val member = varchar("member", 18)
     val strikes = integer("strikes")
     val reason = text("reason")
+    val date = date("date")
 }

@@ -2,13 +2,12 @@ package me.aberrantfox.aegeus.commandframework.commands
 
 import me.aberrantfox.aegeus.commandframework.ArgumentType
 import me.aberrantfox.aegeus.commandframework.Command
-import me.aberrantfox.aegeus.commandframework.util.idToName
-import me.aberrantfox.aegeus.commandframework.util.idToUser
-import me.aberrantfox.aegeus.commandframework.util.muteMember
+import me.aberrantfox.aegeus.commandframework.util.*
 import me.aberrantfox.aegeus.services.*
 import net.dv8tion.jda.core.EmbedBuilder
 import net.dv8tion.jda.core.entities.User
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent
+import org.joda.time.format.DateTimeFormat
 import java.awt.Color
 
 
@@ -59,7 +58,15 @@ fun history(event: GuildMessageReceivedEvent, args: List<Any>) {
         builder.addField("Strike ID: ${it.id}",
                 "**Acting moderator**: ${it.moderator.idToName(event.jda)}" +
                         "\n**Reason**: ${it.reason}" +
-                        "\n**Weight**: ${it.strikes}",
+                        "\n**Weight**: ${it.strikes}" +
+                        "\n**Date**: ${it.dateTime.toString(DateTimeFormat.forPattern("dd/MM/yyyy"))}," +
+                        "\n**Expired:** ${it.isExpired}",
+                false)
+    }
+
+    if(builder.fields.size == 0) {
+        builder.addField("Strikes",
+                "Clean as a whistle sir",
                 false)
     }
 
