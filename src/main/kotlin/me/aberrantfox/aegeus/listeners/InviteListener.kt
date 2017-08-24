@@ -29,11 +29,11 @@ class InviteListener(val config: Configuration) : ListenerAdapter() {
         if (message.rawContent.matches(Regex("(.|\n)*(https://discord.gg/)+(.|\n)*"))) {
             var messageContent = message.rawContent
 
-            if (messageContent.contains('@')) messageContent.replace("@", "`@`")
+            if (messageContent.contains('@')) messageContent = messageContent.replace("@", "`@`")
 
             message.delete().queue()
             guild.textChannels.findLast { it.id == config.leaveChannel }
-                    ?.sendMessage("Deleted message: ${message.rawContent} " +
+                    ?.sendMessage("Deleted message: $messageContent " +
                             "by ${author.asMention} " +
                             "in ${channel.asMention}")
                     ?.queue()
