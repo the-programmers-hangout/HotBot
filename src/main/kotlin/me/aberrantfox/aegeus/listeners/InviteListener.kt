@@ -1,28 +1,35 @@
 package me.aberrantfox.aegeus.listeners
 
 import me.aberrantfox.aegeus.services.Configuration
+import net.dv8tion.jda.core.entities.Guild
+import net.dv8tion.jda.core.entities.Message
+import net.dv8tion.jda.core.entities.TextChannel
+import net.dv8tion.jda.core.entities.User
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent
 import net.dv8tion.jda.core.events.message.guild.GuildMessageUpdateEvent
 import net.dv8tion.jda.core.hooks.ListenerAdapter
 
 
 class InviteListener(val config: Configuration) : ListenerAdapter() {
-    override fun onGuildMessageUpdate(event: GuildMessageUpdateEvent) = handlePossibleInviteMessage(event)
+    override fun onGuildMessageUpdate(event: GuildMessageUpdateEvent) =
+            handlePossibleInviteMessage(event.author, event.message, event.guild, event.channel)
 
-    override fun onGuildMessageReceived(event: GuildMessageReceivedEvent) = handlePossibleInviteMessage(event)
+    override fun onGuildMessageReceived(event: GuildMessageReceivedEvent) =
+            handlePossibleInviteMessage(event.author, event.message, event.guild, event.channel)
 
-    private fun handlePossibleInviteMessage(event: GuildMessageReceivedEvent) {
-        if(event.author.isBot) return
+    private fun handlePossibleInviteMessage(author: User, message: Message, guild: Guild, channel: TextChannel) {
+        if (author.isBot) return
 
-        if(event.message.rawContent.matches(Regex("(.|\n)*(https://discord.gg/)+(.|\n)*"))) {
+        if (message.rawContent.matches(Regex("(.|\n)*(https://discord.gg/)+(.|\n)*"))) {
+            var messageContent = message.rawContent
 
-            if(event.message.rawContent.contains('@'))
+            if (messageContent.contains('@')) messageContent.replace("@", "`@`")
 
-                event.message.delete().queue()
-            event.guild.textChannels.findLast { it.id == config.leaveChannel }
-                    ?.sendMessage("Deleted message: ${event.message.rawContent} " +
-                            "by ${event.author.asMention} " +
-                            "in ${event.channel.asMention}")
+            message.delete().queue()
+            guild.textChannels.findLast { it.id == config.leaveChannel }
+                    ?.sendMessage("Deleted message: ${message.rawContent} " +
+                            "by ${author.asMention} " +
+                            "in ${channel.asMention}")
                     ?.queue()
         }
     }
