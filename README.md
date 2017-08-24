@@ -18,9 +18,11 @@ Strike and Warn system, other minor changes
 
 ##### Future Release
 
- - 1.2 - Much improved help menu system
- - 1.3 - $commend and $resource <tag> 
- - 1.4 - Spam prevention and improved logging
+ - 1.2 - Spam prevention and improved logging
+ - 1.3 - Much improved help menu system
+ - 1.4 - $commend and $resource <tag>
+ - 1.5 - Ability to report other members privately
+ - 2.0 - Module integrations  
 
 
 ##### Unplanned but desired feature list
