@@ -36,7 +36,7 @@ fun convertArguments(actual: List<String>, expected: Array<out ArgumentType>, jd
             ArgumentType.Boolean -> returnVals.add(pair.first.toBooleanValue())
             ArgumentType.UserID -> returnVals.add(pair.first)
             ArgumentType.Joiner -> returnVals.add(joinArgs(index, actual))
-            else -> pair.first
+            else -> returnVals.add(pair.first)
         }
     }
 
