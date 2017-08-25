@@ -2,7 +2,6 @@ package me.aberrantfox.aegeus
 
 import me.aberrantfox.aegeus.services.loadConfig
 import me.aberrantfox.aegeus.commandframework.produceCommandMap
-import me.aberrantfox.aegeus.commandframework.util.MuteRecord
 import me.aberrantfox.aegeus.commandframework.util.hasRole
 import me.aberrantfox.aegeus.commandframework.util.timeToDifference
 import me.aberrantfox.aegeus.commandframework.util.unmute
@@ -12,9 +11,6 @@ import me.aberrantfox.aegeus.services.setupDatabaseSchema
 import net.dv8tion.jda.core.*
 import net.dv8tion.jda.core.entities.Game
 import net.dv8tion.jda.core.entities.Guild
-import net.dv8tion.jda.core.entities.User
-import org.joda.time.DateTime
-import java.util.*
 
 
 fun main(args: Array<String>) {

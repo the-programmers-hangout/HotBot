@@ -46,11 +46,12 @@ data class CommandListener(val config: Configuration,
                 }
             } else {
                 if(actualArgs.size != annotation.expectedArgs.size) {
-                    event.channel.sendMessage("This command requires ${annotation.expectedArgs.size} arguments.").queue()
-                    return
+                    if(!annotation.expectedArgs.contains(ArgumentType.Manual)) {
+                        event.channel.sendMessage("This command requires ${annotation.expectedArgs.size} arguments.").queue()
+                        return
+                    }
                 }
             }
-
 
             val convertedArguments = convertArguments(actualArgs, annotation.expectedArgs, event.jda)
 
