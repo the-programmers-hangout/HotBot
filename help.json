@@ -40,7 +40,7 @@
       "name": "nuke",
       "category": "moderation",
       "description": "Delete the last 1 - 99 messages in the chat.",
-      "structure:": "{amount}",  
+      "structure:": "{amount}",
       "example": "10"
     },
     {
