@@ -59,6 +59,11 @@ fun unmute(guild: Guild, user: User, config: Configuration, time: Long, muteReco
 }
 
 fun removeMuteRole(guild: Guild, user: User, config: Configuration, record: MuteRecord) {
+    if(user.mutualGuilds.isEmpty()) {
+        config.mutedMembers.remove(record)
+        return
+    }
+
     user.openPrivateChannel().queue {
         it.sendMessage("${user.name} - you have been unmuted. Please respect our rules to prevent" +
                 " further infractions.").queue {
