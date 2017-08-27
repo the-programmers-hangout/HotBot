@@ -8,26 +8,23 @@ Currently the help menu is in a very alpha state, it doesn't label all commands.
 
 ### Roadmap
 ##### Bot current Version
-1.0.0
+1.2.1
 
 ##### Next release candidate
-1.1.0
+1.3.0
 
 ##### New system changes
-Strike and Warn system, other minor changes
+Improved Help system
 
 ##### Future Release
 
- - 1.2 - Spam prevention and improved logging
- - 1.3 - Much improved help menu system
- - 1.4 - $commend and $resource <tag>
- - 1.5 - Ability to report other members privately
+ - 1.3 - $remember command
+ - 1.4 - $commend, $resource, and $suggest
  - 2.0 - Module integrations  
 
 
 ##### Unplanned but desired feature list
 
- - $suggestion command for loggin suggestions
  - improved welcome messages
  - sentiment analysis (distant future, if at all)
  - website integration
