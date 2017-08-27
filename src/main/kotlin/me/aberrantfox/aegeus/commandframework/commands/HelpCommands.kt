@@ -66,7 +66,7 @@ private fun buildCommandHelpMessage(config: Configuration, descriptor: CommandDe
 
 private fun buildCategoryDescription(name: String, commands: String) =
         EmbedBuilder().setTitle("Category $name Overview")
-                .setColor(Color.BLUE)
+                .setColor(Color.cyan)
                 .setDescription(HelpConf.configuration.categoryDescriptions[name])
                 .addField("Commands In this Category", commands, false)
                 .build()
