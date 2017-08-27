@@ -1,4 +1,12 @@
 {
+  "categoryDescriptions": {
+    "fun": "Fun commands, they have no real purpose other than to entertain. Enjoy :)",
+    "moderation": "These commands are specifically for disciplining members or providing corrective action.",
+    "macro": "Macro commands are useful for maintaining and displaying helpful messages.",
+    "utility": "Generally useful commands, this is a misc section.",
+    "infractions": "Used for distributing and maintaining strike-based infractions.",
+    "permissions": "Administrative functionality for setting command permissions."
+  },
   "commands":
   [
     {
