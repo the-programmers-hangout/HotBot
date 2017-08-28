@@ -37,3 +37,4 @@ Improved Help system
  - $disable command for helpers
  - $profile command
  - Automated distribution of active role
+ - add a $badname command
