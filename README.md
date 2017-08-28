@@ -31,3 +31,9 @@ Improved Help system
  - security mode
  - Log export
  - Eval (Kotlin, Js, Java) (Admin only)
+ - Replace #project-listings with a command for embeds
+ - Replace #server-support with several commands (a pool, then moved into a todo)
+ - Build a poll command ($poll question | Option1 | Option2 | Option3) (Reaction based)
+ - $disable command for helpers
+ - $profile command
+ - Automated distribution of active role
