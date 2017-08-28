@@ -28,8 +28,7 @@ fun serverinfo(event: GuildMessageReceivedEvent) {
     builder.addField("Users", "${event.guild.members.filter {
         m ->
         m.onlineStatus != OnlineStatus.OFFLINE
-    }.size
-    }/${event.guild.members.size}", true)
+    }.size}/${event.guild.members.size}", true)
     builder.addField("Total Roles", "${event.guild.roles.size}", true)
     builder.addField("Owner", "${event.guild.owner.effectiveName}", true)
     builder.addField("Region", "${event.guild.region}", true)
@@ -68,7 +67,7 @@ fun saveConfigurations(event: GuildMessageReceivedEvent, args: List<Any>, config
 }
 
 @Command(ArgumentType.Manual)
-fun sendInfoMessage(event: GuildMessageReceivedEvent, args: List<Any>) {
+fun info(event: GuildMessageReceivedEvent, args: List<Any>) {
     val builder = EmbedBuilder()
             .setDescription("I'm Hotbot, the superior Auto-Titan replacement!")
             .setAuthor("Fox", "https://github.com/AberrantFox", "https://avatars1.githubusercontent.com/u/22015832")
