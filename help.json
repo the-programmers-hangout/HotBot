@@ -213,9 +213,16 @@
       "example": ""
     },
     {
-      "name": "sendInfoMessage",
+      "name": "info",
       "category": "utility",
       "description": "Display some information about me",
+      "structure:": "",
+      "example": ""
+    },
+    {
+      "name": "dog",
+      "category": "fun",
+      "description": "Display a picture of a dog",
       "structure:": "",
       "example": ""
     }
