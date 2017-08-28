@@ -24,3 +24,8 @@ fun flip(event: GuildMessageReceivedEvent) {
     event.channel.sendMessage(message).queue()
 }
 
+@Command
+fun dog(event: GuildMessageReceivedEvent) {
+    val json = get("https://dog.ceo/api/breeds/image/random").jsonObject
+    event.channel.sendMessage(json.getString("message")).queue()
+}
