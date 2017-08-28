@@ -80,8 +80,6 @@ fun setFilter(event: GuildMessageReceivedEvent, args: List<Any>, config: Configu
     event.channel.sendMessage("Permission level now set to: ${desiredLevel.name} ; be sure to save configurations.").queue()
 }
 
-//move id,id,id,id amount, chan
-
 @Command(ArgumentType.String, ArgumentType.Integer, ArgumentType.String)
 fun move(event: GuildMessageReceivedEvent, args: List<Any>) {
     val targets = getTargets((args[0] as String))
