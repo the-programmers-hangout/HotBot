@@ -2,7 +2,9 @@ package me.aberrantfox.aegeus.commandframework.commands
 
 import me.aberrantfox.aegeus.services.Configuration
 import me.aberrantfox.aegeus.commandframework.*
+import net.dv8tion.jda.core.EmbedBuilder
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent
+import java.awt.Color
 import java.util.*
 
 @Command(ArgumentType.String, ArgumentType.String)
@@ -51,8 +53,15 @@ fun listCommands(event: GuildMessageReceivedEvent, args: List<Any>, config: Conf
 fun listAvailable(event: GuildMessageReceivedEvent, args: List<Any>, config: Configuration) {
     val permLevel = getHighestPermissionLevel(event.member.roles, config)
     val available = config.commandPermissionMap.filter { it.value <= permLevel }.keys.reduce { acc, s -> "$acc, $s" }
+    val response = EmbedBuilder()
+            .setTitle("Available Commands")
+            .setColor(Color.cyan)
+            .setDescription("Below you can find a list of commands that are available to based on your permission level," +
+                    " which is $permLevel - if you need help using any of them, simply type ${config.prefix}help <command>.")
+            .addField("Commands", available, false)
+            .build()
 
-    event.channel.sendMessage("Commands available to you based on your permission level($permLevel): $available.").queue()
+    event.channel.sendMessage(response).queue()
 }
 
 
