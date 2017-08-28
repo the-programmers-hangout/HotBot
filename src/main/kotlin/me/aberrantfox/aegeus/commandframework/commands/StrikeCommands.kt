@@ -43,6 +43,7 @@ fun strike(event: GuildMessageReceivedEvent, args: List<Any>, config: Configurat
     if(totalStrikes > config.strikeCeil) totalStrikes = config.strikeCeil
 
     administerPunishment(config, target.idToUser(event.jda), strikeQuantity, reason, event, event.author, totalStrikes)
+    event.message.delete().queue()
 }
 
 @Command(ArgumentType.UserID)
@@ -71,6 +72,7 @@ fun history(event: GuildMessageReceivedEvent, args: List<Any>) {
     }
 
     event.channel.sendMessage(builder.build()).queue()
+    event.message.delete().queue()
 }
 
 @Command(ArgumentType.Integer)
