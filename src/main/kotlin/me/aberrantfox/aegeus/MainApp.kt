@@ -70,6 +70,8 @@ private fun handleLTSMutes(config: Configuration, jda: JDA) {
         val guild = jda.getGuildById(it.guildId)
         val user = guild.getMemberById(it.user)
 
-        unmute(guild, user.user, config, difference, it)
+        if(user != null) {
+            unmute(guild, user.user, config, difference, it)
+        }
     }
 }
