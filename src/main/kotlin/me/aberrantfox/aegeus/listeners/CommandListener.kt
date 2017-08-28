@@ -11,13 +11,7 @@ data class CommandListener(val config: Configuration,
                            val commandMap: Map<String, Method>): ListenerAdapter() {
 
     override fun onGuildMessageReceived(event: GuildMessageReceivedEvent) {
-        if(config.lockDownMode && event.author.id != config.ownerID) return
-
-        if( !(event.message.rawContent.startsWith(config.prefix)) ) return
-
-        if(config.ignoredIDs.contains(event.channel.id) || config.ignoredIDs.contains(event.author.id)) return
-
-        if(event.author.isBot) return
+        if(!isUsableEvent(event)) return
 
         val rawMessage = event.message.rawContent
         val (commandName, actualArgs) = getCommandStruct(rawMessage, config)
@@ -75,4 +69,17 @@ data class CommandListener(val config: Configuration,
 
         event.channel.sendMessage(":unamused: I don't know what that command is").queue()
     }
+
+    private fun isUsableEvent(event: GuildMessageReceivedEvent): Boolean {
+        if(config.lockDownMode && event.author.id != config.ownerID) return false
+
+        if( !(event.message.rawContent.startsWith(config.prefix)) ) return false
+
+        if(config.ignoredIDs.contains(event.channel.id) || config.ignoredIDs.contains(event.author.id)) return false
+
+        if(event.author.isBot) return false
+
+        return true
+    }
 }
+
