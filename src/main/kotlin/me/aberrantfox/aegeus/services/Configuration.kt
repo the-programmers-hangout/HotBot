@@ -16,6 +16,7 @@ data class Configuration(val token: String = "insert-token",
                          val leaveMessage: String = "%name% left... :wave: ... noob",
                          val welcomeChannel: String = "insert-id",
                          val leaveChannel: String = "insert-id",
+                         val suggestionChannel: String = "insert-id",
                          var lockDownMode: Boolean = false,
                          val commandPermissionMap: MutableMap<String, Permission> = HashMap(),
                          val rolePermissions: PermissionRoles = PermissionRoles(),
@@ -26,7 +27,8 @@ data class Configuration(val token: String = "insert-token",
                          val infractionActionMap: HashMap<Int, InfractionAction> = HashMap(),
                          val mutedRole: String = "Muted",
                          val strikeCeil: Int = 3,
-                         val invitePermissionLevel: Permission = Permission.MODERATOR)
+                         val invitePermissionLevel: Permission = Permission.MODERATOR,
+                         val suggestionPoolLimit: Int = 20)
 
 class PermissionRoles(val moderatorRoles: Array<String> = arrayOf("Moderator"),
                       val adminRoles: Array<String> = arrayOf("Admin"),
