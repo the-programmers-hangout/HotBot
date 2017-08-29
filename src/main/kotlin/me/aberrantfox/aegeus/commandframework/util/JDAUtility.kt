@@ -3,6 +3,7 @@ package me.aberrantfox.aegeus.commandframework.util
 import me.aberrantfox.aegeus.services.Configuration
 import net.dv8tion.jda.core.JDA
 import net.dv8tion.jda.core.entities.Guild
+import net.dv8tion.jda.core.entities.MessageEmbed
 import net.dv8tion.jda.core.entities.User
 import java.util.*
 
@@ -75,3 +76,13 @@ fun removeMuteRole(guild: Guild, user: User, config: Configuration, record: Mute
     }
 }
 
+fun sendPrivateMessage(user: User, msg: MessageEmbed) =
+        user.openPrivateChannel().queue {
+            it.sendMessage(msg).queue()
+        }
+
+
+fun sendPrivateMessage(user: User, msg: String) =
+        user.openPrivateChannel().queue {
+            it.sendMessage(msg).queue()
+        }

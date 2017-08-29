@@ -2,6 +2,7 @@ package me.aberrantfox.aegeus.commandframework.commands
 
 import me.aberrantfox.aegeus.commandframework.ArgumentType
 import me.aberrantfox.aegeus.commandframework.Command
+import me.aberrantfox.aegeus.commandframework.util.sendPrivateMessage
 import me.aberrantfox.aegeus.services.CommandDescriptor
 import me.aberrantfox.aegeus.services.Configuration
 import me.aberrantfox.aegeus.services.HelpConf
@@ -23,7 +24,6 @@ fun help(event: GuildMessageReceivedEvent, args: List<Any>, config: Configuratio
             val selection = args[0] as String
             val argType = HelpConf.fetchArgumentType(selection)
 
-
             when (argType) {
                 SelectionArgument.CommandName -> {
                     val descriptor = HelpConf.fetchCommandDescriptor(selection) ?: return
@@ -43,17 +43,6 @@ fun help(event: GuildMessageReceivedEvent, args: List<Any>, config: Configuratio
 
     event.message.delete().queue()
 }
-
-private fun sendPrivateMessage(user: User, msg: MessageEmbed) =
-    user.openPrivateChannel().queue {
-        it.sendMessage(msg).queue()
-    }
-
-
-private fun sendPrivateMessage(user: User, msg: String) =
-    user.openPrivateChannel().queue {
-        it.sendMessage(msg).queue()
-    }
 
 private fun buildCommandHelpMessage(config: Configuration, descriptor: CommandDescriptor) =
         EmbedBuilder().setTitle("${descriptor.category} - ${descriptor.name}")
