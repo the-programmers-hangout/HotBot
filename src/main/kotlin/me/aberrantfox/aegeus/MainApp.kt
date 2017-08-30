@@ -7,7 +7,7 @@ import me.aberrantfox.aegeus.commandframework.util.timeToDifference
 import me.aberrantfox.aegeus.commandframework.util.unmute
 import me.aberrantfox.aegeus.listeners.*
 import me.aberrantfox.aegeus.services.Configuration
-import me.aberrantfox.aegeus.services.setupDatabaseSchema
+import me.aberrantfox.aegeus.services.database.setupDatabaseSchema
 import net.dv8tion.jda.core.*
 import net.dv8tion.jda.core.entities.Game
 import net.dv8tion.jda.core.entities.Guild
@@ -20,8 +20,7 @@ fun main(args: Array<String>) {
     val config = loadConfig(commandMap)
 
     if (config == null) {
-        println("""The default configuration has been generated."
-                   Please fill in this configuration in order to use the bot.""")
+        println("""The default configuration has been generated. Please fill in this configuration in order to use the bot.""")
         System.exit(0)
         return
     }

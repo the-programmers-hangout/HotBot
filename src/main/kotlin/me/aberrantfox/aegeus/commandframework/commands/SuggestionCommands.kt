@@ -6,6 +6,8 @@ import me.aberrantfox.aegeus.commandframework.util.idToName
 import me.aberrantfox.aegeus.commandframework.util.sendPrivateMessage
 import me.aberrantfox.aegeus.services.Configuration
 import net.dv8tion.jda.core.EmbedBuilder
+import net.dv8tion.jda.core.JDA
+import net.dv8tion.jda.core.entities.Guild
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
@@ -14,6 +16,12 @@ import java.util.*
 import java.util.LinkedList
 
 data class Suggestion(val member: String, val idea: String, val timeOf: DateTime, val userIcon: String)
+
+enum class SuggestionStatus(val colour: Color, val message: String) {
+    Accepted(Color.green, "Accepted"),
+    Review(Color.orange, "Under Review"),
+    Denied(Color.red, "Denied")
+}
 
 object Suggestions {
     val pool: Queue<Suggestion> = LinkedList()
@@ -32,7 +40,7 @@ fun suggest(event: GuildMessageReceivedEvent, args: List<Any>) {
 
     val suggestion = args[0] as String
 
-    Suggestions.pool.add(Suggestion(event.author.id, suggestion, DateTime.now()))
+    Suggestions.pool.add(Suggestion(event.author.id, suggestion, DateTime.now(), event.author.avatarUrl))
     sendPrivateMessage(event.author, "Your suggestion has been added to the review-pool. " +
             "If it passes it'll be pushed out to the suggestions channel.")
 
@@ -52,7 +60,7 @@ fun poolInfo(event: GuildMessageReceivedEvent) {
 
 @Command
 fun poolTop(event: GuildMessageReceivedEvent) {
-    if(Suggestions.pool.isEmpty()) {
+    if (Suggestions.pool.isEmpty()) {
         sendPrivateMessage(event.author, "The pool is empty.")
         return
     }
@@ -74,7 +82,7 @@ fun poolTop(event: GuildMessageReceivedEvent) {
 
 @Command
 fun poolAccept(event: GuildMessageReceivedEvent, args: List<Any>, config: Configuration) {
-    if(Suggestions.pool.isEmpty()) {
+    if (Suggestions.pool.isEmpty()) {
         sendPrivateMessage(event.author, "The suggestion pool is empty... :)")
         return
     }
@@ -82,20 +90,14 @@ fun poolAccept(event: GuildMessageReceivedEvent, args: List<Any>, config: Config
     val channel = event.guild.textChannels.findLast { it.id == config.suggestionChannel }
     val suggestion = Suggestions.pool.remove()
 
-    channel?.sendMessage(EmbedBuilder()
-            .setTitle("${suggestion.member.idToName(event.jda)}'s Suggestion")
-            .setColor(Color.orange)
-            .setDescription(suggestion.idea)
-            .addField("Suggestion Status", "Community Review", false)
-            .build())
-            ?.queue()
+    channel?.sendMessage(buildSuggestionMessage(suggestion, event.jda, SuggestionStatus.Review))?.queue()
 
     event.message.delete().queue()
 }
 
 @Command
 fun poolDeny(event: GuildMessageReceivedEvent, args: List<Any>, config: Configuration) {
-    if(Suggestions.pool.isEmpty()) {
+    if (Suggestions.pool.isEmpty()) {
         sendPrivateMessage(event.author, "The suggestion pool is empty... :)")
         return
     }
@@ -108,3 +110,39 @@ fun poolDeny(event: GuildMessageReceivedEvent, args: List<Any>, config: Configur
             .addField("Time of Suggestion", rejected.timeOf.toString(DateTimeFormat.forPattern("dd/MM/yyyy")), false)
             .build())
 }
+
+@Command(ArgumentType.String, ArgumentType.String, ArgumentType.Joiner)
+fun closeIdea(event: GuildMessageReceivedEvent, args: List<Any>, config: Configuration) {
+    val target = args[0] as String
+    val response = args[1] as String
+    val reason = args[2] as String
+    val status = inputToStatus(response)
+
+    if (status == null) {
+        sendPrivateMessage(event.author, "Valid responses are 'accepted' or 'denied'... use accordingly.")
+        return
+    }
+
+    fetchSuggestionChannel(event.guild, config).getMessageById(target).queue {
+
+    }
+}
+
+private fun fetchSuggestionChannel(guild: Guild, config: Configuration) = guild.getTextChannelById(config.suggestionChannel)
+
+private fun inputToStatus(input: String) =
+        when (input.toLowerCase()) {
+            "accepted" -> SuggestionStatus.Accepted
+            "denied" -> SuggestionStatus.Denied
+            else -> null
+        }
+
+private fun buildSuggestionMessage(suggestion: Suggestion, jda: JDA, status: SuggestionStatus,
+                                   title: String = "${suggestion.member.idToName(jda)}'s Suggestion") =
+        EmbedBuilder()
+                .setTitle(title)
+                .setThumbnail(suggestion.userIcon)
+                .setColor(status.colour)
+                .setDescription(suggestion.idea)
+                .addField("Suggestion Status", status.message, false)
+                .build()
