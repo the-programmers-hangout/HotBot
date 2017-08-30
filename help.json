@@ -5,7 +5,8 @@
     "macro": "Macro commands are useful for maintaining and displaying helpful messages.",
     "utility": "Generally useful commands, this is a misc section.",
     "infractions": "Used for distributing and maintaining strike-based infractions.",
-    "permissions": "Administrative functionality for setting command permissions."
+    "permissions": "Administrative functionality for setting command permissions.",
+    "suggestions": "You can use commands in this section to give suggestions to the server."
   },
   "commands":
   [
@@ -181,7 +182,7 @@
       "name": "help",
       "category": "utility",
       "description": "Display a help menu.",
-      "structure:": "help { nothing | CommandName | category }",
+      "structure:": "{ nothing | CommandName | category }",
       "example": ""
     },
     {
@@ -224,6 +225,48 @@
       "category": "fun",
       "description": "Display a picture of a dog",
       "structure:": "",
+      "example": ""
+    },
+    {
+      "name": "suggest",
+      "category": "suggestions",
+      "description": "Send a suggestion to the pre-lim pool. Suggestions are reviewed by a mod before they are reviewed by the community.",
+      "structure:": "{suggestion}",
+      "example": ""
+    },
+    {
+      "name": "poolinfo",
+      "category": "suggestions",
+      "description": "Display how many suggestions are in the staging area.",
+      "structure:": "",
+      "example": ""
+    },
+    {
+      "name": "poolTop",
+      "category": "suggestions",
+      "description": "See the suggestion in the pool next in line for review.",
+      "structure:": "",
+      "example": ""
+    },
+    {
+      "name": "poolaccept",
+      "category": "suggestions",
+      "description": "Move the suggestion at the top of the pool to the community review stage.",
+      "structure:": "",
+      "example": ""
+    },
+    {
+      "name": "pooldeny",
+      "category": "suggestions",
+      "description": "Delete the suggestion at the top of the pool; this is for removing bad or vulgar suggestions.",
+      "structure:": "",
+      "example": ""
+    },
+    {
+      "name": "respond",
+      "category": "suggestions",
+      "description": "Respond to a suggestion in the community review stage. Suggestions here can be accepted or denied, must supply a reason.",
+      "structure:": "{suggestion message ID} {Accepted | Denied} {Reason}",
       "example": ""
     }
   ]
