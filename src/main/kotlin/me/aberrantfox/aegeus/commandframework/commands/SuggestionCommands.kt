@@ -118,23 +118,26 @@ fun poolDeny(event: GuildMessageReceivedEvent, args: List<Any>, config: Configur
 }
 
 @Command(ArgumentType.String, ArgumentType.String, ArgumentType.Joiner)
-fun closeIdea(event: GuildMessageReceivedEvent, args: List<Any>, config: Configuration) {
+fun respond(event: GuildMessageReceivedEvent, args: List<Any>, config: Configuration) {
     val target = args[0] as String
     val response = args[1] as String
     val reason = args[2] as String
     val status = inputToStatus(response)
 
     if (status == null) {
-        sendPrivateMessage(event.author, "Valid responses are 'accepted' or 'denied'... use accordingly.")
+        event.channel.sendMessage("Valid responses are 'accepted' or 'denied'... use accordingly.").queue()
         return
     }
 
-    if ( !(isTracked(target)) ) {
-        sendPrivateMessage(event.author, "That is not a valid message id... or at least it is not in the database.")
+    val channel = fetchSuggestionChannel(event.guild, config)
+
+    if ( !(isTracked(target))  || channel.getMessageById(target) == null ) {
+        event.channel.sendMessage("That is not a valid message or a suggestion by the ID.").queue()
+        event.message.delete().queue()
         return
     }
 
-    fetchSuggestionChannel(event.guild, config).getMessageById(target).queue {
+    channel.getMessageById(target).queue {
         val suggestion = obtainSuggestion(target)
         val message = buildSuggestionMessage(suggestion, event.jda, status)
         val reasonTitle = "Reason for Status"
@@ -146,6 +149,8 @@ fun closeIdea(event: GuildMessageReceivedEvent, args: List<Any>, config: Configu
 
         it.editMessage(message.build()).queue()
     }
+
+    event.message.delete().queue()
 }
 
 private fun fetchSuggestionChannel(guild: Guild, config: Configuration) = guild.getTextChannelById(config.suggestionChannel)
