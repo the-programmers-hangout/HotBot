@@ -33,7 +33,8 @@ object Strikes : Table() {
 }
 
 object Suggestions : Table() {
-    val id = integer("id").autoIncrement().primaryKey()
+    val id = varchar("id", 18).primaryKey()
+    val avatarURL = varchar("url", 1024)
     val member = varchar("member", 18)
     val status = enumeration("status", SuggestionStatus::class.java)
     val idea = text("idea")
