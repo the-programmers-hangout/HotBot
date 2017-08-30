@@ -5,6 +5,10 @@ import me.aberrantfox.aegeus.commandframework.Command
 import me.aberrantfox.aegeus.commandframework.util.idToName
 import me.aberrantfox.aegeus.commandframework.util.sendPrivateMessage
 import me.aberrantfox.aegeus.services.Configuration
+import me.aberrantfox.aegeus.services.database.isTracked
+import me.aberrantfox.aegeus.services.database.obtainSuggestion
+import me.aberrantfox.aegeus.services.database.trackSuggestion
+import me.aberrantfox.aegeus.services.database.updateSuggestion
 import net.dv8tion.jda.core.EmbedBuilder
 import net.dv8tion.jda.core.JDA
 import net.dv8tion.jda.core.entities.Guild
@@ -15,7 +19,7 @@ import java.awt.Color
 import java.util.*
 import java.util.LinkedList
 
-data class Suggestion(val member: String, val idea: String, val timeOf: DateTime, val userIcon: String)
+data class Suggestion(val member: String, val idea: String, val timeOf: DateTime, val avatarURL: String)
 
 enum class SuggestionStatus(val colour: Color, val message: String) {
     Accepted(Color.green, "Accepted"),
@@ -90,7 +94,9 @@ fun poolAccept(event: GuildMessageReceivedEvent, args: List<Any>, config: Config
     val channel = event.guild.textChannels.findLast { it.id == config.suggestionChannel }
     val suggestion = Suggestions.pool.remove()
 
-    channel?.sendMessage(buildSuggestionMessage(suggestion, event.jda, SuggestionStatus.Review))?.queue()
+    channel?.sendMessage(buildSuggestionMessage(suggestion, event.jda, SuggestionStatus.Review).build())?.queue {
+        trackSuggestion(suggestion, SuggestionStatus.Review, it.id)
+    }
 
     event.message.delete().queue()
 }
@@ -123,8 +129,22 @@ fun closeIdea(event: GuildMessageReceivedEvent, args: List<Any>, config: Configu
         return
     }
 
-    fetchSuggestionChannel(event.guild, config).getMessageById(target).queue {
+    if ( !(isTracked(target)) ) {
+        sendPrivateMessage(event.author, "That is not a valid message id... or at least it is not in the database.")
+        return
+    }
 
+    fetchSuggestionChannel(event.guild, config).getMessageById(target).queue {
+        val suggestion = obtainSuggestion(target)
+        val message = buildSuggestionMessage(suggestion, event.jda, status)
+        val reasonTitle = "Reason for Status"
+
+        message.fields.removeIf { it.name == reasonTitle }
+
+        message.addField(reasonTitle, reason, false)
+        updateSuggestion(target, status)
+
+        it.editMessage(message.build()).queue()
     }
 }
 
@@ -137,12 +157,10 @@ private fun inputToStatus(input: String) =
             else -> null
         }
 
-private fun buildSuggestionMessage(suggestion: Suggestion, jda: JDA, status: SuggestionStatus,
-                                   title: String = "${suggestion.member.idToName(jda)}'s Suggestion") =
+private fun buildSuggestionMessage(suggestion: Suggestion, jda: JDA, status: SuggestionStatus) =
         EmbedBuilder()
-                .setTitle(title)
-                .setThumbnail(suggestion.userIcon)
+                .setTitle("${suggestion.member.idToName(jda)}'s Suggestion")
+                .setThumbnail(suggestion.avatarURL)
                 .setColor(status.colour)
                 .setDescription(suggestion.idea)
                 .addField("Suggestion Status", status.message, false)
-                .build()
