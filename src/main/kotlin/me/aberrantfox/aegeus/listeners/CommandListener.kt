@@ -72,7 +72,7 @@ data class CommandListener(val config: Configuration,
         }
 
         val recommended = CommandRecommender.recommendCommand(commandName)
-        event.channel.sendMessage("I don't know what `$commandName` is, did you mean `$recommended`").queue()
+        event.channel.sendMessage("I don't know what ${commandName.replace("@", "")} is, did you mean $recommended?").queue()
     }
 
     private fun isUsableEvent(event: GuildMessageReceivedEvent): Boolean {
