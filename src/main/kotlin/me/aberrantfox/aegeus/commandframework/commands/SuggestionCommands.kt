@@ -9,13 +9,10 @@ import me.aberrantfox.aegeus.services.database.isTracked
 import me.aberrantfox.aegeus.services.database.obtainSuggestion
 import me.aberrantfox.aegeus.services.database.trackSuggestion
 import me.aberrantfox.aegeus.services.database.updateSuggestion
-import net.dv8tion.jda.client.managers.EmoteManager
 import net.dv8tion.jda.core.EmbedBuilder
 import net.dv8tion.jda.core.JDA
-import net.dv8tion.jda.core.entities.Emote
 import net.dv8tion.jda.core.entities.Guild
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent
-import net.dv8tion.jda.core.requests.Route
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
 import java.awt.Color
