@@ -8,266 +8,265 @@
     "permissions": "Administrative functionality for setting command permissions.",
     "suggestions": "You can use commands in this section to give suggestions to the server."
   },
-  "commands":
-  [
+  "commands": [
     {
       "name": "cat",
       "category": "fun",
       "description": "Displays a picture of a cat.",
-      "structure:": "",
+      "structure": "",
       "example": ""
     },
     {
       "name": "flip",
       "category": "fun",
       "description": "Flips a coin.",
-      "structure:": "",
+      "structure": "",
       "example": ""
     },
     {
       "name": "addmacro",
       "category": "macro",
       "description": "Adds a macro by the which will respond with the given message when invoked by the given name.",
-      "structure:": "{macroName} [macroMessage]",
+      "structure": "{macroName} [macroMessage]",
       "example": "greet Hello, World!"
     },
     {
       "name": "removemacro",
       "category": "macro",
       "description": "Removes a macro with the given name",
-      "structure:": "{macroname}",
+      "structure": "{macroname}",
       "example": "removeMacro greet"
     },
     {
       "name": "listmacros",
       "category": "macro",
       "description": "List all of the currently available macros.",
-      "structure:": "",
+      "structure": "",
       "example": ""
     },
     {
       "name": "nuke",
       "category": "moderation",
       "description": "Delete the last 1 - 99 messages in the chat.",
-      "structure:": "{amount}",
+      "structure": "{amount}",
       "example": "10"
     },
     {
       "name": "move",
       "category": "moderation",
       "description": "Move every message found within the given search space sent by any supplied ID in the Comma separated ID list to the specified channel.",
-      "structure:": "{idList (a list of ids, separated by commas)} {searchSpace} {targetChannelID}",
+      "structure": "{idList (a list of ids, separated by commas)} {searchSpace} {targetChannelID}",
       "example": "123412488123,23450293480234,234234234 10 323499949234"
     },
     {
       "name": "ignore",
       "category": "moderation",
       "description": "Drop all commands from the given id (user or channel)",
-      "structure:": "{user/channelID}",
+      "structure": "{user/channelID}",
       "example": "12340985893"
     },
     {
       "name": "mute",
       "category": "moderation",
       "description": "Mute a member for a specified amount of minutes. ",
-      "structure:": "{userID} {timeInMinutes} [Reason]",
+      "structure": "{userID} {timeInMinutes} [Reason]",
       "example": "12340234239 10 Being a silly billy."
     },
     {
       "name": "lockdown",
       "category": "management",
       "description": "Force the bot to ignore anyone who isn't the owner.",
-      "structure:": "",
+      "structure": "",
       "example": ""
     },
     {
       "name": "prefix",
       "category": "management",
       "description": "Set the bot prefix to the specified string (Cannot be a space)",
-      "structure:": "{prefix}",
+      "structure": "{prefix}",
       "example": "!!"
     },
     {
       "name": "setFilter",
       "category": "management",
       "description": "Set the permission level required to run a command which contains a mention (used for mention sanitation)  ",
-      "structure:": "{permissionLevel}",
+      "structure": "{permissionLevel}",
       "example": "moderator"
     },
     {
       "name": "setperm",
       "category": "permissions",
       "description": "Set the permission level of the given command to the given permission level.",
-      "structure:": "{commandName} {permissionLevel}",
+      "structure": "{commandName} {permissionLevel}",
       "example": "nuke moderator"
     },
     {
       "name": "getPerm",
       "category": "permissions",
       "description": "Get the current required permission level for a particular command.",
-      "structure:": "{commandName}",
+      "structure": "{commandName}",
       "example": "nuke"
     },
     {
       "name": "listcommands",
       "category": "permissions",
       "description": "List all commands",
-      "structure:": "",
+      "structure": "",
       "example": ""
     },
     {
       "name": "listavailable",
       "category": "permissions",
       "description": "List what commands are available to you.",
-      "structure:": "",
+      "structure": "",
       "example": ""
     },
     {
       "name": "listPerms",
       "category": "permissions",
       "description": "List all available permission levels.",
-      "structure:": "",
+      "structure": "",
       "example": ""
     },
     {
       "name": "listCommandPerms",
       "category": "permissions",
       "description": "Display all current commands and the corresponding required permission level to use each of them.",
-      "structure:": "",
+      "structure": "",
       "example": ""
     },
     {
       "name": "warn",
       "category": "infractions",
       "description": "Warn a member, giving them a 0 strike infraction with the given reason.",
-      "structure:": "{userid} {reason}",
+      "structure": "{userid} {reason}",
       "example": "123401991824 Re-read the rules... no advertising."
     },
     {
       "name": "strike",
       "category": "infractions",
       "description": "Give a member a weighted infraction, with specified weight and reason. This may result in them being banned. Weights should be below or equal to StrikeCeil",
-      "structure:": "{userid} {weight} {reason}",
+      "structure": "{userid} {weight} {reason}",
       "example": "1324234523048 1 Refusing to stop arguing. Please pay more attention to what moderators are saying to you"
     },
     {
       "name": "history",
       "category": "infractions",
       "description": "Display a user's infraction history.",
-      "structure:": "",
+      "structure": "",
       "example": ""
     },
     {
       "name": "removeStrike",
       "category": "infractions",
       "description": "Delete a particular strike by ID (these are listed in the history command).",
-      "structure:": "{strikeID}",
+      "structure": "{strikeID}",
       "example": "123"
     },
     {
       "name": "cleanse",
       "category": "infractions",
       "description": "Completely wipe a user of all infractions. (Permanently deletes them)",
-      "structure:": "{userID}",
-      "example": ""
+      "structure": "{userID}",
+      "example": "12093810293810293"
     },
     {
       "name": "ping",
       "category": "utility",
       "description": "Pong!",
-      "structure:": "",
+      "structure": "",
       "example": ""
     },
     {
       "name": "help",
       "category": "utility",
       "description": "Display a help menu.",
-      "structure:": "{ nothing | CommandName | category }",
-      "example": ""
+      "structure": "{ nothing | CommandName | category }",
+      "example": "nuke"
     },
     {
       "name": "serverinfo",
       "category": "utility",
       "description": "Display a message giving basic server information",
-      "structure:": "",
+      "structure": "",
       "example": ""
     },
     {
       "name": "exit",
       "category": "utility",
       "description": "Exit, saving configurations.",
-      "structure:": "",
+      "structure": "",
       "example": ""
     },
     {
       "name": "kill",
       "category": "utility",
       "description": "Exit, without saving configurations.",
-      "structure:": "",
+      "structure": "",
       "example": ""
     },
     {
       "name": "uptime",
       "category": "utility",
       "description": "Displays how long you have kept me, HOTBOT, AWAKE!",
-      "structure:": "",
+      "structure": "",
       "example": ""
     },
     {
       "name": "info",
       "category": "utility",
       "description": "Display some information about me",
-      "structure:": "",
+      "structure": "",
       "example": ""
     },
     {
       "name": "dog",
       "category": "fun",
       "description": "Display a picture of a dog",
-      "structure:": "",
+      "structure": "",
       "example": ""
     },
     {
       "name": "suggest",
       "category": "suggestions",
       "description": "Send a suggestion to the pre-lim pool. Suggestions are reviewed by a mod before they are reviewed by the community.",
-      "structure:": "{suggestion}",
-      "example": ""
+      "structure": "{suggestion}",
+      "example": "I want a rust channel because I want a rust channel. **Notice me senpai**"
     },
     {
       "name": "poolinfo",
       "category": "suggestions",
       "description": "Display how many suggestions are in the staging area.",
-      "structure:": "",
+      "structure": "",
       "example": ""
     },
     {
       "name": "poolTop",
       "category": "suggestions",
       "description": "See the suggestion in the pool next in line for review.",
-      "structure:": "",
+      "structure": "",
       "example": ""
     },
     {
       "name": "poolaccept",
       "category": "suggestions",
       "description": "Move the suggestion at the top of the pool to the community review stage.",
-      "structure:": "",
+      "structure": "",
       "example": ""
     },
     {
       "name": "pooldeny",
       "category": "suggestions",
       "description": "Delete the suggestion at the top of the pool; this is for removing bad or vulgar suggestions.",
-      "structure:": "",
+      "structure": "",
       "example": ""
     },
     {
       "name": "respond",
       "category": "suggestions",
       "description": "Respond to a suggestion in the community review stage. Suggestions here can be accepted or denied, must supply a reason.",
-      "structure:": "{suggestion message ID} {Accepted | Denied} {Reason}",
-      "example": ""
+      "structure": "{suggestion message ID} {Accepted | Denied} {Reason}",
+      "example": "1231928401824 Denied This is a bad suggestion, it won't really fit here, sadly."
     }
   ]
 }

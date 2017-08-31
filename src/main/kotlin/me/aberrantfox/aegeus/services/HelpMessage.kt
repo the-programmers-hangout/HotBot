@@ -8,8 +8,8 @@ data class HelpFile(val commands: List<CommandDescriptor>, val categoryDescripti
 
 data class CommandDescriptor(val name: String,
                              val description: String,
-                             val structure: String,
-                             val example: String,
+                             val structure: String?,
+                             val example: String?,
                              val category: String)
 
 enum class SelectionArgument { CommandName, CategoryName }

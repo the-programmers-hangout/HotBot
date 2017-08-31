@@ -48,6 +48,9 @@ private fun buildCommandHelpMessage(config: Configuration, descriptor: CommandDe
         EmbedBuilder().setTitle("${descriptor.category} - ${descriptor.name}")
                 .setDescription(descriptor.description)
                 .setColor(Color.CYAN)
+                .addField("Argument structure",
+                        if(descriptor.structure.isNullOrBlank()) "This command takes no arguments" else descriptor.structure,
+                        false)
                 .addField("Example Command",
                         "${config.prefix}${descriptor.name} ${descriptor.example}",
                         false)

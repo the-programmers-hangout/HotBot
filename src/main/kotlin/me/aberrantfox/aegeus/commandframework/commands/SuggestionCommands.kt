@@ -9,10 +9,13 @@ import me.aberrantfox.aegeus.services.database.isTracked
 import me.aberrantfox.aegeus.services.database.obtainSuggestion
 import me.aberrantfox.aegeus.services.database.trackSuggestion
 import me.aberrantfox.aegeus.services.database.updateSuggestion
+import net.dv8tion.jda.client.managers.EmoteManager
 import net.dv8tion.jda.core.EmbedBuilder
 import net.dv8tion.jda.core.JDA
+import net.dv8tion.jda.core.entities.Emote
 import net.dv8tion.jda.core.entities.Guild
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent
+import net.dv8tion.jda.core.requests.Route
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
 import java.awt.Color
@@ -38,8 +41,9 @@ fun suggest(event: GuildMessageReceivedEvent, args: List<Any>) {
         return
     }
 
-    if (Suggestions.pool.filter { it.member == event.author.id }.size > 3) {
+    if(Suggestions.pool.count { it.member == event.author.id } == 3) {
         sendPrivateMessage(event.author, "You have enough suggestions in the pool for now...")
+        return
     }
 
     val suggestion = args[0] as String
@@ -96,6 +100,9 @@ fun poolAccept(event: GuildMessageReceivedEvent, args: List<Any>, config: Config
 
     channel?.sendMessage(buildSuggestionMessage(suggestion, event.jda, SuggestionStatus.Review).build())?.queue {
         trackSuggestion(suggestion, SuggestionStatus.Review, it.id)
+
+        it.addReaction("⬆").queue()
+        it.addReaction("⬇").queue()
     }
 
     event.message.delete().queue()
