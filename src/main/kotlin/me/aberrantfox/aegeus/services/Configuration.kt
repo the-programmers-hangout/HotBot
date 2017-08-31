@@ -12,7 +12,6 @@ import java.util.*
 data class Configuration(val token: String = "insert-token",
                          val ownerID: String = "insert-id",
                          var prefix: String = "insert-prefix",
-                         val welcomeMessage: String = "Welcome to %servername%, %name%! Be sure to check",
                          val leaveMessage: String = "%name% left... :wave: ... noob",
                          val welcomeChannel: String = "insert-id",
                          val leaveChannel: String = "insert-id",

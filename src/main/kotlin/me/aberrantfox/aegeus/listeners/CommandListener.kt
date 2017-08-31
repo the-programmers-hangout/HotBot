@@ -8,8 +8,7 @@ import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent
 import net.dv8tion.jda.core.hooks.ListenerAdapter
 import java.lang.reflect.Method
 
-data class CommandListener(val config: Configuration,
-                           val commandMap: Map<String, Method>): ListenerAdapter() {
+data class CommandListener(val config: Configuration, val commandMap: Map<String, Method>): ListenerAdapter() {
     init {
         CommandRecommender.addAll(commandMap.keys.toList() + macroMap.keys.toList())
     }
@@ -21,61 +20,75 @@ data class CommandListener(val config: Configuration,
         val (commandName, actualArgs) = getCommandStruct(rawMessage, config)
 
         if(commandMap.containsKey(commandName)) {
-            val method = commandMap[commandName]?: return
-            val userPermissionLevel = getHighestPermissionLevel(event.member.roles, config)
-            val commandPermissionLevel = config.commandPermissionMap[commandName] ?: return
-            val annotation = method.getAnnotation(Command::class.java)
-
-            if(userPermissionLevel < config.mentionFilterLevel
-                    && (event.message.mentionsEveryone() || event.message.mentionedUsers.size > 0 || event.message.mentionedRoles.size > 0)) {
-                event.channel.sendMessage("Your permission level is below the required level to use a command mention.").queue()
-                return
-            }
-
-            if(userPermissionLevel < commandPermissionLevel) {
-                event.channel.sendMessage(":unamused: Do you really think I would let you do that").queue()
-                return
-            }
-
-            if (annotation.expectedArgs.contains(ArgumentType.Joiner)) {
-                if(actualArgs.size < annotation.expectedArgs.size) {
-                    event.channel.sendMessage("You didn't enter the minimum amount of required arguments.").queue()
-                    return
-                }
-            } else {
-                if(actualArgs.size != annotation.expectedArgs.size) {
-                    if(!annotation.expectedArgs.contains(ArgumentType.Manual)) {
-                        event.channel.sendMessage("This command requires ${annotation.expectedArgs.size} arguments.").queue()
-                        return
-                    }
-                }
-            }
-
-            val convertedArguments = convertArguments(actualArgs, annotation.expectedArgs, event.jda)
-
-            if( convertedArguments == null ) {
-                event.channel.sendMessage(":unamused: Yea, you'll need to learn how to use that properly.").queue()
-                return
-            }
-
-            when (method.parameterCount) {
-                0 -> method.invoke(null)
-                1 -> method.invoke(null, event)
-                2 -> method.invoke(null, event, convertedArguments)
-                3 -> method.invoke(null, event, convertedArguments, config)
-            }
-
+            respondToCommand(commandName, actualArgs, event)
             return
-        } else if (macroMap.containsKey(commandName)) {
+        }
+
+        if (macroMap.containsKey(commandName)) {
             event.channel.sendMessage(macroMap[commandName]).queue()
             return
         }
 
         val recommended = CommandRecommender.recommendCommand(commandName)
-        event.channel.sendMessage("I don't know what ${commandName.replace("@", "")} is, did you mean $recommended?").queue()
+        event.channel.sendMessage("I don't know what ${commandName.replace("@", "")} is, perhaps you meant $recommended?").queue()
+    }
+
+    private fun respondToCommand(commandName: String, actual: List<String>, event: GuildMessageReceivedEvent) {
+        val method = commandMap[commandName]?: return
+        val userPermissionLevel = getHighestPermissionLevel(event.member.roles, config)
+        val commandPermissionLevel = config.commandPermissionMap[commandName] ?: return
+        val annotation = method.getAnnotation(Command::class.java)
+
+        if( !(isValidCommandInvocation(userPermissionLevel, commandPermissionLevel, annotation, event, actual)) ) return
+
+        val convertedArguments = convertArguments(actual, annotation.expectedArgs, event.jda)
+
+        if( convertedArguments == null ) {
+            event.channel.sendMessage(":unamused: Yea, you'll need to learn how to use that properly.").queue()
+            return
+        }
+
+        when (method.parameterCount) {
+            0 -> method.invoke(null)
+            1 -> method.invoke(null, event)
+            2 -> method.invoke(null, event, convertedArguments)
+            3 -> method.invoke(null, event, convertedArguments, config)
+        }
+    }
+
+    private fun isValidCommandInvocation(userPermission: Permission, commandPermission: Permission, cmd: Command,
+                                       event: GuildMessageReceivedEvent, actual: List<String>): Boolean {
+        if(userPermission < config.mentionFilterLevel
+                && (event.message.mentionsEveryone() || event.message.mentionedUsers.size > 0 || event.message.mentionedRoles.size > 0)) {
+            event.channel.sendMessage("Your permission level is below the required level to use a command mention.").queue()
+            return false
+        }
+
+        if(userPermission < commandPermission) {
+            event.channel.sendMessage(":unamused: Do you really think I would let you do that").queue()
+            return false
+        }
+
+        if (cmd.expectedArgs.contains(ArgumentType.Joiner)) {
+            if(actual.size < cmd.expectedArgs.size) {
+                event.channel.sendMessage("You didn't enter the minimum amount of required arguments.").queue()
+                return false
+            }
+        } else {
+            if(actual.size != cmd.expectedArgs.size) {
+                if(!cmd.expectedArgs.contains(ArgumentType.Manual)) {
+                    event.channel.sendMessage("This command requires ${cmd.expectedArgs.size} arguments.").queue()
+                    return false
+                }
+            }
+        }
+
+        return true
     }
 
     private fun isUsableEvent(event: GuildMessageReceivedEvent): Boolean {
+        if(event.message.rawContent.length > 1500) return false
+
         if(config.lockDownMode && event.author.id != config.ownerID) return false
 
         if( !(event.message.rawContent.startsWith(config.prefix)) ) return false
