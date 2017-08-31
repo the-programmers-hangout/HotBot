@@ -18,7 +18,7 @@ class MemberListener(val configuration: Configuration) : ListenerAdapter() {
     override fun onGuildMemberJoin(event: GuildMemberJoinEvent) {
         val target = event.guild.textChannels.findLast { it.id == configuration.welcomeChannel }
         val response = pickResponse(responses).replace("%name%", event.user.asMention)
-        val userImage = event.user.avatarUrl
+        val userImage = event.user.avatarUrl ?: "http://i.imgur.com/HYkhEFO.jpg"
 
         target?.sendMessage(buildJoinMessage(response, userImage))?.queue()
     }
