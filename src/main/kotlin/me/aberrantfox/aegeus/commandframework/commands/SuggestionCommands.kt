@@ -45,7 +45,7 @@ fun suggest(event: GuildMessageReceivedEvent, args: List<Any>) {
 
     val suggestion = args[0] as String
 
-    Suggestions.pool.add(Suggestion(event.author.id, suggestion, DateTime.now(), event.author.avatarUrl))
+    Suggestions.pool.add(Suggestion(event.author.id, suggestion, DateTime.now(), event.author.avatarUrl ?: "http://i.imgur.com/HYkhEFO.jpg"))
     sendPrivateMessage(event.author, "Your suggestion has been added to the review-pool. " +
             "If it passes it'll be pushed out to the suggestions channel.")
 
