@@ -3,13 +3,16 @@ package me.aberrantfox.aegeus.listeners
 import me.aberrantfox.aegeus.commandframework.*
 import me.aberrantfox.aegeus.services.Configuration
 import me.aberrantfox.aegeus.commandframework.commands.macroMap
+import me.aberrantfox.aegeus.services.CommandRecommender
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent
 import net.dv8tion.jda.core.hooks.ListenerAdapter
 import java.lang.reflect.Method
 
 data class CommandListener(val config: Configuration,
                            val commandMap: Map<String, Method>): ListenerAdapter() {
-
+    init {
+        CommandRecommender.addAll(commandMap.keys.toList() + macroMap.keys.toList())
+    }
 
     override fun onGuildMessageReceived(event: GuildMessageReceivedEvent) {
         if(!isUsableEvent(event)) return
@@ -68,7 +71,8 @@ data class CommandListener(val config: Configuration,
             return
         }
 
-        event.channel.sendMessage(":unamused: I don't know what that command is").queue()
+        val recommended = CommandRecommender.recommendCommand(commandName)
+        event.channel.sendMessage("I don't know what $commandName is, did you mean $recommended").queue()
     }
 
     private fun isUsableEvent(event: GuildMessageReceivedEvent): Boolean {

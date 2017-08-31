@@ -5,6 +5,7 @@ import com.google.gson.Gson
 import me.aberrantfox.aegeus.commandframework.ArgumentType
 import me.aberrantfox.aegeus.commandframework.Command
 import me.aberrantfox.aegeus.commandframework.produceCommandMap
+import me.aberrantfox.aegeus.services.CommandRecommender
 import me.aberrantfox.aegeus.services.Configuration
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent
 import java.io.File
@@ -12,9 +13,9 @@ import java.io.File
 val macroMap = loadMacroMap()
 private val mapLocation = "macros.json"
 
-@Command(ArgumentType.Manual)
+@Command(ArgumentType.String, ArgumentType.Joiner)
 fun addMacro(event: GuildMessageReceivedEvent, args: List<Any>, config: Configuration) {
-    val key = args[0] as String
+    val key = (args[0] as String).toLowerCase()
 
     if(produceCommandMap().containsKey(key)) {
         event.channel.sendMessage("You dummy. There is a command with that name already...").queue()
@@ -26,9 +27,11 @@ fun addMacro(event: GuildMessageReceivedEvent, args: List<Any>, config: Configur
 
     val value = event.message.rawContent.substring("addmacro ".length + key.length + config.prefix.length + 1)
 
-    macroMap[key.toLowerCase()] = value
+    macroMap[key] = value
     event.channel.sendMessage("**$key** will now respond with: **$value**").queue()
+
     saveMacroMap(macroMap)
+    CommandRecommender.addPossibility(key)
 }
 
 @Command(ArgumentType.String)
@@ -38,6 +41,7 @@ fun removeMacro(event: GuildMessageReceivedEvent, args: List<Any>) {
     if(macroMap.containsKey(key)) {
         macroMap.remove(key)
         saveMacroMap(macroMap)
+        CommandRecommender.removePossibility(key)
         event.channel.sendMessage("$key - this macro is now gone.").queue()
         return
     }
