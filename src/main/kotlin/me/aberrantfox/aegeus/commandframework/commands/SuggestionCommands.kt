@@ -38,7 +38,7 @@ fun suggest(event: GuildMessageReceivedEvent, args: List<Any>) {
         return
     }
 
-    if(Suggestions.pool.count { it.member == event.author.id } == 3) {
+    if (Suggestions.pool.count { it.member == event.author.id } == 3) {
         sendPrivateMessage(event.author, "You have enough suggestions in the pool for now...")
         return
     }
@@ -129,13 +129,13 @@ fun respond(event: GuildMessageReceivedEvent, args: List<Any>, config: Configura
     val status = inputToStatus(response)
 
     if (status == null) {
-        event.channel.sendMessage("Valid responses are 'accepted' or 'denied'... use accordingly.").queue()
+        event.channel.sendMessage("Valid responses are 'accepted', 'denied' and 'review'... use accordingly.").queue()
         return
     }
 
     val channel = fetchSuggestionChannel(event.guild, config)
 
-    if ( !(isTracked(target))  || channel.getMessageById(target) == null ) {
+    if (!(isTracked(target)) || channel.getMessageById(target) == null) {
         event.channel.sendMessage("That is not a valid message or a suggestion by the ID.").queue()
         event.message.delete().queue()
         return
@@ -159,12 +159,7 @@ fun respond(event: GuildMessageReceivedEvent, args: List<Any>, config: Configura
 
 private fun fetchSuggestionChannel(guild: Guild, config: Configuration) = guild.getTextChannelById(config.suggestionChannel)
 
-private fun inputToStatus(input: String) =
-        when (input.toLowerCase()) {
-            "accepted" -> SuggestionStatus.Accepted
-            "denied" -> SuggestionStatus.Denied
-            else -> null
-        }
+private fun inputToStatus(input: String): SuggestionStatus? = SuggestionStatus.values().findLast { it.name.toLowerCase() == input.toLowerCase() }
 
 private fun buildSuggestionMessage(suggestion: Suggestion, jda: JDA, status: SuggestionStatus) =
         EmbedBuilder()

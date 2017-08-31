@@ -265,7 +265,7 @@
       "name": "respond",
       "category": "suggestions",
       "description": "Respond to a suggestion in the community review stage. Suggestions here can be accepted or denied, must supply a reason.",
-      "structure": "{suggestion message ID} {Accepted | Denied} {Reason}",
+      "structure": "{suggestion message ID} {Accepted | Denied | Review} {Reason}",
       "example": "1231928401824 Denied This is a bad suggestion, it won't really fit here, sadly."
     }
   ]
