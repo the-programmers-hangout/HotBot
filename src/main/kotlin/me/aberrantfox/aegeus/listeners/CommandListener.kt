@@ -57,7 +57,7 @@ data class CommandListener(val config: Configuration, val commandMap: Map<String
     }
 
     private fun isValidCommandInvocation(userPermission: Permission, commandPermission: Permission, cmd: Command,
-                                       event: GuildMessageReceivedEvent, actual: List<String>): Boolean {
+                                         event: GuildMessageReceivedEvent, actual: List<String>): Boolean {
         if(userPermission < config.mentionFilterLevel
                 && (event.message.mentionsEveryone() || event.message.mentionedUsers.size > 0 || event.message.mentionedRoles.size > 0)) {
             event.channel.sendMessage("Your permission level is below the required level to use a command mention.").queue()
