@@ -32,7 +32,8 @@ fun main(args: Array<String>) {
             CommandListener(config, commandMap),
             MemberListener(config),
             InviteListener(config),
-            ResponseListener(config))
+            ResponseListener(config),
+            MentionListener())
 
     jda.presence.setPresence(OnlineStatus.ONLINE, Game.of("${config.prefix}help"))
     jda.guilds.forEach { setupMutedRole(it, config.mutedRole) }
