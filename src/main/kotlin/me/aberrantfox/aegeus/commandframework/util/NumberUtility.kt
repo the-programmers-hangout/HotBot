@@ -8,11 +8,6 @@ fun futureTime(timeToAdd: Long): Long {
     return now.plus(timeToAdd).millis
 }
 
-fun millisToDateString(time: Long): String {
-    val time = DateTime(time)
-    return time.toString()
-}
-
 fun timeToDifference(time: Long): Long {
     val now = DateTime.now()
     return time - now.millis
