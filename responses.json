@@ -11,5 +11,8 @@
     "%name% has come to save the day!",
     "%name% joined the party.",
     "%name% joined the guild."
+  ],
+  "names": [
+    "Stephen", "Bob", "Joe", "Timmy", "Arnold", "Jeff", "Tim"
   ]
 }
