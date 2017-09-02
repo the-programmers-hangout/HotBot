@@ -18,6 +18,8 @@ fun randomInt(min: Int, max: Int): Int {
     return random.nextInt(max + 1 - min) + min
 }
 
+fun <T> randomListItem(list: List<T>) = list[randomInt(0, list.size - 1)]
+
 fun String.isInteger(): Boolean =
         try {
             this.toInt()

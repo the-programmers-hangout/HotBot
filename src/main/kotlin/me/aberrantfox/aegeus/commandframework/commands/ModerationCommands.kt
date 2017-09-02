@@ -7,6 +7,8 @@ import me.aberrantfox.aegeus.commandframework.util.idToUser
 import me.aberrantfox.aegeus.commandframework.util.muteMember
 import me.aberrantfox.aegeus.commandframework.util.unmute
 import me.aberrantfox.aegeus.services.Configuration
+import me.aberrantfox.aegeus.services.MessageService
+import me.aberrantfox.aegeus.services.MessageType
 import net.dv8tion.jda.core.OnlineStatus
 import net.dv8tion.jda.core.entities.Game
 import net.dv8tion.jda.core.entities.Message
@@ -107,6 +109,19 @@ fun move(event: GuildMessageReceivedEvent, args: List<Any>) {
 
     event.channel.history.retrievePast(searchSpace + 1).queue {
         handleResponse(it, channel, targets, event.channel, event.author.asMention)
+    }
+}
+
+@Command(ArgumentType.UserID, ArgumentType.Joiner)
+fun badname(event: GuildMessageReceivedEvent, args: List<Any>) {
+    val target = args[0] as String
+    val reason = args[1] as String
+    val targetMember = event.guild.getMemberById(target)
+
+    event.guild.controller.setNickname(targetMember, MessageService.getMessage(MessageType.Name)).queue {
+        targetMember.user.openPrivateChannel().queue {
+            it.sendMessage("Your name has been changed forcefully by a member of staff for reason: $reason").queue()
+        }
     }
 }
 

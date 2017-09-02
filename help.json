@@ -267,6 +267,13 @@
       "description": "Respond to a suggestion in the community review stage. Suggestions here can be accepted or denied, must supply a reason.",
       "structure": "{suggestion message ID} {Accepted | Denied | Review} {Reason}",
       "example": "1231928401824 Denied This is a bad suggestion, it won't really fit here, sadly."
+    },
+    {
+      "name": "badname",
+      "category": "moderation",
+      "description": "Auto-nick a user with a bad name.",
+      "structure": "{UserID} {Reason for nick}",
+      "example": "1231928401824 Your name is not taggable."
     }
   ]
 }
