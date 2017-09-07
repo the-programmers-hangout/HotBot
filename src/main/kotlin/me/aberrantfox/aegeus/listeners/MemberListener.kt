@@ -1,7 +1,5 @@
 package me.aberrantfox.aegeus.listeners
 
-import com.google.gson.Gson
-import me.aberrantfox.aegeus.commandframework.util.randomInt
 import me.aberrantfox.aegeus.services.Configuration
 import me.aberrantfox.aegeus.services.MessageService
 import me.aberrantfox.aegeus.services.MessageType
@@ -10,7 +8,6 @@ import net.dv8tion.jda.core.events.guild.member.GuildMemberJoinEvent
 import net.dv8tion.jda.core.events.guild.member.GuildMemberLeaveEvent
 import net.dv8tion.jda.core.hooks.ListenerAdapter
 import java.awt.Color
-import java.io.File
 
 
 
