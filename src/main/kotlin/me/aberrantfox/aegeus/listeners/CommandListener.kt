@@ -4,7 +4,11 @@ import me.aberrantfox.aegeus.commandframework.*
 import me.aberrantfox.aegeus.services.Configuration
 import me.aberrantfox.aegeus.commandframework.commands.macroMap
 import me.aberrantfox.aegeus.services.CommandRecommender
+import net.dv8tion.jda.core.entities.Message
+import net.dv8tion.jda.core.events.message.GenericMessageEvent
+import net.dv8tion.jda.core.events.message.MessageReceivedEvent
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent
+import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent
 import net.dv8tion.jda.core.hooks.ListenerAdapter
 import java.lang.reflect.Method
 
@@ -13,8 +17,12 @@ data class CommandListener(val config: Configuration, val commandMap: Map<String
         CommandRecommender.addAll(commandMap.keys.toList() + macroMap.keys.toList())
     }
 
+    override fun onPrivateMessageReceived(event: PrivateMessageReceivedEvent) {
+        if(!isUsableEvent(event.message, event.author.id, event.channel.id, event.author.isBot)) return
+    }
+
     override fun onGuildMessageReceived(event: GuildMessageReceivedEvent) {
-        if(!isUsableEvent(event)) return
+        if(!isUsableEvent(event.message, event.author.id, event.channel.id, event.author.isBot)) return
 
         val rawMessage = event.message.rawContent
         val (commandName, actualArgs) = getCommandStruct(rawMessage, config)
@@ -86,16 +94,16 @@ data class CommandListener(val config: Configuration, val commandMap: Map<String
         return true
     }
 
-    private fun isUsableEvent(event: GuildMessageReceivedEvent): Boolean {
-        if(event.message.rawContent.length > 1500) return false
+    private fun isUsableEvent(message: Message, author: String, channel: String, isBot: Boolean): Boolean {
+        if(message.rawContent.length > 1500) return false
 
-        if(config.lockDownMode && event.author.id != config.ownerID) return false
+        if(config.lockDownMode && author != config.ownerID) return false
 
-        if( !(event.message.rawContent.startsWith(config.prefix)) ) return false
+        if( !(message.rawContent.startsWith(config.prefix)) ) return false
 
-        if(config.ignoredIDs.contains(event.channel.id) || config.ignoredIDs.contains(event.author.id)) return false
+        if(config.ignoredIDs.contains(channel) || config.ignoredIDs.contains(author)) return false
 
-        if(event.author.isBot) return false
+        if(isBot) return false
 
         return true
     }
