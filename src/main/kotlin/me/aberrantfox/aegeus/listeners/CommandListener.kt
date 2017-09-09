@@ -5,12 +5,17 @@ import me.aberrantfox.aegeus.services.Configuration
 import me.aberrantfox.aegeus.commandframework.commands.macroMap
 import me.aberrantfox.aegeus.services.CommandRecommender
 import net.dv8tion.jda.core.entities.Message
+import net.dv8tion.jda.core.entities.MessageChannel
 import net.dv8tion.jda.core.events.message.GenericMessageEvent
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent
 import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent
 import net.dv8tion.jda.core.hooks.ListenerAdapter
 import java.lang.reflect.Method
+
+data class CommandEvent(val guildEvent: GuildMessageReceivedEvent,
+                        val args: List<Any>,
+                        val config: Configuration)
 
 data class CommandListener(val config: Configuration, val commandMap: Map<String, Method>): ListenerAdapter() {
     init {
@@ -56,11 +61,10 @@ data class CommandListener(val config: Configuration, val commandMap: Map<String
             return
         }
 
-        when (method.parameterCount) {
-            0 -> method.invoke(null)
-            1 -> method.invoke(null, event)
-            2 -> method.invoke(null, event, convertedArguments)
-            3 -> method.invoke(null, event, convertedArguments, config)
+        if (method.parameterCount == 0) {
+            method.invoke(null)
+        } else {
+            method.invoke(null, CommandEvent(event, convertedArguments, config))
         }
     }
 

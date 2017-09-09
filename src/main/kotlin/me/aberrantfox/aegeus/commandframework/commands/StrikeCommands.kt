@@ -3,6 +3,7 @@ package me.aberrantfox.aegeus.commandframework.commands
 import me.aberrantfox.aegeus.commandframework.ArgumentType
 import me.aberrantfox.aegeus.commandframework.Command
 import me.aberrantfox.aegeus.commandframework.util.*
+import me.aberrantfox.aegeus.listeners.CommandEvent
 import me.aberrantfox.aegeus.services.*
 import me.aberrantfox.aegeus.services.database.*
 import net.dv8tion.jda.core.EmbedBuilder
@@ -13,29 +14,30 @@ import java.awt.Color
 
 
 @Command(ArgumentType.UserID, ArgumentType.Joiner)
-fun warn(event: GuildMessageReceivedEvent, args: List<Any>, config: Configuration) =
-        strike(event, listOf(args[0], 0, args[1]), config)
+fun warn(event: CommandEvent) =
+        strike(CommandEvent(event.guildEvent, listOf(event.args[0], 0, event.args[1]), event.config))
 
 @Command(ArgumentType.UserID, ArgumentType.Integer, ArgumentType.Joiner)
-fun strike(event: GuildMessageReceivedEvent, args: List<Any>, config: Configuration) {
+fun strike(event: CommandEvent) {
+    val (guildEvent, args, config) = event
     val target = args[0] as String
     val strikeQuantity = args[1] as Int
     val reason = args[2] as String
 
     if(strikeQuantity < 0 || strikeQuantity > 3) {
-        event.channel.sendMessage("Strike weight should be between 0 and 3").queue()
+        guildEvent.channel.sendMessage("Strike weight should be between 0 and 3").queue()
         return
     }
 
-    if( !(event.guild.members.map { it.user.id }.contains(target)) ) {
-        event.channel.sendMessage("Cannot find the member by the id: $target").queue()
+    if( !(guildEvent.guild.members.map { it.user.id }.contains(target)) ) {
+        guildEvent.channel.sendMessage("Cannot find the member by the id: $target").queue()
         return
     }
 
-    insertInfraction(target, event.author.id, strikeQuantity, reason)
+    insertInfraction(target, guildEvent.author.id, strikeQuantity, reason)
 
-    event.author.openPrivateChannel().queue {
-        it.sendMessage("User ${target.idToUser(event.jda).asMention} has been infracted with weight: $strikeQuantity," +
+    guildEvent.author.openPrivateChannel().queue {
+        it.sendMessage("User ${target.idToUser(guildEvent.jda).asMention} has been infracted with weight: $strikeQuantity," +
                 " with reason $reason.").queue()
     }
 
@@ -43,22 +45,23 @@ fun strike(event: GuildMessageReceivedEvent, args: List<Any>, config: Configurat
 
     if(totalStrikes > config.strikeCeil) totalStrikes = config.strikeCeil
 
-    administerPunishment(config, target.idToUser(event.jda), strikeQuantity, reason, event, event.author, totalStrikes)
-    event.message.delete().queue()
+    administerPunishment(config, target.idToUser(guildEvent.jda), strikeQuantity, reason, guildEvent, guildEvent.author, totalStrikes)
+    guildEvent.message.delete().queue()
 }
 
 @Command(ArgumentType.UserID)
-fun history(event: GuildMessageReceivedEvent, args: List<Any>) {
+fun history(event: CommandEvent) {
+    val (guildEvent, args, config) = event
     val target = args[0] as String
     val records = getHistory(target)
     val builder = EmbedBuilder()
-            .setTitle("${target.idToName(event.jda)}'s Record")
+            .setTitle("${target.idToName(guildEvent.jda)}'s Record")
             .setColor(Color.MAGENTA)
-            .setThumbnail(target.idToUser(event.jda).avatarUrl)
+            .setThumbnail(target.idToUser(guildEvent.jda).avatarUrl)
 
     records.forEach {
         builder.addField("Strike ID: ${it.id}",
-                "**Acting moderator**: ${it.moderator.idToName(event.jda)}" +
+                "**Acting moderator**: ${it.moderator.idToName(guildEvent.jda)}" +
                         "\n**Reason**: ${it.reason}" +
                         "\n**Weight**: ${it.strikes}" +
                         "\n**Date**: ${it.dateTime.toString(DateTimeFormat.forPattern("dd/MM/yyyy"))}," +
@@ -72,24 +75,26 @@ fun history(event: GuildMessageReceivedEvent, args: List<Any>) {
                 false)
     }
 
-    event.channel.sendMessage(builder.build()).queue()
-    event.message.delete().queue()
+    guildEvent.channel.sendMessage(builder.build()).queue()
+    guildEvent.message.delete().queue()
 }
 
 @Command(ArgumentType.Integer)
-fun removeStrike(event: GuildMessageReceivedEvent, args: List<Any>) {
+fun removeStrike(event: CommandEvent) {
+    val (guildEvent, args) = event
     val strikeID = args[0] as Int
     val amountRemoved = removeInfraction(strikeID)
 
-    event.channel.sendMessage("Deleted $amountRemoved strike records.").queue()
+    guildEvent.channel.sendMessage("Deleted $amountRemoved strike records.").queue()
 }
 
 @Command(ArgumentType.UserID)
-fun cleanse(event: GuildMessageReceivedEvent, args: List<Any>) {
+fun cleanse(event: CommandEvent) {
+    val (guildEvent, args, config) = event
     val userId = args[0] as String
     val amount = removeAllInfractions(userId)
 
-    event.channel.sendMessage("Infractions for ${userId.idToUser(event.jda).asMention} have been wiped. Total removed: $amount").queue()
+    guildEvent.channel.sendMessage("Infractions for ${userId.idToUser(guildEvent.jda).asMention} have been wiped. Total removed: $amount").queue()
 }
 
 private fun administerPunishment(config: Configuration, user: User, strikeQuantity: Int, reason: String,

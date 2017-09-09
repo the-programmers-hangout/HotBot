@@ -3,20 +3,19 @@ package me.aberrantfox.aegeus.commandframework.commands
 import me.aberrantfox.aegeus.commandframework.ArgumentType
 import me.aberrantfox.aegeus.commandframework.Command
 import me.aberrantfox.aegeus.commandframework.util.sendPrivateMessage
+import me.aberrantfox.aegeus.listeners.CommandEvent
 import me.aberrantfox.aegeus.services.CommandDescriptor
 import me.aberrantfox.aegeus.services.Configuration
 import me.aberrantfox.aegeus.services.HelpConf
 import me.aberrantfox.aegeus.services.SelectionArgument
 import net.dv8tion.jda.core.EmbedBuilder
-import net.dv8tion.jda.core.entities.MessageEmbed
-import net.dv8tion.jda.core.entities.User
-import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent
 import java.awt.Color
 import java.time.LocalDateTime
 
 @Command(ArgumentType.Manual)
-fun help(event: GuildMessageReceivedEvent, args: List<Any>, config: Configuration) {
-    val user = event.author
+fun help(commandEvent: CommandEvent) {
+    val (guildEvent, args, config) = commandEvent
+    val user = guildEvent.author
 
     when (args.size) {
         0 -> sendPrivateMessage(user, getZeroArgMessage(config))
@@ -41,7 +40,7 @@ fun help(event: GuildMessageReceivedEvent, args: List<Any>, config: Configuratio
         }
     }
 
-    event.message.delete().queue()
+    guildEvent.message.delete().queue()
 }
 
 private fun buildCommandHelpMessage(config: Configuration, descriptor: CommandDescriptor) =
