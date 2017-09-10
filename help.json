@@ -153,8 +153,8 @@
       "name": "history",
       "category": "infractions",
       "description": "Display a user's infraction history.",
-      "structure": "",
-      "example": ""
+      "structure": "{userid}",
+      "example": "history 1341350050053"
     },
     {
       "name": "removeStrike",
