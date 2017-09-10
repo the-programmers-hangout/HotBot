@@ -1,6 +1,8 @@
 package me.aberrantfox.aegeus.commandframework
 
 import me.aberrantfox.aegeus.services.Configuration
+import net.dv8tion.jda.core.JDA
+import net.dv8tion.jda.core.entities.Guild
 import net.dv8tion.jda.core.entities.Role
 import org.reflections.Reflections
 import org.reflections.scanners.MethodAnnotationsScanner
@@ -22,7 +24,10 @@ fun produceCommandMap(): HashMap<String, Method> {
     return map
 }
 
-fun getHighestPermissionLevel(roles: List<Role>, config: Configuration): Permission {
+fun getHighestPermissionLevel(guild: Guild?, config: Configuration, jda: JDA): Permission {
+
+    val roles = getRoles(guild, config, jda)
+
     val roleNames = roles.map { it.name }
 
     when {
@@ -33,6 +38,13 @@ fun getHighestPermissionLevel(roles: List<Role>, config: Configuration): Permiss
 
     return Permission.GUEST
 }
+
+private fun getRoles(guild: Guild?, config: Configuration, jda: JDA): List<Role> =
+        if (guild != null) {
+            guild.roles
+        } else {
+            jda.getGuildById(config.defaultGuildID).roles
+        }
 
 fun stringToPermission(choice: String): Permission? =
         try {
