@@ -17,27 +17,25 @@ fun help(commandEvent: CommandEvent) {
     val (guildEvent, args, config) = commandEvent
     val user = guildEvent.author
 
-    when (args.size) {
-        0 -> sendPrivateMessage(user, getZeroArgMessage(config))
-        1 -> {
-            val selection = args[0] as String
-            val argType = HelpConf.fetchArgumentType(selection)
+    if(args.isEmpty()) {
+        sendPrivateMessage(user, getZeroArgMessage(config))
+    } else if (args.size == 1) {
+        val selection = args[0] as String
+        val argType = HelpConf.fetchArgumentType(selection)
 
-            when (argType) {
-                SelectionArgument.CommandName -> {
-                    val descriptor = HelpConf.fetchCommandDescriptor(selection) ?: return
-                    sendPrivateMessage(user, buildCommandHelpMessage(config, descriptor))
-                }
-                SelectionArgument.CategoryName -> {
-                    val categories = HelpConf.fetchCommandsInCategory(selection)
-                    sendPrivateMessage(user, buildCategoryDescription(selection.toLowerCase(), categories))
-                }
-                else -> sendPrivateMessage(user, "Not a command or category... maybe try the default help command?")
+        when (argType) {
+            SelectionArgument.CommandName -> {
+                val descriptor = HelpConf.fetchCommandDescriptor(selection) ?: return
+                sendPrivateMessage(user, buildCommandHelpMessage(config, descriptor))
             }
+            SelectionArgument.CategoryName -> {
+                val categories = HelpConf.fetchCommandsInCategory(selection)
+                sendPrivateMessage(user, buildCategoryDescription(selection.toLowerCase(), categories))
+            }
+            else -> sendPrivateMessage(user, "Not a command or category... maybe try the default help command?")
         }
-        else -> {
-            sendPrivateMessage(user, "Uhh... this command takes either 0 or 1 arguments.")
-        }
+    } else {
+        sendPrivateMessage(user, "Uhh... this command takes either 0 or 1 arguments.")
     }
 
     guildEvent.message.delete().queue()

@@ -18,7 +18,7 @@ val startTime = Date()
 
 @Command
 fun serverinfo(event: CommandEvent) {
-    val (guildEvent, args, config) = event
+    val (guildEvent) = event
     val builder = EmbedBuilder()
     builder.setTitle(guildEvent.guild.name)
             .setColor(Color.MAGENTA)
@@ -37,7 +37,7 @@ fun serverinfo(event: CommandEvent) {
     builder.addField("Text Channels", "${guildEvent.guild.textChannels.size}", true)
     builder.addField("Voice Channels", "${guildEvent.guild.voiceChannels.size}", true)
 
-    guildEvent.channel.sendMessage(builder.build()).queue()
+    event.channel.sendMessage(builder.build()).queue()
 }
 
 @Command
@@ -46,13 +46,13 @@ fun uptime(event: CommandEvent) {
     val minutes = uptime / 1000 / 60
     val currentDate = startTime.toString()
 
-    event.guildEvent.channel.sendMessage("I've been awake since ${currentDate}, so like... ${minutes} minutes").queue()
+    event.channel.sendMessage("I've been awake since ${currentDate}, so like... ${minutes} minutes").queue()
 }
 
 @Command
 fun exit(event: CommandEvent) {
     saveConfig(event.config)
-    event.guildEvent.channel.sendMessage("Exiting").queue()
+    event.channel.sendMessage("Exiting").queue()
     System.exit(0)
 }
 
@@ -65,7 +65,7 @@ fun kill(event: GuildMessageReceivedEvent) {
 @Command
 fun saveConfigurations(event: CommandEvent) {
     saveConfig(event.config)
-    event.guildEvent.channel.sendMessage("Configurations saved. I hope you know what you are doing...").queue()
+    event.channel.sendMessage("Configurations saved. I hope you know what you are doing...").queue()
 }
 
 @Command(ArgumentType.Manual)
@@ -84,6 +84,6 @@ fun info(event: CommandEvent) {
             .addField("Progress to Completion", "100% for a basic version plus or minus 5%, needs a little more testing", false)
             .addField("Repo link", "https://github.com/AberrantFox/hotbot", false)
 
-    event.guildEvent.channel.sendMessage(builder.build()).queue()
-    event.guildEvent.message.delete().queue()
+    event.channel.sendMessage(builder.build()).queue()
+    event.message.delete().queue()
 }

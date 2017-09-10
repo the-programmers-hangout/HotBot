@@ -4,10 +4,10 @@ import me.aberrantfox.aegeus.commandframework.*
 import me.aberrantfox.aegeus.services.Configuration
 import me.aberrantfox.aegeus.commandframework.commands.macroMap
 import me.aberrantfox.aegeus.services.CommandRecommender
+import net.dv8tion.jda.core.JDA
 import net.dv8tion.jda.core.entities.Message
 import net.dv8tion.jda.core.entities.MessageChannel
-import net.dv8tion.jda.core.events.message.GenericMessageEvent
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent
+import net.dv8tion.jda.core.entities.User
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent
 import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent
 import net.dv8tion.jda.core.hooks.ListenerAdapter
@@ -15,7 +15,11 @@ import java.lang.reflect.Method
 
 data class CommandEvent(val guildEvent: GuildMessageReceivedEvent,
                         val args: List<Any>,
-                        val config: Configuration)
+                        val config: Configuration,
+                        val jda: JDA,
+                        val channel: MessageChannel,
+                        val author: User,
+                        val message: Message)
 
 data class CommandListener(val config: Configuration, val commandMap: Map<String, Method>): ListenerAdapter() {
     init {
@@ -54,9 +58,9 @@ data class CommandListener(val config: Configuration, val commandMap: Map<String
 
         if( !(isValidCommandInvocation(userPermissionLevel, commandPermissionLevel, annotation, event, actual)) ) return
 
-        val convertedArguments = convertArguments(actual, annotation.expectedArgs, event.jda)
+        val parsedArgs = convertArguments(actual, annotation.expectedArgs, event.jda)
 
-        if( convertedArguments == null ) {
+        if( parsedArgs == null ) {
             event.channel.sendMessage(":unamused: Yea, you'll need to learn how to use that properly.").queue()
             return
         }
@@ -64,7 +68,7 @@ data class CommandListener(val config: Configuration, val commandMap: Map<String
         if (method.parameterCount == 0) {
             method.invoke(null)
         } else {
-            method.invoke(null, CommandEvent(event, convertedArguments, config))
+            method.invoke(null, CommandEvent(event, parsedArgs, config, event.jda, event.channel, event.author, event.message))
         }
     }
 

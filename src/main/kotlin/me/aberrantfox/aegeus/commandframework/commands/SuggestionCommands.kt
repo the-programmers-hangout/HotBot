@@ -34,53 +34,49 @@ object Suggestions {
 
 @Command(ArgumentType.Joiner)
 fun suggest(event: CommandEvent) {
-    val (guildEvent, args) = event
-
+    val author = event.author
     if (Suggestions.pool.size > 20) {
-        sendPrivateMessage(guildEvent.author, "There are too many suggestions in the pool to handle your request currently... sorry about that.")
+        sendPrivateMessage(author, "There are too many suggestions in the pool to handle your request currently... sorry about that.")
         return
     }
 
-    if (Suggestions.pool.count { it.member == guildEvent.author.id } == 3) {
-        sendPrivateMessage(guildEvent.author, "You have enough suggestions in the pool for now...")
+    if (Suggestions.pool.count { it.member == author.id } == 3) {
+        sendPrivateMessage(author, "You have enough suggestions in the pool for now...")
         return
     }
 
-    val suggestion = args[0] as String
+    val suggestion = event.args[0] as String
 
-    Suggestions.pool.add(Suggestion(guildEvent.author.id, suggestion, DateTime.now(), guildEvent.author.avatarUrl ?: "http://i.imgur.com/HYkhEFO.jpg"))
-    sendPrivateMessage(guildEvent.author, "Your suggestion has been added to the review-pool. " +
+    Suggestions.pool.add(Suggestion(author.id, suggestion, DateTime.now(), author.avatarUrl ?: "http://i.imgur.com/HYkhEFO.jpg"))
+    sendPrivateMessage(author, "Your suggestion has been added to the review-pool. " +
             "If it passes it'll be pushed out to the suggestions channel.")
 
-    guildEvent.message.delete().queue()
+    event.message.delete().queue()
 }
 
 @Command
 fun poolInfo(event: CommandEvent) {
-    val (guildEvent) = event
-
-    sendPrivateMessage(guildEvent.author,
+    sendPrivateMessage(event.author,
             EmbedBuilder().setTitle("Suggestion Pool Info")
                     .setColor(Color.cyan)
                     .setDescription("There are currently ${Suggestions.pool.size} suggestions in the pool.")
                     .build())
 
-    guildEvent.message.delete().queue()
+    event.message.delete().queue()
 }
 
 @Command
 fun poolTop(event: CommandEvent) {
-    val (guildEvent) = event
     if (Suggestions.pool.isEmpty()) {
-        sendPrivateMessage(guildEvent.author, "The pool is empty.")
+        sendPrivateMessage(event.author, "The pool is empty.")
         return
     }
 
     val suggestion = Suggestions.pool.peek()
 
-    sendPrivateMessage(guildEvent.author,
+    sendPrivateMessage(event.author,
             EmbedBuilder()
-                    .setTitle("Suggestion by ${suggestion.member.idToName(guildEvent.jda)}")
+                    .setTitle("Suggestion by ${suggestion.member.idToName(event.jda)}")
                     .setDescription(suggestion.idea)
                     .addField("Time of Creation",
                             suggestion.timeOf.toString(DateTimeFormat.forPattern("dd/MM/yyyy")),
@@ -88,7 +84,7 @@ fun poolTop(event: CommandEvent) {
                     .addField("Member ID", suggestion.member, false)
                     .build())
 
-    guildEvent.message.delete().queue()
+    event.message.delete().queue()
 }
 
 @Command
@@ -113,7 +109,7 @@ fun poolAccept(event: CommandEvent) {
 }
 
 @Command
-fun poolDeny(event: GuildMessageReceivedEvent, args: List<Any>, config: Configuration) {
+fun poolDeny(event: CommandEvent) {
     if (Suggestions.pool.isEmpty()) {
         sendPrivateMessage(event.author, "The suggestion pool is empty... :)")
         return

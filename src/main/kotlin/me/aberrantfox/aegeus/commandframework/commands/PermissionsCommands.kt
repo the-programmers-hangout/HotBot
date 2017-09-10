@@ -1,58 +1,54 @@
 package me.aberrantfox.aegeus.commandframework.commands
 
-import me.aberrantfox.aegeus.services.Configuration
 import me.aberrantfox.aegeus.commandframework.*
 import me.aberrantfox.aegeus.listeners.CommandEvent
 import net.dv8tion.jda.core.EmbedBuilder
-import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent
 import java.awt.Color
 import java.util.*
 
 @Command(ArgumentType.String, ArgumentType.String)
 fun setPerm(event: CommandEvent) {
-    val (guildEvent, args, config) = event
+    val (_, args, config) = event
 
     val commandName = args[0] as String
     val desiredPermission = (args[1] as String).toUpperCase()
     
     if( !(config.commandPermissionMap.contains(commandName)) ) {
-        guildEvent.channel.sendMessage("Dunno what the command: $commandName is - run the help command?").queue()
+        event.channel.sendMessage("Dunno what the command: $commandName is - run the help command?").queue()
         return
     }
 
     val permission = stringToPermission(desiredPermission)
 
     if (permission == null) {
-        guildEvent.channel.sendMessage("Yup. That permission level doesn't exist. Sorry").queue()
+        event.channel.sendMessage("Yup. That permission level doesn't exist. Sorry").queue()
         return
     }
 
     config.commandPermissionMap[commandName] = permission
-    guildEvent.channel.sendMessage("Permission of $commandName is now $permission").queue()
+    event.channel.sendMessage("Permission of $commandName is now $permission").queue()
 }
 
 @Command(ArgumentType.String)
 fun getPerm(event: CommandEvent) {
-    val (guildEvent, args, config) = event
 
-    val commandName = args[0] as String
+    val commandName = event.args[0] as String
 
-    if( !(config.commandPermissionMap.containsKey(commandName)) ) {
-        guildEvent.channel.sendMessage("What command is that, exactly?").queue()
+    if( !(event.config.commandPermissionMap.containsKey(commandName)) ) {
+        event.channel.sendMessage("What command is that, exactly?").queue()
         return
     }
 
-    guildEvent.channel.sendMessage("Current permission level: ${config.commandPermissionMap[commandName]}").queue()
+    event.channel.sendMessage("Current permission level: ${event.config.commandPermissionMap[commandName]}").queue()
 }
 
 @Command
 fun listCommands(event: CommandEvent) {
-    val (guildEvent, _, config) = event
     val messageBuilder = StringBuilder()
-    config.commandPermissionMap.keys.forEach { messageBuilder.append(it).append(", ") }
+    event.config.commandPermissionMap.keys.forEach { messageBuilder.append(it).append(", ") }
 
     val message = messageBuilder.substring(0, messageBuilder.length -  2)
-    guildEvent.channel.sendMessage("Currently there are the following commands: $message.").queue()
+    event.channel.sendMessage("Currently there are the following commands: $message.").queue()
 }
 
 @Command
@@ -68,21 +64,20 @@ fun listAvailable(event: CommandEvent) {
             .addField("Commands", available, false)
             .build()
 
-    guildEvent.channel.sendMessage(response).queue()
+    event.channel.sendMessage(response).queue()
 }
 
 
 @Command
 fun listPerms(event: CommandEvent) {
-    event.guildEvent.channel.sendMessage(Permission.values().map { it.name }.reduceRight{
+    event.channel.sendMessage(Permission.values().map { it.name }.reduceRight{
         acc, s -> "$acc, $s"
     } + ".").queue()
 }
 
 @Command
 fun listCommandPerms(event: CommandEvent) {
-    val (guildEvent, args, config) = event
     val joiner = StringJoiner("\n")
-    config.commandPermissionMap.entries.forEach { joiner.add("${it.key} :: ${it.value}") }
-    guildEvent.channel.sendMessage(joiner.toString()).queue()
+    event.config.commandPermissionMap.entries.forEach { joiner.add("${it.key} :: ${it.value}") }
+    event.channel.sendMessage(joiner.toString()).queue()
 }
