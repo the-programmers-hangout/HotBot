@@ -44,7 +44,9 @@ fun convertArguments(actual: List<String>, expected: Array<out ArgumentType>, jd
 }
 
 fun getCommandStruct(message: String, config: Configuration): CommandStruct {
-    val trimmedMessage = message.substring(config.prefix.length)
+    var trimmedMessage = message.substring(config.prefix.length)
+
+    if(trimmedMessage.startsWith(config.prefix)) trimmedMessage = trimmedMessage.substring(config.prefix.length)
 
     if (!(message.contains(" "))) {
         return CommandStruct(trimmedMessage.toLowerCase())

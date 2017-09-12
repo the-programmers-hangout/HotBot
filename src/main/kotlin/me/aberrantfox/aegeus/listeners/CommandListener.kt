@@ -3,6 +3,7 @@ package me.aberrantfox.aegeus.listeners
 import me.aberrantfox.aegeus.commandframework.*
 import me.aberrantfox.aegeus.services.Configuration
 import me.aberrantfox.aegeus.commandframework.commands.macroMap
+import me.aberrantfox.aegeus.commandframework.util.isDeleted
 import me.aberrantfox.aegeus.services.CommandRecommender
 import net.dv8tion.jda.core.JDA
 import net.dv8tion.jda.core.entities.Guild
@@ -53,33 +54,36 @@ data class CommandListener(val config: Configuration, val commandMap: Map<String
 
     private fun respondToCommand(commandName: String, actual: List<String>, channel: MessageChannel, message: Message,
                                  author: User, guild: Guild? = null) {
-        val method = commandMap[commandName]?: return
+        val method = commandMap[commandName] ?: return
         val userPermissionLevel = getHighestPermissionLevel(guild, config, jda)
         val commandPermissionLevel = config.commandPermissionMap[commandName] ?: return
         val annotation = method.getAnnotation(Command::class.java)
         val requiresGuild = method.getAnnotation(RequiresGuild::class.java)
 
-        if( !(isValidCommandInvocation(userPermissionLevel, commandPermissionLevel, annotation, channel, actual, message)) ) return
+        if (!(isValidCommandInvocation(userPermissionLevel, commandPermissionLevel, annotation, channel, actual, message))) return
 
         val parsedArgs = convertArguments(actual, annotation.expectedArgs, jda)
 
-        if( parsedArgs == null ) {
+        if (parsedArgs == null) {
             channel.sendMessage(":unamused: Yea, you'll need to learn how to use that properly.").queue()
             return
         }
 
         if (method.parameterCount == 0) {
             method.invoke(null)
+            handleDelete(message, config.prefix)
             return
         }
 
-        if(requiresGuild != null && !requiresGuild.useDefault && guild == null) {
+        if (requiresGuild != null && !requiresGuild.useDefault && guild == null) {
             channel.sendMessage("This command must be invoked in a guild channel, and not through PM").queue()
         } else if (requiresGuild != null && requiresGuild.useDefault && guild == null) {
             method.invoke(null, CommandEvent(parsedArgs, config, jda, channel, author, message, jda.getGuildById(config.guildid)))
         } else {
             method.invoke(null, CommandEvent(parsedArgs, config, jda, channel, author, message, guild))
         }
+
+        handleDelete(message, config.prefix)
     }
 
     private fun isUsableEvent(message: Message, author: String, channel: String, isBot: Boolean): Boolean {
@@ -124,6 +128,16 @@ data class CommandListener(val config: Configuration, val commandMap: Map<String
         }
 
         return true
+    }
+
+    private fun handleDelete(message: Message, prefix: String) {
+        if(message.rawContent.startsWith(prefix + prefix)) {
+            return
+        }
+
+        message.channel.getMessageById(message.id).queue {
+            it?.delete()?.queue()
+        }
     }
 }
 

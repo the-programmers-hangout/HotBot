@@ -12,7 +12,7 @@ import java.util.*
 
 val startTime = Date()
 
-@Command fun ping(event: GuildMessageReceivedEvent) = event.channel.sendMessage("Pong!").queue()
+@Command fun ping(event: CommandEvent) = event.channel.sendMessage("Pong!").queue()
 
 @Command
 fun serverinfo(event: CommandEvent) {
