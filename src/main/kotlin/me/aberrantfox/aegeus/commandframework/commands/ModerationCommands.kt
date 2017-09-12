@@ -2,6 +2,7 @@ package me.aberrantfox.aegeus.commandframework.commands
 
 import me.aberrantfox.aegeus.commandframework.ArgumentType
 import me.aberrantfox.aegeus.commandframework.Command
+import me.aberrantfox.aegeus.commandframework.RequiresGuild
 import me.aberrantfox.aegeus.commandframework.stringToPermission
 import me.aberrantfox.aegeus.commandframework.util.idToUser
 import me.aberrantfox.aegeus.commandframework.util.muteMember
@@ -14,27 +15,31 @@ import net.dv8tion.jda.core.entities.Message
 import net.dv8tion.jda.core.entities.MessageChannel
 import net.dv8tion.jda.core.entities.TextChannel
 
-
+@RequiresGuild(false)
 @Command(ArgumentType.Integer)
 fun nuke(event: CommandEvent) {
-    val (guildEvent, args) = event
-    val amount = args[0] as Int
+    if(event.guild == null) return
+
+    val amount = event.args[0] as Int
 
     if (amount <= 0) {
-        guildEvent.channel.sendMessage("Yea, what exactly is the point in nuking nothing... ?").queue()
+        event.channel.sendMessage("Yea, what exactly is the point in nuking nothing... ?").queue()
         return
     }
 
-    guildEvent.channel.history.retrievePast(amount + 1).queue({
+    event.channel.history.retrievePast(amount + 1).queue({
         it.forEach { it.delete().queue() }
-        guildEvent.channel.sendMessage("Be nice. No spam.").queue()
+        event.channel.sendMessage("Be nice. No spam.").queue()
     })
 }
 
+@RequiresGuild
 @Command(ArgumentType.String)
 fun ignore(event: CommandEvent) {
-    val (_, args, config) = event
-    val target = args[0] as String
+    if(event.guild == null) return
+
+    val config = event.config
+    val target = event.args[0] as String
 
     if (config.ignoredIDs.contains(target)) {
         config.ignoredIDs.remove(target)
@@ -45,15 +50,18 @@ fun ignore(event: CommandEvent) {
     }
 }
 
+@RequiresGuild
 @Command(ArgumentType.UserID, ArgumentType.Integer, ArgumentType.Joiner)
 fun mute(event: CommandEvent) {
-    val (guildEvent, args, config) = event
+    if(event.guild == null) return
+
+    val args = event.args
+
     val user = (args[0] as String).idToUser(event.jda)
     val time = (args[1] as Int).toLong() * 1000 * 60
     val reason = args[2] as String
-    val guild = guildEvent.guild
 
-    muteMember(guild, user, time, reason, config, event.author)
+    muteMember(event.guild, user, time, reason, event.config, event.author)
 }
 
 @Command
@@ -65,31 +73,33 @@ fun lockdown(event: CommandEvent) {
 
 @Command(ArgumentType.String)
 fun prefix(event: CommandEvent) {
-    val (_, args, config) = event
-    val newPrefix = args[0] as String
-    config.prefix = newPrefix
+    val newPrefix = event.args[0] as String
+    event.config.prefix = newPrefix
     event.channel.sendMessage("Prefix is now $newPrefix. Please invoke commands using that prefix in the future. " +
             "To save this configuration, use the saveconfigurations command.").queue()
-    event.jda.presence.setPresence(OnlineStatus.ONLINE, Game.of("${config.prefix}help"))
+    event.jda.presence.setPresence(OnlineStatus.ONLINE, Game.of("${event.config.prefix}help"))
 }
 
 @Command(ArgumentType.String)
 fun setFilter(event: CommandEvent) {
-    val (_, args, config) = event
-    val desiredLevel = stringToPermission((args[0] as String).toUpperCase())
+    val desiredLevel = stringToPermission((event.args[0] as String).toUpperCase())
 
     if (desiredLevel == null) {
         event.channel.sendMessage("Don't know that permission level boss... ").queue()
         return
     }
 
-    config.mentionFilterLevel = desiredLevel
+    event.config.mentionFilterLevel = desiredLevel
     event.channel.sendMessage("Permission level now set to: ${desiredLevel.name} ; be sure to save configurations.").queue()
 }
 
+@RequiresGuild(false)
 @Command(ArgumentType.String, ArgumentType.Integer, ArgumentType.String)
 fun move(event: CommandEvent) {
-    val (guildEvent, args) = event
+    if(event.guild == null) return
+
+    val args = event.args
+
     val targets = getTargets((args[0] as String))
     val searchSpace = args[1] as Int
     val chan = args[2] as String
@@ -106,7 +116,7 @@ fun move(event: CommandEvent) {
         return
     }
 
-    val channel = guildEvent.guild.textChannels.filter { it.id == chan }.first()
+    val channel = event.guild.textChannels.filter { it.id == chan }.first()
 
     if (channel == null) {
         event.channel.sendMessage("... to where?").queue()
@@ -118,14 +128,18 @@ fun move(event: CommandEvent) {
     }
 }
 
+@RequiresGuild
 @Command(ArgumentType.UserID, ArgumentType.Joiner)
 fun badname(event: CommandEvent) {
-    val (guildEvent, args) = event
+    if(event.guild == null) return
+
+    val args = event.args
     val target = args[0] as String
     val reason = args[1] as String
-    val targetMember = guildEvent.guild.getMemberById(target)
 
-    guildEvent.guild.controller.setNickname(targetMember, MessageService.getMessage(MessageType.Name)).queue {
+    val targetMember = event.guild.getMemberById(target)
+
+    event.guild.controller.setNickname(targetMember, MessageService.getMessage(MessageType.Name)).queue {
         targetMember.user.openPrivateChannel().queue {
             it.sendMessage("Your name has been changed forcefully by a member of staff for reason: $reason").queue()
         }

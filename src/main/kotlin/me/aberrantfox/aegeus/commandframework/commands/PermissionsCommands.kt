@@ -6,14 +6,15 @@ import net.dv8tion.jda.core.EmbedBuilder
 import java.awt.Color
 import java.util.*
 
+@RequiresGuild
 @Command(ArgumentType.String, ArgumentType.String)
 fun setPerm(event: CommandEvent) {
-    val (_, args, config) = event
+    if(event.guild == null) return
 
-    val commandName = args[0] as String
-    val desiredPermission = (args[1] as String).toUpperCase()
+    val commandName = event.args[0] as String
+    val desiredPermission = (event.args[1] as String).toUpperCase()
     
-    if( !(config.commandPermissionMap.contains(commandName)) ) {
+    if( !(event.config.commandPermissionMap.contains(commandName)) ) {
         event.channel.sendMessage("Dunno what the command: $commandName is - run the help command?").queue()
         return
     }
@@ -25,13 +26,12 @@ fun setPerm(event: CommandEvent) {
         return
     }
 
-    config.commandPermissionMap[commandName] = permission
+    event.config.commandPermissionMap[commandName] = permission
     event.channel.sendMessage("Permission of $commandName is now $permission").queue()
 }
 
 @Command(ArgumentType.String)
 fun getPerm(event: CommandEvent) {
-
     val commandName = event.args[0] as String
 
     if( !(event.config.commandPermissionMap.containsKey(commandName)) ) {
@@ -51,16 +51,18 @@ fun listCommands(event: CommandEvent) {
     event.channel.sendMessage("Currently there are the following commands: $message.").queue()
 }
 
+@RequiresGuild
 @Command
 fun listAvailable(event: CommandEvent) {
-    val (guildEvent, _, config) = event
-    val permLevel = getHighestPermissionLevel(guildEvent.member.roles, config)
-    val available = config.commandPermissionMap.filter { it.value <= permLevel }.keys.reduce { acc, s -> "$acc, $s" }
+    if(event.guild == null) return
+
+    val permLevel = getHighestPermissionLevel(event.guild, event.config, event.jda)
+    val available = event.config.commandPermissionMap.filter { it.value <= permLevel }.keys.reduce { acc, s -> "$acc, $s" }
     val response = EmbedBuilder()
             .setTitle("Available Commands")
             .setColor(Color.cyan)
             .setDescription("Below you can find a list of commands that are available to based on your permission level," +
-                    " which is $permLevel - if you need help using any of them, simply type ${config.prefix}help <command>.")
+                    " which is $permLevel - if you need help using any of them, simply type ${event.config.prefix}help <command>.")
             .addField("Commands", available, false)
             .build()
 

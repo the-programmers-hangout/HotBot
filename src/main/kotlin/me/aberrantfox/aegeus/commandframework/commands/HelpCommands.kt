@@ -13,12 +13,11 @@ import java.awt.Color
 import java.time.LocalDateTime
 
 @Command(ArgumentType.Manual)
-fun help(commandEvent: CommandEvent) {
-    val (guildEvent, args, config) = commandEvent
-    val user = guildEvent.author
+fun help(event: CommandEvent) {
+    val (args, config, _, _, author) = event
 
     if(args.isEmpty()) {
-        sendPrivateMessage(user, getZeroArgMessage(config))
+        sendPrivateMessage(author, getZeroArgMessage(config))
     } else if (args.size == 1) {
         val selection = args[0] as String
         val argType = HelpConf.fetchArgumentType(selection)
@@ -26,19 +25,17 @@ fun help(commandEvent: CommandEvent) {
         when (argType) {
             SelectionArgument.CommandName -> {
                 val descriptor = HelpConf.fetchCommandDescriptor(selection) ?: return
-                sendPrivateMessage(user, buildCommandHelpMessage(config, descriptor))
+                sendPrivateMessage(author, buildCommandHelpMessage(config, descriptor))
             }
             SelectionArgument.CategoryName -> {
                 val categories = HelpConf.fetchCommandsInCategory(selection)
-                sendPrivateMessage(user, buildCategoryDescription(selection.toLowerCase(), categories))
+                sendPrivateMessage(author, buildCategoryDescription(selection.toLowerCase(), categories))
             }
-            else -> sendPrivateMessage(user, "Not a command or category... maybe try the default help command?")
+            else -> sendPrivateMessage(author, "Not a command or category... maybe try the default help command?")
         }
     } else {
-        sendPrivateMessage(user, "Uhh... this command takes either 0 or 1 arguments.")
+        sendPrivateMessage(author, "Uhh... this command takes either 0 or 1 arguments.")
     }
-
-    guildEvent.message.delete().queue()
 }
 
 private fun buildCommandHelpMessage(config: Configuration, descriptor: CommandDescriptor) =

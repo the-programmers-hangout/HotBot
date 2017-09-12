@@ -35,8 +35,7 @@ data class CommandListener(val config: Configuration, val commandMap: Map<String
     private fun handleInvocation(channel: MessageChannel, message: Message, author: User, guild: Guild? = null) {
         if(!isUsableEvent(message, author.id, channel.id, author.isBot)) return
 
-        val rawMessage = message.rawContent
-        val (commandName, actualArgs) = getCommandStruct(rawMessage, config)
+        val (commandName, actualArgs) = getCommandStruct(message.rawContent, config)
 
         if(commandMap.containsKey(commandName)) {
             respondToCommand(commandName, actualArgs, channel, message, author, guild)
@@ -58,9 +57,9 @@ data class CommandListener(val config: Configuration, val commandMap: Map<String
         val userPermissionLevel = getHighestPermissionLevel(guild, config, jda)
         val commandPermissionLevel = config.commandPermissionMap[commandName] ?: return
         val annotation = method.getAnnotation(Command::class.java)
+        val requiresGuild = method.getAnnotation(RequiresGuild::class.java)
 
         if( !(isValidCommandInvocation(userPermissionLevel, commandPermissionLevel, annotation, channel, actual, message)) ) return
-
 
         val parsedArgs = convertArguments(actual, annotation.expectedArgs, jda)
 
@@ -71,6 +70,13 @@ data class CommandListener(val config: Configuration, val commandMap: Map<String
 
         if (method.parameterCount == 0) {
             method.invoke(null)
+            return
+        }
+
+        if(requiresGuild != null && !requiresGuild.useDefault && guild == null) {
+            channel.sendMessage("This command must be invoked in a guild channel, and not through PM").queue()
+        } else if (requiresGuild != null && requiresGuild.useDefault && guild == null) {
+            method.invoke(null, CommandEvent(parsedArgs, config, jda, channel, author, message, jda.getGuildById(config.guildid)))
         } else {
             method.invoke(null, CommandEvent(parsedArgs, config, jda, channel, author, message, guild))
         }

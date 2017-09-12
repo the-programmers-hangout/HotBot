@@ -8,6 +8,7 @@ import me.aberrantfox.aegeus.commandframework.util.unmute
 import me.aberrantfox.aegeus.listeners.*
 import me.aberrantfox.aegeus.services.Configuration
 import me.aberrantfox.aegeus.services.database.setupDatabaseSchema
+import me.aberrantfox.aegeus.services.saveConfig
 import net.dv8tion.jda.core.*
 import net.dv8tion.jda.core.entities.Game
 import net.dv8tion.jda.core.entities.Guild
@@ -17,7 +18,8 @@ fun main(args: Array<String>) {
     println("Starting to load Aegeus bot.")
 
     val commandMap = produceCommandMap()
-    val config = loadConfig(commandMap)
+    val config = loadConfig(commandMap) ?: return
+    saveConfig(config)
 
     if (config == null) {
         println("""The default configuration has been generated. Please fill in this configuration in order to use the bot.""")
@@ -29,7 +31,7 @@ fun main(args: Array<String>) {
 
     val jda = JDABuilder(AccountType.BOT).setToken(config.token).buildBlocking()
     jda.addEventListener(
-            CommandListener(config, commandMap),
+            CommandListener(config, commandMap, jda),
             MemberListener(config),
             InviteListener(config),
             ResponseListener(config),

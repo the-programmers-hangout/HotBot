@@ -28,7 +28,7 @@ data class Configuration(val token: String = "insert-token",
                          val strikeCeil: Int = 3,
                          val invitePermissionLevel: Permission = Permission.MODERATOR,
                          val suggestionPoolLimit: Int = 20,
-                         val defaultGuildID: String = "Insert-master-Guild-ID")
+                         val guildid: String = "Insert-id")
 
 class PermissionRoles(val moderatorRoles: Array<String> = arrayOf("Moderator"),
                       val adminRoles: Array<String> = arrayOf("Admin"),

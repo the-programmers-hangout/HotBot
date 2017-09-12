@@ -2,6 +2,7 @@ package me.aberrantfox.aegeus.commandframework.commands
 
 import me.aberrantfox.aegeus.commandframework.ArgumentType
 import me.aberrantfox.aegeus.commandframework.Command
+import me.aberrantfox.aegeus.commandframework.RequiresGuild
 import me.aberrantfox.aegeus.commandframework.util.idToName
 import me.aberrantfox.aegeus.commandframework.util.sendPrivateMessage
 import me.aberrantfox.aegeus.listeners.CommandEvent
@@ -50,8 +51,6 @@ fun suggest(event: CommandEvent) {
     Suggestions.pool.add(Suggestion(author.id, suggestion, DateTime.now(), author.avatarUrl ?: "http://i.imgur.com/HYkhEFO.jpg"))
     sendPrivateMessage(author, "Your suggestion has been added to the review-pool. " +
             "If it passes it'll be pushed out to the suggestions channel.")
-
-    event.message.delete().queue()
 }
 
 @Command
@@ -61,8 +60,6 @@ fun poolInfo(event: CommandEvent) {
                     .setColor(Color.cyan)
                     .setDescription("There are currently ${Suggestions.pool.size} suggestions in the pool.")
                     .build())
-
-    event.message.delete().queue()
 }
 
 @Command
@@ -83,29 +80,27 @@ fun poolTop(event: CommandEvent) {
                             false)
                     .addField("Member ID", suggestion.member, false)
                     .build())
-
-    event.message.delete().queue()
 }
 
+@RequiresGuild
 @Command
 fun poolAccept(event: CommandEvent) {
-    val (guildEvent, _, config) = event
+    if(event.guild == null) return
+
     if (Suggestions.pool.isEmpty()) {
-        sendPrivateMessage(guildEvent.author, "The suggestion pool is empty... :)")
+        sendPrivateMessage(event.author, "The suggestion pool is empty... :)")
         return
     }
 
-    val channel = guildEvent.guild.textChannels.findLast { it.id == config.suggestionChannel }
+    val channel = event.guild.textChannels.findLast { it.id == event.config.suggestionChannel }
     val suggestion = Suggestions.pool.remove()
 
-    channel?.sendMessage(buildSuggestionMessage(suggestion, guildEvent.jda, SuggestionStatus.Review).build())?.queue {
+    channel?.sendMessage(buildSuggestionMessage(suggestion, event.jda, SuggestionStatus.Review).build())?.queue {
         trackSuggestion(suggestion, SuggestionStatus.Review, it.id)
 
         it.addReaction("⬆").queue()
         it.addReaction("⬇").queue()
     }
-
-    guildEvent.message.delete().queue()
 }
 
 @Command
@@ -124,30 +119,32 @@ fun poolDeny(event: CommandEvent) {
             .build())
 }
 
+@RequiresGuild
 @Command(ArgumentType.String, ArgumentType.String, ArgumentType.Joiner)
 fun respond(event: CommandEvent) {
-    val (guildEvent, args, config) = event
+    if(event.guild == null) return
+
+    val (args, config) = event
     val target = args[0] as String
     val response = args[1] as String
     val reason = args[2] as String
     val status = inputToStatus(response)
 
     if (status == null) {
-        guildEvent.channel.sendMessage("Valid responses are 'accepted', 'denied' and 'review'... use accordingly.").queue()
+        event.channel.sendMessage("Valid responses are 'accepted', 'denied' and 'review'... use accordingly.").queue()
         return
     }
 
-    val channel = fetchSuggestionChannel(guildEvent.guild, config)
+    val channel = fetchSuggestionChannel(event.guild, config)
 
     if (!(isTracked(target)) || channel.getMessageById(target) == null) {
-        guildEvent.channel.sendMessage("That is not a valid message or a suggestion by the ID.").queue()
-        guildEvent.message.delete().queue()
+        event.channel.sendMessage("That is not a valid message or a suggestion by the ID.").queue()
         return
     }
 
     channel.getMessageById(target).queue {
         val suggestion = obtainSuggestion(target)
-        val message = buildSuggestionMessage(suggestion, guildEvent.jda, status)
+        val message = buildSuggestionMessage(suggestion, event.jda, status)
         val reasonTitle = "Reason for Status"
 
         message.fields.removeIf { it.name == reasonTitle }
@@ -157,8 +154,6 @@ fun respond(event: CommandEvent) {
 
         it.editMessage(message.build()).queue()
     }
-
-    guildEvent.message.delete().queue()
 }
 
 private fun fetchSuggestionChannel(guild: Guild, config: Configuration) = guild.getTextChannelById(config.suggestionChannel)

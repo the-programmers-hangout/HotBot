@@ -2,6 +2,7 @@ package me.aberrantfox.aegeus.listeners
 
 import me.aberrantfox.aegeus.commandframework.getHighestPermissionLevel
 import me.aberrantfox.aegeus.services.Configuration
+import net.dv8tion.jda.core.JDA
 import net.dv8tion.jda.core.entities.Guild
 import net.dv8tion.jda.core.entities.Message
 import net.dv8tion.jda.core.entities.TextChannel
@@ -13,16 +14,16 @@ import net.dv8tion.jda.core.hooks.ListenerAdapter
 
 class InviteListener(val config: Configuration) : ListenerAdapter() {
     override fun onGuildMessageUpdate(event: GuildMessageUpdateEvent) =
-            handlePossibleInviteMessage(event.member, event.message, event.guild, event.channel, event.author.isBot)
+            handlePossibleInviteMessage(event.member, event.message, event.guild, event.channel, event.author.isBot, event.jda)
 
     override fun onGuildMessageReceived(event: GuildMessageReceivedEvent) =
-            handlePossibleInviteMessage(event.member, event.message, event.guild, event.channel, event.author.isBot)
+            handlePossibleInviteMessage(event.member, event.message, event.guild, event.channel, event.author.isBot, event.jda)
 
     private fun handlePossibleInviteMessage(author: Member, message: Message, guild: Guild, channel: TextChannel,
-                                            isBot: Boolean) {
+                                            isBot: Boolean, jda: JDA) {
         if (isBot) return
 
-        val maxPermissionLevel = getHighestPermissionLevel(author.roles, config)
+        val maxPermissionLevel = getHighestPermissionLevel(guild, config, jda)
 
         if(maxPermissionLevel >= config.invitePermissionLevel) return
 

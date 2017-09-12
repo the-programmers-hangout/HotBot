@@ -2,11 +2,13 @@ package me.aberrantfox.aegeus.commandframework.commands
 
 import me.aberrantfox.aegeus.commandframework.ArgumentType
 import me.aberrantfox.aegeus.commandframework.Command
+import me.aberrantfox.aegeus.commandframework.RequiresGuild
 import me.aberrantfox.aegeus.commandframework.util.*
 import me.aberrantfox.aegeus.listeners.CommandEvent
 import me.aberrantfox.aegeus.services.*
 import me.aberrantfox.aegeus.services.database.*
 import net.dv8tion.jda.core.EmbedBuilder
+import net.dv8tion.jda.core.entities.Guild
 import net.dv8tion.jda.core.entities.User
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent
 import org.joda.time.format.DateTimeFormat
@@ -15,18 +17,16 @@ import java.awt.Color
 
 @Command(ArgumentType.UserID, ArgumentType.Joiner)
 fun warn(event: CommandEvent) =
-        strike(CommandEvent(
-                event.guildEvent,
-                listOf(event.args[0], 0, event.args[1]),
-                event.config,
-                event.jda,
-                event.channel,
-                event.author,
-                event.message))
+        strike(CommandEvent(listOf(event.args[0], 0, event.args[1]),
+                event.config, event.jda, event.channel,
+                event.author, event.message, event.guild))
 
+@RequiresGuild
 @Command(ArgumentType.UserID, ArgumentType.Integer, ArgumentType.Joiner)
 fun strike(event: CommandEvent) {
-    val (guildEvent, args, config) = event
+    if(event.guild == null) return
+
+    val args = event.args
     val target = args[0] as String
     val strikeQuantity = args[1] as Int
     val reason = args[2] as String
@@ -36,7 +36,7 @@ fun strike(event: CommandEvent) {
         return
     }
 
-    if( !(guildEvent.guild.members.map { it.user.id }.contains(target)) ) {
+    if( !(event.guild.members.map { it.user.id }.contains(target)) ) {
         event.channel.sendMessage("Cannot find the member by the id: $target").queue()
         return
     }
@@ -50,16 +50,14 @@ fun strike(event: CommandEvent) {
 
     var totalStrikes = getMaxStrikes(target)
 
-    if(totalStrikes > config.strikeCeil) totalStrikes = config.strikeCeil
+    if(totalStrikes > event.config.strikeCeil) totalStrikes = event.config.strikeCeil
 
-    administerPunishment(config, target.idToUser(event.jda), strikeQuantity, reason, guildEvent, event.author, totalStrikes)
-    event.message.delete().queue()
+    administerPunishment(event.config, target.idToUser(event.jda), strikeQuantity, reason, event.guild, event.author, totalStrikes)
 }
 
 @Command(ArgumentType.UserID)
 fun history(event: CommandEvent) {
-    val (guildEvent, args) = event
-    val target = args[0] as String
+    val target = event.args[0] as String
     val records = getHistory(target)
     val builder = EmbedBuilder()
             .setTitle("${target.idToName(event.jda)}'s Record")
@@ -83,7 +81,6 @@ fun history(event: CommandEvent) {
     }
 
     event.channel.sendMessage(builder.build()).queue()
-    event.message.delete().queue()
 }
 
 @Command(ArgumentType.Integer)
@@ -103,7 +100,7 @@ fun cleanse(event: CommandEvent) {
 }
 
 private fun administerPunishment(config: Configuration, user: User, strikeQuantity: Int, reason: String,
-                                 event: GuildMessageReceivedEvent, moderator: User, totalStrikes: Int) {
+                                 guild: Guild, moderator: User, totalStrikes: Int) {
     user.openPrivateChannel().queue { chan ->
         val punishmentAction = config.infractionActionMap[totalStrikes]
         chan.sendMessage("${chan.user.asMention}, you have been infracted. Infractions are formal warnings from staff members" +
@@ -119,16 +116,16 @@ private fun administerPunishment(config: Configuration, user: User, strikeQuanti
                 InfractionAction.Kick -> {
                     chan.sendMessage("You may return via this: https://discord.gg/BQN6BYE - please be mindful of the rules next time.")
                             .queue {
-                                event.guild.controller.kick(user.id, reason).queue()
+                                guild.controller.kick(user.id, reason).queue()
                             }
                 }
                 InfractionAction.Mute -> {
-                    muteMember(event.guild, user, 1000 * 60 * 60 * 24, reason, config, moderator)
+                    muteMember(guild, user, 1000 * 60 * 60 * 24, reason, config, moderator)
                 }
                 InfractionAction.Ban -> {
                     chan.sendMessage("Well... that happened. There may be an appeal system in the future. But for now, you're" +
                             " permanently banned. Sorry about that :) ").queue {
-                        event.guild.controller.ban(user.id, 0, reason).queue()
+                        guild.controller.ban(user.id, 0, reason).queue()
                     }
                 }
             }

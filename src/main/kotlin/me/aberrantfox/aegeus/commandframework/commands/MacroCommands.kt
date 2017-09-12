@@ -16,8 +16,7 @@ private val mapLocation = "macros.json"
 
 @Command(ArgumentType.String, ArgumentType.Joiner)
 fun addMacro(event: CommandEvent) {
-    val (_, args, config) = event
-    val key = (args[0] as String).toLowerCase()
+    val key = (event.args[0] as String).toLowerCase()
 
     if(produceCommandMap().containsKey(key)) {
         event.channel.sendMessage("You dummy. There is a command with that name already...").queue()
@@ -27,7 +26,7 @@ fun addMacro(event: CommandEvent) {
         return
     }
 
-    val value = event.message.rawContent.substring("addmacro ".length + key.length + config.prefix.length + 1)
+    val value = event.message.rawContent.substring("addmacro ".length + key.length + event.config.prefix.length + 1)
 
     macroMap[key] = value
     event.channel.sendMessage("**$key** will now respond with: **$value**").queue()

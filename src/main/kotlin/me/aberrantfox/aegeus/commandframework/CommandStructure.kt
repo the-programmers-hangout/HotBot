@@ -14,6 +14,8 @@ enum class Permission {
 
 annotation class Command(vararg val expectedArgs: ArgumentType = arrayOf())
 
+annotation class RequiresGuild(val useDefault: Boolean = true)
+
 fun produceCommandMap(): HashMap<String, Method> {
     val reflections = Reflections("me.aberrantfox.aegeus.commandframework.commands", MethodAnnotationsScanner())
     val commands = reflections.getMethodsAnnotatedWith(Command::class.java)
@@ -43,7 +45,7 @@ private fun getRoles(guild: Guild?, config: Configuration, jda: JDA): List<Role>
         if (guild != null) {
             guild.roles
         } else {
-            jda.getGuildById(config.defaultGuildID).roles
+            jda.getGuildById(config.guildid).roles
         }
 
 fun stringToPermission(choice: String): Permission? =
