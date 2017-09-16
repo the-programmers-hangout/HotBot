@@ -23,5 +23,3 @@ fun Message.isDoubleCommandInvocation(config: Configuration) = this.rawContent.s
 fun Message.deleteIfExists() = if(! (isDeleted()) ) delete().queue() else Unit
 
 fun Message.mentionsSomeone() = (mentionsEveryone() || mentionedUsers.size > 0 || mentionedRoles.size > 0)
-
-
