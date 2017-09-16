@@ -5,6 +5,8 @@ import me.aberrantfox.aegeus.services.Configuration
 import me.aberrantfox.aegeus.commandframework.commands.macroMap
 import me.aberrantfox.aegeus.commandframework.util.*
 import me.aberrantfox.aegeus.services.CommandRecommender
+import me.aberrantfox.aegeus.services.InvocationType
+import me.aberrantfox.aegeus.services.LastCommands
 import net.dv8tion.jda.core.JDA
 import net.dv8tion.jda.core.entities.Guild
 import net.dv8tion.jda.core.entities.Message
@@ -31,9 +33,11 @@ data class CommandListener(val config: Configuration, val commandMap: Map<String
 
     override fun onPrivateMessageReceived(e: PrivateMessageReceivedEvent) = handleInvocation(e.channel, e.message, e.author)
 
-    override fun onGuildMessageReceived(e: GuildMessageReceivedEvent) = handleInvocation(e.channel, e.message, e.author, e.guild)
+    override fun onGuildMessageReceived(e: GuildMessageReceivedEvent) = handleInvocation(e.channel, e.message, e.author,
+            e.guild, InvocationType.Guild)
 
-    private fun handleInvocation(channel: MessageChannel, message: Message, author: User, guild: Guild? = null) {
+    private fun handleInvocation(channel: MessageChannel, message: Message, author: User, guild: Guild? = null,
+                                 type: InvocationType = InvocationType.Dm) {
         if (!isUsableEvent(message, author.id, channel.id, author.isBot)) return
 
         val (commandName, actualArgs) = getCommandStruct(message.rawContent, config)
@@ -42,12 +46,13 @@ data class CommandListener(val config: Configuration, val commandMap: Map<String
         if (!(isValidCommand(userPermissionLevel, channel, message))) return
 
         if (commandMap.containsKey(commandName)) {
-            respondToCommand(commandName, actualArgs, channel, message, author, guild, userPermissionLevel)
+            respondToCommand(commandName, actualArgs, channel, message, author, guild, userPermissionLevel, type)
             return
         }
 
         if (macroMap.containsKey(commandName)) {
             channel.sendMessage(macroMap[commandName]).queue()
+            LastCommands.queue.add(Pair(type, message))
             return
         }
 
@@ -56,7 +61,8 @@ data class CommandListener(val config: Configuration, val commandMap: Map<String
     }
 
     private fun respondToCommand(commandName: String, actual: List<String>, channel: MessageChannel, message: Message,
-                                 author: User, guild: Guild? = null, userPermissionLevel: Permission) {
+                                 author: User, guild: Guild? = null, userPermissionLevel: Permission,
+                                 type: InvocationType) {
         val method = commandMap[commandName] ?: return
         val commandPermissionLevel = config.commandPermissionMap[commandName] ?: return
         val annotation = method.getAnnotation(Command::class.java)
@@ -90,6 +96,7 @@ data class CommandListener(val config: Configuration, val commandMap: Map<String
             method.invoke(null, CommandEvent(parsedArgs, config, jda, channel, author, message, guild))
         }
 
+        LastCommands.queue.add(Pair(type, message))
         if(guild != null) handleDelete(message, config.prefix)
     }
 

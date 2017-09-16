@@ -7,10 +7,7 @@ import me.aberrantfox.aegeus.commandframework.util.idToName
 import me.aberrantfox.aegeus.commandframework.util.sendPrivateMessage
 import me.aberrantfox.aegeus.listeners.CommandEvent
 import me.aberrantfox.aegeus.services.Configuration
-import me.aberrantfox.aegeus.services.database.isTracked
-import me.aberrantfox.aegeus.services.database.obtainSuggestion
-import me.aberrantfox.aegeus.services.database.trackSuggestion
-import me.aberrantfox.aegeus.services.database.updateSuggestion
+import me.aberrantfox.aegeus.services.database.*
 import net.dv8tion.jda.core.EmbedBuilder
 import net.dv8tion.jda.core.JDA
 import net.dv8tion.jda.core.entities.Guild
