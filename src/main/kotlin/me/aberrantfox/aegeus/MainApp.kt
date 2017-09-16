@@ -19,7 +19,6 @@ fun main(args: Array<String>) {
 
     val commandMap = produceCommandMap()
     val config = loadConfig(commandMap) ?: return
-    saveConfig(config)
 
     if (config == null) {
         println("""The default configuration has been generated. Please fill in this configuration in order to use the bot.""")
