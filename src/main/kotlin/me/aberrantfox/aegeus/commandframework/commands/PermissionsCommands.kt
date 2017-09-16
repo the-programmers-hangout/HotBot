@@ -56,7 +56,7 @@ fun listCommands(event: CommandEvent) {
 fun listAvailable(event: CommandEvent) {
     if(event.guild == null) return
 
-    val permLevel = getHighestPermissionLevel(event.guild, event.config, event.jda)
+    val permLevel = getHighestPermissionLevel(event.guild, event.config, event.jda,event.author.id)
     val available = event.config.commandPermissionMap.filter { it.value <= permLevel }.keys.reduce { acc, s -> "$acc, $s" }
     val response = EmbedBuilder()
             .setTitle("Available Commands")
