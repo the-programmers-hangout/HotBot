@@ -90,7 +90,7 @@ data class CommandListener(val config: Configuration, val commandMap: Map<String
             method.invoke(null, CommandEvent(parsedArgs, config, jda, channel, author, message, guild))
         }
 
-        handleDelete(message, config.prefix)
+        if(guild != null) handleDelete(message, config.prefix)
     }
 
     private fun isUsableEvent(message: Message, author: String, channel: String, isBot: Boolean): Boolean {
