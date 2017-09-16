@@ -50,6 +50,10 @@ object LastCommands {
     val queue: FillableQueue<Pair<InvocationType, Message>> = FillableQueue()
 }
 
-object GlobalSelfDeletions {
-    val queue: FillableQueue<Message> = FillableQueue()
+enum class VoiceMovement {
+    Join, Leave, Switch
+}
+
+object VoiceMovements {
+    val queue: FillableQueue<Pair<VoiceMovement, String>> = FillableQueue(100)
 }
