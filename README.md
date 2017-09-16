@@ -8,10 +8,10 @@ Currently the help menu is in a very alpha state, it doesn't label all commands.
 
 ### Roadmap
 ##### Bot current Version
-1.2.1
+1.3.6
 
 ##### Next release candidate
-1.3.0
+2.0.0
 
 ##### New system changes
 Improved Help system
@@ -32,7 +32,7 @@ Improved Help system
  - Log export
  - Eval (Kotlin, Js, Java) (Admin only)
  - Replace #project-listings with a command for embeds
- - Replace #server-support with several commands (a pool, then moved into a todo)
+ - Replace #server-support with several commands (a queue, then moved into a todo)
  - Build a poll command ($poll question | Option1 | Option2 | Option3) (Reaction based)
  - $disable command for helpers
  - $profile command
