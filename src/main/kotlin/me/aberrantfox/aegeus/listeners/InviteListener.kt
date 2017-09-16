@@ -1,6 +1,8 @@
 package me.aberrantfox.aegeus.listeners
 
 import me.aberrantfox.aegeus.commandframework.getHighestPermissionLevel
+import me.aberrantfox.aegeus.commandframework.util.containsInvite
+import me.aberrantfox.aegeus.commandframework.util.deleteIfExists
 import me.aberrantfox.aegeus.services.Configuration
 import net.dv8tion.jda.core.JDA
 import net.dv8tion.jda.core.entities.Guild
@@ -23,16 +25,16 @@ class InviteListener(val config: Configuration) : ListenerAdapter() {
                                             isBot: Boolean, jda: JDA) {
         if (isBot) return
 
-        val maxPermissionLevel = getHighestPermissionLevel(guild, config, jda)
+        val maxPermissionLevel = getHighestPermissionLevel(guild, config, jda, author.user.id)
 
         if(maxPermissionLevel >= config.invitePermissionLevel) return
 
-        if (message.rawContent.matches(Regex("(.|\n)*(https://discord.gg/)+(.|\n)*"))) {
+        if (message.containsInvite()) {
             var messageContent = message.rawContent
 
             if (messageContent.contains('@')) messageContent = messageContent.replace("@", "`@`")
 
-            message.delete().queue()
+            message.deleteIfExists()
             guild.textChannels.findLast { it.id == config.leaveChannel }
                     ?.sendMessage("Deleted message: $messageContent " +
                             "by ${author.asMention} " +
