@@ -26,26 +26,22 @@ fun produceCommandMap(): HashMap<String, Method> {
     return map
 }
 
-fun getHighestPermissionLevel(guild: Guild?, config: Configuration, jda: JDA): Permission {
+fun getHighestPermissionLevel(guild: Guild?, config: Configuration, jda: JDA, userID: String): Permission {
+    val roles = getRoles(guild, config, jda, userID).map { it.name }
 
-    val roles = getRoles(guild, config, jda)
-
-    val roleNames = roles.map { it.name }
-
-    when {
-        roleNames.contains(config.rolePermissions.ownerRole) -> return Permission.OWNER
-        roleNames.any { config.rolePermissions.adminRoles.contains(it) } -> return Permission.ADMIN
-        roleNames.any { config.rolePermissions.moderatorRoles.contains(it) } -> return Permission.MODERATOR
+    return when {
+        roles.contains(config.rolePermissions.ownerRole) -> Permission.OWNER
+        roles.any { config.rolePermissions.adminRoles.contains(it) } -> Permission.ADMIN
+        roles.any { config.rolePermissions.moderatorRoles.contains(it) } -> Permission.MODERATOR
+        else -> Permission.GUEST
     }
-
-    return Permission.GUEST
 }
 
-private fun getRoles(guild: Guild?, config: Configuration, jda: JDA): List<Role> =
+private fun getRoles(guild: Guild?, config: Configuration, jda: JDA, userID: String): List<Role> =
         if (guild != null) {
-            guild.roles
+            guild.getMemberById(userID).roles
         } else {
-            jda.getGuildById(config.guildid).roles
+            jda.getGuildById(config.guildid).getMemberById(userID).roles
         }
 
 fun stringToPermission(choice: String): Permission? =
