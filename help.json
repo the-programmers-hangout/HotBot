@@ -274,6 +274,20 @@
       "description": "Auto-nick a user with a bad name.",
       "structure": "{UserID} {Reason for nick}",
       "example": "1231928401824 Your name is not taggable."
+    },
+    {
+      "name": "cmdLog",
+      "category": "logs",
+      "description": "Gives a log of the last X commands executed by users on the server.",
+      "structure": "",
+      "example": ""
+    },
+    {
+      "name": "voiceLog",
+      "category": "logs",
+      "description": "Display a list of the movements of users throughout voice channels. ",
+      "structure": "{UserID} {Reason for nick}",
+      "example": ""
     }
   ]
 }
