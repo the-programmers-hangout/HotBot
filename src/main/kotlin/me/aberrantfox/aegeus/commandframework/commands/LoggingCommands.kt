@@ -8,7 +8,7 @@ import java.util.*
 
 
 @Command
-fun lastCommands(event: CommandEvent) {
+fun cmdLog(event: CommandEvent) {
     if(LastCommands.queue.getQueue().isEmpty()) {
         event.channel.sendMessage("No commands since starting").queue()
         return
