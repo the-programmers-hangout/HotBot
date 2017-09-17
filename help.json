@@ -6,7 +6,8 @@
     "utility": "Generally useful commands, this is a misc section.",
     "infractions": "Used for distributing and maintaining strike-based infractions.",
     "permissions": "Administrative functionality for setting command permissions.",
-    "suggestions": "You can use commands in this section to give suggestions to the server."
+    "suggestions": "You can use commands in this section to give suggestions to the server.",
+    "logs": "Useful commands for displaying event information."
   },
   "commands": [
     {
