@@ -25,6 +25,7 @@ Improved Help system
 
 ##### Unplanned but desired feature list
 
+ - $profile command
  - improved welcome messages
  - sentiment analysis (distant future, if at all)
  - website integration
@@ -35,6 +36,6 @@ Improved Help system
  - Replace #server-support with several commands (a queue, then moved into a todo)
  - Build a poll command ($poll question | Option1 | Option2 | Option3) (Reaction based)
  - $disable command for helpers
- - $profile command
+ -
  - Automated distribution of active role
  - add a $badname command
