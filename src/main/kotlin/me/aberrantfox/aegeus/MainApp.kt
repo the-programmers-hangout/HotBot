@@ -20,22 +20,19 @@ fun main(args: Array<String>) {
     val commandMap = produceCommandMap()
     val config = loadConfig(commandMap) ?: return
 
-    if (config == null) {
-        println("""The default configuration has been generated. Please fill in this configuration in order to use the bot.""")
-        System.exit(0)
-        return
-    }
-
+    saveConfig(config)
     setupDatabaseSchema(config)
 
     val jda = JDABuilder(AccountType.BOT).setToken(config.token).buildBlocking()
+    val logChannel = jda.getTextChannelById(config.logChannel)
+
     jda.addEventListener(
-            CommandListener(config, commandMap, jda),
+            CommandListener(config, commandMap, jda, logChannel),
             MemberListener(config),
             InviteListener(config),
             ResponseListener(config),
             MentionListener(),
-            VoiceChannelListener())
+            VoiceChannelListener(logChannel))
 
     jda.presence.setPresence(OnlineStatus.ONLINE, Game.of("${config.prefix}help"))
     jda.guilds.forEach { setupMutedRole(it, config.mutedRole) }

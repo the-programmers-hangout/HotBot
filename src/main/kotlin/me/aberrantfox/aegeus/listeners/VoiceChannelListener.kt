@@ -1,21 +1,21 @@
 package me.aberrantfox.aegeus.listeners
 
-import me.aberrantfox.aegeus.services.VoiceMovement
-import me.aberrantfox.aegeus.services.VoiceMovements
+import me.aberrantfox.aegeus.commandframework.util.descriptor
+import me.aberrantfox.aegeus.commandframework.util.fullName
+import net.dv8tion.jda.core.entities.MessageChannel
 import net.dv8tion.jda.core.events.guild.voice.GuildVoiceJoinEvent
 import net.dv8tion.jda.core.events.guild.voice.GuildVoiceLeaveEvent
 import net.dv8tion.jda.core.events.guild.voice.GuildVoiceMoveEvent
 import net.dv8tion.jda.core.hooks.ListenerAdapter
 
 
-class VoiceChannelListener : ListenerAdapter() {
+class VoiceChannelListener (val channel: MessageChannel) : ListenerAdapter() {
     override fun onGuildVoiceJoin(event: GuildVoiceJoinEvent) =
-        VoiceMovements.queue.add(Pair(VoiceMovement.Join, "${event.member.asMention} :: ${event.channelJoined.name}"))
+        channel.sendMessage("**Voice Join** ${event.member.descriptor()} :: ${event.channelJoined.name}").queue()
 
     override fun onGuildVoiceLeave(event: GuildVoiceLeaveEvent) =
-        VoiceMovements.queue.add(Pair(VoiceMovement.Leave, "${event.member.asMention} :: ${event.channelLeft.name}"))
+        channel.sendMessage("**Voice Leave** ${event.member.descriptor()} :: ${event.channelLeft.name}").queue()
 
-    override fun onGuildVoiceMove(event: GuildVoiceMoveEvent) {
-        VoiceMovements.queue.add(Pair(VoiceMovement.Switch, "${event.member.asMention} :: ${event.channelJoined.name}"))
-    }
+    override fun onGuildVoiceMove(event: GuildVoiceMoveEvent) =
+        channel.sendMessage("**Voice Move** ${event.member.descriptor()} :: ${event.channelJoined.name}").queue()
 }

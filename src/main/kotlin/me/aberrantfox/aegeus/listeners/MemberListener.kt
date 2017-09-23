@@ -22,7 +22,7 @@ class MemberListener(val configuration: Configuration) : ListenerAdapter() {
     }
 
     override fun onGuildMemberLeave(event: GuildMemberLeaveEvent) {
-        event.guild.textChannels.findLast { it.id == configuration.leaveChannel }
+        event.guild.textChannels.findLast { it.id == configuration.logChannel }
                 ?.sendMessage(configuration.leaveMessage.replace("%name%", event.user.asMention))
                 ?.queue()
     }
