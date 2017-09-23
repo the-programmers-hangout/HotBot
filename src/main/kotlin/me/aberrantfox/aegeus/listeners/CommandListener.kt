@@ -5,7 +5,6 @@ import me.aberrantfox.aegeus.services.Configuration
 import me.aberrantfox.aegeus.commandframework.commands.macroMap
 import me.aberrantfox.aegeus.commandframework.util.*
 import me.aberrantfox.aegeus.services.CommandRecommender
-import mu.KLogging
 import net.dv8tion.jda.core.JDA
 import net.dv8tion.jda.core.entities.Guild
 import net.dv8tion.jda.core.entities.Message
@@ -45,12 +44,14 @@ data class CommandListener(val config: Configuration, val commandMap: Map<String
         if (commandMap.containsKey(commandName)) {
             respondToCommand(commandName, actualArgs, channel, message, author, guild, userPermissionLevel)
             logChannel.sendMessage("${author.descriptor()} -- invoked $commandName in ${channel.name}").queue()
+            if(guild != null) handleDelete(message, config.prefix)
             return
         }
 
         if (macroMap.containsKey(commandName)) {
             channel.sendMessage(macroMap[commandName]).queue()
             logChannel.sendMessage("${author.descriptor()} -- invoked $commandName in ${channel.name}").queue()
+            if(guild != null) handleDelete(message, config.prefix)
             return
         }
 
@@ -92,8 +93,6 @@ data class CommandListener(val config: Configuration, val commandMap: Map<String
         } else {
             method.invoke(null, CommandEvent(parsedArgs, config, jda, channel, author, message, guild))
         }
-
-        if(guild != null) handleDelete(message, config.prefix)
     }
 
     private fun isUsableEvent(message: Message, author: String, channel: String, isBot: Boolean): Boolean {
@@ -153,6 +152,5 @@ data class CommandListener(val config: Configuration, val commandMap: Map<String
             } else {
                 Unit
             }
-
 }
 
