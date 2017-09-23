@@ -6,8 +6,7 @@
     "utility": "Generally useful commands, this is a misc section.",
     "infractions": "Used for distributing and maintaining strike-based infractions.",
     "permissions": "Administrative functionality for setting command permissions.",
-    "suggestions": "You can use commands in this section to give suggestions to the server.",
-    "logs": "Useful commands for displaying event information."
+    "suggestions": "You can use commands in this section to give suggestions to the server."
   },
   "commands": [
     {
@@ -275,20 +274,6 @@
       "description": "Auto-nick a user with a bad name.",
       "structure": "{UserID} {Reason for nick}",
       "example": "1231928401824 Your name is not taggable."
-    },
-    {
-      "name": "cmdLog",
-      "category": "logs",
-      "description": "Gives a log of the last X commands executed by users on the server.",
-      "structure": "",
-      "example": ""
-    },
-    {
-      "name": "voiceLog",
-      "category": "logs",
-      "description": "Display a list of the movements of users throughout voice channels. ",
-      "structure": "{UserID} {Reason for nick}",
-      "example": ""
     }
   ]
 }
