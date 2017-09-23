@@ -11,7 +11,7 @@ object CommandRecommender {
     fun recommendCommand(input: String): String {
         val minVal = possibilities.map { calc.apply(input, it) }.min() ?: return smartAssComment
 
-        return if (minVal > 20) smartAssComment else possibilities.minBy { calc.apply(input, it) }!!
+        return if (minVal > (input.length/2) + 3) smartAssComment else possibilities.minBy { calc.apply(input, it) }!!
     }
 
     fun addPossibility(item: String) = possibilities.add(item)
