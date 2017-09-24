@@ -179,6 +179,20 @@
       "example": ""
     },
     {
+      "name": "version",
+      "category": "utility",
+      "description": "Display the bot version -- this is updated via maven filtering.",
+      "structure": "",
+      "example": ""
+    },
+    {
+      "name": "author",
+      "category": "utility",
+      "description": "Display project authors -- this is updated via maven filtering.",
+      "structure": "",
+      "example": ""
+    },
+    {
       "name": "help",
       "category": "utility",
       "description": "Display a help menu.",
