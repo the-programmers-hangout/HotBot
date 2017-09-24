@@ -6,7 +6,8 @@
     "utility": "Generally useful commands, this is a misc section.",
     "infractions": "Used for distributing and maintaining strike-based infractions.",
     "permissions": "Administrative functionality for setting command permissions.",
-    "suggestions": "You can use commands in this section to give suggestions to the server."
+    "suggestions": "You can use commands in this section to give suggestions to the server.",
+    "embed": "Commands used to build an embed and then send it. You build an embed by using the set/add commands (listed below) - when ready, use sendembed"
   },
   "commands": [
     {
@@ -274,6 +275,132 @@
       "description": "Auto-nick a user with a bad name.",
       "structure": "{UserID} {Reason for nick}",
       "example": "1231928401824 Your name is not taggable."
+    },
+    {
+      "name": "clearEmbed",
+      "category": "embed",
+      "description": "Reset the embed in memory",
+      "structure": "",
+      "example": ""
+    },
+    {
+      "name": "sendEmbed",
+      "category": "embed",
+      "description": "Send the embed in the channel. This will not call clearEmbed.",
+      "structure": "",
+      "example": ""
+    },
+    {
+      "name": "setTitle",
+      "category": "embed",
+      "description": "Set the title of the embed in memory",
+      "structure": "{title}",
+      "example": "this is the title... :)"
+    },
+    {
+      "name": "setDescription",
+      "category": "embed",
+      "description": "Set the description of the embed",
+      "structure": "{description}",
+      "example": "this is the description... :)"
+    },
+    {
+      "name": "clearEmbed",
+      "category": "embed",
+      "description": "Reset the embed in memory",
+      "structure": "",
+      "example": ""
+    },
+    {
+      "name": "addTimestamp",
+      "category": "embed",
+      "description": "Add a timestamp to the footer of the embed in memory",
+      "structure": "",
+      "example": ""
+    },
+    {
+      "name": "setColour",
+      "category": "embed",
+      "description": "Set the colour of the embed using RGB -- values must be between 0 and 1",
+      "structure": "{red} {green} {blue}",
+      "example": "0.333 0.666 0"
+    },
+    {
+      "name": "setSelfAuthor",
+      "category": "embed",
+      "description": "Set yourself to be the author of the embed",
+      "structure": "",
+      "example": ""
+    },
+    {
+      "name": "setAuthor",
+      "category": "embed",
+      "description": "Set a user with the given ID to be the author",
+      "structure": "{targetUserID}",
+      "example": "1231238858851"
+    },
+    {
+      "name": "setImage",
+      "category": "embed",
+      "description": "Set the image of the embed",
+      "structure": "{image url}",
+      "example": "http://www.imgur.com/exampleimage.png"
+    },
+    {
+      "name": "setFooter",
+      "category": "embed",
+      "description": "Set the footer of the embed, including the URL and text",
+      "structure": "{image url} {text}",
+      "example": "http://www.imgur.com/exampleimage.png this is the footer... :)"
+    },
+    {
+      "name": "addBlankField",
+      "category": "embed",
+      "description": "Add a blank field to the embed",
+      "structure": "",
+      "example": ""
+    },
+    {
+      "name": "addField",
+      "category": "embed",
+      "description": "Add the field currently held in memory to the embed currently held in memory (Note: Use setFName and setFText to set the text)",
+      "structure": "",
+      "example": ""
+    },
+    {
+      "name": "addIField",
+      "category": "embed",
+      "description": "Inline and add the field currently held in memory to the embed currently held in memory (Note: Use setFName and setFText to set the text)",
+      "structure": "",
+      "example": ""
+    },
+    {
+      "name": "clearFieldHolder",
+      "category": "embed",
+      "description": "Clear the fields out in the field in memory, resetting the field to a new one",
+      "structure": "",
+      "example": ""
+    },
+    {
+      "name": "setFText",
+      "category": "embed",
+      "description": "Set the field text in memory",
+      "structure": "{text}",
+      "example": "this text will be appended to the bottom of the field... :) "
+    },
+    {
+      "name": "setFName",
+      "category": "embed",
+      "description": "Set the field name or title",
+      "structure": "{name}",
+      "example": "This text will be set as the title of the field... :)"
+    },
+    {
+      "name": "setThumbnail",
+      "category": "embed",
+      "description": "Set the thumbnail of the embed",
+      "structure": "{imageURL}",
+      "example": "www.imgur.com/exampleImage.png"
     }
   ]
 }
