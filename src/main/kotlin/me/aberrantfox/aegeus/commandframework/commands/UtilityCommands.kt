@@ -1,14 +1,29 @@
 package me.aberrantfox.aegeus.commandframework.commands
 
+import com.google.gson.Gson
 import me.aberrantfox.aegeus.commandframework.ArgumentType
 import me.aberrantfox.aegeus.services.saveConfig
 import me.aberrantfox.aegeus.commandframework.Command
 import me.aberrantfox.aegeus.listeners.CommandEvent
+import me.aberrantfox.aegeus.services.Configuration
 import net.dv8tion.jda.core.EmbedBuilder
 import net.dv8tion.jda.core.OnlineStatus
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent
 import java.awt.Color
+import java.io.File
 import java.util.*
+
+data class Properties(val version: String, val author: String)
+
+object Project {
+    val properties: Properties
+
+    init {
+        val propFile = Configuration::class.java.getResource("/properties.json").readText()
+        val gson = Gson()
+        properties = gson.fromJson(propFile, Properties::class.java)
+    }
+}
 
 val startTime = Date()
 
@@ -74,7 +89,7 @@ fun info(event: CommandEvent) {
             .setAuthor("Fox", "https://github.com/AberrantFox", "https://avatars1.githubusercontent.com/u/22015832")
             .setColor(Color.MAGENTA)
             .setThumbnail("http://i.imgur.com/DFoaG7k.png")
-            .setFooter("Bot by Fox, made with Kotlin", "http://i.imgur.com/SJPggeJ.png")
+            .setFooter("Bot by Fox, made with Kotlin", "https://images-ext-1.discordapp.net/external/q9ZpQURnfAGbNxsxSqMzCiALNNVck5h4oWgRsHkG3bw/https/i.imgur.com/UymVLqf.png")
 
 
     builder.addField("Project Name", "Hotbot", true)
@@ -85,3 +100,9 @@ fun info(event: CommandEvent) {
 
     event.channel.sendMessage(builder.build()).queue()
 }
+
+@Command
+fun version(event: CommandEvent) = event.channel.sendMessage("**Hotbot version**: ${Project.properties.version}").queue()
+
+@Command
+fun author(event: CommandEvent) = event.channel.sendMessage("**Project author**: ${Project.properties.author}").queue()
