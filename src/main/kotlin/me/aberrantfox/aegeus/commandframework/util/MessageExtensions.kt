@@ -14,7 +14,7 @@ fun Message.isDeleted() = channel.getMessageById(id).complete() == null
 
 fun Message.containsInvite() = inviteRegex.matches(rawContent)
 
-fun Message.containsURL() = urlRegexes.any { rawContent.replace("\n", "").contains(it) }
+fun Message.containsURL() = rawContent.containsURl()
 
 fun Message.isCommandInvocation(config: Configuration) = rawContent.startsWith(config.prefix)
 
@@ -23,3 +23,5 @@ fun Message.isDoubleCommandInvocation(config: Configuration) = this.rawContent.s
 fun Message.deleteIfExists() = if(! (isDeleted()) ) delete().queue() else Unit
 
 fun Message.mentionsSomeone() = (mentionsEveryone() || mentionedUsers.size > 0 || mentionedRoles.size > 0)
+
+fun String.containsURl() = urlRegexes.any { this.replace("\n", "").contains(it) }
