@@ -4,10 +4,13 @@ import com.google.gson.Gson
 import me.aberrantfox.aegeus.commandframework.ArgumentType
 import me.aberrantfox.aegeus.services.saveConfig
 import me.aberrantfox.aegeus.commandframework.Command
+import me.aberrantfox.aegeus.commandframework.util.fullName
 import me.aberrantfox.aegeus.listeners.CommandEvent
 import me.aberrantfox.aegeus.services.Configuration
 import net.dv8tion.jda.core.EmbedBuilder
 import net.dv8tion.jda.core.OnlineStatus
+import net.dv8tion.jda.core.entities.Guild
+import net.dv8tion.jda.core.entities.MessageEmbed
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent
 import java.awt.Color
 import java.io.File
@@ -32,26 +35,8 @@ val startTime = Date()
 @Command
 fun serverinfo(event: CommandEvent) {
     if(event.guild == null) return
-
-    val builder = EmbedBuilder()
-    builder.setTitle(event.guild.name)
-            .setColor(Color.MAGENTA)
-            .setDescription("The programmer's hangout is a programming server, made for persons of all skill levels, " +
-                    "be you someone who has wrote 10 lines of code, or someone with 10 years of experience.")
-            .setFooter("Guild creation date: ${event.guild.creationTime}", "http://i.imgur.com/iwwEprG.png")
-            .setThumbnail("http://i.imgur.com/DFoaG7k.png")
-
-    builder.addField("Users", "${event.guild.members.filter {
-        m ->
-        m.onlineStatus != OnlineStatus.OFFLINE
-    }.size}/${event.guild.members.size}", true)
-    builder.addField("Total Roles", "${event.guild.roles.size}", true)
-    builder.addField("Owner", event.guild.owner.effectiveName, true)
-    builder.addField("Region", "${event.guild.region}", true)
-    builder.addField("Text Channels", "${event.guild.textChannels.size}", true)
-    builder.addField("Voice Channels", "${event.guild.voiceChannels.size}", true)
-
-    event.channel.sendMessage(builder.build()).queue()
+    val embed = produceServerInfoEmbed(event.guild)
+    event.channel.sendMessage(embed).queue()
 }
 
 @Command
@@ -106,3 +91,26 @@ fun version(event: CommandEvent) = event.channel.sendMessage("**Hotbot version**
 
 @Command
 fun author(event: CommandEvent) = event.channel.sendMessage("**Project author**: ${Project.properties.author}").queue()
+
+
+fun produceServerInfoEmbed(guild: Guild): MessageEmbed {
+    val builder = EmbedBuilder()
+    builder.setTitle(guild.name)
+        .setColor(Color.MAGENTA)
+        .setDescription("The programmer's hangout is a programming server, made for persons of all skill levels, " +
+            "be you someone who has wrote 10 lines of code, or someone with 10 years of experience.")
+        .setFooter("Guild creation date: ${guild.creationTime}", "http://i.imgur.com/iwwEprG.png")
+        .setThumbnail("http://i.imgur.com/DFoaG7k.png")
+
+    builder.addField("Users", "${guild.members.filter {
+        it.onlineStatus != OnlineStatus.OFFLINE
+    }.size}/${guild.members.size}", true)
+
+    builder.addField("Total Roles", "${guild.roles.size}", true)
+    builder.addField("Owner", guild.owner.fullName(), true)
+    builder.addField("Region", "${guild.region}", true)
+    builder.addField("Text Channels", "${guild.textChannels.size}", true)
+    builder.addField("Voice Channels", "${guild.voiceChannels.size}", true)
+
+    return builder.build()
+}

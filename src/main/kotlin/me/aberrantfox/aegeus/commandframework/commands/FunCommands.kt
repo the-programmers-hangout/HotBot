@@ -7,7 +7,6 @@ import me.aberrantfox.aegeus.commandframework.RequiresGuild
 import me.aberrantfox.aegeus.listeners.CommandEvent
 import java.util.*
 
-@RequiresGuild
 @Command
 fun cat(event: CommandEvent) {
     val json = get("http://random.cat/meow").jsonObject
