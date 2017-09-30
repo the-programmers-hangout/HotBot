@@ -1,4 +1,4 @@
-package me.aberrantfox.aegeus.commandframework.util
+package me.aberrantfox.aegeus.commandframework.extensions
 
 import net.dv8tion.jda.core.entities.Member
 import net.dv8tion.jda.core.entities.User

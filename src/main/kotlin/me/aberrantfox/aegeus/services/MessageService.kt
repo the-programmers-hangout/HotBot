@@ -1,7 +1,7 @@
 package me.aberrantfox.aegeus.services
 
 import com.google.gson.Gson
-import me.aberrantfox.aegeus.commandframework.util.randomListItem
+import me.aberrantfox.aegeus.commandframework.extensions.randomListItem
 import java.io.File
 
 private data class Messages(val onJoin: List<String>, val names: List<String>)

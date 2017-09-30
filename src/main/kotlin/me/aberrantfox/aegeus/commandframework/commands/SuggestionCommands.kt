@@ -3,15 +3,14 @@ package me.aberrantfox.aegeus.commandframework.commands
 import me.aberrantfox.aegeus.commandframework.ArgumentType
 import me.aberrantfox.aegeus.commandframework.Command
 import me.aberrantfox.aegeus.commandframework.RequiresGuild
-import me.aberrantfox.aegeus.commandframework.util.idToName
-import me.aberrantfox.aegeus.commandframework.util.sendPrivateMessage
+import me.aberrantfox.aegeus.commandframework.extensions.idToName
+import me.aberrantfox.aegeus.commandframework.extensions.sendPrivateMessage
 import me.aberrantfox.aegeus.listeners.CommandEvent
 import me.aberrantfox.aegeus.services.Configuration
 import me.aberrantfox.aegeus.services.database.*
 import net.dv8tion.jda.core.EmbedBuilder
 import net.dv8tion.jda.core.JDA
 import net.dv8tion.jda.core.entities.Guild
-import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
 import java.awt.Color

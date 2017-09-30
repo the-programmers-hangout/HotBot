@@ -4,16 +4,18 @@ import me.aberrantfox.aegeus.commandframework.ArgumentType
 import me.aberrantfox.aegeus.commandframework.Command
 import me.aberrantfox.aegeus.commandframework.RequiresGuild
 import me.aberrantfox.aegeus.commandframework.stringToPermission
-import me.aberrantfox.aegeus.commandframework.util.idToUser
-import me.aberrantfox.aegeus.commandframework.util.muteMember
+import me.aberrantfox.aegeus.commandframework.extensions.idToUser
+import me.aberrantfox.aegeus.commandframework.extensions.isUserID
+import me.aberrantfox.aegeus.commandframework.extensions.isUserIDList
+import me.aberrantfox.aegeus.commandframework.extensions.muteMember
 import me.aberrantfox.aegeus.listeners.CommandEvent
+import me.aberrantfox.aegeus.services.BanQueue
 import me.aberrantfox.aegeus.services.MessageService
 import me.aberrantfox.aegeus.services.MessageType
 import net.dv8tion.jda.core.OnlineStatus
 import net.dv8tion.jda.core.entities.Game
 import net.dv8tion.jda.core.entities.Message
 import net.dv8tion.jda.core.entities.MessageChannel
-import net.dv8tion.jda.core.entities.TextChannel
 
 @RequiresGuild(false)
 @Command(ArgumentType.Integer)
@@ -144,6 +146,76 @@ fun badname(event: CommandEvent) {
             it.sendMessage("Your name has been changed forcefully by a member of staff for reason: $reason").queue()
         }
     }
+}
+
+
+@Command(ArgumentType.Joiner)
+fun setQueueReason(event: CommandEvent) {
+    val reason = event.args[0] as String
+    BanQueue.setReason(event.author.id, reason)
+    event.channel.sendMessage("Set Ban-Raid reason to: $reason").queue()
+}
+
+@Command(ArgumentType.Splitter)
+fun addQueueTargets(event: CommandEvent) {
+    val targets = event.args[0] as List<String>
+
+    if( !(targets.isUserIDList(event.jda)) )  {
+        event.channel.sendMessage("One or more UserIDS were invalid.").queue()
+        return
+    }
+
+    targets.forEach { BanQueue.queueBan(event.author.id, it) }
+    event.channel.sendMessage("Attempted to add ${targets.size} -- BanQueue now ${BanQueue.getBans(event.author.id)?.size}").queue()
+}
+
+@Command(ArgumentType.Splitter)
+fun removeTarget(event: CommandEvent) {
+    val targets = event.args[0] as List<String>
+
+    if( !(targets.isUserIDList(event.jda)) ) {
+        event.channel.sendMessage("One or more UserIDS were invalid.").queue()
+        return
+    }
+
+    targets.forEach { BanQueue.removeBan(event.author.id, it) }
+    event.channel.sendMessage("${targets.size} removed from the ban queue").queue()
+}
+
+@Command
+fun clearQueue(event: CommandEvent) {
+    BanQueue.clearBans(event.author.id)
+    event.channel.sendMessage("Targets cleared.").queue()
+}
+
+@RequiresGuild
+@Command
+fun banRaid(event: CommandEvent) {
+    if(event.guild == null) return
+
+    val bans = BanQueue.getBans(event.author.id)
+    val reason = BanQueue.getReason(event.author.id)
+
+    if(bans == null || reason == null || bans.isEmpty()) {
+        event.channel.sendMessage("You haven't added any bans... ").queue()
+        return
+    }
+
+    bans.forEach { event.guild.controller.ban(it, 1, reason).queue() }
+    BanQueue.clearBans(event.author.id)
+    event.channel.sendMessage("Raid cleared.").queue()
+}
+
+@Command
+fun showRaid(event: CommandEvent) {
+    val targets = BanQueue.getBans(event.author.id)
+
+    if(targets == null || targets.isEmpty()) {
+        event.channel.sendMessage("You haven't added anyone to your ban queue").queue()
+        return
+    }
+
+    event.channel.sendMessage("Current targets: ${targets.reduce{a, b -> "$a, $b"}}.").queue()
 }
 
 private fun handleResponse(past: List<Message>, channel: MessageChannel, targets: List<String>, error: MessageChannel,

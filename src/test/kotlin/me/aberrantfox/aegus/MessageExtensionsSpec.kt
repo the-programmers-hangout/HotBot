@@ -1,7 +1,7 @@
 package me.aberrantfox.aegus
 
-import me.aberrantfox.aegeus.commandframework.util.containsInvite
-import me.aberrantfox.aegeus.commandframework.util.containsURL
+import me.aberrantfox.aegeus.commandframework.extensions.containsInvite
+import me.aberrantfox.aegeus.commandframework.extensions.containsURL
 import net.dv8tion.jda.core.MessageBuilder
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.describe

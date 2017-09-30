@@ -1,7 +1,6 @@
 package me.aberrantfox.aegeus.listeners
 
-import me.aberrantfox.aegeus.commandframework.util.descriptor
-import me.aberrantfox.aegeus.commandframework.util.fullName
+import me.aberrantfox.aegeus.commandframework.extensions.descriptor
 import net.dv8tion.jda.core.entities.MessageChannel
 import net.dv8tion.jda.core.events.guild.voice.GuildVoiceJoinEvent
 import net.dv8tion.jda.core.events.guild.voice.GuildVoiceLeaveEvent

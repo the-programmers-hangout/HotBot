@@ -1,4 +1,4 @@
-package me.aberrantfox.aegeus.commandframework.util
+package me.aberrantfox.aegeus.commandframework.extensions
 
 import org.joda.time.DateTime
 import java.security.SecureRandom

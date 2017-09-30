@@ -1,4 +1,4 @@
-package me.aberrantfox.aegeus.commandframework.util
+package me.aberrantfox.aegeus.commandframework.extensions
 
 import me.aberrantfox.aegeus.services.Configuration
 import net.dv8tion.jda.core.entities.Message

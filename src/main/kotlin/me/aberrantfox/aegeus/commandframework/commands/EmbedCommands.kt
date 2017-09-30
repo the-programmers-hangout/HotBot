@@ -2,8 +2,8 @@ package me.aberrantfox.aegeus.commandframework.commands
 
 import me.aberrantfox.aegeus.commandframework.ArgumentType
 import me.aberrantfox.aegeus.commandframework.Command
-import me.aberrantfox.aegeus.commandframework.util.fullName
-import me.aberrantfox.aegeus.commandframework.util.idToUser
+import me.aberrantfox.aegeus.commandframework.extensions.fullName
+import me.aberrantfox.aegeus.commandframework.extensions.idToUser
 import me.aberrantfox.aegeus.listeners.CommandEvent
 import net.dv8tion.jda.core.EmbedBuilder
 import java.awt.Color

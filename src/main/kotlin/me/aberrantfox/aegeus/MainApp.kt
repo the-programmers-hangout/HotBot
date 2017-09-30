@@ -2,9 +2,9 @@ package me.aberrantfox.aegeus
 
 import me.aberrantfox.aegeus.services.loadConfig
 import me.aberrantfox.aegeus.commandframework.produceCommandMap
-import me.aberrantfox.aegeus.commandframework.util.hasRole
-import me.aberrantfox.aegeus.commandframework.util.timeToDifference
-import me.aberrantfox.aegeus.commandframework.util.unmute
+import me.aberrantfox.aegeus.commandframework.extensions.hasRole
+import me.aberrantfox.aegeus.commandframework.extensions.timeToDifference
+import me.aberrantfox.aegeus.commandframework.extensions.unmute
 import me.aberrantfox.aegeus.listeners.*
 import me.aberrantfox.aegeus.services.Configuration
 import me.aberrantfox.aegeus.services.database.setupDatabaseSchema

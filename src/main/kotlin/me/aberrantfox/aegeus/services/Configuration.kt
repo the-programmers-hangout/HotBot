@@ -1,10 +1,9 @@
 package me.aberrantfox.aegeus.services
 
 import com.github.salomonbrys.kotson.fromJson
-import com.google.common.collect.ConcurrentHashMultiset
 import com.google.gson.Gson
 import me.aberrantfox.aegeus.commandframework.Permission
-import me.aberrantfox.aegeus.commandframework.util.MuteRecord
+import me.aberrantfox.aegeus.commandframework.extensions.MuteRecord
 import java.io.File
 import java.lang.reflect.Method
 import java.util.*
