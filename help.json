@@ -7,7 +7,8 @@
     "infractions": "Used for distributing and maintaining strike-based infractions.",
     "permissions": "Administrative functionality for setting command permissions.",
     "suggestions": "You can use commands in this section to give suggestions to the server.",
-    "embed": "Commands used to build an embed and then send it. You build an embed by using the set/add commands (listed below) - when ready, use sendembed"
+    "embed": "Commands used to build an embed and then send it. You build an embed by using the set/add commands (listed below) - when ready, use sendembed",
+    "banqueue": "Commands used for preventing raids and setting up bans. Each moderator has a raid queue in which they can 'pre-load' some bans, with a defined reason."
   },
   "commands": [
     {
@@ -415,6 +416,48 @@
       "description": "Set the thumbnail of the embed",
       "structure": "{imageURL}",
       "example": "www.imgur.com/exampleImage.png"
+    },
+    {
+      "name": "addQueueTargets",
+      "category": "banqueue",
+      "description": "Add all of the listed IDS to the banqueue.",
+      "structure": "{id|id|id|...}",
+      "example": "12312354252435|2134234234324324234234|234234234"
+    },
+    {
+      "name": "showRaid",
+      "category": "banqueue",
+      "description": "Show what IDs are in the raid.",
+      "structure": "",
+      "example": ""
+    },
+    {
+      "name": "banraid",
+      "category": "banqueue",
+      "description": "Ban all members you have added as a part of the current raid",
+      "structure": "",
+      "example": ""
+    },
+    {
+      "name": "setQueueReason",
+      "category": "banqueue",
+      "description": "Sets the reason members of the raid will be banned for.",
+      "structure": "{reason}",
+      "example": "voice trolling"
+    },
+    {
+      "name": "removeTarget",
+      "category": "banqueue",
+      "description": "Remove a specific member from the raid queue.",
+      "structure": "{id}",
+      "example": "4285825823823500"
+    },
+    {
+      "name": "clearQueue",
+      "category": "banqueue",
+      "description": "Clear out all IDs from the BanQueue",
+      "structure": "",
+      "example": ""
     }
   ]
 }
