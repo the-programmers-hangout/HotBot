@@ -4,10 +4,9 @@ import me.aberrantfox.aegeus.commandframework.ArgumentType
 import me.aberrantfox.aegeus.commandframework.Command
 import me.aberrantfox.aegeus.commandframework.RequiresGuild
 import me.aberrantfox.aegeus.commandframework.stringToPermission
-import me.aberrantfox.aegeus.commandframework.extensions.idToUser
-import me.aberrantfox.aegeus.commandframework.extensions.isUserID
-import me.aberrantfox.aegeus.commandframework.extensions.isUserIDList
-import me.aberrantfox.aegeus.commandframework.extensions.muteMember
+import me.aberrantfox.aegeus.extensions.idToUser
+import me.aberrantfox.aegeus.extensions.isUserIDList
+import me.aberrantfox.aegeus.extensions.muteMember
 import me.aberrantfox.aegeus.listeners.CommandEvent
 import me.aberrantfox.aegeus.services.BanQueue
 import me.aberrantfox.aegeus.services.MessageService

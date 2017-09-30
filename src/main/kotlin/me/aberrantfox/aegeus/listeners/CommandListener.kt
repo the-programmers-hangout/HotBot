@@ -3,7 +3,7 @@ package me.aberrantfox.aegeus.listeners
 import me.aberrantfox.aegeus.commandframework.*
 import me.aberrantfox.aegeus.services.Configuration
 import me.aberrantfox.aegeus.commandframework.commands.macroMap
-import me.aberrantfox.aegeus.commandframework.extensions.*
+import me.aberrantfox.aegeus.extensions.*
 import me.aberrantfox.aegeus.services.CommandRecommender
 import net.dv8tion.jda.core.JDA
 import net.dv8tion.jda.core.entities.Guild

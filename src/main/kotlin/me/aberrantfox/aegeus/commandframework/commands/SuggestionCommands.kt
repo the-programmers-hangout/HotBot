@@ -3,8 +3,8 @@ package me.aberrantfox.aegeus.commandframework.commands
 import me.aberrantfox.aegeus.commandframework.ArgumentType
 import me.aberrantfox.aegeus.commandframework.Command
 import me.aberrantfox.aegeus.commandframework.RequiresGuild
-import me.aberrantfox.aegeus.commandframework.extensions.idToName
-import me.aberrantfox.aegeus.commandframework.extensions.sendPrivateMessage
+import me.aberrantfox.aegeus.extensions.idToName
+import me.aberrantfox.aegeus.extensions.sendPrivateMessage
 import me.aberrantfox.aegeus.listeners.CommandEvent
 import me.aberrantfox.aegeus.services.Configuration
 import me.aberrantfox.aegeus.services.database.*

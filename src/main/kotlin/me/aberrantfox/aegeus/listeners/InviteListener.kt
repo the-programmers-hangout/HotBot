@@ -1,8 +1,8 @@
 package me.aberrantfox.aegeus.listeners
 
 import me.aberrantfox.aegeus.commandframework.getHighestPermissionLevel
-import me.aberrantfox.aegeus.commandframework.extensions.containsInvite
-import me.aberrantfox.aegeus.commandframework.extensions.deleteIfExists
+import me.aberrantfox.aegeus.extensions.containsInvite
+import me.aberrantfox.aegeus.extensions.deleteIfExists
 import me.aberrantfox.aegeus.services.Configuration
 import net.dv8tion.jda.core.JDA
 import net.dv8tion.jda.core.entities.*
