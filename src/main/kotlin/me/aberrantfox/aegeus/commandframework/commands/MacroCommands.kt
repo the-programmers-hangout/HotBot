@@ -5,10 +5,8 @@ import com.google.gson.Gson
 import me.aberrantfox.aegeus.commandframework.ArgumentType
 import me.aberrantfox.aegeus.commandframework.Command
 import me.aberrantfox.aegeus.commandframework.produceCommandMap
-import me.aberrantfox.aegeus.listeners.CommandEvent
+import me.aberrantfox.aegeus.commandframework.CommandEvent
 import me.aberrantfox.aegeus.services.CommandRecommender
-import me.aberrantfox.aegeus.services.Configuration
-import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent
 import java.io.File
 
 val macroMap = loadMacroMap()

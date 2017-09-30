@@ -1,7 +1,6 @@
 package me.aberrantfox.aegeus.commandframework.commands
 
 import me.aberrantfox.aegeus.commandframework.*
-import me.aberrantfox.aegeus.listeners.CommandEvent
 import net.dv8tion.jda.core.EmbedBuilder
 import java.awt.Color
 import java.util.*

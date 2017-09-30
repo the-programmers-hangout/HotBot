@@ -5,13 +5,12 @@ import me.aberrantfox.aegeus.commandframework.ArgumentType
 import me.aberrantfox.aegeus.services.saveConfig
 import me.aberrantfox.aegeus.commandframework.Command
 import me.aberrantfox.aegeus.extensions.fullName
-import me.aberrantfox.aegeus.listeners.CommandEvent
+import me.aberrantfox.aegeus.commandframework.CommandEvent
 import me.aberrantfox.aegeus.services.Configuration
 import net.dv8tion.jda.core.EmbedBuilder
 import net.dv8tion.jda.core.OnlineStatus
 import net.dv8tion.jda.core.entities.Guild
 import net.dv8tion.jda.core.entities.MessageEmbed
-import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent
 import java.awt.Color
 import java.util.*
 

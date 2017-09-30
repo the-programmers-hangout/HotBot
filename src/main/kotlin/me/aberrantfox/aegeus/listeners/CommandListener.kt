@@ -12,13 +12,6 @@ import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent
 import net.dv8tion.jda.core.hooks.ListenerAdapter
 import java.lang.reflect.Method
 
-data class CommandEvent(val args: List<Any>, val config: Configuration, val jda: JDA, val channel: MessageChannel,
-                        val author: User, val message: Message, val guild: Guild?) {
-
-    fun respond(msg: String) = this.channel.sendMessage(msg).queue()
-    fun respond(embed: MessageEmbed) = this.channel.sendMessage(embed).queue()
-}
-
 data class CommandListener(val config: Configuration, val commandMap: Map<String, Method>, val jda: JDA,
                            val logChannel: MessageChannel) : ListenerAdapter() {
     init {

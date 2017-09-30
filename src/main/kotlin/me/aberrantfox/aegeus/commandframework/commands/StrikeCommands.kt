@@ -3,8 +3,8 @@ package me.aberrantfox.aegeus.commandframework.commands
 import me.aberrantfox.aegeus.commandframework.ArgumentType
 import me.aberrantfox.aegeus.commandframework.Command
 import me.aberrantfox.aegeus.commandframework.RequiresGuild
+import me.aberrantfox.aegeus.commandframework.CommandEvent
 import me.aberrantfox.aegeus.extensions.*
-import me.aberrantfox.aegeus.listeners.CommandEvent
 import me.aberrantfox.aegeus.services.*
 import me.aberrantfox.aegeus.services.database.*
 import net.dv8tion.jda.core.EmbedBuilder

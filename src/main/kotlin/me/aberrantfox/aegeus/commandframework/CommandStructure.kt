@@ -2,8 +2,7 @@ package me.aberrantfox.aegeus.commandframework
 
 import me.aberrantfox.aegeus.services.Configuration
 import net.dv8tion.jda.core.JDA
-import net.dv8tion.jda.core.entities.Guild
-import net.dv8tion.jda.core.entities.Role
+import net.dv8tion.jda.core.entities.*
 import org.reflections.Reflections
 import org.reflections.scanners.MethodAnnotationsScanner
 import java.lang.reflect.Method
@@ -15,6 +14,13 @@ enum class Permission {
 annotation class Command(vararg val expectedArgs: ArgumentType = arrayOf())
 
 annotation class RequiresGuild(val useDefault: Boolean = true)
+
+data class CommandEvent(val args: List<Any>, val config: Configuration, val jda: JDA, val channel: MessageChannel,
+                        val author: User, val message: Message, val guild: Guild?) {
+
+    fun respond(msg: String) = this.channel.sendMessage(msg).queue()
+    fun respond(embed: MessageEmbed) = this.channel.sendMessage(embed).queue()
+}
 
 fun produceCommandMap(): HashMap<String, Method> {
     val reflections = Reflections("me.aberrantfox.aegeus.commandframework.commands", MethodAnnotationsScanner())
