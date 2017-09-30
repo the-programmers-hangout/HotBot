@@ -6,7 +6,7 @@
 
     <groupId>me.aberrantfox.</groupId>
     <artifactId>hotbot</artifactId>
-    <version>2.3.0</version>
+    <version>2.3.1</version>
 
     <properties>
         <main.class>me.aberrantfox.aegeus.MainAppKt</main.class>
@@ -15,7 +15,7 @@
         <junit.version>4.12</junit.version>
         <jupiter.version>5.0.0-M4</jupiter.version>
         <junitPlatformVersion>1.0.0-M4</junitPlatformVersion>
-        <jda.version>3.3.0_260</jda.version>
+        <jda.version>3.3.1_284</jda.version>
         <project.author>Fox#7705</project.author>
     </properties>
 
