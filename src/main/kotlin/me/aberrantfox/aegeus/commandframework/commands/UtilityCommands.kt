@@ -29,13 +29,13 @@ object Project {
 
 val startTime = Date()
 
-@Command fun ping(event: CommandEvent) = event.channel.sendMessage("Pong!").queue()
+@Command fun ping(event: CommandEvent) = event.respond("Pong!")
 
 @Command
 fun serverinfo(event: CommandEvent) {
     if(event.guild == null) return
     val embed = produceServerInfoEmbed(event.guild)
-    event.channel.sendMessage(embed).queue()
+    event.respond(embed)
 }
 
 @Command
@@ -44,26 +44,26 @@ fun uptime(event: CommandEvent) {
     val minutes = uptime / 1000 / 60
     val currentDate = startTime.toString()
 
-    event.channel.sendMessage("I've been awake since ${currentDate}, so like... ${minutes} minutes").queue()
+    event.respond("I've been awake since ${currentDate}, so like... ${minutes} minutes")
 }
 
 @Command
 fun exit(event: CommandEvent) {
     saveConfig(event.config)
-    event.channel.sendMessage("Exiting").queue()
+    event.respond("Exiting")
     System.exit(0)
 }
 
 @Command
-fun kill(event: GuildMessageReceivedEvent) {
-    event.channel.sendMessage("Killing process, configurations will not be saved.").queue()
+fun kill(event: CommandEvent) {
+    event.respond("Killing process, configurations will not be saved.")
     System.exit(0)
 }
 
 @Command
 fun saveConfigurations(event: CommandEvent) {
     saveConfig(event.config)
-    event.channel.sendMessage("Configurations saved. I hope you know what you are doing...").queue()
+    event.respond("Configurations saved. I hope you know what you are doing...")
 }
 
 @Command(ArgumentType.Manual)
@@ -82,14 +82,14 @@ fun info(event: CommandEvent) {
             .addField("Progress to Completion", "100% for a basic version plus or minus 5%, needs a little more testing", false)
             .addField("Repo link", "https://github.com/AberrantFox/hotbot", false)
 
-    event.channel.sendMessage(builder.build()).queue()
+    event.respond(builder.build())
 }
 
 @Command
-fun version(event: CommandEvent) = event.channel.sendMessage("**Hotbot version**: ${Project.properties.version}").queue()
+fun version(event: CommandEvent) = event.respond("**Hotbot version**: ${Project.properties.version}")
 
 @Command
-fun author(event: CommandEvent) = event.channel.sendMessage("**Project author**: ${Project.properties.author}").queue()
+fun author(event: CommandEvent) = event.respond("**Project author**: ${Project.properties.author}")
 
 
 fun produceServerInfoEmbed(guild: Guild): MessageEmbed {

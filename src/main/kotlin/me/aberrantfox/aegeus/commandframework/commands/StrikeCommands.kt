@@ -31,12 +31,12 @@ fun strike(event: CommandEvent) {
     val reason = args[2] as String
 
     if(strikeQuantity < 0 || strikeQuantity > 3) {
-        event.channel.sendMessage("Strike weight should be between 0 and 3").queue()
+        event.respond("Strike weight should be between 0 and 3")
         return
     }
 
     if( !(event.guild.members.map { it.user.id }.contains(target)) ) {
-        event.channel.sendMessage("Cannot find the member by the id: $target").queue()
+        event.respond("Cannot find the member by the id: $target")
         return
     }
 
@@ -79,7 +79,7 @@ fun history(event: CommandEvent) {
                 false)
     }
 
-    event.channel.sendMessage(builder.build()).queue()
+    event.respond(builder.build())
 }
 
 @Command(ArgumentType.Integer)
@@ -87,7 +87,7 @@ fun removeStrike(event: CommandEvent) {
     val strikeID = event.args[0] as Int
     val amountRemoved = removeInfraction(strikeID)
 
-    event.channel.sendMessage("Deleted $amountRemoved strike records.").queue()
+    event.respond("Deleted $amountRemoved strike records.")
 }
 
 @Command(ArgumentType.UserID)
@@ -95,7 +95,7 @@ fun cleanse(event: CommandEvent) {
     val userId = event.args[0] as String
     val amount = removeAllInfractions(userId)
 
-    event.channel.sendMessage("Infractions for ${userId.idToUser(event.jda).asMention} have been wiped. Total removed: $amount").queue()
+    event.respond("Infractions for ${userId.idToUser(event.jda).asMention} have been wiped. Total removed: $amount")
 }
 
 private fun administerPunishment(config: Configuration, user: User, strikeQuantity: Int, reason: String,

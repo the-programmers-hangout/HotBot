@@ -76,14 +76,14 @@ fun removeMuteRole(guild: Guild, user: User, config: Configuration, record: Mute
     }
 }
 
-fun sendPrivateMessage(user: User, msg: MessageEmbed) =
-        user.openPrivateChannel().queue {
+fun User.sendPrivateMessage(msg: MessageEmbed) =
+        openPrivateChannel().queue {
             it.sendMessage(msg).queue()
         }
 
 
-fun sendPrivateMessage(user: User, msg: String) =
-        user.openPrivateChannel().queue {
+fun User.sendPrivateMessage(msg: String) =
+        openPrivateChannel().queue {
             it.sendMessage(msg).queue()
         }
 

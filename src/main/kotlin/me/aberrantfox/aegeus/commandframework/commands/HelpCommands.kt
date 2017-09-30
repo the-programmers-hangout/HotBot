@@ -17,7 +17,7 @@ fun help(event: CommandEvent) {
     val (args, config, _, _, author) = event
 
     if(args.isEmpty()) {
-        sendPrivateMessage(author, getZeroArgMessage(config))
+        author.sendPrivateMessage(getZeroArgMessage(config))
     } else if (args.size == 1) {
         val selection = args[0] as String
         val argType = HelpConf.fetchArgumentType(selection)
@@ -25,16 +25,16 @@ fun help(event: CommandEvent) {
         when (argType) {
             SelectionArgument.CommandName -> {
                 val descriptor = HelpConf.fetchCommandDescriptor(selection) ?: return
-                sendPrivateMessage(author, buildCommandHelpMessage(config, descriptor))
+                author.sendPrivateMessage(buildCommandHelpMessage(config, descriptor))
             }
             SelectionArgument.CategoryName -> {
                 val categories = HelpConf.fetchCommandsInCategory(selection)
-                sendPrivateMessage(author, buildCategoryDescription(selection.toLowerCase(), categories))
+                author.sendPrivateMessage(buildCategoryDescription(selection.toLowerCase(), categories))
             }
-            else -> sendPrivateMessage(author, "Not a command or category... maybe try the default help command?")
+            else -> author.sendPrivateMessage("Not a command or category... maybe try the default help command?")
         }
     } else {
-        sendPrivateMessage(author, "Uhh... this command takes either 0 or 1 arguments.")
+        author.sendPrivateMessage("Uhh... this command takes either 0 or 1 arguments.")
     }
 }
 

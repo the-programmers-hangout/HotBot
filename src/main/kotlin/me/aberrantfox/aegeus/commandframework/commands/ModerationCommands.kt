@@ -24,13 +24,13 @@ fun nuke(event: CommandEvent) {
     val amount = event.args[0] as Int
 
     if (amount <= 0) {
-        event.channel.sendMessage("Yea, what exactly is the point in nuking nothing... ?").queue()
+        event.respond("Yea, what exactly is the point in nuking nothing... ?")
         return
     }
 
     event.channel.history.retrievePast(amount + 1).queue({
         it.forEach { it.delete().queue() }
-        event.channel.sendMessage("Be nice. No spam.").queue()
+        event.respond("Be nice. No spam.")
     })
 }
 
@@ -44,10 +44,10 @@ fun ignore(event: CommandEvent) {
 
     if (config.ignoredIDs.contains(target)) {
         config.ignoredIDs.remove(target)
-        event.channel.sendMessage("Unignored $target").queue()
+        event.respond("Unignored $target")
     } else {
         config.ignoredIDs.add(target)
-        event.channel.sendMessage("$target? Who? What? Don't know what that is. ;)").queue()
+        event.respond("$target? Who? What? Don't know what that is. ;)")
     }
 }
 
@@ -69,15 +69,15 @@ fun mute(event: CommandEvent) {
 fun lockdown(event: CommandEvent) {
     val config = event.config
     config.lockDownMode = !config.lockDownMode
-    event.channel.sendMessage("Lockdown mode is now set to: ${config.lockDownMode}.").queue()
+    event.respond("Lockdown mode is now set to: ${config.lockDownMode}.")
 }
 
 @Command(ArgumentType.String)
 fun prefix(event: CommandEvent) {
     val newPrefix = event.args[0] as String
     event.config.prefix = newPrefix
-    event.channel.sendMessage("Prefix is now $newPrefix. Please invoke commands using that prefix in the future. " +
-            "To save this configuration, use the saveconfigurations command.").queue()
+    event.respond("Prefix is now $newPrefix. Please invoke commands using that prefix in the future." +
+            "To save this configuration, use the saveconfigurations command.")
     event.jda.presence.setPresence(OnlineStatus.ONLINE, Game.of("${event.config.prefix}help"))
 }
 
@@ -86,12 +86,12 @@ fun setFilter(event: CommandEvent) {
     val desiredLevel = stringToPermission((event.args[0] as String).toUpperCase())
 
     if (desiredLevel == null) {
-        event.channel.sendMessage("Don't know that permission level boss... ").queue()
+        event.respond("Don't know that permission level boss... ")
         return
     }
 
     event.config.mentionFilterLevel = desiredLevel
-    event.channel.sendMessage("Permission level now set to: ${desiredLevel.name} ; be sure to save configurations.").queue()
+    event.respond("Permission level now set to: ${desiredLevel.name} ; be sure to save configurations.")
 }
 
 @RequiresGuild(false)
@@ -108,19 +108,19 @@ fun move(event: CommandEvent) {
     event.message.delete().queue()
 
     if (searchSpace < 0) {
-        event.channel.sendMessage("... move what").queue()
+        event.respond("... move what")
         return
     }
 
     if(searchSpace > 99) {
-        event.channel.sendMessage("Yea buddy, I'm not moving the entire channel into another, 99 messages or less").queue()
+        event.respond("Yea buddy, I'm not moving the entire channel into another, 99 messages or less")
         return
     }
 
     val channel = event.guild.textChannels.filter { it.id == chan }.first()
 
     if (channel == null) {
-        event.channel.sendMessage("... to where?").queue()
+        event.respond("... to where?")
         return
     }
 
@@ -152,7 +152,7 @@ fun badname(event: CommandEvent) {
 fun setQueueReason(event: CommandEvent) {
     val reason = event.args[0] as String
     BanQueue.setReason(event.author.id, reason)
-    event.channel.sendMessage("Set Ban-Raid reason to: $reason").queue()
+    event.respond("Set Ban-Raid reason to: $reason")
 }
 
 @Command(ArgumentType.Splitter)
@@ -160,12 +160,12 @@ fun addQueueTargets(event: CommandEvent) {
     val targets = event.args[0] as List<String>
 
     if( !(targets.isUserIDList(event.jda)) )  {
-        event.channel.sendMessage("One or more UserIDS were invalid.").queue()
+        event.respond("One or more UserIDS were invalid.")
         return
     }
 
     targets.forEach { BanQueue.queueBan(event.author.id, it) }
-    event.channel.sendMessage("Attempted to add ${targets.size} -- BanQueue now ${BanQueue.getBans(event.author.id)?.size}").queue()
+    event.respond("Attempted to add ${targets.size} -- BanQueue now ${BanQueue.getBans(event.author.id)?.size}")
 }
 
 @Command(ArgumentType.Splitter)
@@ -173,18 +173,18 @@ fun removeTarget(event: CommandEvent) {
     val targets = event.args[0] as List<String>
 
     if( !(targets.isUserIDList(event.jda)) ) {
-        event.channel.sendMessage("One or more UserIDS were invalid.").queue()
+        event.respond("One or more UserIDS were invalid.")
         return
     }
 
     targets.forEach { BanQueue.removeBan(event.author.id, it) }
-    event.channel.sendMessage("${targets.size} removed from the ban queue").queue()
+    event.respond("${targets.size} removed from the ban queue")
 }
 
 @Command
 fun clearQueue(event: CommandEvent) {
     BanQueue.clearBans(event.author.id)
-    event.channel.sendMessage("Targets cleared.").queue()
+    event.respond("Targets cleared.")
 }
 
 @RequiresGuild
@@ -196,13 +196,13 @@ fun banRaid(event: CommandEvent) {
     val reason = BanQueue.getReason(event.author.id)
 
     if(bans == null || reason == null || bans.isEmpty()) {
-        event.channel.sendMessage("You haven't added any bans... ").queue()
+        event.respond("You haven't added any bans... ")
         return
     }
 
     bans.forEach { event.guild.controller.ban(it, 1, reason).queue() }
     BanQueue.clearBans(event.author.id)
-    event.channel.sendMessage("Raid cleared.").queue()
+    event.respond("Raid cleared.")
 }
 
 @Command
@@ -210,11 +210,11 @@ fun showRaid(event: CommandEvent) {
     val targets = BanQueue.getBans(event.author.id)
 
     if(targets == null || targets.isEmpty()) {
-        event.channel.sendMessage("You haven't added anyone to your ban queue").queue()
+        event.respond("You haven't added anyone to your ban queue")
         return
     }
 
-    event.channel.sendMessage("Current targets: ${targets.reduce{a, b -> "$a, $b"}}.").queue()
+    event.respond("Current targets: ${targets.reduce{a, b -> "$a, $b"}}.")
 }
 
 private fun handleResponse(past: List<Message>, channel: MessageChannel, targets: List<String>, error: MessageChannel,

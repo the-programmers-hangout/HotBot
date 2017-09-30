@@ -33,58 +33,55 @@ object Suggestions {
 fun suggest(event: CommandEvent) {
     val author = event.author
     if (Suggestions.pool.size > 20) {
-        sendPrivateMessage(author, "There are too many suggestions in the pool to handle your request currently... sorry about that.")
+        event.respond("There are too many suggestions in the pool to handle your request currently... sorry about that.")
         return
     }
 
     if (Suggestions.pool.count { it.member == author.id } == 3) {
-        sendPrivateMessage(author, "You have enough suggestions in the pool for now...")
+        event.respond("You have enough suggestions in the pool for now...")
         return
     }
 
     val suggestion = event.args[0] as String
 
     Suggestions.pool.add(Suggestion(author.id, suggestion, DateTime.now(), author.avatarUrl ?: "http://i.imgur.com/HYkhEFO.jpg"))
-    sendPrivateMessage(author, "Your suggestion has been added to the review-pool. " +
-            "If it passes it'll be pushed out to the suggestions channel.")
+    event.respond("Your suggestion has been added to the review-pool. If it passes it'll be pushed out to the suggestions channel.")
 }
 
 @Command
-fun poolInfo(event: CommandEvent) {
-    sendPrivateMessage(event.author,
-            EmbedBuilder().setTitle("Suggestion Pool Info")
-                    .setColor(Color.cyan)
-                    .setDescription("There are currently ${Suggestions.pool.size} suggestions in the pool.")
-                    .build())
-}
+fun poolInfo(event: CommandEvent) =
+    event.respond(EmbedBuilder().setTitle("Suggestion Pool Info")
+        .setColor(Color.cyan)
+        .setDescription("There are currently ${Suggestions.pool.size} suggestions in the pool.")
+        .build())
+
 
 @Command
 fun poolTop(event: CommandEvent) {
     if (Suggestions.pool.isEmpty()) {
-        sendPrivateMessage(event.author, "The pool is empty.")
+        event.respond("The pool is empty.")
         return
     }
 
     val suggestion = Suggestions.pool.peek()
 
-    sendPrivateMessage(event.author,
-            EmbedBuilder()
-                    .setTitle("Suggestion by ${suggestion.member.idToName(event.jda)}")
-                    .setDescription(suggestion.idea)
-                    .addField("Time of Creation",
-                            suggestion.timeOf.toString(DateTimeFormat.forPattern("dd/MM/yyyy")),
-                            false)
-                    .addField("Member ID", suggestion.member, false)
-                    .build())
+    event.respond(EmbedBuilder()
+            .setTitle("Suggestion by ${suggestion.member.idToName(event.jda)}")
+            .setDescription(suggestion.idea)
+            .addField("Time of Creation",
+                suggestion.timeOf.toString(DateTimeFormat.forPattern("dd/MM/yyyy")),
+                false)
+            .addField("Member ID", suggestion.member, false)
+            .build())
 }
 
 @RequiresGuild
 @Command
 fun poolAccept(event: CommandEvent) {
-    if(event.guild == null) return
+    if (event.guild == null) return
 
     if (Suggestions.pool.isEmpty()) {
-        sendPrivateMessage(event.author, "The suggestion pool is empty... :)")
+        event.respond("The suggestion pool is empty... :)")
         return
     }
 
@@ -102,23 +99,23 @@ fun poolAccept(event: CommandEvent) {
 @Command
 fun poolDeny(event: CommandEvent) {
     if (Suggestions.pool.isEmpty()) {
-        sendPrivateMessage(event.author, "The suggestion pool is empty... :)")
+        event.respond("The suggestion pool is empty... :)")
         return
     }
 
     val rejected = Suggestions.pool.remove()
 
-    sendPrivateMessage(event.author, EmbedBuilder()
-            .setTitle("Suggestion Removed")
-            .addField("User ID", rejected.member, false)
-            .addField("Time of Suggestion", rejected.timeOf.toString(DateTimeFormat.forPattern("dd/MM/yyyy")), false)
-            .build())
+    event.respond(EmbedBuilder()
+        .setTitle("Suggestion Removed")
+        .addField("User ID", rejected.member, false)
+        .addField("Time of Suggestion", rejected.timeOf.toString(DateTimeFormat.forPattern("dd/MM/yyyy")), false)
+        .build())
 }
 
 @RequiresGuild
 @Command(ArgumentType.String, ArgumentType.String, ArgumentType.Joiner)
 fun respond(event: CommandEvent) {
-    if(event.guild == null) return
+    if (event.guild == null) return
 
     val (args, config) = event
     val target = args[0] as String
@@ -127,14 +124,14 @@ fun respond(event: CommandEvent) {
     val status = inputToStatus(response)
 
     if (status == null) {
-        event.channel.sendMessage("Valid responses are 'accepted', 'denied' and 'review'... use accordingly.").queue()
+        event.respond("Valid responses are 'accepted', 'denied' and 'review'... use accordingly.")
         return
     }
 
     val channel = fetchSuggestionChannel(event.guild, config)
 
     if (!(isTracked(target)) || channel.getMessageById(target) == null) {
-        event.channel.sendMessage("That is not a valid message or a suggestion by the ID.").queue()
+        event.respond("That is not a valid message or a suggestion by the ID.")
         return
     }
 
@@ -157,9 +154,9 @@ private fun fetchSuggestionChannel(guild: Guild, config: Configuration) = guild.
 private fun inputToStatus(input: String): SuggestionStatus? = SuggestionStatus.values().findLast { it.name.toLowerCase() == input.toLowerCase() }
 
 private fun buildSuggestionMessage(suggestion: Suggestion, jda: JDA, status: SuggestionStatus) =
-        EmbedBuilder()
-                .setTitle("${suggestion.member.idToName(jda)}'s Suggestion")
-                .setThumbnail(suggestion.avatarURL)
-                .setColor(status.colour)
-                .setDescription(suggestion.idea)
-                .addField("Suggestion Status", status.message, false)
+    EmbedBuilder()
+        .setTitle("${suggestion.member.idToName(jda)}'s Suggestion")
+        .setThumbnail(suggestion.avatarURL)
+        .setColor(status.colour)
+        .setDescription(suggestion.idea)
+        .addField("Suggestion Status", status.message, false)

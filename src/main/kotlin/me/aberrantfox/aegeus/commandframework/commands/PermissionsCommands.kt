@@ -15,19 +15,19 @@ fun setPerm(event: CommandEvent) {
     val desiredPermission = (event.args[1] as String).toUpperCase()
     
     if( !(event.config.commandPermissionMap.contains(commandName)) ) {
-        event.channel.sendMessage("Dunno what the command: $commandName is - run the help command?").queue()
+        event.respond("Dunno what the command: $commandName is - run the help command?")
         return
     }
 
     val permission = stringToPermission(desiredPermission)
 
     if (permission == null) {
-        event.channel.sendMessage("Yup. That permission level doesn't exist. Sorry").queue()
+        event.respond("Yup. That permission level doesn't exist. Sorry")
         return
     }
 
     event.config.commandPermissionMap[commandName] = permission
-    event.channel.sendMessage("Permission of $commandName is now $permission").queue()
+    event.respond("Permission of $commandName is now $permission")
 }
 
 @Command(ArgumentType.String)
@@ -35,11 +35,11 @@ fun getPerm(event: CommandEvent) {
     val commandName = event.args[0] as String
 
     if( !(event.config.commandPermissionMap.containsKey(commandName)) ) {
-        event.channel.sendMessage("What command is that, exactly?").queue()
+        event.respond("What command is that, exactly?")
         return
     }
 
-    event.channel.sendMessage("Current permission level: ${event.config.commandPermissionMap[commandName]}").queue()
+    event.respond("Current permission level: ${event.config.commandPermissionMap[commandName]}")
 }
 
 @Command
@@ -48,7 +48,7 @@ fun listCommands(event: CommandEvent) {
     event.config.commandPermissionMap.keys.forEach { messageBuilder.append(it).append(", ") }
 
     val message = messageBuilder.substring(0, messageBuilder.length -  2)
-    event.channel.sendMessage("Currently there are the following commands: $message.").queue()
+    event.respond("Currently there are the following commands: $message.")
 }
 
 @RequiresGuild
@@ -66,7 +66,7 @@ fun listAvailable(event: CommandEvent) {
             .addField("Commands", available, false)
             .build()
 
-    event.channel.sendMessage(response).queue()
+    event.respond(response)
 }
 
 
@@ -81,5 +81,5 @@ fun listPerms(event: CommandEvent) {
 fun listCommandPerms(event: CommandEvent) {
     val joiner = StringJoiner("\n")
     event.config.commandPermissionMap.entries.forEach { joiner.add("${it.key} :: ${it.value}") }
-    event.channel.sendMessage(joiner.toString()).queue()
+    event.respond(joiner.toString())
 }

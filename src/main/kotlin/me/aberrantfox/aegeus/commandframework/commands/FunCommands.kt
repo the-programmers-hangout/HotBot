@@ -10,23 +10,24 @@ import java.util.*
 @Command
 fun cat(event: CommandEvent) {
     val json = get("http://random.cat/meow").jsonObject
-    event.channel.sendMessage(json.getString("file")).queue()
+    event.respond(json.getString("file"))
 }
 
-@Command(ArgumentType.Manual)
+@Command(ArgumentType.Joiner)
 fun ball(event: CommandEvent) {
+    val query = event.args[0] as String
     val json = get("https://8ball.delegator.com/magic/JSON/abc").jsonObject
-    event.channel.sendMessage(json.getJSONObject("magic").getString("answer")).queue()
+    event.respond(json.getJSONObject("magic").getString("answer"))
 }
 
 @Command
 fun flip(event: CommandEvent) {
     val message = if (Random().nextBoolean()) "Heads" else "tails"
-    event.channel.sendMessage(message).queue()
+    event.respond(message)
 }
 
 @Command
 fun dog(event: CommandEvent) {
     val json = get("https://dog.ceo/api/breeds/image/random").jsonObject
-    event.channel.sendMessage(json.getString("message")).queue()
+    event.respond(json.getString("message"))
 }

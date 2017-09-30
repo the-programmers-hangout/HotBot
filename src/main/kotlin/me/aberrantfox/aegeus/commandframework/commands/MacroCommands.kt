@@ -19,17 +19,17 @@ fun addMacro(event: CommandEvent) {
     val key = (event.args[0] as String).toLowerCase()
 
     if(produceCommandMap().containsKey(key)) {
-        event.channel.sendMessage("You dummy. There is a command with that name already...").queue()
+        event.respond("You dummy. There is a command with that name already...")
         return
     } else if (macroMap.containsKey(key)) {
-        event.channel.sendMessage("Yea... that macro exists...").queue()
+        event.respond("Yea... that macro exists...")
         return
     }
 
     val value = event.message.rawContent.substring("addmacro ".length + key.length + event.config.prefix.length + 1)
 
     macroMap[key] = value
-    event.channel.sendMessage("**$key** will now respond with: **$value**").queue()
+    event.respond("**$key** will now respond with: **$value**")
 
     saveMacroMap(macroMap)
     CommandRecommender.addPossibility(key)
@@ -43,17 +43,17 @@ fun removeMacro(event: CommandEvent) {
         macroMap.remove(key)
         saveMacroMap(macroMap)
         CommandRecommender.removePossibility(key)
-        event.channel.sendMessage("$key - this macro is now gone.").queue()
+        event.respond("$key - this macro is now gone.")
         return
     }
 
-    event.channel.sendMessage("$key isn't a macro... ").queue()
+    event.respond("$key isn't a macro... ")
 }
 
 @Command
 fun listMacros(event: CommandEvent) {
     val macros = macroMap.keys.reduce { acc, s -> "$acc, $s" }
-    event.channel.sendMessage("Currently available macros: $macros.").queue()
+    event.respond("Currently available macros: $macros.")
 }
 
 private fun loadMacroMap(): HashMap<String, String> {

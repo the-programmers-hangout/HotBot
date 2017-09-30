@@ -6,22 +6,18 @@ import me.aberrantfox.aegeus.commandframework.commands.macroMap
 import me.aberrantfox.aegeus.extensions.*
 import me.aberrantfox.aegeus.services.CommandRecommender
 import net.dv8tion.jda.core.JDA
-import net.dv8tion.jda.core.entities.Guild
-import net.dv8tion.jda.core.entities.Message
-import net.dv8tion.jda.core.entities.MessageChannel
-import net.dv8tion.jda.core.entities.User
+import net.dv8tion.jda.core.entities.*
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent
 import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent
 import net.dv8tion.jda.core.hooks.ListenerAdapter
 import java.lang.reflect.Method
 
-data class CommandEvent(val args: List<Any>,
-                        val config: Configuration,
-                        val jda: JDA,
-                        val channel: MessageChannel,
-                        val author: User,
-                        val message: Message,
-                        val guild: Guild?)
+data class CommandEvent(val args: List<Any>, val config: Configuration, val jda: JDA, val channel: MessageChannel,
+                        val author: User, val message: Message, val guild: Guild?) {
+
+    fun respond(msg: String) = this.channel.sendMessage(msg).queue()
+    fun respond(embed: MessageEmbed) = this.channel.sendMessage(embed).queue()
+}
 
 data class CommandListener(val config: Configuration, val commandMap: Map<String, Method>, val jda: JDA,
                            val logChannel: MessageChannel) : ListenerAdapter() {

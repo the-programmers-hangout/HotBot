@@ -21,12 +21,12 @@ private object FHolder {
 @Command
 fun clearEmbed(event: CommandEvent) {
     EHolder.embed = EmbedBuilder()
-    event.channel.sendMessage("Embed cleared").queue()
+    event.respond("Embed cleared")
 }
 
 @Command
 fun sendEmbed(event: CommandEvent) {
-    event.channel.sendMessage(EHolder.embed.build()).queue()
+    event.respond(EHolder.embed.build())
 }
 
 @Command(ArgumentType.Joiner)
@@ -53,7 +53,7 @@ fun setColour(event: CommandEvent) {
     if(r > 1 || r < 0 ||
         g > 1 || g < 0 ||
             b > 1 || b < 0) {
-        event.channel.sendMessage("R/G/B values must be between 0 and 1").queue()
+        event.respond("R/G/B values must be between 0 and 1")
         return
     }
 
