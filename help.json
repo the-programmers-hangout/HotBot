@@ -458,6 +458,13 @@
       "description": "Clear out all IDs from the BanQueue",
       "structure": "",
       "example": ""
+    },
+    {
+      "name": "echo",
+      "category": "utility",
+      "description": "Echo a message to a channel",
+      "structure": "{channelID} {message}",
+      "example": "139413981501 Hi there, I am hotbot"
     }
   ]
 }
