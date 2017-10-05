@@ -1,18 +1,18 @@
 package me.aberrantfox.aegeus.services.database
 
-import me.aberrantfox.aegeus.commandframework.commands.Suggestion
 import me.aberrantfox.aegeus.commandframework.commands.SuggestionStatus
+import me.aberrantfox.aegeus.services.PoolRecord
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 
 
-fun trackSuggestion(suggestion: Suggestion, status: SuggestionStatus, messageID: String) =
+fun trackSuggestion(suggestion: PoolRecord, status: SuggestionStatus, messageID: String) =
         transaction {
             Suggestions.insert {
                 it[Suggestions.id] = messageID
-                it[Suggestions.date] = suggestion.timeOf
-                it[Suggestions.idea] = suggestion.idea
-                it[Suggestions.member] = suggestion.member
+                it[Suggestions.date] = suggestion.dateTime
+                it[Suggestions.idea] = suggestion.message
+                it[Suggestions.member] = suggestion.sender
                 it[Suggestions.status] = status
                 it[Suggestions.avatarURL] = suggestion.avatarURL
             }
@@ -38,7 +38,7 @@ fun obtainSuggestion(id: String) =
                 Op.build { Suggestions.id eq id }
             }.first()
 
-            Suggestion(row[Suggestions.member], row[Suggestions.idea], row[Suggestions.date], row[Suggestions.avatarURL])
+            PoolRecord(row[Suggestions.member], row[Suggestions.date], row[Suggestions.idea], row[Suggestions.avatarURL])
         }
 
 fun isTracked(id: String) =

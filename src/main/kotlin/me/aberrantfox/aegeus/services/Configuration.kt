@@ -28,7 +28,8 @@ data class Configuration(val token: String = "insert-token",
                          val invitePermissionLevel: Permission = Permission.MODERATOR,
                          val suggestionPoolLimit: Int = 20,
                          val guildid: String = "244230771232079873",
-                         val urlFilterPermissionLevel: Permission = Permission.MODERATOR)
+                         val urlFilterPermissionLevel: Permission = Permission.MODERATOR,
+                         val cleverbotAPIKey: String = "insert-api-key")
 
 class PermissionRoles(val moderatorRoles: Array<String> = arrayOf("Moderator"),
                       val adminRoles: Array<String> = arrayOf("Admin"),

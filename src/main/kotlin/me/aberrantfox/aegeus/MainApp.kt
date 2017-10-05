@@ -31,7 +31,7 @@ fun main(args: Array<String>) {
             MemberListener(config),
             InviteListener(config),
             ResponseListener(config),
-            MentionListener(),
+            MentionListener(config, jda.selfUser.name),
             VoiceChannelListener(logChannel))
 
     jda.presence.setPresence(OnlineStatus.ONLINE, Game.of("${config.prefix}help"))

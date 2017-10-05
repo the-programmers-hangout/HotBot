@@ -3,20 +3,20 @@ package me.aberrantfox.aegeus.commandframework.commands
 import me.aberrantfox.aegeus.commandframework.ArgumentType
 import me.aberrantfox.aegeus.commandframework.Command
 import me.aberrantfox.aegeus.commandframework.RequiresGuild
-import me.aberrantfox.aegeus.extensions.idToName
 import me.aberrantfox.aegeus.commandframework.CommandEvent
+import me.aberrantfox.aegeus.extensions.idToName
+import me.aberrantfox.aegeus.services.AddResponse
 import me.aberrantfox.aegeus.services.Configuration
+import me.aberrantfox.aegeus.services.PoolRecord
+import me.aberrantfox.aegeus.services.UserElementPool
 import me.aberrantfox.aegeus.services.database.*
 import net.dv8tion.jda.core.EmbedBuilder
 import net.dv8tion.jda.core.JDA
 import net.dv8tion.jda.core.entities.Guild
-import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
 import java.awt.Color
-import java.util.*
-import java.util.LinkedList
 
-data class Suggestion(val member: String, val idea: String, val timeOf: DateTime, val avatarURL: String)
+
 
 enum class SuggestionStatus(val colour: Color, val message: String) {
     Accepted(Color.green, "Accepted"),
@@ -25,33 +25,28 @@ enum class SuggestionStatus(val colour: Color, val message: String) {
 }
 
 object Suggestions {
-    val pool: Queue<Suggestion> = LinkedList()
+    val pool: UserElementPool = UserElementPool(poolName = "Suggestions")
 }
 
 @Command(ArgumentType.Joiner)
 fun suggest(event: CommandEvent) {
-    val author = event.author
-    if (Suggestions.pool.size > 20) {
-        event.respond("There are too many suggestions in the pool to handle your request currently... sorry about that.")
-        return
+    val author = event.author.id
+    val message = event.args[0] as String
+
+    val response = Suggestions.pool.addRecord(author, event.author.avatarUrl, message)
+
+    when (response) {
+        AddResponse.PoolFull -> event.respond("You have enough suggestions in the pool for now...")
+        AddResponse.UserFull -> event.respond("There are too many suggestions in the pool to handle your request currently... sorry about that.")
+        AddResponse.Accepted -> event.respond("Your suggestion has been added to the review-pool. If it passes it'll be pushed out to the suggestions channel.")
     }
-
-    if (Suggestions.pool.count { it.member == author.id } == 3) {
-        event.respond("You have enough suggestions in the pool for now...")
-        return
-    }
-
-    val suggestion = event.args[0] as String
-
-    Suggestions.pool.add(Suggestion(author.id, suggestion, DateTime.now(), author.avatarUrl ?: "http://i.imgur.com/HYkhEFO.jpg"))
-    event.respond("Your suggestion has been added to the review-pool. If it passes it'll be pushed out to the suggestions channel.")
 }
 
 @Command
 fun poolInfo(event: CommandEvent) =
     event.respond(EmbedBuilder().setTitle("Suggestion Pool Info")
         .setColor(Color.cyan)
-        .setDescription("There are currently ${Suggestions.pool.size} suggestions in the pool.")
+        .setDescription("There are currently ${Suggestions.pool.entries()} suggestions in the pool.")
         .build())
 
 
@@ -65,12 +60,12 @@ fun poolTop(event: CommandEvent) {
     val suggestion = Suggestions.pool.peek()
 
     event.respond(EmbedBuilder()
-            .setTitle("Suggestion by ${suggestion.member.idToName(event.jda)}")
-            .setDescription(suggestion.idea)
+            .setTitle("Suggestion by ${suggestion.sender.idToName(event.jda)}")
+            .setDescription(suggestion.message)
             .addField("Time of Creation",
-                suggestion.timeOf.toString(DateTimeFormat.forPattern("dd/MM/yyyy")),
+                suggestion.dateTime.toString(DateTimeFormat.forPattern("dd/MM/yyyy")),
                 false)
-            .addField("Member ID", suggestion.member, false)
+            .addField("Member ID", suggestion.sender, false)
             .build())
 }
 
@@ -85,7 +80,7 @@ fun poolAccept(event: CommandEvent) {
     }
 
     val channel = event.guild.textChannels.findLast { it.id == event.config.suggestionChannel }
-    val suggestion = Suggestions.pool.remove()
+    val suggestion = Suggestions.pool.top()
 
     channel?.sendMessage(buildSuggestionMessage(suggestion, event.jda, SuggestionStatus.Review).build())?.queue {
         trackSuggestion(suggestion, SuggestionStatus.Review, it.id)
@@ -102,12 +97,12 @@ fun poolDeny(event: CommandEvent) {
         return
     }
 
-    val rejected = Suggestions.pool.remove()
+    val rejected = Suggestions.pool.top()
 
     event.respond(EmbedBuilder()
         .setTitle("Suggestion Removed")
-        .addField("User ID", rejected.member, false)
-        .addField("Time of Suggestion", rejected.timeOf.toString(DateTimeFormat.forPattern("dd/MM/yyyy")), false)
+        .addField("User ID", rejected.sender, false)
+        .addField("Time of Suggestion", rejected.dateTime.toString(DateTimeFormat.forPattern("dd/MM/yyyy")), false)
         .build())
 }
 
@@ -152,10 +147,10 @@ private fun fetchSuggestionChannel(guild: Guild, config: Configuration) = guild.
 
 private fun inputToStatus(input: String): SuggestionStatus? = SuggestionStatus.values().findLast { it.name.toLowerCase() == input.toLowerCase() }
 
-private fun buildSuggestionMessage(suggestion: Suggestion, jda: JDA, status: SuggestionStatus) =
+private fun buildSuggestionMessage(suggestion: PoolRecord, jda: JDA, status: SuggestionStatus) =
     EmbedBuilder()
-        .setTitle("${suggestion.member.idToName(jda)}'s Suggestion")
+        .setTitle("${suggestion.sender.idToName(jda)}'s Suggestion")
         .setThumbnail(suggestion.avatarURL)
         .setColor(status.colour)
-        .setDescription(suggestion.idea)
+        .setDescription(suggestion.message)
         .addField("Suggestion Status", status.message, false)
