@@ -5,7 +5,6 @@ import me.aberrantfox.aegeus.services.Configuration
 import me.aberrantfox.aegeus.commandframework.commands.macroMap
 import me.aberrantfox.aegeus.extensions.*
 import me.aberrantfox.aegeus.services.CommandRecommender
-import mu.KLogging
 import net.dv8tion.jda.core.JDA
 import net.dv8tion.jda.core.entities.*
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent
@@ -15,7 +14,6 @@ import java.lang.reflect.Method
 
 data class CommandListener(val config: Configuration, val commandMap: Map<String, Method>, val jda: JDA,
                            val logChannel: MessageChannel) : ListenerAdapter() {
-    companion object : KLogging()
 
     init {
         CommandRecommender.addAll(commandMap.keys.toList() + macroMap.keys.toList())

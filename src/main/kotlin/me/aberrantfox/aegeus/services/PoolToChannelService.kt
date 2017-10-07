@@ -1,10 +1,13 @@
 package me.aberrantfox.aegeus.services
 
-import com.github.salomonbrys.kotson.typeToken
-import com.google.gson.Gson
+import com.fatboyindustrial.gsonjodatime.Converters
+import com.google.common.reflect.TypeToken
 import org.joda.time.DateTime
 import java.io.File
 import java.util.*
+import com.google.gson.GsonBuilder
+
+
 
 data class PoolRecord(val sender: String, val dateTime: DateTime, val message: String, val avatarURL: String)
 
@@ -14,27 +17,29 @@ enum class AddResponse {
 
 class UserElementPool(val userLimit: Int = 3, val poolLimit: Int = 20, val poolName: String) {
     private val saveLocation = File("pools/$poolName.json")
-    private val pool: Queue<PoolRecord> = LinkedList()
-    private val gson = Gson()
+    private val pool: Queue<PoolRecord> = LinkedList<PoolRecord>()
+    private val gson = Converters.registerDateTime(GsonBuilder()).create()
+
 
     init {
         if(saveLocation.exists()) {
-            val records = gson.fromJson(saveLocation.readText(), pool::class.java)
+            val type = object : TypeToken<LinkedList<PoolRecord>>(){}.type
+            val records = gson.fromJson<LinkedList<PoolRecord>>(saveLocation.readText(), type)
             records.forEach { pool.add(it) }
+        } else {
+            File(saveLocation.parent).mkdirs()
+            saveLocation.createNewFile()
         }
     }
 
     fun addRecord(sender: String, avatarURL: String, message: String): AddResponse {
-        if(totalInPool(sender) == userLimit) {
-            return AddResponse.UserFull
-        }
+        if(totalInPool(sender) == userLimit)  return AddResponse.UserFull
 
-        if(pool.size == poolLimit) {
-            return AddResponse.PoolFull
-        }
+        if(pool.size == poolLimit) return AddResponse.PoolFull
 
         pool.add(PoolRecord(sender, DateTime.now(), message, avatarURL))
         save()
+
         return AddResponse.Accepted
     }
 
@@ -48,11 +53,6 @@ class UserElementPool(val userLimit: Int = 3, val poolLimit: Int = 20, val poolN
 
     private fun save() {
         val json = gson.toJson(pool)
-
-        if( !(saveLocation.exists()) ) {
-            saveLocation.mkdirs()
-        }
-
         saveLocation.writeText(json)
     }
 

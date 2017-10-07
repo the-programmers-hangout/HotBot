@@ -26,7 +26,7 @@ class MentionListener(val config: Configuration, val selfName: String) : Listene
             .replace(botname, "cleverbot")
             .replace("@$botname", "cleverbot")
             .replace("@everyone", "cleverbot")
-            .replace("@here", "cleverbot")
+        .replace("@here", "cleverbot")
 
     private fun cleverResponse(input: String): String {
         val query = CleverBotQuery(config.cleverbotAPIKey, input)
