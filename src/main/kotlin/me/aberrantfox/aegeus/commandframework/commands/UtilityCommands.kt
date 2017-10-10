@@ -90,6 +90,14 @@ fun version(event: CommandEvent) = event.respond("**Hotbot version**: ${Project.
 @Command
 fun author(event: CommandEvent) = event.respond("**Project author**: ${Project.properties.author}")
 
+@Command(ArgumentType.String, ArgumentType.Joiner)
+fun echo(event: CommandEvent) {
+    val target = event.args[0] as String
+    val message = event.args[1] as String
+
+    event.jda.getTextChannelById(target).sendMessage(message).queue()
+}
+
 
 fun produceServerInfoEmbed(guild: Guild): MessageEmbed {
     val builder = EmbedBuilder()
