@@ -30,7 +30,6 @@ fun main(args: Array<String>) {
             CommandListener(config, commandMap, jda, logChannel),
             MemberListener(config),
             InviteListener(config),
-            ResponseListener(config),
             MentionListener(config, jda.selfUser.name),
             VoiceChannelListener(logChannel))
 
