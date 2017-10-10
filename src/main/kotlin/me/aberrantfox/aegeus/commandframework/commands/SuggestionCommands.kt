@@ -52,21 +52,13 @@ fun poolInfo(event: CommandEvent) =
 
 @Command
 fun poolTop(event: CommandEvent) {
-    if (Suggestions.pool.isEmpty()) {
+    val suggestion = Suggestions.pool.peek()
+    if (suggestion == null) {
         event.respond("The pool is empty.")
         return
     }
 
-    val suggestion = Suggestions.pool.peek()
-
-    event.respond(EmbedBuilder()
-            .setTitle("Suggestion by ${suggestion.sender.idToName(event.jda)}")
-            .setDescription(suggestion.message)
-            .addField("Time of Creation",
-                suggestion.dateTime.toString(DateTimeFormat.forPattern("dd/MM/yyyy")),
-                false)
-            .addField("Member ID", suggestion.sender, false)
-            .build())
+    event.respond(suggestion.describe(event.jda, "Suggestion"))
 }
 
 @RequiresGuild
@@ -74,13 +66,14 @@ fun poolTop(event: CommandEvent) {
 fun poolAccept(event: CommandEvent) {
     if (event.guild == null) return
 
-    if (Suggestions.pool.isEmpty()) {
+    val suggestion = Suggestions.pool.top()
+
+    if (suggestion == null) {
         event.respond("The suggestion pool is empty... :)")
         return
     }
 
     val channel = event.guild.textChannels.findLast { it.id == event.config.suggestionChannel }
-    val suggestion = Suggestions.pool.top()
 
     channel?.sendMessage(buildSuggestionMessage(suggestion, event.jda, SuggestionStatus.Review).build())?.queue {
         trackSuggestion(suggestion, SuggestionStatus.Review, it.id)
@@ -92,18 +85,14 @@ fun poolAccept(event: CommandEvent) {
 
 @Command
 fun poolDeny(event: CommandEvent) {
-    if (Suggestions.pool.isEmpty()) {
+    val rejected = Suggestions.pool.top()
+
+    if (rejected == null) {
         event.respond("The suggestion pool is empty... :)")
         return
     }
 
-    val rejected = Suggestions.pool.top()
-
-    event.respond(EmbedBuilder()
-        .setTitle("Suggestion Removed")
-        .addField("User ID", rejected.sender, false)
-        .addField("Time of Suggestion", rejected.dateTime.toString(DateTimeFormat.forPattern("dd/MM/yyyy")), false)
-        .build())
+    event.respond(rejected.describe(event.jda, "Suggestion"))
 }
 
 @RequiresGuild

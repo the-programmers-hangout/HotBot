@@ -6,10 +6,33 @@ import org.joda.time.DateTime
 import java.io.File
 import java.util.*
 import com.google.gson.GsonBuilder
+import me.aberrantfox.aegeus.extensions.idToName
+import net.dv8tion.jda.core.EmbedBuilder
+import net.dv8tion.jda.core.JDA
+import net.dv8tion.jda.core.entities.MessageEmbed
+import org.joda.time.format.DateTimeFormat
+import java.time.LocalDateTime
 
 
+data class PoolRecord(val sender: String, val dateTime: DateTime, val message: String, val avatarURL: String) {
+    fun describe(jda: JDA, datumName: String): MessageEmbed =
+        EmbedBuilder()
+            .setTitle("$datumName by ${sender.idToName(jda)}")
+            .setDescription(message)
+            .addField("Time of Creation", formatConstructionDate(), false)
+            .addField("Member ID", sender, false)
+            .build()
 
-data class PoolRecord(val sender: String, val dateTime: DateTime, val message: String, val avatarURL: String)
+    fun prettyPrint(jda: JDA, datumName: String): EmbedBuilder =
+        EmbedBuilder()
+            .setTitle("${sender.idToName(jda)}'s $datumName")
+            .addField("Time of Creation", formatConstructionDate(), false)
+            .addField("Content", message, false)
+            .setThumbnail(avatarURL)
+            .setTimestamp(LocalDateTime.now())
+
+    private fun formatConstructionDate() = dateTime.toString(DateTimeFormat.forPattern("dd/MM/yyyy"))
+}
 
 enum class AddResponse {
     Accepted, UserFull, PoolFull
@@ -43,13 +66,18 @@ class UserElementPool(val userLimit: Int = 3, val poolLimit: Int = 20, val poolN
         return AddResponse.Accepted
     }
 
-    fun top() = pool.poll()
+    fun top(): PoolRecord? {
+        val record = pool.poll()
+        save()
+
+        return record
+    }
 
     fun entries() = pool.size
 
     fun isEmpty() = pool.isEmpty()
 
-    fun peek(): PoolRecord = pool.peek()
+    fun peek(): PoolRecord? = pool.peek()
 
     private fun save() {
         val json = gson.toJson(pool)
