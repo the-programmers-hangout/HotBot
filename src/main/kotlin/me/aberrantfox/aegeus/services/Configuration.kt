@@ -36,7 +36,10 @@ class PermissionRoles(val moderatorRoles: Array<String> = arrayOf("Moderator"),
                       val adminRoles: Array<String> = arrayOf("Admin"),
                       val ownerRole: String = "Owner")
 
-data class DatabaseCredentials(val username: String = "db-user", val password: String = "db-password")
+data class DatabaseCredentials(val username: String = "db-username",
+                               val password: String = "db-password",
+                               val hostname: String = "db-hostname",
+                               val database: String = "db-database")
 
 enum class InfractionAction {
     Warn, Mute, Kick, Ban
