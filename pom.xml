@@ -15,7 +15,7 @@
         <junit.version>4.12</junit.version>
         <jupiter.version>5.0.0-M4</jupiter.version>
         <junitPlatformVersion>1.0.0-M4</junitPlatformVersion>
-        <jda.version>3.3.1_284</jda.version>
+        <jda.version>3.3.1_293</jda.version>
         <project.author>Fox#7705</project.author>
     </properties>
 
@@ -207,6 +207,14 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
             </plugin>
         </plugins>
     </build>
