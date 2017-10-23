@@ -6,3 +6,4 @@ macros.json
 ..gitignore.un~
 .gitignore~
 pools/**
+ratelimit/**
