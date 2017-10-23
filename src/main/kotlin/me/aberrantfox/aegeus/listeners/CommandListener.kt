@@ -72,7 +72,6 @@ data class CommandListener(val config: Configuration, val commandMap: Map<String
 
         if (method.parameterCount == 0) {
             method.invoke(null)
-            handleDelete(message, config.prefix)
             return
         }
 
