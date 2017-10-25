@@ -31,12 +31,13 @@ class InviteListener(val config: Configuration) : ListenerAdapter() {
 
             if (messageContent.contains('@')) messageContent = messageContent.replace("@", "`@`")
 
-            message.deleteIfExists()
-            guild.textChannels.findLast { it.id == config.logChannel }
+            message.deleteIfExists {
+                guild.textChannels.findLast { it.id == config.logChannel }
                     ?.sendMessage("Deleted message: $messageContent " +
-                            "by ${author.asMention} " +
-                            "in ${channel.asMention}")
+                        "by ${author.asMention} " +
+                        "in ${channel.asMention}")
                     ?.queue()
+            }
         }
     }
 }
