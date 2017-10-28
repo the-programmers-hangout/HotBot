@@ -6,6 +6,7 @@ import me.aberrantfox.aegeus.extensions.hasRole
 import me.aberrantfox.aegeus.extensions.timeToDifference
 import me.aberrantfox.aegeus.extensions.unmute
 import me.aberrantfox.aegeus.listeners.*
+import me.aberrantfox.aegeus.services.APIRateLimiter
 import me.aberrantfox.aegeus.services.Configuration
 import me.aberrantfox.aegeus.services.database.setupDatabaseSchema
 import me.aberrantfox.aegeus.services.saveConfig
@@ -25,6 +26,8 @@ fun main(args: Array<String>) {
 
     val jda = JDABuilder(AccountType.BOT).setToken(config.token).buildBlocking()
     val logChannel = jda.getTextChannelById(config.logChannel)
+
+    val cleverBot = APIRateLimiter(config.cleverBotApiCallLimit, 0, "CleverBot")
 
     jda.addEventListener(
             CommandListener(config, commandMap, jda, logChannel),

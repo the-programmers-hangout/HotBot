@@ -6,7 +6,7 @@
 
     <groupId>me.aberrantfox.</groupId>
     <artifactId>hotbot</artifactId>
-    <version>2.3.3</version>
+    <version>3.0.1</version>
 
     <properties>
         <main.class>me.aberrantfox.aegeus.MainAppKt</main.class>
