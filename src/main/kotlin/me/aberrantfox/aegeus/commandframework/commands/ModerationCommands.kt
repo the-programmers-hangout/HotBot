@@ -149,18 +149,18 @@ fun badname(event: CommandEvent) {
     }
 }
 
-@RequiresGuild(false)
+@RequiresGuild
 @Command(ArgumentType.UserID)
-fun joindate(event: CommandEvent) {
-    val args = event.args
-    val target = args[0] as String
+fun joinDate(event: CommandEvent) {
+    if(event.guild == null) return
+    val target = event.args[0] as String
 
-    val member = event.guild?.getMemberById(target)
+    val member = event.guild.getMemberById(target)
     val dateFormat = SimpleDateFormat("yyyy-MM-dd")
-    val joinDateParsed = dateFormat.parse(member?.joinDate.toString())
-    val joindate = dateFormat.format(joinDateParsed)
+    val joinDateParsed = dateFormat.parse(member.joinDate.toString())
+    val joinDate = dateFormat.format(joinDateParsed)
 
-    event.respond(member?.fullName() + "'s join date: " + joindate)
+    event.respond("${member.fullName()}'s join date: $joinDate")
 }
 
 

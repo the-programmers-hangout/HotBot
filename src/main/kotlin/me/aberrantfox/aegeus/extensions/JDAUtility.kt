@@ -9,7 +9,12 @@ import java.util.*
 
 data class MuteRecord(val unmuteTime: Long, val reason: String, val moderator: String, val user: String, val guildId: String)
 
-fun String.isUserID(jda: JDA): Boolean = jda.getUserById(this) != null
+fun String.isUserID(jda: JDA): Boolean =
+    try {
+        jda.getUserById(this) != null
+    } catch (e: NumberFormatException) {
+        false
+    }
 
 fun String.idToName(jda: JDA): String = jda.getUserById(this).name
 
@@ -47,7 +52,7 @@ fun muteMember(guild: Guild, user: User, time: Long, reason: String, config: Con
 }
 
 fun unmute(guild: Guild, user: User, config: Configuration, time: Long, muteRecord: MuteRecord) {
-    if(time <= 0) {
+    if (time <= 0) {
         removeMuteRole(guild, user, config, muteRecord)
         return
     }
@@ -60,16 +65,16 @@ fun unmute(guild: Guild, user: User, config: Configuration, time: Long, muteReco
 }
 
 fun removeMuteRole(guild: Guild, user: User, config: Configuration, record: MuteRecord) {
-    if(user.mutualGuilds.isEmpty()) {
+    if (user.mutualGuilds.isEmpty()) {
         config.mutedMembers.remove(record)
         return
     }
 
     user.openPrivateChannel().queue {
         it.sendMessage("${user.name} - you have been unmuted. Please respect our rules to prevent" +
-                " further infractions.").queue {
+            " further infractions.").queue {
             guild.controller.removeRolesFromMember(guild.getMemberById(user.id), guild.getRolesByName(
-                    config.mutedRole, true)).queue()
+                config.mutedRole, true)).queue()
             config.mutedMembers.remove(record)
         }
 
@@ -77,14 +82,14 @@ fun removeMuteRole(guild: Guild, user: User, config: Configuration, record: Mute
 }
 
 fun User.sendPrivateMessage(msg: MessageEmbed) =
-        openPrivateChannel().queue {
-            it.sendMessage(msg).queue()
-        }
+    openPrivateChannel().queue {
+        it.sendMessage(msg).queue()
+    }
 
 
 fun User.sendPrivateMessage(msg: String) =
-        openPrivateChannel().queue {
-            it.sendMessage(msg).queue()
-        }
+    openPrivateChannel().queue {
+        it.sendMessage(msg).queue()
+    }
 
 fun List<String>.isUserIDList(jda: JDA) = this.all { it.isUserID(jda) }
