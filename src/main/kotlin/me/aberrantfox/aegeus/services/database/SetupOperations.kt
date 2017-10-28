@@ -17,15 +17,10 @@ fun setupDatabaseSchema(config: Configuration) {
             "nullNamePatternMatchesAll=true"
     )
 
-    val jdbcUri = "jdbc:mysql://" +
-            config.databaseCredentials.hostname +
-            "/" +
-            config.databaseCredentials.database +
-            "?" +
-            dbParams.joinToString("&")
+    val url = "jdbc:mysql://${config.databaseCredentials.hostname}/${config.databaseCredentials.database}?${dbParams.joinToString("&")}"
 
     Database.connect(
-            url = jdbcUri,
+            url = url,
             driver = "com.mysql.cj.jdbc.Driver",
             password = config.databaseCredentials.password,
             user = config.databaseCredentials.username
