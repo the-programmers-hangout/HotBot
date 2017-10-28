@@ -5,6 +5,7 @@ import me.aberrantfox.aegeus.commandframework.Command
 import me.aberrantfox.aegeus.commandframework.RequiresGuild
 import me.aberrantfox.aegeus.commandframework.stringToPermission
 import me.aberrantfox.aegeus.commandframework.CommandEvent
+import me.aberrantfox.aegeus.extensions.fullName
 import me.aberrantfox.aegeus.extensions.idToUser
 import me.aberrantfox.aegeus.extensions.isUserIDList
 import me.aberrantfox.aegeus.extensions.muteMember
@@ -15,6 +16,7 @@ import net.dv8tion.jda.core.OnlineStatus
 import net.dv8tion.jda.core.entities.Game
 import net.dv8tion.jda.core.entities.Message
 import net.dv8tion.jda.core.entities.MessageChannel
+import java.text.SimpleDateFormat
 
 @RequiresGuild(false)
 @Command(ArgumentType.Integer)
@@ -145,6 +147,20 @@ fun badname(event: CommandEvent) {
             it.sendMessage("Your name has been changed forcefully by a member of staff for reason: $reason").queue()
         }
     }
+}
+
+@RequiresGuild(false)
+@Command(ArgumentType.UserID)
+fun joindate(event: CommandEvent) {
+    val args = event.args
+    val target = args[0] as String
+
+    val member = event.guild?.getMemberById(target)
+    val dateFormat = SimpleDateFormat("yyyy-MM-dd")
+    val joinDateParsed = dateFormat.parse(member?.joinDate.toString())
+    val joindate = dateFormat.format(joinDateParsed)
+
+    event.respond(member?.fullName() + "'s join date: " + joindate)
 }
 
 

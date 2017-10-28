@@ -8,10 +8,24 @@ import org.jetbrains.exposed.sql.StdOutSqlLogger
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.transactions.transaction
 
-
 fun setupDatabaseSchema(config: Configuration) {
+    val dbParams = listOf(
+            "useUnicode=true",
+            "useJDBCCompliantTimezoneShift=true",
+            "useLegacyDatetimeCode=true",
+            "serverTimezone=UTC",
+            "nullNamePatternMatchesAll=true"
+    )
+
+    val jdbcUri = "jdbc:mysql://" +
+            config.databaseCredentials.hostname +
+            "/" +
+            config.databaseCredentials.database +
+            "?" +
+            dbParams.joinToString("&")
+
     Database.connect(
-            url = "jdbc:mysql://localhost/hotbot?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC&nullNamePatternMatchesAll=true",
+            url = jdbcUri,
             driver = "com.mysql.cj.jdbc.Driver",
             password = config.databaseCredentials.password,
             user = config.databaseCredentials.username
