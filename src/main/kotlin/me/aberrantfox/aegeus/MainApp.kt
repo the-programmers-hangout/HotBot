@@ -27,8 +27,6 @@ fun main(args: Array<String>) {
     val jda = JDABuilder(AccountType.BOT).setToken(config.token).buildBlocking()
     val logChannel = jda.getTextChannelById(config.logChannel)
 
-    val cleverBot = APIRateLimiter(config.cleverBotApiCallLimit, 0, "CleverBot")
-
     jda.addEventListener(
             CommandListener(config, commandMap, jda, logChannel),
             MemberListener(config),
