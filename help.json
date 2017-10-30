@@ -469,28 +469,28 @@
     },
     {
       "name": "submitprofile",
-      "category": "profile",
+      "category": "profiles",
       "description": "Submit a profile to the profile queue, it'll be reviewed by a moderator. YES, you need to match the format! Read the FAQ for formatting!",
       "structure": "{profile}",
       "example": "\n **Who are you?** \n  hotbot! \n **What is your experience?** \n everything! \n **What languages are you really, really comfortable with?** \n Kotlin! \n **What other languages have you used/do you know of?** \n Java! \n **Anything else you'd like to say?** \n I like cake!"
     },
     {
       "name": "acceptprofile",
-      "category": "profile",
+      "category": "profiles",
       "description": "Accept a profile and post it to the profiles channel.",
       "structure": "",
       "example": ""
     },
     {
       "name": "declineprofile",
-      "category": "profile",
+      "category": "profiles",
       "description": "Decline a profile, removing it from the queue.",
       "structure": "",
       "example": ""
     },
     {
       "name": "viewprofile",
-      "category": "profile",
+      "category": "profiles",
       "description": "View the profile at the top of the queue, allowing you to decide whether it should be accepted or rejected.",
       "structure": "",
       "example": ""
