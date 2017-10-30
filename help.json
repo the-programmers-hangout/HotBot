@@ -494,6 +494,13 @@
       "description": "View the profile at the top of the queue, allowing you to decide whether it should be accepted or rejected.",
       "structure": "",
       "example": ""
+    },
+    {
+      "name": "joindate",
+      "category": "utility",
+      "description": "See when a member joined the guild.",
+      "structure": "{userID}",
+      "example": "14014394132901"
     }
   ]
 }
