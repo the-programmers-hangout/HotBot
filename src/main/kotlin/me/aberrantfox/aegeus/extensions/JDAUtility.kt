@@ -11,14 +11,14 @@ data class MuteRecord(val unmuteTime: Long, val reason: String, val moderator: S
 
 fun String.isUserID(jda: JDA): Boolean =
     try {
-        jda.getUserById(this) != null
+        jda.getUserById(this.trimToID(jda)) != null
     } catch (e: NumberFormatException) {
         false
     }
 
 fun String.idToName(jda: JDA): String = jda.getUserById(this).name
 
-fun String.idToUser(jda: JDA): User = jda.getUserById(this)
+fun String.idToUser(jda: JDA): User = jda.getUserById(this.trimToID(jda))
 
 fun Guild.hasRole(roleName: String): Boolean = this.roles.any { it.name.toLowerCase() == roleName }
 
@@ -93,3 +93,10 @@ fun User.sendPrivateMessage(msg: String) =
     }
 
 fun List<String>.isUserIDList(jda: JDA) = this.all { it.isUserID(jda) }
+
+private fun String.trimToID(jda: JDA): String =
+    if(this.startsWith("<@") && this.endsWith(">")) {
+        this.substring(2, this.length-1)
+    } else {
+        this
+    }
