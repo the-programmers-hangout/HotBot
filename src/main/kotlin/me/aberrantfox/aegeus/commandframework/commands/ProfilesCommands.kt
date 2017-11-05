@@ -57,6 +57,7 @@ fun acceptProfile(event: CommandEvent) {
     val target = event.jda.getTextChannelById(event.config.profileChannel)
     target.sendMessage(
         record.prettyPrint(event.jda, "Profile")
+            .setTitle("")
             .setAuthor(record.sender.idToName(event.jda), record.avatarURL,record.avatarURL)
             .build())
         .queue()

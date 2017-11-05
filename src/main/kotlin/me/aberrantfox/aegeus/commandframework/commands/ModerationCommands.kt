@@ -7,9 +7,7 @@ import me.aberrantfox.aegeus.commandframework.stringToPermission
 import me.aberrantfox.aegeus.commandframework.CommandEvent
 import me.aberrantfox.aegeus.extensions.fullName
 import me.aberrantfox.aegeus.extensions.idToUser
-import me.aberrantfox.aegeus.extensions.isUserIDList
 import me.aberrantfox.aegeus.extensions.muteMember
-import me.aberrantfox.aegeus.services.BanQueue
 import me.aberrantfox.aegeus.services.MessageService
 import me.aberrantfox.aegeus.services.MessageType
 import net.dv8tion.jda.core.OnlineStatus
@@ -17,6 +15,10 @@ import net.dv8tion.jda.core.entities.Game
 import net.dv8tion.jda.core.entities.Message
 import net.dv8tion.jda.core.entities.MessageChannel
 import java.text.SimpleDateFormat
+import java.io.File
+import java.util.ArrayList
+
+class ModerationCommands
 
 @RequiresGuild(false)
 @Command(ArgumentType.Integer)
@@ -163,6 +165,16 @@ fun joinDate(event: CommandEvent) {
     event.respond("${member.fullName()}'s join date: $joinDate")
 }
 
+@Command
+fun restart(event: CommandEvent) {
+    val javaBin = System.getProperty("java.home") + File.separator + "bin" + File.separator + "java"
+    val currentJar = File(ModerationCommands::class.java.protectionDomain.codeSource.location.toURI())
+
+    if (!currentJar.name.endsWith(".jar")) return
+
+    ProcessBuilder(arrayListOf(javaBin, "-jar", currentJar.path)).start()
+    System.exit(0)
+}
 
 private fun handleResponse(past: List<Message>, channel: MessageChannel, targets: List<String>, error: MessageChannel,
                            source: String) {

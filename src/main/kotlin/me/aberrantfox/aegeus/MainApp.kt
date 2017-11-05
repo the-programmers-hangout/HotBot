@@ -16,7 +16,7 @@ import net.dv8tion.jda.core.entities.Guild
 
 
 fun main(args: Array<String>) {
-    println("Starting to load Aegeus bot.")
+    println("Starting to load hotbot.")
 
     val commandMap = produceCommandMap()
     val config = loadConfig(commandMap) ?: return
