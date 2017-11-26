@@ -1,4 +1,4 @@
-package me.aberrantfox.aegeus.listeners
+package me.aberrantfox.aegeus.listeners.antispam
 
 import me.aberrantfox.aegeus.commandframework.getHighestPermissionLevel
 import me.aberrantfox.aegeus.extensions.containsInvite

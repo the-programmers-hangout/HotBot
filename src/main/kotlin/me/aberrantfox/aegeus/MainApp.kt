@@ -6,7 +6,7 @@ import me.aberrantfox.aegeus.extensions.hasRole
 import me.aberrantfox.aegeus.extensions.timeToDifference
 import me.aberrantfox.aegeus.extensions.unmute
 import me.aberrantfox.aegeus.listeners.*
-import me.aberrantfox.aegeus.services.APIRateLimiter
+import me.aberrantfox.aegeus.listeners.antispam.InviteListener
 import me.aberrantfox.aegeus.services.Configuration
 import me.aberrantfox.aegeus.services.database.setupDatabaseSchema
 import me.aberrantfox.aegeus.services.saveConfig
@@ -30,7 +30,7 @@ fun main(args: Array<String>) {
     jda.addEventListener(
             CommandListener(config, commandMap, jda, logChannel),
             MemberListener(config),
-            InviteListener(config),
+        InviteListener(config),
             MentionListener(config, jda.selfUser.name),
             VoiceChannelListener(logChannel))
 
