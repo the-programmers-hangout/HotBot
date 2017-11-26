@@ -16,7 +16,6 @@ import net.dv8tion.jda.core.entities.Message
 import net.dv8tion.jda.core.entities.MessageChannel
 import java.text.SimpleDateFormat
 import java.io.File
-import java.util.ArrayList
 
 class ModerationCommands
 
