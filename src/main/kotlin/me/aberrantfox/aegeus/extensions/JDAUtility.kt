@@ -22,6 +22,8 @@ fun String.idToUser(jda: JDA): User = jda.getUserById(this.trimToID())
 
 fun Guild.hasRole(roleName: String): Boolean = this.roles.any { it.name.toLowerCase() == roleName }
 
+fun JDA.isRole(role: String)  = this.getRolesByName(role, true).size == 1
+
 fun Long.convertToTimeString(): String {
     val seconds = this / 1000
     val minutes = seconds / 60

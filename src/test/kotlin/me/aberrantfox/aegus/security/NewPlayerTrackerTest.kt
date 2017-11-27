@@ -1,6 +1,6 @@
 package me.aberrantfox.aegus.security
 
-import me.aberrantfox.aegeus.services.security.NewPlayers
+import me.aberrantfox.aegeus.listeners.antispam.NewPlayers
 import org.joda.time.DateTime
 import org.junit.Assert
 import org.junit.Before
