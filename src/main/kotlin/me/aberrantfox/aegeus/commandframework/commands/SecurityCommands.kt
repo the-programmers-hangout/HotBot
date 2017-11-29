@@ -34,7 +34,7 @@ fun securityLevel(event: CommandEvent) = event.respond("Current security level: 
 
 @Command
 fun viewNewPlayers(event: CommandEvent) =
-    event.respond("Current tracked new players: ${NewPlayers.names(SecurityLevelState.alertLevel.mins, event.jda)}")
+    event.respond("Current tracked new players: ${NewPlayers.names(event.jda)}")
 
 @Command
 fun resetSeurityLevel(event: CommandEvent) {
