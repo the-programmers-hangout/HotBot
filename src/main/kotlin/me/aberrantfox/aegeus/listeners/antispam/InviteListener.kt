@@ -50,8 +50,6 @@ class InviteListener(val config: Configuration) : ListenerAdapter() {
             RecentInvites.addOrUpdate(id)
             val logChannel = guild.textChannels.findLast { it.id == config.logChannel }
 
-            println(RecentInvites.value(id))
-
             if(RecentInvites.value(id) >= 3) {
                 guild.controller.ban(author, 0, "You've been automatically banned for linking invitations. Advertising is not allowed, sorry.").queue{
                     logChannel?.sendMessage("Banned user: ${author.fullName()} ($id for advertising automatically.")?.queue()
