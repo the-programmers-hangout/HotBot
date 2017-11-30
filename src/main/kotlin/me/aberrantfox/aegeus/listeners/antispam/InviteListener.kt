@@ -50,7 +50,7 @@ class InviteListener(val config: Configuration) : ListenerAdapter() {
 
             if(RecentInvites.value(id) >= 3) {
                 guild.controller.ban(author, 0, "You've been automatically banned for linking invitations. Advertising is not allowed, sorry.")
-                logChannel?.sendMessage("Banned user: ${author.fullName()} ($id for advertising automatically.")
+                logChannel?.sendMessage("Banned user: ${author.fullName()} ($id for advertising automatically.")?.queue()
                 RecentInvites.cache.cache.remove(id)
             }
 
