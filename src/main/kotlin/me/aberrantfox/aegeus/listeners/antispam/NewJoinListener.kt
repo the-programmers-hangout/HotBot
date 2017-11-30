@@ -6,7 +6,6 @@ import net.dv8tion.jda.core.JDA
 import net.dv8tion.jda.core.events.guild.member.GuildMemberJoinEvent
 import net.dv8tion.jda.core.hooks.ListenerAdapter
 import org.joda.time.DateTime
-import org.joda.time.Hours
 import org.joda.time.Minutes
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
@@ -25,26 +24,26 @@ object NewPlayers {
 }
 
 open class IdTracker<T>(val trackTime: Int) {
-    val cache: ConcurrentHashMap<String, T> = ConcurrentHashMap()
+    val map: ConcurrentHashMap<String, T> = ConcurrentHashMap()
 
-    fun clear() = cache.clear()
+    fun clear() = map.clear()
 
-    fun keyList() = cache.keys().toList()
+    fun keyList() = map.keys().toList()
 
     fun put(key: String, value: T) {
-        this.cache.put(key, value)
+        this.map.put(key, value)
         this.scheduleExit(key)
     }
 
     private fun scheduleExit(key: String) =
         Timer().schedule(timerTask {
-            cache.remove(key)
+            map.remove(key)
         }, (trackTime * 1000 * 60 * 60).toLong())
 }
 
 class DateTracker(trackTime: Int) : IdTracker<DateTime>(trackTime) {
     fun pastMins(min: Int) =
-        cache.filterKeys {
-            cache[it]!!.isAfter(DateTime.now().minus(Minutes.minutes(min)))
+        map.filterKeys {
+            map[it]!!.isAfter(DateTime.now().minus(Minutes.minutes(min)))
         }
 }
