@@ -20,29 +20,31 @@ class NewJoinListener : ListenerAdapter() {
 }
 
 object NewPlayers {
-    val cache = IdTracker(12)
+    val cache = DateTracker(12)
     fun names(jda: JDA) = cache.keyList().map { it.idToName(jda) }
 }
 
-class IdTracker(val trackTime: Int) {
-    val cache: ConcurrentHashMap<String, DateTime> = ConcurrentHashMap()
+open class IdTracker<T>(val trackTime: Int) {
+    val cache: ConcurrentHashMap<String, T> = ConcurrentHashMap()
 
     fun clear() = cache.clear()
 
     fun keyList() = cache.keys().toList()
 
-    fun put(key: String, value: DateTime) {
+    fun put(key: String, value: T) {
         this.cache.put(key, value)
         this.scheduleExit(key)
     }
-
-    fun pastMins(min: Int) =
-        cache.filterKeys {
-            cache[it]!!.isAfter(DateTime.now().minus(Minutes.minutes(min)))
-        }
 
     private fun scheduleExit(key: String) =
         Timer().schedule(timerTask {
             cache.remove(key)
         }, (trackTime * 1000 * 60 * 60).toLong())
+}
+
+class DateTracker(trackTime: Int) : IdTracker<DateTime>(trackTime) {
+    fun pastMins(min: Int) =
+        cache.filterKeys {
+            cache[it]!!.isAfter(DateTime.now().minus(Minutes.minutes(min)))
+        }
 }
