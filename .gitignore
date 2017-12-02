@@ -7,3 +7,5 @@ macros.json
 .gitignore~
 pools/**
 ratelimit/**
+invite-whitelist.json
+rankconfig.json
