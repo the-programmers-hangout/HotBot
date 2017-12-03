@@ -8,6 +8,7 @@ import me.aberrantfox.aegeus.extensions.unmute
 import me.aberrantfox.aegeus.listeners.*
 import me.aberrantfox.aegeus.listeners.antispam.InviteListener
 import me.aberrantfox.aegeus.services.Configuration
+import me.aberrantfox.aegeus.services.HelpConf
 import me.aberrantfox.aegeus.services.database.setupDatabaseSchema
 import me.aberrantfox.aegeus.services.saveConfig
 import net.dv8tion.jda.core.*
@@ -26,18 +27,28 @@ fun main(args: Array<String>) {
 
     val jda = JDABuilder(AccountType.BOT).setToken(config.token).buildBlocking()
     val logChannel = jda.getTextChannelById(config.logChannel)
+    val mutedRole = jda.getRolesByName(config.mutedRole, true).first()
 
     jda.addEventListener(
             CommandListener(config, commandMap, jda, logChannel),
             MemberListener(config),
-        InviteListener(config),
+            InviteListener(config),
             MentionListener(config, jda.selfUser.name),
-            VoiceChannelListener(logChannel))
+            VoiceChannelListener(logChannel),
+            NewChannelListener(mutedRole))
 
     jda.presence.setPresence(OnlineStatus.ONLINE, Game.of("${config.prefix}help"))
     jda.guilds.forEach { setupMutedRole(it, config.mutedRole) }
 
     handleLTSMutes(config, jda)
+
+    val missingHelp = produceCommandMap().values
+        .map { it.name }
+        .filter { HelpConf.hasHelp(it) }
+
+    if(missingHelp.isNotEmpty()) {
+        println("Commands missing help documentation found, names: ${missingHelp.reduceRight{ a, b -> "$a, $b"}}")
+    }
 }
 
 private fun setupMutedRole(guild: Guild, roleName: String) {
