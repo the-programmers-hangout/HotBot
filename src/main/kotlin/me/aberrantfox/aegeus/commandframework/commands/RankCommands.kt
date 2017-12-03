@@ -53,10 +53,10 @@ object RankContainer {
 fun grant(event: CommandEvent) = handleGrant(event, true)
 
 @Command(ArgumentType.String, ArgumentType.UserID)
-fun ungrant(event: CommandEvent) = handleGrant(event, false)
+fun revoke(event: CommandEvent) = handleGrant(event, false)
 
 @Command(ArgumentType.String)
-fun whitelistRole(event: CommandEvent) {
+fun makeRoleGrantable(event: CommandEvent) {
     val role = event.args[0] as String
 
     if( !(event.jda.isRole(role)) ) {
@@ -69,7 +69,7 @@ fun whitelistRole(event: CommandEvent) {
 }
 
 @Command(ArgumentType.String)
-fun removeWhitelistRole(event: CommandEvent) {
+fun makeroleungrantable(event: CommandEvent) {
     val role = event.args[0] as String
 
     if( !(event.jda.isRole(role)) ) {
@@ -82,7 +82,7 @@ fun removeWhitelistRole(event: CommandEvent) {
 }
 
 @Command
-fun listRoleWhitelist(event: CommandEvent) = event.respond("Currently whitelisted roles: ${RankContainer.stringList()}")
+fun listGrantableRoles(event: CommandEvent) = event.respond("Currently whitelisted roles: ${RankContainer.stringList()}")
 
 private fun handleGrant(event: CommandEvent, grant: Boolean) {
     if(event.guild == null) return

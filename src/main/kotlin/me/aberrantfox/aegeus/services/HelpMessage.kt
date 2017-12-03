@@ -36,6 +36,11 @@ object HelpConf {
         return null
     }
 
+    fun hasHelp(name: String) = HelpConf.configuration.commands
+        .map { it.name }
+        .map { it.toLowerCase() }
+        .all { it != name.toLowerCase() }
+
     fun fetchCommandsInCategory(category: String): String =
             HelpConf.configuration.commands
                     .filter { it.category.toLowerCase() == category.toLowerCase() }
