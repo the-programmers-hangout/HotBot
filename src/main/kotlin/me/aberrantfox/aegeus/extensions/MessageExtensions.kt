@@ -10,7 +10,7 @@ private val urlRegexes = listOf(
 
 private val inviteRegex = "(\n|.)*((discord|discordapp).(gg|me|io|com/invite)/)(\n|.)*".toRegex()
 
-fun Message.containsInvite() = inviteRegex.matches(rawContent)
+fun Message.containsInvite() = rawContent.containsInvite()
 
 fun Message.containsURL() = rawContent.containsURl()
 
@@ -21,3 +21,5 @@ fun Message.deleteIfExists(runnable: () -> Unit = {}) = channel.getMessageById(i
 fun Message.mentionsSomeone() = (mentionsEveryone() || mentionedUsers.size > 0 || mentionedRoles.size > 0)
 
 fun String.containsURl() = urlRegexes.any { this.replace("\n", "").contains(it) }
+
+fun String.containsInvite() = inviteRegex.matches(this)
