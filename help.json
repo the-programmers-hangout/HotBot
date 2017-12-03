@@ -9,7 +9,10 @@
     "suggestions": "You can use commands in this section to give suggestions to the server.",
     "embed": "Commands used to build an embed and then send it. You build an embed by using the set/add commands (listed below) - when ready, use sendembed",
     "banqueue": "Commands used for preventing raids and setting up bans. Each moderator has a raid queue in which they can 'pre-load' some bans, with a defined reason.",
-    "profiles": "Commands relating to the profile queue for posting developer profiles or introductions"
+    "profiles": "Commands relating to the profile queue for posting developer profiles or introductions",
+    "security": "Commands for modifying security features and thresholds of the bot.",
+    "invites": "Commands for dictating how the bot will handle invites",
+    "rank": "Commands for granting and removing ranks."
   },
   "commands": [
     {
@@ -501,6 +504,111 @@
       "description": "See when a member joined the guild.",
       "structure": "{userID}",
       "example": "14014394132901"
+    },
+    {
+      "name": "clearFields",
+      "category": "embed",
+      "description": "Clear the fields in the embed.",
+      "structure": "",
+      "example": ""
+    },
+    {
+      "name": "unwhitelistinvite",
+      "category": "invite",
+      "description": "Remove an invitation from the whitelist.",
+      "structure": "{invite}",
+      "example": "discord.gg/programming"
+    },
+    {
+      "name": "resetsecuritylevel",
+      "category": "security",
+      "description": "Set the security level back to normal.",
+      "structure": "",
+      "example": ""
+    },
+    {
+      "name": "makeroleungrantable",
+      "category": "rank",
+      "description": "Disallow granting of this role",
+      "structure": "{rolename}",
+      "example": "admin"
+    },
+    {
+      "name": "saveconfigurations",
+      "category": "moderation",
+      "description": "Save the configuration of the bot. You may want to do this if you change the prefix.",
+      "structure": "",
+      "example": ""
+    },
+    {
+      "name": "whitelistinvite",
+      "category": "invite",
+      "description": "Allow an invite to be posted.",
+      "structure": "{invite}",
+      "example": "discord.gg/programming"
+    },
+    {
+      "name": "ball",
+      "category": "fun",
+      "description": "Ask the magic 8ball a question.",
+      "structure": "{question}",
+      "example": "Is fox cool? (Yes, he is. You shouldn't need to ask this... :) )"
+    },
+    {
+      "name": "makerolegrantable",
+      "category": "rank",
+      "description": "Allow a role to be granted.",
+      "structure": "{role}",
+      "example": "admin"
+    },
+    {
+      "name": "viewnewplayers",
+      "category": "security",
+      "description": "View what the bot deems as new players",
+      "structure": "",
+      "example": ""
+    },
+    {
+      "name": "restart",
+      "category": "moderation",
+      "description": "Restart the bot.",
+      "structure": "",
+      "example": ""
+    },
+    {
+      "name": "setsecuritylevel",
+      "category": "security",
+      "description": "Set the bot's security level",
+      "structure": "{security level}",
+      "example": "max"
+    },
+    {
+      "name": "revoke",
+      "category": "rank",
+      "description": "Revoke a rank from a user",
+      "structure": "{role name} {userID}",
+      "example": "active 123135401939983"
+    },
+    {
+      "name": "grant",
+      "category": "rank",
+      "description": "Grant a rank to a user.",
+      "structure": "{role name} {userID}",
+      "example": "active 123135401939983"
+    },
+    {
+      "name": "listgrantableroles",
+      "category": "rank",
+      "description": "List grantable roles",
+      "structure": "",
+      "example": ""
+    },
+    {
+      "name": "securitylevel",
+      "category": "security",
+      "description": "See what the current server security level is.",
+      "structure": "",
+      "example": ""
     }
   ]
 }
