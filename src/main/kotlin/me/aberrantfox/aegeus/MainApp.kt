@@ -7,6 +7,7 @@ import me.aberrantfox.aegeus.extensions.timeToDifference
 import me.aberrantfox.aegeus.extensions.unmute
 import me.aberrantfox.aegeus.listeners.*
 import me.aberrantfox.aegeus.listeners.antispam.InviteListener
+import me.aberrantfox.aegeus.listeners.antispam.RepeatMessageListener
 import me.aberrantfox.aegeus.services.Configuration
 import me.aberrantfox.aegeus.services.HelpConf
 import me.aberrantfox.aegeus.services.database.setupDatabaseSchema
@@ -35,7 +36,8 @@ fun main(args: Array<String>) {
             InviteListener(config),
             MentionListener(config, jda.selfUser.name),
             VoiceChannelListener(logChannel),
-            NewChannelListener(mutedRole))
+            NewChannelListener(mutedRole),
+            RepeatMessageListener())
 
     jda.presence.setPresence(OnlineStatus.ONLINE, Game.of("${config.prefix}help"))
     jda.guilds.forEach { setupMutedRole(it, config.mutedRole) }
