@@ -187,7 +187,7 @@ private fun handleResponse(past: List<Message>, channel: MessageChannel, targets
             .map { "${it.author.asMention} said ${it.rawContent}" }
             .reduce { a, b -> "$a\n$b" }
 
-    channel.sendMessage("==Messages moved from ${channel.name} to here by $source\n$response")
+    channel.sendMessage("==Messages moved from ${error.name} to here by $source\n$response")
             .queue{ messages.forEach { it.delete().queue() }}
 }
 
