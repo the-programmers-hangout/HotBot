@@ -324,13 +324,6 @@
       "example": "this is the description... :)"
     },
     {
-      "name": "clearEmbed",
-      "category": "embed",
-      "description": "Reset the embed in memory",
-      "structure": "",
-      "example": ""
-    },
-    {
       "name": "addTimestamp",
       "category": "embed",
       "description": "Add a timestamp to the footer of the embed in memory",
