@@ -20,7 +20,7 @@ fun String.idToName(jda: JDA): String = jda.getUserById(this).name
 
 fun String.idToUser(jda: JDA): User = jda.getUserById(this.trimToID())
 
-fun Guild.hasRole(roleName: String): Boolean = this.roles.any { it.name.toLowerCase() == roleName }
+fun Guild.hasRole(roleName: String): Boolean = this.roles.any { it.name.toLowerCase() == roleName.toLowerCase() }
 
 fun JDA.isRole(role: String)  = this.getRolesByName(role, true).size == 1
 

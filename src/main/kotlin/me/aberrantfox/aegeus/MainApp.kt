@@ -67,7 +67,7 @@ private fun handleRole(guild: Guild, roleName: String) {
 
     guild.textChannels.forEach {
         val hasOverride = it.permissionOverrides.any {
-            it.role.name.toLowerCase() == roleName
+            it.role.name.toLowerCase() == roleName.toLowerCase()
         }
 
         if (!hasOverride) it.createPermissionOverride(role).setDeny(Permission.MESSAGE_WRITE).queue()
