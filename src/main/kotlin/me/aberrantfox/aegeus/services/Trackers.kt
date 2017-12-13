@@ -1,5 +1,6 @@
 package me.aberrantfox.aegeus.services
 
+import net.dv8tion.jda.core.entities.Message
 import org.apache.commons.text.similarity.LevenshteinDistance
 import org.joda.time.DateTime
 import org.joda.time.Minutes
@@ -41,13 +42,15 @@ class WeightTracker(trackTime: Int) : IdTracker<Int>(trackTime) {
     }
 }
 
-class MessageTracker(trackTime: Int) : IdTracker<ArrayList<String>>(trackTime) {
+class MessageTracker(trackTime: Int) : IdTracker<LimitedList<Message>>(trackTime) {
     private val calc = LevenshteinDistance()
 
-    fun addMessage(who: String, msg: String): Int {
-        map.putIfAbsent(who, ArrayList())
+    fun addMessage(msg: Message): Int {
+        val who = msg.author.id
 
-        val matches = map[who]!!.map { calc.apply(it, msg) }
+        map.putIfAbsent(who, LimitedList(20))
+
+        val matches = map[who]!!.map { calc.apply(it.rawContent, msg.rawContent) }
             .filter { it <=  2 }
             .count()
 
@@ -57,9 +60,12 @@ class MessageTracker(trackTime: Int) : IdTracker<ArrayList<String>>(trackTime) {
     }
 
 
-    fun count(who: String) = map.getOrDefault(who, ArrayList()).size
-}
+    fun count(who: String) = map.getOrDefault(who, LimitedList(20)).size
 
+    fun removeUser(who: String) = map.remove(who)
+
+    fun list(who: String) = map[who]
+}
 
 
 

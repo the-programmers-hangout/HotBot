@@ -22,7 +22,7 @@ fun String.idToUser(jda: JDA): User = jda.getUserById(this.trimToID())
 
 fun Guild.hasRole(roleName: String): Boolean = this.roles.any { it.name.toLowerCase() == roleName }
 
-fun JDA.isRole(role: String)  = this.getRolesByName(role, true).size == 1
+fun JDA.isRole(role: String) = this.getRolesByName(role, true).size == 1
 
 fun Long.convertToTimeString(): String {
     val seconds = this / 1000
@@ -31,6 +31,14 @@ fun Long.convertToTimeString(): String {
     val days = hours / 24
 
     return "$days days, ${hours % 24} hours, ${minutes % 60} minutes, ${seconds % 60} seconds"
+}
+
+fun permMuteMember(guild: Guild, user: User, reason: String, config: Configuration, moderator: User) {
+    guild.controller.addRolesToMember(guild.getMemberById(user.id), guild.getRolesByName(config.mutedRole, true)).queue()
+
+    user.openPrivateChannel().queue {
+        it.sendMessage("You have been muted indefinitely, for reason: $reason").queue()
+    }
 }
 
 fun muteMember(guild: Guild, user: User, time: Long, reason: String, config: Configuration, moderator: User) {
@@ -45,6 +53,7 @@ fun muteMember(guild: Guild, user: User, time: Long, reason: String, config: Con
 
         config.mutedMembers.add(record)
         unmute(guild, user, config, time, record)
+
     }
 
     moderator.openPrivateChannel().queue {

@@ -37,7 +37,7 @@ fun main(args: Array<String>) {
             MentionListener(config, jda.selfUser.name),
             VoiceChannelListener(logChannel),
             NewChannelListener(mutedRole),
-            RepeatMessageListener())
+            RepeatMessageListener(config, logChannel))
 
     jda.presence.setPresence(OnlineStatus.ONLINE, Game.of("${config.prefix}help"))
     jda.guilds.forEach { setupMutedRole(it, config.mutedRole) }
