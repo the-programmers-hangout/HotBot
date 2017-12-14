@@ -1,9 +1,9 @@
 {
   "categoryDescriptions": {
-    "fun": "Fun commands, they have no real purpose other than to entertain. Enjoy :)",
+    "fun": "Fun commands: they have no real purpose other than to entertain. Enjoy :)",
     "moderation": "These commands are specifically for disciplining members or providing corrective action.",
     "macro": "Macro commands are useful for maintaining and displaying helpful messages.",
-    "utility": "Generally useful commands, this is a misc section.",
+    "utility": "Generally useful commands. This is a misc section.",
     "infractions": "Used for distributing and maintaining strike-based infractions.",
     "permissions": "Administrative functionality for setting command permissions.",
     "suggestions": "You can use commands in this section to give suggestions to the server.",
@@ -32,7 +32,7 @@
     {
       "name": "addmacro",
       "category": "macro",
-      "description": "Adds a macro by the which will respond with the given message when invoked by the given name.",
+      "description": "Adds a macro which will respond with the given message when invoked by the given name.",
       "structure": "{macroName} [macroMessage]",
       "example": "greet Hello, World!"
     },
@@ -41,7 +41,7 @@
       "category": "macro",
       "description": "Removes a macro with the given name",
       "structure": "{macroname}",
-      "example": "removeMacro greet"
+      "example": "greet"
     },
     {
       "name": "listmacros",
@@ -60,8 +60,8 @@
     {
       "name": "move",
       "category": "moderation",
-      "description": "Move every message found within the given search space sent by any supplied ID in the Comma separated ID list to the specified channel.",
-      "structure": "{idList (a list of ids, separated by commas)} {searchSpace} {targetChannelID}",
+      "description": "Move every message sent by any of the users with the IDs listed found within the given search space to the specified channel.",
+      "structure": "{idList (a list of user ids, separated by commas)} {searchSpace} {targetChannelID}",
       "example": "123412488123,23450293480234,234234234 10 323499949234"
     },
     {
@@ -74,7 +74,7 @@
     {
       "name": "mute",
       "category": "moderation",
-      "description": "Mute a member for a specified amount of minutes. ",
+      "description": "Mute a member for a specified number of minutes.",
       "structure": "{userID} {timeInMinutes} [Reason]",
       "example": "12340234239 10 Being a silly billy."
     },
@@ -90,12 +90,12 @@
       "category": "management",
       "description": "Set the bot prefix to the specified string (Cannot be a space)",
       "structure": "{prefix}",
-      "example": "!!"
+      "example": "!"
     },
     {
       "name": "setFilter",
       "category": "management",
-      "description": "Set the permission level required to run a command which contains a mention (used for mention sanitation)  ",
+      "description": "Set the permission level required to run a command which contains a mention (used for mention sanitation)",
       "structure": "{permissionLevel}",
       "example": "moderator"
     },
@@ -160,7 +160,7 @@
       "category": "infractions",
       "description": "Display a user's infraction history.",
       "structure": "{userid}",
-      "example": "history 1341350050053"
+      "example": "1341350050053"
     },
     {
       "name": "removeStrike",
@@ -322,13 +322,6 @@
       "description": "Set the description of the embed",
       "structure": "{description}",
       "example": "this is the description... :)"
-    },
-    {
-      "name": "clearEmbed",
-      "category": "embed",
-      "description": "Reset the embed in memory",
-      "structure": "",
-      "example": ""
     },
     {
       "name": "addTimestamp",
