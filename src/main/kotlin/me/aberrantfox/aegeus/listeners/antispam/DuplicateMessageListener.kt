@@ -6,14 +6,14 @@ import me.aberrantfox.aegeus.extensions.permMuteMember
 import me.aberrantfox.aegeus.services.AccurateMessage
 import me.aberrantfox.aegeus.services.Configuration
 import me.aberrantfox.aegeus.services.MessageTracker
-import me.aberrantfox.aegeus.services.PersistentList
+import me.aberrantfox.aegeus.services.PersistenSet
 import net.dv8tion.jda.core.entities.TextChannel
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent
 import net.dv8tion.jda.core.hooks.ListenerAdapter
 import org.joda.time.DateTime
 
 object MutedRaiders {
-    val list = PersistentList("raiders.json")
+    val list = PersistenSet("raiders.json")
 }
 
 class DuplicateMessageListener (val config: Configuration, val log: TextChannel, val tracker: MessageTracker) : ListenerAdapter() {
