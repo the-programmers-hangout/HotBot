@@ -9,7 +9,7 @@ import java.util.concurrent.ConcurrentHashMap
 import kotlin.concurrent.timerTask
 
 
-open class IdTracker<T>(val trackTime: Int) {
+open class IdTracker<T>(val trackTime: Int, val timeUnit: Int = 60) {
     val map: ConcurrentHashMap<String, T> = ConcurrentHashMap()
 
     fun clear() = map.clear()
@@ -24,7 +24,7 @@ open class IdTracker<T>(val trackTime: Int) {
     private fun scheduleExit(key: String) =
         Timer().schedule(timerTask {
             map.remove(key)
-        }, (trackTime * 1000 * 60 * 60).toLong())
+        }, (trackTime * 1000 * 60 * timeUnit).toLong())
 }
 
 class DateTracker(trackTime: Int) : IdTracker<DateTime>(trackTime) {
@@ -42,19 +42,19 @@ class WeightTracker(trackTime: Int) : IdTracker<Int>(trackTime) {
     }
 }
 
-class MessageTracker(trackTime: Int) : IdTracker<LimitedList<Message>>(trackTime) {
+class MessageTracker(trackTime: Int) : IdTracker<LimitedList<AccurateMessage>>(trackTime) {
     private val calc = LevenshteinDistance()
 
-    fun addMessage(msg: Message): Int {
-        val who = msg.author.id
+    fun addMessage(acMsg: AccurateMessage): Int {
+        val who = acMsg.message.author.id
 
         map.putIfAbsent(who, LimitedList(20))
 
-        val matches = map[who]!!.map { calc.apply(it.rawContent, msg.rawContent) }
+        val matches = map[who]!!.map { calc.apply(it.message.rawContent, acMsg.message.rawContent) }
             .filter { it <=  2 }
             .count()
 
-        map[who]!!.add(msg)
+        map[who]!!.add(acMsg)
 
         return matches
     }
@@ -67,12 +67,4 @@ class MessageTracker(trackTime: Int) : IdTracker<LimitedList<Message>>(trackTime
     fun list(who: String) = map[who]
 }
 
-
-
-
-
-
-
-
-
-
+data class AccurateMessage(val time: DateTime, val message: Message)
