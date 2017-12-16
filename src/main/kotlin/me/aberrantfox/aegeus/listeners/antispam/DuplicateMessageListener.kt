@@ -6,14 +6,14 @@ import me.aberrantfox.aegeus.extensions.permMuteMember
 import me.aberrantfox.aegeus.services.AccurateMessage
 import me.aberrantfox.aegeus.services.Configuration
 import me.aberrantfox.aegeus.services.MessageTracker
-import me.aberrantfox.aegeus.services.PersistenSet
+import me.aberrantfox.aegeus.services.PersistentSet
 import net.dv8tion.jda.core.entities.TextChannel
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent
 import net.dv8tion.jda.core.hooks.ListenerAdapter
 import org.joda.time.DateTime
 
 object MutedRaiders {
-    val list = PersistenSet("raiders.json")
+    val set = PersistentSet("raiders.json")
 }
 
 class DuplicateMessageListener (val config: Configuration, val log: TextChannel, val tracker: MessageTracker) : ListenerAdapter() {
@@ -35,13 +35,13 @@ class DuplicateMessageListener (val config: Configuration, val log: TextChannel,
         if(tracker.count(id) < SecurityLevelState.alertLevel.waitPeriod)  return
         if(matches <  SecurityLevelState.alertLevel.matchCount) return
 
-        MutedRaiders.list.add(id)
+        MutedRaiders.set.add(id)
         val reason = "Automatic mute for duplicate-spam detection due to security level ${SecurityLevelState.alertLevel.name}"
         punish(event, reason, id)
     }
 
     private fun checkSpeed(id: String, event: GuildMessageReceivedEvent) {
-        if(MutedRaiders.list.contains(id)) return
+        if(MutedRaiders.set.contains(id)) return
 
         val maxAmount = SecurityLevelState.alertLevel.maxAmount
 
@@ -50,7 +50,7 @@ class DuplicateMessageListener (val config: Configuration, val log: TextChannel,
             ?: return
 
         if(maxAmount <= amount) {
-            MutedRaiders.list.add(id)
+            MutedRaiders.set.add(id)
             val reason = "Automatic mute for repeat-spam detection due to security level ${SecurityLevelState.alertLevel.name}"
             punish(event, reason, id)
         }

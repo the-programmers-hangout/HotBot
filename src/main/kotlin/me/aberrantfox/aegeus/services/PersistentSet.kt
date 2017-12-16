@@ -5,7 +5,7 @@ import com.google.gson.Gson
 import java.io.File
 
 
-class PersistenSet(location: String) : HashSet<String>() {
+class PersistentSet(location: String) : HashSet<String>() {
     private val gson = Gson()
     private val file = File(location)
 
@@ -28,6 +28,11 @@ class PersistenSet(location: String) : HashSet<String>() {
         save()
 
         return result
+    }
+
+    override fun clear() {
+        super.clear()
+        save()
     }
 
     private fun save() = file.writeText(gson.toJson(this as HashSet<String>))

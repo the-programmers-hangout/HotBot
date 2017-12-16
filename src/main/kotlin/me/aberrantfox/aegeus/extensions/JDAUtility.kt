@@ -81,16 +81,20 @@ fun removeMuteRole(guild: Guild, user: User, config: Configuration, record: Mute
         return
     }
 
+    config.mutedMembers.remove(record)
+    removeMuteRole(guild, user, config, record)
+}
+
+fun removeMuteRole(guild: Guild, user: User, config: Configuration) =
     user.openPrivateChannel().queue {
         it.sendMessage("${user.name} - you have been unmuted. Please respect our rules to prevent" +
             " further infractions.").queue {
             guild.controller.removeRolesFromMember(guild.getMemberById(user.id), guild.getRolesByName(
                 config.mutedRole, true)).queue()
-            config.mutedMembers.remove(record)
         }
 
     }
-}
+
 
 fun User.sendPrivateMessage(msg: MessageEmbed) =
     openPrivateChannel().queue {
@@ -106,8 +110,8 @@ fun User.sendPrivateMessage(msg: String) =
 fun List<String>.isUserIDList(jda: JDA) = this.all { it.isUserID(jda) }
 
 private fun String.trimToID(): String =
-    if(this.startsWith("<@") && this.endsWith(">")) {
-        this.substring(2, this.length-1)
+    if (this.startsWith("<@") && this.endsWith(">")) {
+        this.substring(2, this.length - 1)
     } else {
         this
     }

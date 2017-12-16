@@ -7,7 +7,7 @@ import me.aberrantfox.aegeus.listeners.antispam.NewPlayers
 
 
 enum class SecurityLevel(val matchCount: Int, val waitPeriod: Int, val maxAmount: Int) {
-    Normal(8, 10, 5), Elevated(7, 5, 5), High(5, 5, 4), Max(3, 3, 3)
+    Normal(6, 10, 5), Elevated(6, 5, 5), High(4, 5, 4), Max(3, 3, 3)
 }
 
 fun names() = SecurityLevel.values().map { it.name }

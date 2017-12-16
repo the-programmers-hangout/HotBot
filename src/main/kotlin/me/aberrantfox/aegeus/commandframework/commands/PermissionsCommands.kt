@@ -60,7 +60,7 @@ fun listAvailable(event: CommandEvent) {
     val response = EmbedBuilder()
             .setTitle("Available Commands")
             .setColor(Color.cyan)
-            .setDescription("Below you can find a list of commands that are available to based on your permission level," +
+            .setDescription("Below you can find a set of commands that are available to based on your permission level," +
                     " which is $permLevel - if you need help using any of them, simply type ${event.config.prefix}help <command>.")
             .addField("Commands", available, false)
             .build()
