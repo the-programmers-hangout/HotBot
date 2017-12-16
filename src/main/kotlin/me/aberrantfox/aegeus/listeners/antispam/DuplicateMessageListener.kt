@@ -26,7 +26,7 @@ class DuplicateMessageListener (val config: Configuration, val log: TextChannel,
         val id = event.author.id
         val matches = tracker.addMessage(AccurateMessage(time, event.message))
 
-        //checkDuplicates(id, event, matches)
+        checkDuplicates(id, event, matches)
         checkSpeed(id, event)
     }
 
@@ -41,6 +41,8 @@ class DuplicateMessageListener (val config: Configuration, val log: TextChannel,
     }
 
     private fun checkSpeed(id: String, event: GuildMessageReceivedEvent) {
+        if(MutedRaiders.list.contains(id)) return
+
         val maxAmount = SecurityLevelState.alertLevel.maxAmount
 
         val amount = tracker.list(id)
