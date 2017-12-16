@@ -602,6 +602,48 @@
       "description": "See what the current server security level is.",
       "structure": "",
       "example": ""
+    },
+    {
+      "name": "viewCreationDate",
+      "category": "utility",
+      "description": "See when a user was created",
+      "structure": "{userID}",
+      "example": "3432424004320"
+    },
+    {
+      "name": "banRaider",
+      "category": "security",
+      "description": "Ban a raider by an ID, do this rather than ban people as it'll exit them from the raidView",
+      "structure": "{raiderID} {amount of days to delete messages}",
+      "example": "9432432934290 1"
+    },
+    {
+      "name": "freeRaider",
+      "category": "security",
+      "description": "Free a raider by an ID, unmuting them. Do this rather than ban people as it'll exit them from the raidView as well.",
+      "structure": "{raiderID}",
+      "example": "9432432934290"
+    },
+    {
+      "name": "viewRaiders",
+      "category": "security",
+      "description": "See what raiders are in the raidView",
+      "structure": "",
+      "example": ""
+    },
+    {
+      "name": "freeAllRaiders",
+      "category": "security",
+      "description": "For freeing all raiders from the raid queue, unmuting them as well.",
+      "structure": "",
+      "example": ""
+    },
+    {
+      "name": "banAutodetectedRaid",
+      "category": "security",
+      "description": "Ban all of the raiders in the raidview",
+      "structure": "{amount of days to delete messages}",
+      "example": "1"
     }
   ]
 }
