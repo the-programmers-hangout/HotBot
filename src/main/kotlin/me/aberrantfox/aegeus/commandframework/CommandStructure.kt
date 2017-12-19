@@ -8,7 +8,7 @@ import org.reflections.scanners.MethodAnnotationsScanner
 import java.lang.reflect.Method
 
 enum class Permission {
-    GUEST, MODERATOR, ADMIN, OWNER;
+    GUEST, MEMBER, JRMOD, MODERATOR, SRMOD, ADMIN, OWNER;
 }
 
 annotation class Command(vararg val expectedArgs: ArgumentType = arrayOf())
