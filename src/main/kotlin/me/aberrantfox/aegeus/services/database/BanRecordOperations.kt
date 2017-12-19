@@ -7,6 +7,7 @@ import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.update
 
+data class BanRecord(val mod: String, val reason: String)
 
 fun getReason(id: String) =
     transaction {
@@ -15,24 +16,25 @@ fun getReason(id: String) =
                 Op.build { BanRecords.id eq id}
             }.first()
 
-            select[BanRecords.reason]
+            BanRecord(select[BanRecords.moderator], select[BanRecords.reason])
         } else {
             null
         }
     }
 
-fun updateOrSetReason(id: String, reason: String): Boolean =
+fun updateOrSetReason(id: String, reason: String, moderator: String): Boolean =
     transaction {
         if(hasReason(id)) {
-
             BanRecords.update({BanRecords.id eq id}) {
                 it[BanRecords.id] = id
                 it[BanRecords.reason] = reason
+                it[BanRecords.moderator] = moderator
             }
         } else {
             BanRecords.insert {
                 it[BanRecords.id] = id
                 it[BanRecords.reason] = reason
+                it[BanRecords.moderator] = moderator
             }
         }
         true

@@ -185,7 +185,7 @@ fun setBanReason(event: CommandEvent) {
 
     try {
         event.jda.performActionIfIsID(target) {
-            updateOrSetReason(target, reason)
+            updateOrSetReason(target, reason, event.author.id)
             event.respond("The ban reason for $target has been logged")
         }
     } catch (e: IllegalArgumentException) {
@@ -200,8 +200,14 @@ fun getBanReason(event: CommandEvent) {
 
     try {
         event.jda.performActionIfIsID(target) {
-            val reason = getReason(target)
-            event.respond("$target was banned for reason: $reason")
+            val record = getReason(target)
+
+            if(record != null) {
+                event.respond("$target was banned by ${record.mod.idToUser(event.jda).fullName()} for record ${record.reason}")
+            } else {
+                event.respond("That user does not have a record logged.")
+            }
+
         }
     } catch (e: IllegalArgumentException) {
         event.respond("$target is not a valid ID")

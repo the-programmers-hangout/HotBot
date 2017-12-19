@@ -54,4 +54,5 @@ object Suggestions : Table() {
 object BanRecords : Table() {
     val id = varchar("id", 18).primaryKey()
     val reason = text("reason")
+    val moderator = varchar("moderator", 18)
 }
