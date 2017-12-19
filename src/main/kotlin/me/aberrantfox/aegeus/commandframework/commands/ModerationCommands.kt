@@ -8,8 +8,11 @@ import me.aberrantfox.aegeus.commandframework.CommandEvent
 import me.aberrantfox.aegeus.extensions.fullName
 import me.aberrantfox.aegeus.extensions.idToUser
 import me.aberrantfox.aegeus.extensions.muteMember
+import me.aberrantfox.aegeus.extensions.performActionIfIsID
 import me.aberrantfox.aegeus.services.MessageService
 import me.aberrantfox.aegeus.services.MessageType
+import me.aberrantfox.aegeus.services.database.getReason
+import me.aberrantfox.aegeus.services.database.updateOrSetReason
 import net.dv8tion.jda.core.OnlineStatus
 import net.dv8tion.jda.core.entities.Game
 import net.dv8tion.jda.core.entities.Message
@@ -22,7 +25,7 @@ class ModerationCommands
 @RequiresGuild(false)
 @Command(ArgumentType.Integer)
 fun nuke(event: CommandEvent) {
-    if(event.guild == null) return
+    if (event.guild == null) return
 
     val amount = event.args[0] as Int
 
@@ -40,7 +43,7 @@ fun nuke(event: CommandEvent) {
 @RequiresGuild
 @Command(ArgumentType.String)
 fun ignore(event: CommandEvent) {
-    if(event.guild == null) return
+    if (event.guild == null) return
 
     val config = event.config
     val target = event.args[0] as String
@@ -57,7 +60,7 @@ fun ignore(event: CommandEvent) {
 @RequiresGuild
 @Command(ArgumentType.UserID, ArgumentType.Integer, ArgumentType.Joiner)
 fun mute(event: CommandEvent) {
-    if(event.guild == null) return
+    if (event.guild == null) return
 
     val args = event.args
 
@@ -80,7 +83,7 @@ fun prefix(event: CommandEvent) {
     val newPrefix = event.args[0] as String
     event.config.prefix = newPrefix
     event.respond("Prefix is now $newPrefix. Please invoke commands using that prefix in the future." +
-            "To save this configuration, use the saveconfigurations command.")
+        "To save this configuration, use the saveconfigurations command.")
     event.jda.presence.setPresence(OnlineStatus.ONLINE, Game.of("${event.config.prefix}help"))
 }
 
@@ -100,7 +103,7 @@ fun setFilter(event: CommandEvent) {
 @RequiresGuild(false)
 @Command(ArgumentType.String, ArgumentType.Integer, ArgumentType.String)
 fun move(event: CommandEvent) {
-    if(event.guild == null) return
+    if (event.guild == null) return
 
     val args = event.args
 
@@ -115,7 +118,7 @@ fun move(event: CommandEvent) {
         return
     }
 
-    if(searchSpace > 99) {
+    if (searchSpace > 99) {
         event.respond("Yea buddy, I'm not moving the entire channel into another, 99 messages or less")
         return
     }
@@ -135,7 +138,7 @@ fun move(event: CommandEvent) {
 @RequiresGuild
 @Command(ArgumentType.UserID, ArgumentType.Joiner)
 fun badname(event: CommandEvent) {
-    if(event.guild == null) return
+    if (event.guild == null) return
 
     val args = event.args
     val target = args[0] as String
@@ -153,7 +156,7 @@ fun badname(event: CommandEvent) {
 @RequiresGuild
 @Command(ArgumentType.UserID)
 fun joinDate(event: CommandEvent) {
-    if(event.guild == null) return
+    if (event.guild == null) return
     val target = event.args[0] as String
 
     val member = event.guild.getMemberById(target)
@@ -175,6 +178,36 @@ fun restart(event: CommandEvent) {
     System.exit(0)
 }
 
+@Command(ArgumentType.String, ArgumentType.Joiner)
+fun setBanReason(event: CommandEvent) {
+    val target = (event.args[0] as String)
+    val reason = event.args[1] as String
+
+    try {
+        event.jda.performActionIfIsID(target) {
+            updateOrSetReason(target, reason)
+            event.respond("The ban reason for $target has been logged")
+        }
+    } catch (e: IllegalArgumentException) {
+        event.respond("$target is not a valid ID")
+    }
+
+}
+
+@Command(ArgumentType.String)
+fun getBanReason(event: CommandEvent) {
+    val target = event.args[0] as String
+
+    try {
+        event.jda.performActionIfIsID(target) {
+            val reason = getReason(target)
+            event.respond("$target was banned for reason: $reason")
+        }
+    } catch (e: IllegalArgumentException) {
+        event.respond("$target is not a valid ID")
+    }
+}
+
 private fun handleResponse(past: List<Message>, channel: MessageChannel, targets: List<String>, error: MessageChannel,
                            source: String) {
     val messages = past.subList(1, past.size).filter { targets.contains(it.author.id) }
@@ -184,16 +217,16 @@ private fun handleResponse(past: List<Message>, channel: MessageChannel, targets
     }
 
     val response = messages
-            .map { "${it.author.asMention} said ${it.rawContent}" }
-            .reduce { a, b -> "$a\n$b" }
+        .map { "${it.author.asMention} said ${it.rawContent}" }
+        .reduce { a, b -> "$a\n$b" }
 
     channel.sendMessage("==Messages moved from ${error.name} to here by $source\n$response")
             .queue{ messages.forEach { it.delete().queue() }}
 }
 
 private fun getTargets(msg: String): List<String> =
-        if (msg.contains(",")) {
-            msg.split(",")
-        } else {
-            listOf(msg)
-        }
+    if (msg.contains(",")) {
+        msg.split(",")
+    } else {
+        listOf(msg)
+    }

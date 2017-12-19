@@ -6,7 +6,8 @@ import me.aberrantfox.aegeus.extensions.deleteIfExists
 import me.aberrantfox.aegeus.extensions.fullName
 import me.aberrantfox.aegeus.extensions.idToName
 import me.aberrantfox.aegeus.services.Configuration
-import me.aberrantfox.aegeus.services.PersistentList
+import me.aberrantfox.aegeus.services.PersistentSet
+import me.aberrantfox.aegeus.services.WeightTracker
 import net.dv8tion.jda.core.JDA
 import net.dv8tion.jda.core.entities.*
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent
@@ -14,14 +15,8 @@ import net.dv8tion.jda.core.events.message.guild.GuildMessageUpdateEvent
 import net.dv8tion.jda.core.hooks.ListenerAdapter
 
 object RecentInvites {
-    val cache = IdTracker<Int>(6)
-    val ignore = PersistentList("invite-whitelist.json")
-
-    fun addOrUpdate(id: String) {
-        cache.map.putIfAbsent(id, 0)
-        val get = cache.map[id]!!
-        cache.map.put(id, get + 1)
-    }
+    val cache = WeightTracker(6)
+    val ignore = PersistentSet("invite-whitelist.json")
 
     fun value(id: String) = cache.map[id]!!
 
@@ -54,7 +49,7 @@ class InviteListener(val config: Configuration) : ListenerAdapter() {
 
             if (messageContent.contains('@')) messageContent = messageContent.replace("@", "`@`")
 
-            RecentInvites.addOrUpdate(id)
+            RecentInvites.cache.addOrUpdate(id)
             val logChannel = guild.textChannels.findLast { it.id == config.logChannel }
 
             //TODO: Make the amount configurable.

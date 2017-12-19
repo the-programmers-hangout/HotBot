@@ -9,3 +9,4 @@ pools/**
 ratelimit/**
 invite-whitelist.json
 rankconfig.json
+raiders.json

@@ -2,6 +2,7 @@ package me.aberrantfox.aegeus.services.database
 
 import me.aberrantfox.aegeus.commandframework.commands.SuggestionStatus
 import me.aberrantfox.aegeus.services.Configuration
+import me.aberrantfox.aegeus.services.database.Suggestions.primaryKey
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.StdOutSqlLogger
@@ -27,7 +28,7 @@ fun setupDatabaseSchema(config: Configuration) {
     )
 
     transaction {
-        SchemaUtils.create(Strikes, Suggestions)
+        SchemaUtils.create(Strikes, Suggestions, BanRecords)
         logger.addLogger(StdOutSqlLogger)
     }
 }
@@ -48,4 +49,9 @@ object Suggestions : Table() {
     val status = enumeration("status", SuggestionStatus::class.java)
     val idea = text("idea")
     val date = date("date")
+}
+
+object BanRecords : Table() {
+    val id = varchar("id", 18).primaryKey()
+    val reason = text("reason")
 }

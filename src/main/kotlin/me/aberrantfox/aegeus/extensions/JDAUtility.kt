@@ -22,7 +22,7 @@ fun String.idToUser(jda: JDA): User = jda.getUserById(this.trimToID())
 
 fun Guild.hasRole(roleName: String): Boolean = this.roles.any { it.name.toLowerCase() == roleName.toLowerCase() }
 
-fun JDA.isRole(role: String)  = this.getRolesByName(role, true).size == 1
+fun JDA.isRole(role: String) = this.getRolesByName(role, true).size == 1
 
 fun Long.convertToTimeString(): String {
     val seconds = this / 1000
@@ -31,6 +31,14 @@ fun Long.convertToTimeString(): String {
     val days = hours / 24
 
     return "$days days, ${hours % 24} hours, ${minutes % 60} minutes, ${seconds % 60} seconds"
+}
+
+fun permMuteMember(guild: Guild, user: User, reason: String, config: Configuration, moderator: User) {
+    guild.controller.addRolesToMember(guild.getMemberById(user.id), guild.getRolesByName(config.mutedRole, true)).queue()
+
+    user.openPrivateChannel().queue {
+        it.sendMessage("You have been muted indefinitely, for reason: $reason").queue()
+    }
 }
 
 fun muteMember(guild: Guild, user: User, time: Long, reason: String, config: Configuration, moderator: User) {
@@ -45,6 +53,7 @@ fun muteMember(guild: Guild, user: User, time: Long, reason: String, config: Con
 
         config.mutedMembers.add(record)
         unmute(guild, user, config, time, record)
+
     }
 
     moderator.openPrivateChannel().queue {
@@ -72,16 +81,20 @@ fun removeMuteRole(guild: Guild, user: User, config: Configuration, record: Mute
         return
     }
 
+    config.mutedMembers.remove(record)
+    removeMuteRole(guild, user, config, record)
+}
+
+fun removeMuteRole(guild: Guild, user: User, config: Configuration) =
     user.openPrivateChannel().queue {
         it.sendMessage("${user.name} - you have been unmuted. Please respect our rules to prevent" +
             " further infractions.").queue {
             guild.controller.removeRolesFromMember(guild.getMemberById(user.id), guild.getRolesByName(
                 config.mutedRole, true)).queue()
-            config.mutedMembers.remove(record)
         }
 
     }
-}
+
 
 fun User.sendPrivateMessage(msg: MessageEmbed) =
     openPrivateChannel().queue {
@@ -96,9 +109,14 @@ fun User.sendPrivateMessage(msg: String) =
 
 fun List<String>.isUserIDList(jda: JDA) = this.all { it.isUserID(jda) }
 
+fun JDA.performActionIfIsID(id: String, action: (User) -> Unit) =
+    retrieveUserById(id).queue {
+        action(it)
+    }
+
 private fun String.trimToID(): String =
-    if(this.startsWith("<@") && this.endsWith(">")) {
-        this.substring(2, this.length-1)
+    if (this.startsWith("<@") && this.endsWith(">")) {
+        this.substring(2, this.length - 1)
     } else {
         this
     }

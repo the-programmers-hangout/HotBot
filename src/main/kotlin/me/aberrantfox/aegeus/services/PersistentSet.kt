@@ -5,7 +5,7 @@ import com.google.gson.Gson
 import java.io.File
 
 
-class PersistentList(private val location: String) : ArrayList<String>() {
+class PersistentSet(location: String) : HashSet<String>() {
     private val gson = Gson()
     private val file = File(location)
 
@@ -30,5 +30,10 @@ class PersistentList(private val location: String) : ArrayList<String>() {
         return result
     }
 
-    private fun save() = file.writeText(gson.toJson(this as ArrayList<String>))
+    override fun clear() {
+        super.clear()
+        save()
+    }
+
+    private fun save() = file.writeText(gson.toJson(this as HashSet<String>))
 }

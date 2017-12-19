@@ -7,6 +7,7 @@ import me.aberrantfox.aegeus.commandframework.Command
 import me.aberrantfox.aegeus.extensions.fullName
 import me.aberrantfox.aegeus.commandframework.CommandEvent
 import me.aberrantfox.aegeus.commandframework.RequiresGuild
+import me.aberrantfox.aegeus.extensions.idToUser
 import me.aberrantfox.aegeus.services.Configuration
 import net.dv8tion.jda.core.EmbedBuilder
 import net.dv8tion.jda.core.OnlineStatus
@@ -98,6 +99,13 @@ fun echo(event: CommandEvent) {
     val message = event.args[1] as String
 
     event.jda.getTextChannelById(target).sendMessage(message).queue()
+}
+
+@Command(ArgumentType.UserID)
+fun viewCreationDate(event: CommandEvent) {
+    val target = (event.args[0] as String).idToUser(event.jda)
+
+    event.respond("${target.fullName()}'s account was made on ${target.creationTime}")
 }
 
 

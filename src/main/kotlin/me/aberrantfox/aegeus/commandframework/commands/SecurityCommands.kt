@@ -6,8 +6,8 @@ import me.aberrantfox.aegeus.commandframework.CommandEvent
 import me.aberrantfox.aegeus.listeners.antispam.NewPlayers
 
 
-enum class SecurityLevel(val mins: Int) {
-    Normal(5), Elevated(15), High(60), Max(120)
+enum class SecurityLevel(val matchCount: Int, val waitPeriod: Int, val maxAmount: Int) {
+    Normal(6, 10, 5), Elevated(6, 5, 5), High(4, 5, 4), Max(3, 3, 3)
 }
 
 fun names() = SecurityLevel.values().map { it.name }
@@ -18,7 +18,7 @@ object SecurityLevelState {
 
 @Command(ArgumentType.String)
 fun setSecurityLevel(event: CommandEvent) {
-    val targetLevel = (event.args[0] as String).toUpperCase()
+    val targetLevel = (event.args[0] as String).capitalize()
 
     try {
         val parsed = SecurityLevel.valueOf(targetLevel)
