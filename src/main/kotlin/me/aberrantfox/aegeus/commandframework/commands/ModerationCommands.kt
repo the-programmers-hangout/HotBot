@@ -203,7 +203,7 @@ fun getBanReason(event: CommandEvent) {
             val record = getReason(target)
 
             if(record != null) {
-                event.respond("$target was banned by ${record.mod.idToUser(event.jda).fullName()} for record ${record.reason}")
+                event.respond("$target was banned by ${record.mod.idToUser(event.jda).fullName()} for reason ${record.reason}")
             } else {
                 event.respond("That user does not have a record logged.")
             }
