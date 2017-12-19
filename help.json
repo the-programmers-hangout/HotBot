@@ -644,6 +644,20 @@
       "description": "Ban all of the raiders in the raidview",
       "structure": "{amount of days to delete messages}",
       "example": "1"
+    },
+    {
+      "name": "getBanReason",
+      "category": "moderation",
+      "description": "Get the ban reason of someone logged who does not have a ban reason in the audit log.",
+      "structure": "{userID}",
+      "example": "132493219093592"
+    },
+    {
+      "name": "setBanReason",
+      "category": "moderation",
+      "description": "Set the ban reason of someone logged who does not have a ban reason in the audit log.",
+      "structure": "{userID} {reason}",
+      "example": "132493219093592 being a naughty boy!"
     }
   ]
 }
