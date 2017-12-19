@@ -109,6 +109,11 @@ fun User.sendPrivateMessage(msg: String) =
 
 fun List<String>.isUserIDList(jda: JDA) = this.all { it.isUserID(jda) }
 
+fun JDA.performActionIfIsID(id: String, action: (User) -> Unit) =
+    retrieveUserById(id).queue {
+        action(it)
+    }
+
 private fun String.trimToID(): String =
     if (this.startsWith("<@") && this.endsWith(">")) {
         this.substring(2, this.length - 1)
