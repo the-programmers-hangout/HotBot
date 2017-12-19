@@ -658,6 +658,13 @@
       "description": "Set the ban reason of someone logged who does not have a ban reason in the audit log.",
       "structure": "{userID} {reason}",
       "example": "132493219093592 being a naughty boy!"
+    },
+    {
+      "name": "google",
+      "category": "utility",
+      "description": "google a thing",
+      "structure": "{search term}",
+      "example": "Stackoverflow"
     }
   ]
 }
