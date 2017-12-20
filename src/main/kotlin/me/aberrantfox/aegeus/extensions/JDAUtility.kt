@@ -82,17 +82,14 @@ fun removeMuteRole(guild: Guild, user: User, config: Configuration, record: Mute
     }
 
     config.mutedMembers.remove(record)
-    removeMuteRole(guild, user, config, record)
+    removeMuteRole(guild, user, config)
 }
 
 fun removeMuteRole(guild: Guild, user: User, config: Configuration) =
     user.openPrivateChannel().queue {
-        it.sendMessage("${user.name} - you have been unmuted. Please respect our rules to prevent" +
-            " further infractions.").queue {
-            guild.controller.removeRolesFromMember(guild.getMemberById(user.id), guild.getRolesByName(
-                config.mutedRole, true)).queue()
+        it.sendMessage("${user.name} - you have been unmuted. Please respect our rules to prevent further infractions.").queue {
+            guild.controller.removeRolesFromMember(guild.getMemberById(user.id), guild.getRolesByName(config.mutedRole, true)).queue()
         }
-
     }
 
 
