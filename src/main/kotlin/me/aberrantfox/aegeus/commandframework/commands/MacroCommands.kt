@@ -3,56 +3,61 @@ package me.aberrantfox.aegeus.commandframework.commands
 import com.google.common.reflect.TypeToken
 import com.google.gson.Gson
 import me.aberrantfox.aegeus.commandframework.ArgumentType
-import me.aberrantfox.aegeus.commandframework.Command
 import me.aberrantfox.aegeus.commandframework.produceCommandMap
-import me.aberrantfox.aegeus.commandframework.CommandEvent
+import me.aberrantfox.aegeus.commandframework.commands.dsl.commands
 import me.aberrantfox.aegeus.services.CommandRecommender
 import java.io.File
 
 val macroMap = loadMacroMap()
 private val mapLocation = "macros.json"
 
-@Command(ArgumentType.String, ArgumentType.Joiner)
-fun addMacro(event: CommandEvent) {
-    val key = (event.args[0] as String).toLowerCase()
+fun macroCommands() =
+    commands {
+        command("addmacro") {
+            expect(ArgumentType.String, ArgumentType.Joiner)
+            execute {
+                val key = (it.args[0] as String).toLowerCase()
 
-    if(produceCommandMap().containsKey(key)) {
-        event.respond("You dummy. There is a command with that name already...")
-        return
-    } else if (macroMap.containsKey(key)) {
-        event.respond("Yea... that macro exists...")
-        return
+                when {
+                    produceCommandMap().containsKey(key) -> it.respond("You dummy. There is a command with that name already...")
+                    macroMap.containsKey(key) -> it.respond("Yea... that macro exists...")
+                    else -> {
+                        val value = it.message.rawContent.substring("addmacro ".length + key.length + it.config.prefix.length + 1)
+
+                        macroMap[key] = value
+                        it.respond("**$key** will now respond with: **$value**")
+
+                        saveMacroMap(macroMap)
+                        CommandRecommender.addPossibility(key)
+                    }
+                }
+            }
+        }
+
+        command("removemacro") {
+            expect(ArgumentType.String)
+            execute {
+                val key = (it.args[0] as String).toLowerCase()
+
+                if(macroMap.containsKey(key)) {
+                    macroMap.remove(key)
+                    saveMacroMap(macroMap)
+                    CommandRecommender.removePossibility(key)
+                    it.respond("$key - this macro is now gone.")
+                } else {
+                    it.respond("$key isn't a macro... ")
+                }
+            }
+        }
+
+        command("listmacros") {
+            execute {
+                val macros = macroMap.keys.reduce { acc, s -> "$acc, $s" }
+                it.respond("Currently available macros: $macros.")
+            }
+        }
+
     }
-
-    val value = event.message.rawContent.substring("addmacro ".length + key.length + event.config.prefix.length + 1)
-
-    macroMap[key] = value
-    event.respond("**$key** will now respond with: **$value**")
-
-    saveMacroMap(macroMap)
-    CommandRecommender.addPossibility(key)
-}
-
-@Command(ArgumentType.String)
-fun removeMacro(event: CommandEvent) {
-    val key = (event.args[0] as String).toLowerCase()
-
-    if(macroMap.containsKey(key)) {
-        macroMap.remove(key)
-        saveMacroMap(macroMap)
-        CommandRecommender.removePossibility(key)
-        event.respond("$key - this macro is now gone.")
-        return
-    }
-
-    event.respond("$key isn't a macro... ")
-}
-
-@Command
-fun listMacros(event: CommandEvent) {
-    val macros = macroMap.keys.reduce { acc, s -> "$acc, $s" }
-    event.respond("Currently available macros: $macros.")
-}
 
 private fun loadMacroMap(): HashMap<String, String> {
     val file = File(mapLocation)

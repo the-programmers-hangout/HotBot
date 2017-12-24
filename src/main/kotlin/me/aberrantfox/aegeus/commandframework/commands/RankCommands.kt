@@ -2,11 +2,10 @@ package me.aberrantfox.aegeus.commandframework.commands
 
 import com.google.gson.Gson
 import me.aberrantfox.aegeus.commandframework.ArgumentType
-import me.aberrantfox.aegeus.commandframework.Command
-import me.aberrantfox.aegeus.commandframework.CommandEvent
+import me.aberrantfox.aegeus.permissions.CommandEvent
+import me.aberrantfox.aegeus.commandframework.commands.dsl.commands
 import me.aberrantfox.aegeus.extensions.idToName
 import me.aberrantfox.aegeus.extensions.isRole
-import net.dv8tion.jda.core.JDA
 import java.io.File
 
 private const val rankConfigPath = "rankconfig.json"
@@ -19,7 +18,7 @@ object RankContainer {
     private val gson = Gson()
 
     init {
-        config = if(!file.exists()) {
+        config = if (!file.exists()) {
             RankConfiguration()
         } else {
 
@@ -39,8 +38,8 @@ object RankContainer {
         this.save()
     }
 
-    fun stringList()  =
-        if(config.acceptableRanks.isNotEmpty()) {
+    fun stringList() =
+        if (config.acceptableRanks.isNotEmpty()) {
             config.acceptableRanks.reduce { a, b -> "$a, $b" }
         } else {
             "None."
@@ -49,61 +48,78 @@ object RankContainer {
     private fun save() = file.writeText(gson.toJson(config))
 }
 
-@Command(ArgumentType.String, ArgumentType.UserID)
-fun grant(event: CommandEvent) = handleGrant(event, true)
-
-@Command(ArgumentType.String, ArgumentType.UserID)
-fun revoke(event: CommandEvent) = handleGrant(event, false)
-
-@Command(ArgumentType.String)
-fun makeRoleGrantable(event: CommandEvent) {
-    val role = event.args[0] as String
-
-    if( !(event.jda.isRole(role)) ) {
-        event.respond("Error, that is not a role, or there are more than one roles by that name.")
-        return
+fun rankCommands() = commands {
+    command("grant") {
+        expect(ArgumentType.String, ArgumentType.UserID)
+        execute {
+            handleGrant(it, true)
+        }
     }
 
-    RankContainer.add(role)
-    event.respond("The role: $role has been added to the role whitelist, and can now be assigned via the grant command.")
-}
-
-@Command(ArgumentType.String)
-fun makeroleungrantable(event: CommandEvent) {
-    val role = event.args[0] as String
-
-    if( !(event.jda.isRole(role)) ) {
-        event.respond("Error, that is not a role, or there are more than one roles by that name.")
-        return
+    command("revoke") {
+        expect(ArgumentType.String, ArgumentType.UserID)
+        execute {
+            handleGrant(it, false)
+        }
     }
 
-    RankContainer.remove(role)
-    event.respond("The role: $role has been un-whitelisted, meaning it can no longer be granted. ")
-}
+    command("makerolegrantable") {
+        expect(ArgumentType.String)
+        execute {
+            val role = it.args[0] as String
 
-@Command
-fun listGrantableRoles(event: CommandEvent) = event.respond("Currently whitelisted roles: ${RankContainer.stringList()}")
+            if (!(it.jda.isRole(role))) {
+                it.respond("Error, that is not a role, or there are more than one roles by that name.")
+                return@execute
+            }
+
+            RankContainer.add(role)
+            it.respond("The role: $role has been added to the role whitelist, and can now be assigned via the grant command.")
+        }
+    }
+
+    command("makeroleungrantable") {
+        expect(ArgumentType.String)
+        execute {
+            val role = it.args[0] as String
+
+            if (!(it.jda.isRole(role))) {
+                it.respond("Error, that is not a role, or there are more than one roles by that name.")
+                return@execute
+            }
+
+            RankContainer.remove(role)
+            it.respond("The role: $role has been un-whitelisted, meaning it can no longer be granted. ")
+        }
+    }
+
+    command("listgrantableroles") {
+        execute {
+            it.respond("Currently whitelisted roles: ${RankContainer.stringList()}")
+        }
+    }
+}
 
 private fun handleGrant(event: CommandEvent, grant: Boolean) {
-    if(event.guild == null) return
+    if (event.guild == null) return
 
     val roleName = event.args[0] as String
     val target = event.args[1] as String
     val member = event.guild.getMemberById(target)
 
-    if( !(event.jda.isRole(roleName)) ) {
+    if (!(event.jda.isRole(roleName))) {
         event.respond("That is not a known role")
         return
     }
 
     val role = event.guild.getRolesByName(roleName, true)
 
-    if( !(RankContainer.canUse(roleName)) ) {
+    if (!(RankContainer.canUse(roleName))) {
         event.respond("That is not a grantable role")
         return
     }
 
-    if(grant) {
+    if (grant) {
         event.guild.controller.addRolesToMember(member, role).queue()
         event.respond("$roleName assigned to ${target.idToName(event.jda)}")
     } else {

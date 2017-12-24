@@ -1,9 +1,8 @@
 package me.aberrantfox.aegeus.commandframework.commands
 
 import me.aberrantfox.aegeus.commandframework.ArgumentType
-import me.aberrantfox.aegeus.commandframework.Command
-import me.aberrantfox.aegeus.commandframework.RequiresGuild
-import me.aberrantfox.aegeus.commandframework.CommandEvent
+
+import me.aberrantfox.aegeus.commandframework.commands.dsl.commands
 import me.aberrantfox.aegeus.extensions.idToName
 import me.aberrantfox.aegeus.services.AddResponse
 import me.aberrantfox.aegeus.services.Configuration
@@ -13,9 +12,7 @@ import me.aberrantfox.aegeus.services.database.*
 import net.dv8tion.jda.core.EmbedBuilder
 import net.dv8tion.jda.core.JDA
 import net.dv8tion.jda.core.entities.Guild
-import org.joda.time.format.DateTimeFormat
 import java.awt.Color
-
 
 
 enum class SuggestionStatus(val colour: Color, val message: String) {
@@ -28,107 +25,141 @@ object Suggestions {
     val pool: UserElementPool = UserElementPool(poolName = "Suggestions")
 }
 
-@Command(ArgumentType.Joiner)
-fun suggest(event: CommandEvent) {
-    val author = event.author.id
-    val message = event.args[0] as String
+fun suggestionCommands() = commands {
+    command("suggest") {
+        expect(ArgumentType.Joiner)
+        execute {
+            val author = it.author.id
+            val message = it.args[0] as String
 
-    val response = Suggestions.pool.addRecord(author, event.author.avatarUrl, message)
+            val response = Suggestions.pool.addRecord(author, it.author.avatarUrl, message)
 
-    when (response) {
-        AddResponse.PoolFull -> event.respond("You have enough suggestions in the pool for now...")
-        AddResponse.UserFull -> event.respond("There are too many suggestions in the pool to handle your request currently... sorry about that.")
-        AddResponse.Accepted -> event.respond("Your suggestion has been added to the review-pool. If it passes it'll be pushed out to the suggestions channel.")
-    }
-}
-
-@Command
-fun poolInfo(event: CommandEvent) =
-    event.respond(EmbedBuilder().setTitle("Suggestion Pool Info")
-        .setColor(Color.cyan)
-        .setDescription("There are currently ${Suggestions.pool.entries()} suggestions in the pool.")
-        .build())
-
-
-@Command
-fun poolTop(event: CommandEvent) {
-    val suggestion = Suggestions.pool.peek()
-    if (suggestion == null) {
-        event.respond("The pool is empty.")
-        return
+            when (response) {
+                AddResponse.PoolFull -> it.respond("You have enough suggestions in the pool for now...")
+                AddResponse.UserFull -> it.respond("There are too many suggestions in the pool to handle your request currently... sorry about that.")
+                AddResponse.Accepted -> it.respond("Your suggestion has been added to the review-pool. If it passes it'll be pushed out to the suggestions channel.")
+            }
+        }
     }
 
-    event.respond(suggestion.describe(event.jda, "Suggestion"))
-}
-
-@RequiresGuild
-@Command
-fun poolAccept(event: CommandEvent) {
-    if (event.guild == null) return
-
-    val suggestion = Suggestions.pool.top()
-
-    if (suggestion == null) {
-        event.respond("The suggestion pool is empty... :)")
-        return
+    command("poolinfo") {
+        execute {
+            it.respond(EmbedBuilder().setTitle("Suggestion Pool Info")
+                .setColor(Color.cyan)
+                .setDescription("There are currently ${Suggestions.pool.entries()} suggestions in the pool.")
+                .build())
+        }
     }
 
-    val channel = event.guild.textChannels.findLast { it.id == event.config.suggestionChannel }
+    command("pooltop") {
+        execute {
+            val suggestion = Suggestions.pool.peek()
+            if (suggestion == null) {
+                it.respond("The pool is empty.")
+                return@execute
+            }
 
-    channel?.sendMessage(buildSuggestionMessage(suggestion, event.jda, SuggestionStatus.Review).build())?.queue {
-        trackSuggestion(suggestion, SuggestionStatus.Review, it.id)
-
-        it.addReaction("⬆").queue()
-        it.addReaction("⬇").queue()
-    }
-}
-
-@Command
-fun poolDeny(event: CommandEvent) {
-    val rejected = Suggestions.pool.top()
-
-    if (rejected == null) {
-        event.respond("The suggestion pool is empty... :)")
-        return
+            it.respond(suggestion.describe(it.jda, "Suggestion"))
+        }
     }
 
-    event.respond(rejected.describe(event.jda, "Suggestion"))
-}
+    command("poolaccept") {
+        execute {
+            if (it.guild == null) return@execute
 
-@RequiresGuild
-@Command(ArgumentType.String, ArgumentType.String, ArgumentType.Joiner)
-fun respond(event: CommandEvent) {
-    if (event.guild == null) return
+            val suggestion = Suggestions.pool.top()
 
-    val (args, config) = event
-    val target = args[0] as String
-    val response = args[1] as String
-    val reason = args[2] as String
-    val status = inputToStatus(response)
+            if (suggestion == null) {
+                it.respond("The suggestion pool is empty... :)")
+                return@execute
+            }
 
-    if (status == null) {
-        event.respond("Valid responses are 'accepted', 'denied' and 'review'... use accordingly.")
-        return
+            val channel = it.guild.textChannels.findLast {
+                channel -> channel.id == it.config.suggestionChannel
+            }
+
+            channel?.sendMessage(buildSuggestionMessage(suggestion, it.jda, SuggestionStatus.Review).build())?.queue {
+                trackSuggestion(suggestion, SuggestionStatus.Review, it.id)
+
+                it.addReaction("⬆").queue()
+                it.addReaction("⬇").queue()
+            }
+        }
     }
 
-    val channel = fetchSuggestionChannel(event.guild, config)
+    command("poolaccept") {
+        execute {
+            if (it.guild == null) return@execute
 
-    if (!(isTracked(target)) || channel.getMessageById(target) == null) {
-        event.respond("That is not a valid message or a suggestion by the ID.")
-        return
+            val suggestion = Suggestions.pool.top()
+
+            if (suggestion == null) {
+                it.respond("The suggestion pool is empty... :)")
+                return@execute
+            }
+
+            val channel = it.guild.textChannels.findLast {
+                channel -> channel.id == it.config.suggestionChannel
+            }
+
+            channel?.sendMessage(buildSuggestionMessage(suggestion, it.jda, SuggestionStatus.Review).build())?.queue {
+                trackSuggestion(suggestion, SuggestionStatus.Review, it.id)
+
+                it.addReaction("⬆").queue()
+                it.addReaction("⬇").queue()
+            }
+        }
     }
 
-    channel.getMessageById(target).queue {
-        val suggestion = obtainSuggestion(target)
-        val message = buildSuggestionMessage(suggestion, event.jda, status)
-        val reasonTitle = "Reason for Status"
+    command("pooldeny") {
+        execute {
+            val rejected = Suggestions.pool.top()
 
-        message.fields.removeIf { it.name == reasonTitle }
+            if (rejected == null) {
+                it.respond("The suggestion pool is empty... :)")
+                return@execute
+            }
 
-        message.addField(reasonTitle, reason, false)
-        updateSuggestion(target, status)
+            it.respond(rejected.describe(it.jda, "Suggestion"))
+        }
+    }
 
-        it.editMessage(message.build()).queue()
+    command("respond") {
+        expect(ArgumentType.String, ArgumentType.String, ArgumentType.Joiner)
+        execute {
+            if (it.guild == null) return@execute
+
+            val (args, config) = it
+            val target = args[0] as String
+            val response = args[1] as String
+            val reason = args[2] as String
+            val status = inputToStatus(response)
+
+            if (status == null) {
+                it.respond("Valid responses are 'accepted', 'denied' and 'review'... use accordingly.")
+                return@execute
+            }
+
+            val channel = fetchSuggestionChannel(it.guild, config)
+
+            if (!(isTracked(target)) || channel.getMessageById(target) == null) {
+                it.respond("That is not a valid message or a suggestion by the ID.")
+                return@execute
+            }
+
+            channel.getMessageById(target).queue {
+                val suggestion = obtainSuggestion(target)
+                val message = buildSuggestionMessage(suggestion, it.jda, status)
+                val reasonTitle = "Reason for Status"
+
+                message.fields.removeIf { it.name == reasonTitle }
+
+                message.addField(reasonTitle, reason, false)
+                updateSuggestion(target, status)
+
+                it.editMessage(message.build()).queue()
+            }
+        }
     }
 }
 

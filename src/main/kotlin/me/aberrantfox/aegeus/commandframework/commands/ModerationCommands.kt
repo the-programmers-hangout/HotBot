@@ -1,10 +1,8 @@
 package me.aberrantfox.aegeus.commandframework.commands
 
 import me.aberrantfox.aegeus.commandframework.ArgumentType
-import me.aberrantfox.aegeus.commandframework.Command
-import me.aberrantfox.aegeus.commandframework.RequiresGuild
-import me.aberrantfox.aegeus.commandframework.stringToPermission
-import me.aberrantfox.aegeus.commandframework.CommandEvent
+import me.aberrantfox.aegeus.permissions.stringToPermission
+import me.aberrantfox.aegeus.commandframework.commands.dsl.commands
 import me.aberrantfox.aegeus.extensions.fullName
 import me.aberrantfox.aegeus.extensions.idToUser
 import me.aberrantfox.aegeus.extensions.muteMember
@@ -22,195 +20,204 @@ import java.io.File
 
 class ModerationCommands
 
-@RequiresGuild(false)
-@Command(ArgumentType.Integer)
-fun nuke(event: CommandEvent) {
-    if (event.guild == null) return
-
-    val amount = event.args[0] as Int
-
-    if (amount <= 0) {
-        event.respond("Yea, what exactly is the point in nuking nothing... ?")
-        return
-    }
-
-    event.channel.history.retrievePast(amount + 1).queue({
-        it.forEach { it.delete().queue() }
-        event.respond("Be nice. No spam.")
-    })
-}
-
-@RequiresGuild
-@Command(ArgumentType.String)
-fun ignore(event: CommandEvent) {
-    if (event.guild == null) return
-
-    val config = event.config
-    val target = event.args[0] as String
-
-    if (config.ignoredIDs.contains(target)) {
-        config.ignoredIDs.remove(target)
-        event.respond("Unignored $target")
-    } else {
-        config.ignoredIDs.add(target)
-        event.respond("$target? Who? What? Don't know what that is. ;)")
-    }
-}
-
-@RequiresGuild
-@Command(ArgumentType.UserID, ArgumentType.Integer, ArgumentType.Joiner)
-fun mute(event: CommandEvent) {
-    if (event.guild == null) return
-
-    val args = event.args
-
-    val user = (args[0] as String).idToUser(event.jda)
-    val time = (args[1] as Int).toLong() * 1000 * 60
-    val reason = args[2] as String
-
-    muteMember(event.guild, user, time, reason, event.config, event.author)
-}
-
-@Command
-fun lockdown(event: CommandEvent) {
-    val config = event.config
-    config.lockDownMode = !config.lockDownMode
-    event.respond("Lockdown mode is now set to: ${config.lockDownMode}.")
-}
-
-@Command(ArgumentType.String)
-fun prefix(event: CommandEvent) {
-    val newPrefix = event.args[0] as String
-    event.config.prefix = newPrefix
-    event.respond("Prefix is now $newPrefix. Please invoke commands using that prefix in the future." +
-        "To save this configuration, use the saveconfigurations command.")
-    event.jda.presence.setPresence(OnlineStatus.ONLINE, Game.of("${event.config.prefix}help"))
-}
-
-@Command(ArgumentType.String)
-fun setFilter(event: CommandEvent) {
-    val desiredLevel = stringToPermission((event.args[0] as String).toUpperCase())
-
-    if (desiredLevel == null) {
-        event.respond("Don't know that permission level boss... ")
-        return
-    }
-
-    event.config.mentionFilterLevel = desiredLevel
-    event.respond("Permission level now set to: ${desiredLevel.name} ; be sure to save configurations.")
-}
-
-@RequiresGuild(false)
-@Command(ArgumentType.String, ArgumentType.Integer, ArgumentType.String)
-fun move(event: CommandEvent) {
-    if (event.guild == null) return
-
-    val args = event.args
-
-    val targets = getTargets((args[0] as String))
-    val searchSpace = args[1] as Int
-    val chan = args[2] as String
-
-    event.message.delete().queue()
-
-    if (searchSpace < 0) {
-        event.respond("... move what")
-        return
-    }
-
-    if (searchSpace > 99) {
-        event.respond("Yea buddy, I'm not moving the entire channel into another, 99 messages or less")
-        return
-    }
-
-    val channel = event.guild.textChannels.filter { it.id == chan }.first()
-
-    if (channel == null) {
-        event.respond("... to where?")
-        return
-    }
-
-    event.channel.history.retrievePast(searchSpace + 1).queue {
-        handleResponse(it, channel, targets, event.channel, event.author.asMention)
-    }
-}
-
-@RequiresGuild
-@Command(ArgumentType.UserID, ArgumentType.Joiner)
-fun badname(event: CommandEvent) {
-    if (event.guild == null) return
-
-    val args = event.args
-    val target = args[0] as String
-    val reason = args[1] as String
-
-    val targetMember = event.guild.getMemberById(target)
-
-    event.guild.controller.setNickname(targetMember, MessageService.getMessage(MessageType.Name)).queue {
-        targetMember.user.openPrivateChannel().queue {
-            it.sendMessage("Your name has been changed forcefully by a member of staff for reason: $reason").queue()
+fun moderationCommands() = commands {
+    command("nuke") {
+        expect(ArgumentType.Integer)
+        execute {
+            if (it.guild != null) {
+                val amount = it.args[0] as Int
+                if (amount <= 0) {
+                    it.respond("Yea, what exactly is the point in nuking nothing... ?")
+                } else {
+                    it.channel.history.retrievePast(amount + 1).queue { past ->
+                        past.forEach { msg -> msg.delete().queue() }
+                        it.respond("Be nice. No spam.")
+                    }
+                }
+            }
         }
     }
-}
 
-@RequiresGuild
-@Command(ArgumentType.UserID)
-fun joinDate(event: CommandEvent) {
-    if (event.guild == null) return
-    val target = event.args[0] as String
+    command("ignore") {
+        expect(ArgumentType.Integer)
+        execute {
+            if (it.guild != null) {
+                val config = it.config
+                val target = it.args[0] as String
 
-    val member = event.guild.getMemberById(target)
-    val dateFormat = SimpleDateFormat("yyyy-MM-dd")
-    val joinDateParsed = dateFormat.parse(member.joinDate.toString())
-    val joinDate = dateFormat.format(joinDateParsed)
-
-    event.respond("${member.fullName()}'s join date: $joinDate")
-}
-
-@Command
-fun restart(event: CommandEvent) {
-    val javaBin = System.getProperty("java.home") + File.separator + "bin" + File.separator + "java"
-    val currentJar = File(ModerationCommands::class.java.protectionDomain.codeSource.location.toURI())
-
-    if (!currentJar.name.endsWith(".jar")) return
-
-    ProcessBuilder(arrayListOf(javaBin, "-jar", currentJar.path)).start()
-    System.exit(0)
-}
-
-@Command(ArgumentType.String, ArgumentType.Joiner)
-fun setBanReason(event: CommandEvent) {
-    val target = (event.args[0] as String)
-    val reason = event.args[1] as String
-
-    try {
-        event.jda.performActionIfIsID(target) {
-            updateOrSetReason(target, reason, event.author.id)
-            event.respond("The ban reason for $target has been logged")
+                if (config.ignoredIDs.contains(target)) {
+                    config.ignoredIDs.remove(target)
+                    it.respond("Unignored $target")
+                } else {
+                    config.ignoredIDs.add(target)
+                    it.respond("$target? Who? What? Don't know what that is. ;)")
+                }
+            }
         }
-    } catch (e: IllegalArgumentException) {
-        event.respond("$target is not a valid ID")
     }
 
-}
+    command("mute") {
+        expect(ArgumentType.UserID, ArgumentType.Integer, ArgumentType.Joiner)
+        execute {
+            if (it.guild != null) {
+                val args = it.args
 
-@Command(ArgumentType.String)
-fun getBanReason(event: CommandEvent) {
-    val target = event.args[0] as String
+                val user = (args[0] as String).idToUser(it.jda)
+                val time = (args[1] as Int).toLong() * 1000 * 60
+                val reason = args[2] as String
 
-    try {
-        event.jda.performActionIfIsID(target) {
-            val record = getReason(target)
+                muteMember(it.guild, user, time, reason, it.config, it.author)
+            }
+        }
+    }
 
-            if(record != null) {
-                event.respond("$target was banned by ${record.mod.idToUser(event.jda).fullName()} for reason ${record.reason}")
+    command("lockdown") {
+        execute {
+            val config = it.config
+            config.lockDownMode = !config.lockDownMode
+            it.respond("Lockdown mode is now set to: ${config.lockDownMode}.")
+        }
+    }
+
+    command("prefix") {
+        expect(ArgumentType.String)
+        execute {
+            val newPrefix = it.args[0] as String
+            it.config.prefix = newPrefix
+            it.respond("Prefix is now $newPrefix. Please invoke commands using that prefix in the future." +
+                "To save this configuration, use the saveconfigurations command.")
+            it.jda.presence.setPresence(OnlineStatus.ONLINE, Game.of("${it.config.prefix}help"))
+        }
+    }
+
+    command("setfilter") {
+        expect(ArgumentType.String)
+        execute {
+            val desiredLevel = stringToPermission((it.args[0] as String).toUpperCase())
+
+            if (desiredLevel == null) {
+                it.respond("Don't know that permission level boss... ")
             } else {
-                event.respond("That user does not have a record logged.")
+                it.config.mentionFilterLevel = desiredLevel
+                it.respond("Permission level now set to: ${desiredLevel.name} ; be sure to save configurations.")
+            }
+        }
+
+    }
+    command("move") {
+        expect(ArgumentType.String, ArgumentType.Integer, ArgumentType.String)
+        execute {
+            if (it.guild == null) return@execute
+
+            val args = it.args
+
+            val targets = getTargets((args[0] as String))
+            val searchSpace = args[1] as Int
+            val chan = args[2] as String
+
+            it.message.delete().queue()
+
+            if (searchSpace < 0) {
+                it.respond("... move what")
+                return@execute
             }
 
+            if (searchSpace > 99) {
+                it.respond("Yea buddy, I'm not moving the entire channel into another, 99 messages or less")
+                return@execute
+            }
+
+            val channel = it.guild.textChannels.filter { it.id == chan }.first()
+
+            if (channel == null) {
+                it.respond("... to where?")
+                return@execute
+            }
+
+            it.channel.history.retrievePast(searchSpace + 1).queue { past ->
+                handleResponse(past, channel, targets, it.channel, it.author.asMention)
+            }
         }
-    } catch (e: IllegalArgumentException) {
-        event.respond("$target is not a valid ID")
+    }
+    command("badname") {
+        expect(ArgumentType.UserID, ArgumentType.Joiner)
+        execute {
+            if (it.guild == null) return@execute
+
+            val args = it.args
+            val target = args[0] as String
+            val reason = args[1] as String
+
+            val targetMember = it.guild.getMemberById(target)
+
+            it.guild.controller.setNickname(targetMember, MessageService.getMessage(MessageType.Name)).queue {
+                targetMember.user.openPrivateChannel().queue {
+                    it.sendMessage("Your name has been changed forcefully by a member of staff for reason: $reason").queue()
+                }
+            }
+        }
+    }
+    command("joindate") {
+        expect(ArgumentType.UserID)
+        execute {
+            if (it.guild == null) return@execute
+            val target = it.args[0] as String
+
+            val member = it.guild.getMemberById(target)
+            val dateFormat = SimpleDateFormat("yyyy-MM-dd")
+            val joinDateParsed = dateFormat.parse(member.joinDate.toString())
+            val joinDate = dateFormat.format(joinDateParsed)
+
+            it.respond("${member.fullName()}'s join date: $joinDate")
+        }
+    }
+    command("restart") {
+        execute {
+            val javaBin = System.getProperty("java.home") + File.separator + "bin" + File.separator + "java"
+            val currentJar = File(ModerationCommands::class.java.protectionDomain.codeSource.location.toURI())
+
+            if (!currentJar.name.endsWith(".jar")) return@execute
+
+            ProcessBuilder(arrayListOf(javaBin, "-jar", currentJar.path)).start()
+            System.exit(0)
+        }
+    }
+    command("setbanreason") {
+        expect(ArgumentType.String, ArgumentType.Joiner)
+        execute {
+            val target = (it.args[0] as String)
+            val reason = it.args[1] as String
+
+            try {
+                it.jda.performActionIfIsID(target) { user ->
+                    updateOrSetReason(target, reason, it.author.id)
+                    it.respond("The ban reason for $target has been logged")
+                }
+            } catch (e: IllegalArgumentException) {
+                it.respond("$target is not a valid ID")
+            }
+        }
+    }
+    command("getbanreason") {
+        expect(ArgumentType.String)
+        execute {
+            val target = it.args[0] as String
+
+            try {
+                it.jda.performActionIfIsID(target) { user ->
+                    val record = getReason(target)
+
+                    if (record != null) {
+                        it.respond("$target was banned by ${record.mod.idToUser(it.jda).fullName()} for reason ${record.reason}")
+                    } else {
+                        it.respond("That user does not have a record logged.")
+                    }
+
+                }
+            } catch (e: IllegalArgumentException) {
+                it.respond("$target is not a valid ID")
+            }
+        }
     }
 }
 
@@ -227,7 +234,7 @@ private fun handleResponse(past: List<Message>, channel: MessageChannel, targets
         .reduce { a, b -> "$a\n$b" }
 
     channel.sendMessage("==Messages moved from ${error.name} to here by $source\n$response")
-            .queue{ messages.forEach { it.delete().queue() }}
+        .queue { messages.forEach { it.delete().queue() } }
 }
 
 private fun getTargets(msg: String): List<String> =

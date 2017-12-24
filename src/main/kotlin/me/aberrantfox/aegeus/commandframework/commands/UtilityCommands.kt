@@ -3,10 +3,8 @@ package me.aberrantfox.aegeus.commandframework.commands
 import com.google.gson.Gson
 import me.aberrantfox.aegeus.commandframework.ArgumentType
 import me.aberrantfox.aegeus.services.saveConfig
-import me.aberrantfox.aegeus.commandframework.Command
 import me.aberrantfox.aegeus.extensions.fullName
-import me.aberrantfox.aegeus.commandframework.CommandEvent
-import me.aberrantfox.aegeus.commandframework.RequiresGuild
+import me.aberrantfox.aegeus.commandframework.commands.dsl.commands
 import me.aberrantfox.aegeus.extensions.idToUser
 import me.aberrantfox.aegeus.services.Configuration
 import net.dv8tion.jda.core.EmbedBuilder
@@ -30,84 +28,82 @@ object Project {
 
 val startTime = Date()
 
-@Command fun ping(event: CommandEvent) = event.respond("Pong!")
+fun utilCommands() = commands {
+    command("ping") {
+        execute {
+            it.respond("Png!")
+        }
+    }
 
-@RequiresGuild
-@Command
-fun serverinfo(event: CommandEvent) {
-    if(event.guild == null) return
-    val embed = produceServerInfoEmbed(event.guild)
-    event.respond(embed)
+    command("serverinfo") {
+        execute {
+            if (it.guild == null) return@execute
+            val embed = produceServerInfoEmbed(it.guild)
+            it.respond(embed)
+        }
+    }
+
+    command("uptime") {
+        execute {
+            val uptime = Date().time - startTime.time
+            val minutes = uptime / 1000 / 60
+            val currentDate = startTime.toString()
+
+            it.respond("I've been awake since ${currentDate}, so like... ${minutes} minutes")
+        }
+    }
+
+    command("exit") {
+        execute {
+            (it.config)
+            it.respond("Exiting")
+            System.exit(0)
+        }
+    }
+
+    command("kill") {
+        execute {
+            it.respond("Killing process, configurations will not be saved.")
+            System.exit(0)
+        }
+    }
+
+    command("saveconfigurations") {
+        execute {
+            saveConfig(it.config)
+            it.respond("Configurations saved. I hope you know what you are doing...")
+        }
+    }
+
+    command("version") {
+        execute {
+            it.respond("**Hotbot version**: ${Project.properties.version}")
+        }
+    }
+
+    command("author") {
+        execute {
+            it.respond("**Project author**: ${Project.properties.author}")
+        }
+    }
+
+    command("echo") {
+        expect(ArgumentType.String, ArgumentType.Joiner)
+        execute {
+            val target = it.args[0] as String
+            val message = it.args[1] as String
+
+            it.jda.getTextChannelById(target).sendMessage(message).queue()
+        }
+    }
+
+    command("viewcreationdate") {
+        execute {
+            val target = (it.args[0] as String).idToUser(it.jda)
+            it.respond("${target.fullName()}'s account was made on ${target.creationTime}")
+        }
+    }
 }
-
-@Command
-fun uptime(event: CommandEvent) {
-    val uptime = Date().time - startTime.time
-    val minutes = uptime / 1000 / 60
-    val currentDate = startTime.toString()
-
-    event.respond("I've been awake since ${currentDate}, so like... ${minutes} minutes")
-}
-
-@Command
-fun exit(event: CommandEvent) {
-    saveConfig(event.config)
-    event.respond("Exiting")
-    System.exit(0)
-}
-
-@Command
-fun kill(event: CommandEvent) {
-    event.respond("Killing process, configurations will not be saved.")
-    System.exit(0)
-}
-
-@Command
-fun saveConfigurations(event: CommandEvent) {
-    saveConfig(event.config)
-    event.respond("Configurations saved. I hope you know what you are doing...")
-}
-
-@Command(ArgumentType.Manual)
-fun info(event: CommandEvent) {
-    val builder = EmbedBuilder()
-            .setDescription("I'm Hotbot, the superior Auto-Titan replacement!")
-            .setAuthor("Fox", "https://github.com/AberrantFox", "https://avatars1.githubusercontent.com/u/22015832")
-            .setColor(Color.MAGENTA)
-            .setThumbnail("http://i.imgur.com/DFoaG7k.png")
-            .setFooter("Bot by Fox, made with Kotlin", "https://images-ext-1.discordapp.net/external/q9ZpQURnfAGbNxsxSqMzCiALNNVck5h4oWgRsHkG3bw/https/i.imgur.com/UymVLqf.png")
-
-
-    builder.addField("Project Name", "Hotbot", true)
-            .addField("Main Language(s)", "Kotlin", true)
-            .addField("Libraries", "JDA, Gson, (soon) Apache CLI, Apache Reflections, kotson, junit, mockito", false)
-            .addField("Progress to Completion", "100% for a basic version plus or minus 5%, needs a little more testing", false)
-            .addField("Repo link", "https://github.com/AberrantFox/hotbot", false)
-
-    event.respond(builder.build())
-}
-
-@Command
-fun version(event: CommandEvent) = event.respond("**Hotbot version**: ${Project.properties.version}")
-
-@Command
-fun author(event: CommandEvent) = event.respond("**Project author**: ${Project.properties.author}")
-
-@Command(ArgumentType.String, ArgumentType.Joiner)
-fun echo(event: CommandEvent) {
-    val target = event.args[0] as String
-    val message = event.args[1] as String
-
-    event.jda.getTextChannelById(target).sendMessage(message).queue()
-}
-
-@Command(ArgumentType.UserID)
-fun viewCreationDate(event: CommandEvent) {
-    val target = (event.args[0] as String).idToUser(event.jda)
-
-    event.respond("${target.fullName()}'s account was made on ${target.creationTime}")
-}
-
 
 fun produceServerInfoEmbed(guild: Guild): MessageEmbed {
     val builder = EmbedBuilder()

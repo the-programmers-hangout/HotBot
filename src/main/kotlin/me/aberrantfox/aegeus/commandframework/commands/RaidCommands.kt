@@ -1,96 +1,99 @@
 package me.aberrantfox.aegeus.commandframework.commands
 
 import me.aberrantfox.aegeus.commandframework.ArgumentType
-import me.aberrantfox.aegeus.commandframework.Command
-import me.aberrantfox.aegeus.commandframework.CommandEvent
-import me.aberrantfox.aegeus.commandframework.RequiresGuild
+import me.aberrantfox.aegeus.commandframework.commands.dsl.arg
+import me.aberrantfox.aegeus.commandframework.commands.dsl.commands
 import me.aberrantfox.aegeus.extensions.fullName
 import me.aberrantfox.aegeus.extensions.idToUser
 import me.aberrantfox.aegeus.extensions.removeMuteRole
 import me.aberrantfox.aegeus.listeners.antispam.MutedRaiders
 
+fun raidCommands() = commands {
+    command("viewRaiders") {
+        execute {
+            if (MutedRaiders.set.isEmpty()) {
+                it.respond("No raiders... yay? (I hope that is a yay moment :D)")
+                return@execute
+            }
 
-@Command
-fun viewRaiders(event: CommandEvent){
-
-    if(MutedRaiders.set.isEmpty()) {
-        event.respond("No raiders... yay? (I hope that is a yay moment :D)")
-        return
+            it.respond("Raiders: " + MutedRaiders.set.reduce { a, b -> "$a, $b" })
+        }
     }
 
-    event.respond("Raiders: " + MutedRaiders.set.reduce { a, b -> "$a, $b" })
-}
+    command("freeRaider") {
+        expect(ArgumentType.UserID)
+        execute {
+            if (it.guild == null) return@execute
 
-@RequiresGuild
-@Command(ArgumentType.UserID)
-fun freeRaider(event: CommandEvent) {
-    if(event.guild == null) return
+            if (MutedRaiders.set.isEmpty()) {
+                it.respond("There are no raiders...")
+                return@execute
+            }
 
-    if(MutedRaiders.set.isEmpty()) {
-        event.respond("There are no raiders...")
-        return
+            val user = (it.args[0] as String).idToUser(it.jda)
+
+            if (!(MutedRaiders.set.contains(user.id))) {
+                it.respond("That user is not a raider.")
+                return@execute
+            }
+
+            MutedRaiders.set.remove(user.id)
+            removeMuteRole(it.guild, user, it.config)
+
+            it.respond("Removed ${user.fullName()} from the queue, and has been unmuted.")
+        }
     }
 
-    val user = (event.args[0] as String).idToUser(event.jda)
+    command("freeAllRaiders") {
+        execute {
+            if (it.guild == null) return@execute
 
-    if( !(MutedRaiders.set.contains(user.id)) ) {
-        event.respond("That user is not a raider.")
-        return
+            if (MutedRaiders.set.isEmpty()) {
+                it.respond("There are no raiders...")
+                return@execute
+            }
+
+            MutedRaiders.set.forEach { id -> removeMuteRole(it.guild, id.idToUser(it.jda), it.config) }
+            MutedRaiders.set.clear()
+            it.respond("Raiders unmuted, be nice bois!")
+        }
     }
 
-    MutedRaiders.set.remove(user.id)
-    removeMuteRole(event.guild, user, event.config)
+    command("banraider") {
+        expect(ArgumentType.UserID, ArgumentType.Integer)
+        execute {
+            if (it.guild == null) return@execute
 
-    event.respond("Removed ${user.fullName()} from the queue, and has been unmuted.")
-}
+            val user = (it.args[0] as String).idToUser(it.jda)
+            val delDays = (it.args[1] as Int)
 
-@Command
-@RequiresGuild
-fun freeAllRaiders(event: CommandEvent) {
-    if(event.guild == null) return
+            if (!(MutedRaiders.set.contains(user.id))) {
+                it.respond("That user is not a raider.")
+                return@execute
+            }
 
-    if(MutedRaiders.set.isEmpty()) {
-        event.respond("There are no raiders...")
-        return
+            MutedRaiders.set.remove(user.id)
+            it.guild.controller.ban(user, delDays).queue()
+        }
     }
 
-    MutedRaiders.set.forEach { removeMuteRole(event.guild, it.idToUser(event.jda), event.config) }
-    MutedRaiders.set.clear()
-    event.respond("Raiders unmuted, be nice bois!")
-}
+    command("banautodetectedraid") {
+        expect(ArgumentType.Integer)
+        execute {
+            if (it.guild == null) return@execute
 
-@RequiresGuild
-@Command(ArgumentType.UserID, ArgumentType.Integer)
-fun banRaider(event: CommandEvent) {
-    if(event.guild == null) return
+            val delDays = (it.args[0]) as Int
 
-    val user = (event.args[0] as String).idToUser(event.jda)
-    val delDays = (event.args[1] as Int)
+            if (MutedRaiders.set.size == 0) {
+                it.respond("There are currently no automatically detected raiders... ")
+                return@execute
+            }
 
-    if( !(MutedRaiders.set.contains(user.id)) ) {
-        event.respond("That user is not a raider.")
-        return
+            MutedRaiders.set
+                .map { id -> id.idToUser(it.jda) }
+                .forEach { user -> it.guild.controller.ban(user, delDays).queue() }
+
+            it.respond("Performing raid ban.")
+        }
     }
-
-    MutedRaiders.set.remove(user.id)
-    event.guild.controller.ban(user, delDays).queue()
-}
-
-@RequiresGuild
-@Command(ArgumentType.Integer)
-fun banAutodetectedRaid(event: CommandEvent) {
-    if(event.guild == null) return
-
-    val delDays = (event.args[0]) as Int
-
-    if(MutedRaiders.set.size == 0) {
-        event.respond("There are currently no automatically detected raiders... ")
-        return
-    }
-
-    MutedRaiders.set
-        .map { it.idToUser(event.jda) }
-        .forEach { event.guild.controller.ban(it, delDays).queue() }
-
-    event.respond("Performing raid ban.")
 }

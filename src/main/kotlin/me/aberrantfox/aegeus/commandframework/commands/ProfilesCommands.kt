@@ -1,8 +1,7 @@
 package me.aberrantfox.aegeus.commandframework.commands
 
 import me.aberrantfox.aegeus.commandframework.ArgumentType
-import me.aberrantfox.aegeus.commandframework.Command
-import me.aberrantfox.aegeus.commandframework.CommandEvent
+import me.aberrantfox.aegeus.commandframework.commands.dsl.commands
 import me.aberrantfox.aegeus.extensions.idToName
 import me.aberrantfox.aegeus.services.AddResponse
 import me.aberrantfox.aegeus.services.UserElementPool
@@ -15,62 +14,69 @@ object Profiles {
     val pool: UserElementPool = UserElementPool(userLimit = 1, poolName = "Profiles")
 }
 
-@Command(ArgumentType.Joiner)
-fun submitProfile(event: CommandEvent) {
-    val profileText = event.args[0] as String
+fun profileCommands() = commands {
+    command("submitprofile") {
+        expect(ArgumentType.Joiner)
+        execute {
+            val profileText = it.args[0] as String
 
-    if( !(profileText.matches(profileRegex)) ) {
-        event.respond("Your submitted profile does not follow the format. Please re-submit a profile using the format, findable in the FAQ channel.")
-        return
+            if (!(profileText.matches(profileRegex))) {
+                it.respond("Your submitted profile does not follow the format. Please re-submit a profile using the format, findable in the FAQ channel.")
+                return@execute
+            }
+
+            val response = Profiles.pool.addRecord(it.author.id, it.author.avatarUrl, profileText)
+
+            when (response) {
+                AddResponse.Accepted -> it.respond("Your profile has been added to the review pool. An administrator will review it shortly.")
+                AddResponse.UserFull -> it.respond("You've already submitted a profile...")
+                AddResponse.PoolFull -> it.respond("The pool is currently full. Try again in a few days.")
+            }
+        }
     }
 
-    val response = Profiles.pool.addRecord(event.author.id, event.author.avatarUrl, profileText)
+    command("viewprofile") {
+        execute {
+            val record = Profiles.pool.peek()
 
-    when(response) {
-        AddResponse.Accepted -> event.respond("Your profile has been added to the review pool. An administrator will review it shortly.")
-        AddResponse.UserFull -> event.respond("You've already submitted a profile...")
-        AddResponse.PoolFull -> event.respond("The pool is currently full. Try again in a few days.")
-    }
-}
+            if (record == null) {
+                it.respond(RejectionMessage)
+                return@execute
+            }
 
-@Command
-fun viewProfile(event: CommandEvent) {
-    val record = Profiles.pool.peek()
-
-    if(record == null) {
-        event.respond(RejectionMessage)
-        return
+            it.respond(record.describe(it.jda, "Profile"))
+        }
     }
 
-    event.respond(record.describe(event.jda, "Profile"))
-}
+    command("acceptprofile") {
+        execute {
+            val record = Profiles.pool.top()
 
-@Command
-fun acceptProfile(event: CommandEvent) {
-    val record = Profiles.pool.top()
+            if (record == null) {
+                it.respond(RejectionMessage)
+                return@execute
+            }
 
-    if(record == null) {
-        event.respond(RejectionMessage)
-        return
+            val target = it.jda.getTextChannelById(it.config.profileChannel)
+            target.sendMessage(
+                record.prettyPrint(it.jda, "Profile")
+                    .setTitle("")
+                    .setAuthor(record.sender.idToName(it.jda), record.avatarURL, record.avatarURL)
+                    .build())
+                .queue()
+        }
     }
 
-    val target = event.jda.getTextChannelById(event.config.profileChannel)
-    target.sendMessage(
-        record.prettyPrint(event.jda, "Profile")
-            .setTitle("")
-            .setAuthor(record.sender.idToName(event.jda), record.avatarURL,record.avatarURL)
-            .build())
-        .queue()
-}
+    command("declineprofile") {
+        execute {
+            val top = Profiles.pool.top()
 
-@Command
-fun declineProfile(event: CommandEvent) {
-    val top = Profiles.pool.top()
+            if (top == null) {
+                it.respond(RejectionMessage)
+                return@execute
+            }
 
-    if(top == null) {
-        event.respond(RejectionMessage)
-        return
+            it.respond(top.describe(it.jda, "Rejected Profile"))
+        }
     }
-
-    event.respond(top.describe(event.jda, "Rejected Profile"))
 }

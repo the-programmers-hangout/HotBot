@@ -1,8 +1,7 @@
 package me.aberrantfox.aegeus.commandframework.commands
 
 import me.aberrantfox.aegeus.commandframework.ArgumentType
-import me.aberrantfox.aegeus.commandframework.Command
-import me.aberrantfox.aegeus.commandframework.CommandEvent
+import me.aberrantfox.aegeus.commandframework.commands.dsl.commands
 import me.aberrantfox.aegeus.extensions.sendPrivateMessage
 import me.aberrantfox.aegeus.services.CommandDescriptor
 import me.aberrantfox.aegeus.services.Configuration
@@ -12,31 +11,40 @@ import net.dv8tion.jda.core.EmbedBuilder
 import java.awt.Color
 import java.time.LocalDateTime
 
-@Command(ArgumentType.Manual)
-fun help(event: CommandEvent) {
-    val (args, config, _, _, author) = event
+fun helpCommands() =
+    commands {
+        command("help") {
+            expect(ArgumentType.String)
+            execute {
+                val (args, config, _, _, author) = it
 
-    if(args.isEmpty()) {
-        author.sendPrivateMessage(getZeroArgMessage(config))
-    } else if (args.size == 1) {
-        val selection = args[0] as String
-        val argType = HelpConf.fetchArgumentType(selection)
+                if(args.isEmpty()) {
+                    author.sendPrivateMessage(getZeroArgMessage(config))
+                } else if (args.size == 1) {
+                    val selection = args[0] as String
+                    val argType = HelpConf.fetchArgumentType(selection)
 
-        when (argType) {
-            SelectionArgument.CommandName -> {
-                val descriptor = HelpConf.fetchCommandDescriptor(selection) ?: return
-                author.sendPrivateMessage(buildCommandHelpMessage(config, descriptor))
+                    when (argType) {
+                        SelectionArgument.CommandName -> {
+                            val descriptor = HelpConf.fetchCommandDescriptor(selection)
+                            if(descriptor != null) {
+                                author.sendPrivateMessage(buildCommandHelpMessage(config, descriptor))
+                            } else {
+                                author.sendPrivateMessage("A descriptor was null, please notify the bot owner.")
+                            }
+                        }
+                        SelectionArgument.CategoryName -> {
+                            val categories = HelpConf.fetchCommandsInCategory(selection)
+                            author.sendPrivateMessage(buildCategoryDescription(selection.toLowerCase(), categories))
+                        }
+                        else -> author.sendPrivateMessage("Not a command or category... maybe try the default help command?")
+                    }
+                } else {
+                    author.sendPrivateMessage("Uhh... this command takes either 0 or 1 arguments.")
+                }
             }
-            SelectionArgument.CategoryName -> {
-                val categories = HelpConf.fetchCommandsInCategory(selection)
-                author.sendPrivateMessage(buildCategoryDescription(selection.toLowerCase(), categories))
-            }
-            else -> author.sendPrivateMessage("Not a command or category... maybe try the default help command?")
         }
-    } else {
-        author.sendPrivateMessage("Uhh... this command takes either 0 or 1 arguments.")
     }
-}
 
 private fun buildCommandHelpMessage(config: Configuration, descriptor: CommandDescriptor) =
         EmbedBuilder().setTitle("${descriptor.category} - ${descriptor.name}")

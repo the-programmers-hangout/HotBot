@@ -1,9 +1,8 @@
 package me.aberrantfox.aegeus.commandframework.commands
 
 import me.aberrantfox.aegeus.commandframework.ArgumentType
-import me.aberrantfox.aegeus.commandframework.Command
-import me.aberrantfox.aegeus.commandframework.RequiresGuild
-import me.aberrantfox.aegeus.commandframework.CommandEvent
+import me.aberrantfox.aegeus.permissions.CommandEvent
+import me.aberrantfox.aegeus.commandframework.commands.dsl.commands
 import me.aberrantfox.aegeus.extensions.*
 import me.aberrantfox.aegeus.services.*
 import me.aberrantfox.aegeus.services.database.*
@@ -13,16 +12,104 @@ import net.dv8tion.jda.core.entities.User
 import org.joda.time.format.DateTimeFormat
 import java.awt.Color
 
+fun strikeCommands() =
+    commands {
+        command("warn") {
+            expect(ArgumentType.UserID, ArgumentType.Joiner)
+            execute {
+                strike(CommandEvent(listOf(it.args[0], 0, it.args[1]),
+                    it.config, it.jda, it.channel,
+                    it.author, it.message, it.guild))
+            }
+        }
 
-@Command(ArgumentType.UserID, ArgumentType.Joiner)
-fun warn(event: CommandEvent) =
-        strike(CommandEvent(listOf(event.args[0], 0, event.args[1]),
-                event.config, event.jda, event.channel,
-                event.author, event.message, event.guild))
+        command("strike") {
+            expect(ArgumentType.UserID, ArgumentType.Integer, ArgumentType.Joiner)
+            execute {
+                if(it.guild == null) return@execute
 
-@RequiresGuild
-@Command(ArgumentType.UserID, ArgumentType.Integer, ArgumentType.Joiner)
-fun strike(event: CommandEvent) {
+                val args = it.args
+                val target = args[0] as String
+                val strikeQuantity = args[1] as Int
+                val reason = args[2] as String
+
+                if(strikeQuantity < 0 || strikeQuantity > 3) {
+                    it.respond("Strike weight should be between 0 and 3")
+                    return@execute
+                }
+
+                if( !(it.guild.members.map { it.user.id }.contains(target)) ) {
+                    it.respond("Cannot find the member by the id: $target")
+                    return@execute
+                }
+
+                insertInfraction(target, it.author.id, strikeQuantity, reason)
+
+                it.author.openPrivateChannel().queue {
+                    it.sendMessage("User ${target.idToUser(it.jda).asMention} has been infracted with weight: $strikeQuantity," +
+                        " with reason $reason.").queue()
+                }
+
+                var totalStrikes = getMaxStrikes(target)
+
+                if(totalStrikes > it.config.strikeCeil) totalStrikes = it.config.strikeCeil
+
+                administerPunishment(it.config, target.idToUser(it.jda), strikeQuantity, reason, it.guild, it.author, totalStrikes)
+            }
+        }
+
+        command("history") {
+            expect(ArgumentType.UserID)
+            execute {
+                val target = it.args[0] as String
+                val records = getHistory(target)
+                val builder = EmbedBuilder()
+                    .setTitle("${target.idToName(it.jda)}'s Record")
+                    .setColor(Color.MAGENTA)
+                    .setThumbnail(target.idToUser(it.jda).avatarUrl)
+
+                records.forEach { record ->
+                    builder.addField("Strike ID: ${record.id}",
+                        "**Acting moderator**: ${record.moderator.idToName(it.jda)}" +
+                            "\n**Reason**: ${record.reason}" +
+                            "\n**Weight**: ${record.strikes}" +
+                            "\n**Date**: ${record.dateTime.toString(DateTimeFormat.forPattern("dd/MM/yyyy"))}," +
+                            "\n**Expired:** ${record.isExpired}",
+                        false)
+                }
+
+                if(builder.fields.size == 0) {
+                    builder.addField("Strikes",
+                        "Clean as a whistle sir",
+                        false)
+                }
+
+                it.respond(builder.build())
+            }
+        }
+
+        command("removestrike") {
+            expect(ArgumentType.Integer)
+            execute {
+                val strikeID = it.args[0] as Int
+                val amountRemoved = removeInfraction(strikeID)
+
+                it.respond("Deleted $amountRemoved strike records.")
+            }
+        }
+
+        command("cleanse") {
+            execute {
+                val userId = it.args[0] as String
+                val amount = removeAllInfractions(userId)
+
+                it.respond("Infractions for ${userId.idToUser(it.jda).asMention} have been wiped. Total removed: $amount")
+            }
+        }
+    }
+
+
+private fun handleInfraction(event: CommandEvent) {
     if(event.guild == null) return
 
     val args = event.args
@@ -44,7 +131,7 @@ fun strike(event: CommandEvent) {
 
     event.author.openPrivateChannel().queue {
         it.sendMessage("User ${target.idToUser(event.jda).asMention} has been infracted with weight: $strikeQuantity," +
-                " with reason $reason.").queue()
+            " with reason $reason.").queue()
     }
 
     var totalStrikes = getMaxStrikes(target)
@@ -54,48 +141,36 @@ fun strike(event: CommandEvent) {
     administerPunishment(event.config, target.idToUser(event.jda), strikeQuantity, reason, event.guild, event.author, totalStrikes)
 }
 
-@Command(ArgumentType.UserID)
-fun history(event: CommandEvent) {
-    val target = event.args[0] as String
-    val records = getHistory(target)
-    val builder = EmbedBuilder()
-            .setTitle("${target.idToName(event.jda)}'s Record")
-            .setColor(Color.MAGENTA)
-            .setThumbnail(target.idToUser(event.jda).avatarUrl)
+private fun strike(event: CommandEvent) {
+    if(event.guild == null) return
 
-    records.forEach {
-        builder.addField("Strike ID: ${it.id}",
-                "**Acting moderator**: ${it.moderator.idToName(event.jda)}" +
-                        "\n**Reason**: ${it.reason}" +
-                        "\n**Weight**: ${it.strikes}" +
-                        "\n**Date**: ${it.dateTime.toString(DateTimeFormat.forPattern("dd/MM/yyyy"))}," +
-                        "\n**Expired:** ${it.isExpired}",
-                false)
+    val args = event.args
+    val target = args[0] as String
+    val strikeQuantity = args[1] as Int
+    val reason = args[2] as String
+
+    if(strikeQuantity < 0 || strikeQuantity > 3) {
+        event.respond("Strike weight should be between 0 and 3")
+        return
     }
 
-    if(builder.fields.size == 0) {
-        builder.addField("Strikes",
-                "Clean as a whistle sir",
-                false)
+    if( !(event.guild.members.map { it.user.id }.contains(target)) ) {
+        event.respond("Cannot find the member by the id: $target")
+        return
     }
 
-    event.respond(builder.build())
-}
+    insertInfraction(target, event.author.id, strikeQuantity, reason)
 
-@Command(ArgumentType.Integer)
-fun removeStrike(event: CommandEvent) {
-    val strikeID = event.args[0] as Int
-    val amountRemoved = removeInfraction(strikeID)
+    event.author.openPrivateChannel().queue {
+        it.sendMessage("User ${target.idToUser(event.jda).asMention} has been infracted with weight: $strikeQuantity," +
+            " with reason $reason.").queue()
+    }
 
-    event.respond("Deleted $amountRemoved strike records.")
-}
+    var totalStrikes = getMaxStrikes(target)
 
-@Command(ArgumentType.UserID)
-fun cleanse(event: CommandEvent) {
-    val userId = event.args[0] as String
-    val amount = removeAllInfractions(userId)
+    if(totalStrikes > event.config.strikeCeil) totalStrikes = event.config.strikeCeil
 
-    event.respond("Infractions for ${userId.idToUser(event.jda).asMention} have been wiped. Total removed: $amount")
+    administerPunishment(event.config, target.idToUser(event.jda), strikeQuantity, reason, event.guild, event.author, totalStrikes)
 }
 
 private fun administerPunishment(config: Configuration, user: User, strikeQuantity: Int, reason: String,
