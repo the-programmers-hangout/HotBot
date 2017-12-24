@@ -8,7 +8,7 @@ enum class ArgumentType {
     Integer, Double, String, Boolean, Manual, Joiner, UserID, Splitter, URL
 }
 
-val splitSequence = "|"
+const val splitSequence = "|"
 
 data class CommandStruct(val commandName: String, val commandArgs: List<String> = listOf())
 

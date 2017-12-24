@@ -1,6 +1,6 @@
 package me.aberrantfox.aegeus.listeners.antispam
 
-import me.aberrantfox.aegeus.commandframework.getHighestPermissionLevel
+import me.aberrantfox.aegeus.permissions.getHighestPermissionLevel
 import me.aberrantfox.aegeus.extensions.containsInvite
 import me.aberrantfox.aegeus.extensions.deleteIfExists
 import me.aberrantfox.aegeus.extensions.fullName
@@ -44,8 +44,8 @@ class InviteListener(val config: Configuration) : ListenerAdapter() {
 
         if(maxPermissionLevel >= config.invitePermissionLevel) return
 
-        if (RecentInvites.trimmedMessage(message.rawContent).containsInvite()) {
-            var messageContent = message.rawContent
+        if (RecentInvites.trimmedMessage(message.contentRaw).containsInvite()) {
+            var messageContent = message.contentRaw
 
             if (messageContent.contains('@')) messageContent = messageContent.replace("@", "`@`")
 

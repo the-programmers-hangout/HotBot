@@ -1,7 +1,16 @@
 package me.aberrantfox.aegeus.commandframework.commands.dsl
 
 import me.aberrantfox.aegeus.commandframework.ArgumentType
-import me.aberrantfox.aegeus.permissions.CommandEvent
+import me.aberrantfox.aegeus.services.Configuration
+import net.dv8tion.jda.core.JDA
+import net.dv8tion.jda.core.entities.*
+
+data class CommandEvent(val args: List<Any>, val config: Configuration, val jda: JDA, val channel: MessageChannel,
+                        val author: User, val message: Message, val guild: Guild?) {
+
+    fun respond(msg: String) = this.channel.sendMessage(msg).queue()
+    fun respond(embed: MessageEmbed) = this.channel.sendMessage(embed).queue()
+}
 
 @CommandTagMarker
 class Command(var expectedArgs: Array<out CommandArgument> = arrayOf(), var execute: (CommandEvent) -> Unit = {}, var requiresGuild: Boolean = false) {
