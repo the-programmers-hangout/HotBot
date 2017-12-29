@@ -1,6 +1,6 @@
 package me.aberrantfox.aegeus.commandframework.commands
 
-import khttp.get
+import khttp.get as kget
 import me.aberrantfox.aegeus.commandframework.ArgumentType
 import me.aberrantfox.aegeus.commandframework.commands.dsl.commands
 import org.jsoup.Jsoup
@@ -12,7 +12,7 @@ fun funCommands() =
     commands {
         command("cat") {
             execute {
-                val json = get("http://random.cat/meow").jsonObject
+                val json = kget("http://random.cat/meow").jsonObject
                 it.respond(json.getString("file"))
             }
         }
@@ -21,7 +21,7 @@ fun funCommands() =
             expect(ArgumentType.Joiner)
             execute {
                 val query = it.args[0] as String
-                val json = get("https://8ball.delegator.com/magic/JSON/abc").jsonObject
+                val json = kget("https://8ball.delegator.com/magic/JSON/abc").jsonObject
                 it.respond(json.getJSONObject("magic").getString("answer"))
             }
         }
@@ -35,7 +35,7 @@ fun funCommands() =
 
         command("dog") {
             execute {
-                val json = get("https://dog.ceo/api/breeds/image/random").jsonObject
+                val json = kget("https://dog.ceo/api/breeds/image/random").jsonObject
                 it.respond(json.getString("message"))
             }
         }
