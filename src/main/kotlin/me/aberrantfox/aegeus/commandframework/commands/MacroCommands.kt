@@ -3,8 +3,8 @@ package me.aberrantfox.aegeus.commandframework.commands
 import com.google.common.reflect.TypeToken
 import com.google.gson.Gson
 import me.aberrantfox.aegeus.commandframework.ArgumentType
-import me.aberrantfox.aegeus.commandframework.produceCommandMap
 import me.aberrantfox.aegeus.commandframework.commands.dsl.commands
+import me.aberrantfox.aegeus.commandframework.produceContainer
 import me.aberrantfox.aegeus.services.CommandRecommender
 import java.io.File
 
@@ -19,7 +19,7 @@ fun macroCommands() =
                 val key = (it.args[0] as String).toLowerCase()
 
                 when {
-                    produceCommandMap().containsKey(key) -> it.respond("You dummy. There is a command with that name already...")
+                    produceContainer().commands.containsKey(key) -> it.respond("You dummy. There is a command with that name already...")
                     macroMap.containsKey(key) -> it.respond("Yea... that macro exists...")
                     else -> {
                         val value = it.message.rawContent.substring("addmacro ".length + key.length + it.config.prefix.length + 1)
