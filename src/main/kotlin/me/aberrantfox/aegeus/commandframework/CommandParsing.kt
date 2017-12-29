@@ -1,5 +1,7 @@
 package me.aberrantfox.aegeus.commandframework
 
+import me.aberrantfox.aegeus.commandframework.commands.*
+import me.aberrantfox.aegeus.commandframework.commands.dsl.CommandsContainer
 import me.aberrantfox.aegeus.extensions.*
 import me.aberrantfox.aegeus.services.Configuration
 import net.dv8tion.jda.core.JDA
@@ -8,11 +10,23 @@ enum class ArgumentType {
     Integer, Double, String, Boolean, Manual, Joiner, UserID, Splitter, URL
 }
 
-const val splitSequence = "|"
+const val seperatorCharacter = "|"
 
 data class CommandStruct(val commandName: String, val commandArgs: List<String> = listOf())
 
-fun convertArguments(actual: List<String>, expected: Array<out ArgumentType>, jda: JDA): List<Any>? {
+//TODO: Make annotation collector for all of these commands, makes it cleaner and becomes less of a maintenance issue
+fun produceContainer(): CommandsContainer {
+    val container = embedCommands()
+    container.join(
+        funCommands(), helpCommands(), inviteCommands(), macroCommands(), moderationCommands(), permissionCommands(),
+        profileCommands(), raidCommands(), rankCommands(), securityCommands(), strikeCommands(), suggestionCommands(),
+        utilCommands()
+    )
+
+    return container
+}
+
+fun convertArguments(actual: List<String>, expected: List<ArgumentType>, jda: JDA): List<Any>? {
     if(expected.contains(ArgumentType.Manual)) return actual
 
     if (actual.size != expected.size) {
@@ -71,7 +85,7 @@ private fun joinArgs(start: Int, actual: List<String>) = actual.subList(start, a
 private fun splitArg(start: Int, actual: List<String>): List<String> {
     val joined = joinArgs(start, actual)
 
-    if( !(joined.contains(splitSequence)) ) return listOf(joined)
+    if( !(joined.contains(seperatorCharacter)) ) return listOf(joined)
 
-    return joined.split(splitSequence).toList()
+    return joined.split(seperatorCharacter).toList()
 }
