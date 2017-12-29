@@ -1,6 +1,6 @@
 package me.aberrantfox.aegeus
 
-import me.aberrantfox.aegeus.commandframework.produceCommandMap
+import me.aberrantfox.aegeus.commandframework.produceContainer
 import me.aberrantfox.aegeus.extensions.hasRole
 import me.aberrantfox.aegeus.extensions.timeToDifference
 import me.aberrantfox.aegeus.extensions.unmute
@@ -16,9 +16,8 @@ import net.dv8tion.jda.core.entities.Guild
 
 fun main(args: Array<String>) {
     println("Starting to load hotbot.")
-
-    val commandMap = produceCommandMap()
-    val config = loadConfig(commandMap) ?: return
+    val container = produceContainer()
+    val config = loadConfig(container) ?: return
 
     saveConfig(config)
     setupDatabaseSchema(config)
@@ -27,9 +26,10 @@ fun main(args: Array<String>) {
     val logChannel = jda.getTextChannelById(config.logChannel)
     val mutedRole = jda.getRolesByName(config.mutedRole, true).first()
     val tracker = MessageTracker(1)
+    val guild = jda.getGuildById(config.guildid)
 
     jda.addEventListener(
-            CommandListener(config, commandMap, jda, logChannel),
+            CommandListener(config, container, jda, logChannel, guild),
             MemberListener(config),
             InviteListener(config),
             MentionListener(config, jda.selfUser.name),
@@ -42,14 +42,6 @@ fun main(args: Array<String>) {
     jda.guilds.forEach { setupMutedRole(it, config.mutedRole) }
 
     handleLTSMutes(config, jda)
-
-    val missingHelp = produceCommandMap().values
-        .map { it.name }
-        .filter { HelpConf.hasHelp(it) }
-
-    if(missingHelp.isNotEmpty()) {
-        println("Commands missing help documentation found, names: ${missingHelp.reduceRight{ a, b -> "$a, $b"}}")
-    }
 }
 
 private fun setupMutedRole(guild: Guild, roleName: String) {
