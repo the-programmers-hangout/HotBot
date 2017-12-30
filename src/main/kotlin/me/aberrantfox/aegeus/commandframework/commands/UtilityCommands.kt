@@ -31,7 +31,7 @@ val startTime = Date()
 fun utilCommands() = commands {
     command("ping") {
         execute {
-            it.respond("Png!")
+            it.respond("Pong!")
         }
     }
 
