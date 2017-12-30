@@ -13,7 +13,10 @@ data class CommandEvent(val args: List<Any>, val config: Configuration, val jda:
 }
 
 @CommandTagMarker
-class Command(var expectedArgs: Array<out CommandArgument> = arrayOf(), var execute: (CommandEvent) -> Unit = {}, var requiresGuild: Boolean = false) {
+class Command(var expectedArgs: Array<out CommandArgument> = arrayOf(), var execute: (CommandEvent) -> Unit = {},
+              var requiresGuild: Boolean = false) {
+    val parameterCount = expectedArgs.size
+
     operator fun invoke(args: Command.() -> Unit) {}
 
     fun requiresGuild(requiresGuild: Boolean) {
@@ -29,7 +32,8 @@ class Command(var expectedArgs: Array<out CommandArgument> = arrayOf(), var exec
     }
 
     fun expect(vararg args: ArgumentType) {
-        val clone = arrayOf<CommandArgument>()
+        val clone = Array(args.size) { arg(ArgumentType.String) }
+
         for (x in args.indices) {
             clone[x] = arg(args[x])
         }
@@ -45,8 +49,8 @@ class Command(var expectedArgs: Array<out CommandArgument> = arrayOf(), var exec
 data class CommandArgument(val type: ArgumentType, val optional: Boolean = false, val defaultValue: Any = "")
 
 @CommandTagMarker
-data class Commands(val commands: HashMap<String, Command> = HashMap()) {
-    operator fun invoke(args: Commands.() -> Unit) {}
+data class CommandsContainer(val commands: HashMap<String, Command> = HashMap()) {
+    operator fun invoke(args: CommandsContainer.() -> Unit) {}
 
     fun command(name: String, construct: Command.() -> Unit): Command {
         val command = Command()
@@ -55,18 +59,22 @@ data class Commands(val commands: HashMap<String, Command> = HashMap()) {
         return command
     }
 
-    fun join(vararg cmds: Commands) {
+    fun join(vararg cmds: CommandsContainer) {
         cmds.forEach {
             this.commands.putAll(it.commands)
         }
     }
+
+    fun has(name: String) = this.commands.containsKey(name)
+
+    fun get(name: String) = this.commands.get(name)
 }
 
 @DslMarker
 annotation class CommandTagMarker
 
-fun commands(construct: Commands.() -> Unit): Commands {
-    val commands = Commands()
+fun commands(construct: CommandsContainer.() -> Unit): CommandsContainer {
+    val commands = CommandsContainer()
     commands.construct()
     return commands
 }
