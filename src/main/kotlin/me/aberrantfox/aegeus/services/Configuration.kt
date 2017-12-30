@@ -2,6 +2,7 @@ package me.aberrantfox.aegeus.services
 
 import com.github.salomonbrys.kotson.fromJson
 import com.google.gson.Gson
+import me.aberrantfox.aegeus.commandframework.commands.dsl.CommandsContainer
 import me.aberrantfox.aegeus.permissions.Permission
 import me.aberrantfox.aegeus.extensions.MuteRecord
 import java.io.File
@@ -49,7 +50,7 @@ enum class InfractionAction {
 private val configLocation = "config.json"
 private val gson = Gson()
 
-fun loadConfig(commandMap: MutableMap<String, Method>): Configuration? {
+fun loadConfig(container: CommandsContainer): Configuration? {
     val configFile = File(configLocation)
 
     if(!configFile.exists()) {
@@ -62,8 +63,9 @@ fun loadConfig(commandMap: MutableMap<String, Method>): Configuration? {
     val json = configFile.readLines().stream().reduce("", { a: String, b: String -> a + b })
     val configuration = gson.fromJson<Configuration>(json)
 
-    commandMap.keys.filter { !configuration.commandPermissionMap.containsKey(it) }
-            .forEach { configuration.commandPermissionMap[it] = Permission.ADMIN }
+    container.commands.keys
+        .filter { !configuration.commandPermissionMap.containsKey(it) }
+        .forEach { configuration.commandPermissionMap[it] = Permission.ADMIN }
 
     return configuration
 }
