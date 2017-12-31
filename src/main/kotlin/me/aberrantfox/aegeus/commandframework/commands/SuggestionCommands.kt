@@ -65,8 +65,6 @@ fun suggestionCommands() = commands {
 
     command("poolaccept") {
         execute {
-            if (it.guild == null) return@execute
-
             val suggestion = Suggestions.pool.top()
 
             if (suggestion == null) {
@@ -89,8 +87,6 @@ fun suggestionCommands() = commands {
 
     command("poolaccept") {
         execute {
-            if (it.guild == null) return@execute
-
             val suggestion = Suggestions.pool.top()
 
             if (suggestion == null) {
@@ -127,8 +123,6 @@ fun suggestionCommands() = commands {
     command("respond") {
         expect(ArgumentType.String, ArgumentType.String, ArgumentType.Joiner)
         execute {
-            if (it.guild == null) return@execute
-
             val (args, config) = it
             val target = args[0] as String
             val response = args[1] as String

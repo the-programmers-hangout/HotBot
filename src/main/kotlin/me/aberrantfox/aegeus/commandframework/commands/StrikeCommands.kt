@@ -26,8 +26,6 @@ fun strikeCommands() =
         command("strike") {
             expect(ArgumentType.UserID, ArgumentType.Integer, ArgumentType.Joiner)
             execute {
-                if(it.guild == null) return@execute
-
                 val args = it.args
                 val target = args[0] as String
                 val strikeQuantity = args[1] as Int

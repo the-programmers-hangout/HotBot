@@ -107,8 +107,6 @@ fun moderationCommands() = commands {
     command("move") {
         expect(ArgumentType.String, ArgumentType.Integer, ArgumentType.String)
         execute {
-            if (it.guild == null) return@execute
-
             val args = it.args
 
             val targets = getTargets((args[0] as String))
@@ -142,8 +140,6 @@ fun moderationCommands() = commands {
     command("badname") {
         expect(ArgumentType.UserID, ArgumentType.Joiner)
         execute {
-            if (it.guild == null) return@execute
-
             val args = it.args
             val target = args[0] as String
             val reason = args[1] as String
@@ -160,7 +156,6 @@ fun moderationCommands() = commands {
     command("joindate") {
         expect(ArgumentType.UserID)
         execute {
-            if (it.guild == null) return@execute
             val target = it.args[0] as String
 
             val member = it.guild.getMemberById(target)

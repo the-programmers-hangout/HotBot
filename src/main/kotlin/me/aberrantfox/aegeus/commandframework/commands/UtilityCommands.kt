@@ -37,7 +37,6 @@ fun utilCommands() = commands {
 
     command("serverinfo") {
         execute {
-            if (it.guild == null) return@execute
             val embed = produceServerInfoEmbed(it.guild)
             it.respond(embed)
         }

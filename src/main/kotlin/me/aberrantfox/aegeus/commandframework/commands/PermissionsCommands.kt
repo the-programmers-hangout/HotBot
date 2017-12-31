@@ -14,8 +14,6 @@ fun permissionCommands() =
         command("setperm") {
             expect(ArgumentType.String, ArgumentType.String)
             execute {
-                if (it.guild == null) return@execute
-
                 val commandName = it.args[0] as String
                 val desiredPermission = (it.args[1] as String).toUpperCase()
 
@@ -62,8 +60,6 @@ fun permissionCommands() =
 
         command("listavailable") {
             execute {
-                if (it.guild == null) return@execute
-
                 val permLevel = getHighestPermissionLevel(it.guild, it.config, it.jda, it.author.id)
                 val available = it.config.commandPermissionMap.filter { it.value <= permLevel }.keys.reduce { acc, s -> "$acc, $s" }
                 val response = EmbedBuilder()

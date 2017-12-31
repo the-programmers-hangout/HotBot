@@ -23,8 +23,6 @@ fun raidCommands() = commands {
     command("freeRaider") {
         expect(ArgumentType.UserID)
         execute {
-            if (it.guild == null) return@execute
-
             if (MutedRaiders.set.isEmpty()) {
                 it.respond("There are no raiders...")
                 return@execute
@@ -46,8 +44,6 @@ fun raidCommands() = commands {
 
     command("freeAllRaiders") {
         execute {
-            if (it.guild == null) return@execute
-
             if (MutedRaiders.set.isEmpty()) {
                 it.respond("There are no raiders...")
                 return@execute
@@ -62,8 +58,6 @@ fun raidCommands() = commands {
     command("banraider") {
         expect(ArgumentType.UserID, ArgumentType.Integer)
         execute {
-            if (it.guild == null) return@execute
-
             val user = (it.args[0] as String).idToUser(it.jda)
             val delDays = (it.args[1] as Int)
 
@@ -80,8 +74,6 @@ fun raidCommands() = commands {
     command("banautodetectedraid") {
         expect(ArgumentType.Integer)
         execute {
-            if (it.guild == null) return@execute
-
             val delDays = (it.args[0]) as Int
 
             if (MutedRaiders.set.size == 0) {
