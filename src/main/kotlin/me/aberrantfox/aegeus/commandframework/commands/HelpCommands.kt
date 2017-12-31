@@ -14,7 +14,7 @@ import java.time.LocalDateTime
 fun helpCommands() =
     commands {
         command("help") {
-            expect(ArgumentType.String)
+            expect(ArgumentType.Manual)
             execute {
                 val (args, config, _, _, author) = it
 
