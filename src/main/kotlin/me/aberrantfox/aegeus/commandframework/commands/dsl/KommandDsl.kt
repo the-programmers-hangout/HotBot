@@ -88,14 +88,3 @@ fun commands(construct: CommandsContainer.() -> Unit): CommandsContainer {
 }
 
 fun arg(type: ArgumentType, optional: Boolean = false) = CommandArgument(type, optional)
-
-fun sampleCommands() =
-    commands {
-        command("abc") {
-            expect(arg(ArgumentType.Joiner, true))
-            requiresGuild(false)
-            execute {
-                it.respond("hi")
-            }
-        }
-    }
