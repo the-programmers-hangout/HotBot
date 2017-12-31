@@ -46,7 +46,15 @@ class Command(var expectedArgs: Array<out CommandArgument> = arrayOf(), var exec
     }
 }
 
-data class CommandArgument(val type: ArgumentType, val optional: Boolean = false, val defaultValue: Any = "")
+data class CommandArgument(val type: ArgumentType, val optional: Boolean = false, val defaultValue: Any = "") {
+    override fun equals(other: Any?): Boolean {
+        if(other == null) return false
+
+        if(other !is CommandArgument) return false
+
+        return other.type == this.type
+    }
+}
 
 @CommandTagMarker
 data class CommandsContainer(val commands: HashMap<String, Command> = HashMap()) {
