@@ -8,7 +8,14 @@ import net.dv8tion.jda.core.entities.*
 data class CommandEvent(val args: List<Any>, val config: Configuration, val jda: JDA, val channel: MessageChannel,
                         val author: User, val message: Message, val guild: Guild) {
 
-    fun respond(msg: String) = this.channel.sendMessage(msg).queue()
+    fun respond(msg: String) =
+        if(msg.length > 2000) {
+            val toSend = msg.chunked(2000)
+            toSend.forEach { channel.sendMessage(it).queue() }
+        } else {
+            this.channel.sendMessage(msg).queue()
+        }
+
     fun respond(embed: MessageEmbed) = this.channel.sendMessage(embed).queue()
 }
 
