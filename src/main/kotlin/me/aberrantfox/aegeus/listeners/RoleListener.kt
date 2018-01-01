@@ -9,5 +9,11 @@ class RoleListener(val configuration: Configuration) : ListenerAdapter() {
     override fun onRoleUpdateName(event: RoleUpdateNameEvent) {
         val oldName = event.oldName
         val newName = event.role.name
+
+        // Update grantable role
+        if(RankContainer.canUse(oldName)) {
+            RankContainer.remove(oldName)
+            RankContainer.add(newName)
+        }
     }
 }
