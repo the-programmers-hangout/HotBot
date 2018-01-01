@@ -11,7 +11,7 @@ class RoleListener(val configuration: Configuration) : ListenerAdapter() {
         val newName = event.role.name
 
         // Update grantable role
-        if(RankContainer.canUse(oldName)) {
+        if (RankContainer.canUse(oldName)) {
             RankContainer.remove(oldName)
             RankContainer.add(newName)
         }
