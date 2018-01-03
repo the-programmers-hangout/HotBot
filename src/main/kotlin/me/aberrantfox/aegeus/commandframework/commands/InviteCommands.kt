@@ -1,10 +1,11 @@
 package me.aberrantfox.aegeus.commandframework.commands
 
 import me.aberrantfox.aegeus.commandframework.ArgumentType
+import me.aberrantfox.aegeus.commandframework.CommandSet
 import me.aberrantfox.aegeus.commandframework.commands.dsl.commands
 import me.aberrantfox.aegeus.listeners.antispam.RecentInvites
 
-
+@CommandSet
 fun inviteCommands() =
     commands {
         command("whitelistinvite") {

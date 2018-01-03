@@ -1,6 +1,7 @@
 package me.aberrantfox.aegeus.commandframework.commands
 
 import me.aberrantfox.aegeus.commandframework.ArgumentType
+import me.aberrantfox.aegeus.commandframework.CommandSet
 import me.aberrantfox.aegeus.extensions.fullName
 import me.aberrantfox.aegeus.extensions.idToUser
 import me.aberrantfox.aegeus.commandframework.commands.dsl.commands
@@ -17,6 +18,7 @@ private object FHolder {
     var text = ""
 }
 
+@CommandSet
 fun embedCommands() =
     commands {
         command("clearembed") {

@@ -1,6 +1,7 @@
 package me.aberrantfox.aegeus.commandframework.commands
 
 import me.aberrantfox.aegeus.commandframework.ArgumentType
+import me.aberrantfox.aegeus.commandframework.CommandSet
 import me.aberrantfox.aegeus.permissions.stringToPermission
 import me.aberrantfox.aegeus.commandframework.commands.dsl.commands
 import me.aberrantfox.aegeus.extensions.fullName
@@ -20,6 +21,7 @@ import java.io.File
 
 class ModerationCommands
 
+@CommandSet
 fun moderationCommands() = commands {
     command("nuke") {
         expect(ArgumentType.Integer)

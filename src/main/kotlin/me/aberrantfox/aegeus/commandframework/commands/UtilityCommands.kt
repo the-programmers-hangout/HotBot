@@ -2,6 +2,7 @@ package me.aberrantfox.aegeus.commandframework.commands
 
 import com.google.gson.Gson
 import me.aberrantfox.aegeus.commandframework.ArgumentType
+import me.aberrantfox.aegeus.commandframework.CommandSet
 import me.aberrantfox.aegeus.services.saveConfig
 import me.aberrantfox.aegeus.extensions.fullName
 import me.aberrantfox.aegeus.commandframework.commands.dsl.commands
@@ -28,6 +29,7 @@ object Project {
 
 val startTime = Date()
 
+@CommandSet
 fun utilCommands() = commands {
     command("ping") {
         execute {

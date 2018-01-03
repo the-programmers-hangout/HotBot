@@ -9,6 +9,7 @@ import net.dv8tion.jda.core.EmbedBuilder
 import java.awt.Color
 import java.util.*
 
+@CommandSet
 fun permissionCommands() =
     commands {
         command("setperm") {

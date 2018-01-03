@@ -1,6 +1,7 @@
 package me.aberrantfox.aegeus.commandframework.commands
 
 import me.aberrantfox.aegeus.commandframework.ArgumentType
+import me.aberrantfox.aegeus.commandframework.CommandSet
 import me.aberrantfox.aegeus.commandframework.commands.dsl.commands
 import me.aberrantfox.aegeus.extensions.idToName
 import me.aberrantfox.aegeus.services.AddResponse
@@ -14,6 +15,7 @@ object Profiles {
     val pool: UserElementPool = UserElementPool(userLimit = 1, poolName = "Profiles")
 }
 
+@CommandSet
 fun profileCommands() = commands {
     command("submitprofile") {
         expect(ArgumentType.Joiner)

@@ -1,6 +1,7 @@
 package me.aberrantfox.aegeus.commandframework.commands
 
 import me.aberrantfox.aegeus.commandframework.ArgumentType
+import me.aberrantfox.aegeus.commandframework.CommandSet
 
 import me.aberrantfox.aegeus.commandframework.commands.dsl.commands
 import me.aberrantfox.aegeus.extensions.idToName
@@ -25,6 +26,7 @@ object Suggestions {
     val pool: UserElementPool = UserElementPool(poolName = "Suggestions")
 }
 
+@CommandSet
 fun suggestionCommands() = commands {
     command("suggest") {
         expect(ArgumentType.Joiner)

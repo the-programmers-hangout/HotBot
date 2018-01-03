@@ -1,6 +1,7 @@
 package me.aberrantfox.aegeus.commandframework.commands
 
 import me.aberrantfox.aegeus.commandframework.ArgumentType
+import me.aberrantfox.aegeus.commandframework.CommandSet
 import me.aberrantfox.aegeus.commandframework.commands.dsl.commands
 import me.aberrantfox.aegeus.extensions.sendPrivateMessage
 import me.aberrantfox.aegeus.services.CommandDescriptor
@@ -11,6 +12,7 @@ import net.dv8tion.jda.core.EmbedBuilder
 import java.awt.Color
 import java.time.LocalDateTime
 
+@CommandSet
 fun helpCommands() =
     commands {
         command("help") {

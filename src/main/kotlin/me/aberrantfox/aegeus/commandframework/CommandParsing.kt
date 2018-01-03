@@ -5,6 +5,8 @@ import me.aberrantfox.aegeus.commandframework.commands.dsl.CommandsContainer
 import me.aberrantfox.aegeus.extensions.*
 import me.aberrantfox.aegeus.services.Configuration
 import net.dv8tion.jda.core.JDA
+import org.reflections.Reflections
+import org.reflections.scanners.MethodAnnotationsScanner
 
 enum class ArgumentType {
     Integer, Double, String, Boolean, Manual, Joiner, UserID, Splitter, URL
@@ -12,18 +14,18 @@ enum class ArgumentType {
 
 const val seperatorCharacter = "|"
 
+annotation class CommandSet
+
 data class CommandStruct(val commandName: String, val commandArgs: List<String> = listOf())
 
-//TODO: Make annotation collector for all of these commands, makes it cleaner and becomes less of a maintenance issue
-fun produceContainer(): CommandsContainer {
-    val container = embedCommands()
-    container.join(
-        funCommands(), helpCommands(), inviteCommands(), macroCommands(), moderationCommands(), permissionCommands(),
-        profileCommands(), raidCommands(), rankCommands(), securityCommands(), strikeCommands(), suggestionCommands(),
-        utilCommands()
-    )
 
-    return container
+fun produceContainer(): CommandsContainer {
+    val pack = "me.aberrantfox.aegeus.commandframework.commands"
+    val cmds = Reflections(pack, MethodAnnotationsScanner()).getMethodsAnnotatedWith(CommandSet::class.java)
+
+    return cmds.map { it.invoke(null) }
+        .map { it as CommandsContainer }
+        .reduce { a, b -> a.join(b) }
 }
 
 fun convertArguments(actual: List<String>, expected: List<ArgumentType>, jda: JDA): List<Any>? {

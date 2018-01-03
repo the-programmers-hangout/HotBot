@@ -1,6 +1,7 @@
 package me.aberrantfox.aegeus.commandframework.commands
 
 import me.aberrantfox.aegeus.commandframework.ArgumentType
+import me.aberrantfox.aegeus.commandframework.CommandSet
 import me.aberrantfox.aegeus.commandframework.commands.dsl.arg
 import me.aberrantfox.aegeus.commandframework.commands.dsl.commands
 import me.aberrantfox.aegeus.extensions.fullName
@@ -8,6 +9,7 @@ import me.aberrantfox.aegeus.extensions.idToUser
 import me.aberrantfox.aegeus.extensions.removeMuteRole
 import me.aberrantfox.aegeus.listeners.antispam.MutedRaiders
 
+@CommandSet
 fun raidCommands() = commands {
     command("viewRaiders") {
         execute {

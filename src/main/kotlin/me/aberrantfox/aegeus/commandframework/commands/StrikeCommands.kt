@@ -1,6 +1,7 @@
 package me.aberrantfox.aegeus.commandframework.commands
 
 import me.aberrantfox.aegeus.commandframework.ArgumentType
+import me.aberrantfox.aegeus.commandframework.CommandSet
 import me.aberrantfox.aegeus.commandframework.commands.dsl.CommandEvent
 import me.aberrantfox.aegeus.commandframework.commands.dsl.commands
 import me.aberrantfox.aegeus.extensions.*
@@ -12,6 +13,7 @@ import net.dv8tion.jda.core.entities.User
 import org.joda.time.format.DateTimeFormat
 import java.awt.Color
 
+@CommandSet
 fun strikeCommands() =
     commands {
         command("warn") {

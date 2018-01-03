@@ -2,6 +2,7 @@ package me.aberrantfox.aegeus.commandframework.commands
 
 import com.google.gson.Gson
 import me.aberrantfox.aegeus.commandframework.ArgumentType
+import me.aberrantfox.aegeus.commandframework.CommandSet
 import me.aberrantfox.aegeus.commandframework.commands.dsl.CommandEvent
 import me.aberrantfox.aegeus.commandframework.commands.dsl.commands
 import me.aberrantfox.aegeus.extensions.idToName
@@ -48,6 +49,7 @@ object RankContainer {
     private fun save() = file.writeText(gson.toJson(config))
 }
 
+@CommandSet
 fun rankCommands() = commands {
     command("grant") {
         expect(ArgumentType.String, ArgumentType.UserID)

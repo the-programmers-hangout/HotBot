@@ -74,10 +74,12 @@ data class CommandsContainer(val commands: HashMap<String, Command> = HashMap())
         return command
     }
 
-    fun join(vararg cmds: CommandsContainer) {
+    fun join(vararg cmds: CommandsContainer): CommandsContainer {
         cmds.forEach {
             this.commands.putAll(it.commands)
         }
+
+        return this
     }
 
     fun has(name: String) = this.commands.containsKey(name)
