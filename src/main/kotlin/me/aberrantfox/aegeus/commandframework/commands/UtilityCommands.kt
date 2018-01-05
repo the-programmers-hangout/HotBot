@@ -5,7 +5,7 @@ import me.aberrantfox.aegeus.commandframework.ArgumentType
 import me.aberrantfox.aegeus.commandframework.CommandSet
 import me.aberrantfox.aegeus.services.saveConfig
 import me.aberrantfox.aegeus.extensions.fullName
-import me.aberrantfox.aegeus.commandframework.commands.dsl.commands
+import me.aberrantfox.aegeus.dsls.command.commands
 import me.aberrantfox.aegeus.extensions.idToUser
 import me.aberrantfox.aegeus.services.Configuration
 import net.dv8tion.jda.core.EmbedBuilder

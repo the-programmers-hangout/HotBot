@@ -1,7 +1,6 @@
 package me.aberrantfox.aegeus.commandframework
 
-import me.aberrantfox.aegeus.commandframework.commands.*
-import me.aberrantfox.aegeus.commandframework.commands.dsl.CommandsContainer
+import me.aberrantfox.aegeus.dsls.command.CommandsContainer
 import me.aberrantfox.aegeus.extensions.*
 import me.aberrantfox.aegeus.services.Configuration
 import net.dv8tion.jda.core.JDA

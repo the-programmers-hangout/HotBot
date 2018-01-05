@@ -4,7 +4,7 @@ import me.aberrantfox.aegeus.commandframework.ArgumentType
 import me.aberrantfox.aegeus.commandframework.CommandSet
 import me.aberrantfox.aegeus.extensions.fullName
 import me.aberrantfox.aegeus.extensions.idToUser
-import me.aberrantfox.aegeus.commandframework.commands.dsl.commands
+import me.aberrantfox.aegeus.dsls.command.commands
 import net.dv8tion.jda.core.EmbedBuilder
 import java.awt.Color
 import java.time.Instant
@@ -59,12 +59,12 @@ fun embedCommands() =
                 val g = it.args[1] as Double
                 val b = it.args[2] as Double
 
-                if(r > 1 || r < 0 ||
+                if (r > 1 || r < 0 ||
                     g > 1 || g < 0 ||
                     b > 1 || b < 0) {
                     it.respond("R/G/B values must be between 0 and 1")
                 } else {
-                    EHolder.embed.setColor(Color(r.toFloat(),g.toFloat(),b.toFloat()))
+                    EHolder.embed.setColor(Color(r.toFloat(), g.toFloat(), b.toFloat()))
                 }
             }
         }

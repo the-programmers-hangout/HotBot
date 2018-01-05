@@ -1,4 +1,4 @@
-package me.aberrantfox.aegeus.commandframework.commands.dsl
+package me.aberrantfox.aegeus.dsls.command
 
 import me.aberrantfox.aegeus.commandframework.ArgumentType
 import me.aberrantfox.aegeus.services.Configuration

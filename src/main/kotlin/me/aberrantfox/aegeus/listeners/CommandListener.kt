@@ -1,10 +1,10 @@
 package me.aberrantfox.aegeus.listeners
 
 import me.aberrantfox.aegeus.commandframework.*
-import me.aberrantfox.aegeus.commandframework.commands.dsl.Command
-import me.aberrantfox.aegeus.commandframework.commands.dsl.CommandEvent
-import me.aberrantfox.aegeus.commandframework.commands.dsl.CommandsContainer
-import me.aberrantfox.aegeus.commandframework.commands.dsl.arg
+import me.aberrantfox.aegeus.dsls.command.Command
+import me.aberrantfox.aegeus.dsls.command.CommandEvent
+import me.aberrantfox.aegeus.dsls.command.CommandsContainer
+import me.aberrantfox.aegeus.dsls.command.arg
 import me.aberrantfox.aegeus.services.Configuration
 import me.aberrantfox.aegeus.commandframework.commands.macroMap
 import me.aberrantfox.aegeus.extensions.*

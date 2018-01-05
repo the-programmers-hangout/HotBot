@@ -1,7 +1,7 @@
 package me.aberrantfox.aegeus.commandframework.commands
 
 import me.aberrantfox.aegeus.commandframework.*
-import me.aberrantfox.aegeus.commandframework.commands.dsl.commands
+import me.aberrantfox.aegeus.dsls.command.commands
 import me.aberrantfox.aegeus.permissions.Permission
 import me.aberrantfox.aegeus.permissions.getHighestPermissionLevel
 import me.aberrantfox.aegeus.permissions.stringToPermission
@@ -77,8 +77,8 @@ fun permissionCommands() =
 
         command("listperms") {
             execute {
-                it.channel.sendMessage(Permission.values().map { it.name }.reduceRight {
-                    acc, s -> "$acc, $s"
+                it.channel.sendMessage(Permission.values().map { it.name }.reduceRight { acc, s ->
+                    "$acc, $s"
                 } + ".").queue()
             }
         }

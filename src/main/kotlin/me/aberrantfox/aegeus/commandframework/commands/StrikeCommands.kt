@@ -2,8 +2,8 @@ package me.aberrantfox.aegeus.commandframework.commands
 
 import me.aberrantfox.aegeus.commandframework.ArgumentType
 import me.aberrantfox.aegeus.commandframework.CommandSet
-import me.aberrantfox.aegeus.commandframework.commands.dsl.CommandEvent
-import me.aberrantfox.aegeus.commandframework.commands.dsl.commands
+import me.aberrantfox.aegeus.dsls.command.CommandEvent
+import me.aberrantfox.aegeus.dsls.command.commands
 import me.aberrantfox.aegeus.extensions.*
 import me.aberrantfox.aegeus.services.*
 import me.aberrantfox.aegeus.services.database.*
@@ -33,12 +33,12 @@ fun strikeCommands() =
                 val strikeQuantity = args[1] as Int
                 val reason = args[2] as String
 
-                if(strikeQuantity < 0 || strikeQuantity > 3) {
+                if (strikeQuantity < 0 || strikeQuantity > 3) {
                     it.respond("Strike weight should be between 0 and 3")
                     return@execute
                 }
 
-                if( !(it.guild.members.map { it.user.id }.contains(target)) ) {
+                if (!(it.guild.members.map { it.user.id }.contains(target))) {
                     it.respond("Cannot find the member by the id: $target")
                     return@execute
                 }
@@ -52,7 +52,7 @@ fun strikeCommands() =
 
                 var totalStrikes = getMaxStrikes(target)
 
-                if(totalStrikes > it.config.strikeCeil) totalStrikes = it.config.strikeCeil
+                if (totalStrikes > it.config.strikeCeil) totalStrikes = it.config.strikeCeil
 
                 administerPunishment(it.config, target.idToUser(it.jda), strikeQuantity, reason, it.guild, it.author, totalStrikes)
             }
@@ -78,7 +78,7 @@ fun strikeCommands() =
                         false)
                 }
 
-                if(builder.fields.size == 0) {
+                if (builder.fields.size == 0) {
                     builder.addField("Strikes",
                         "Clean as a whistle sir",
                         false)

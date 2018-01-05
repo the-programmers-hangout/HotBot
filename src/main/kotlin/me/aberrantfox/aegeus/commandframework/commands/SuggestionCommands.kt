@@ -3,7 +3,7 @@ package me.aberrantfox.aegeus.commandframework.commands
 import me.aberrantfox.aegeus.commandframework.ArgumentType
 import me.aberrantfox.aegeus.commandframework.CommandSet
 
-import me.aberrantfox.aegeus.commandframework.commands.dsl.commands
+import me.aberrantfox.aegeus.dsls.command.commands
 import me.aberrantfox.aegeus.extensions.idToName
 import me.aberrantfox.aegeus.services.AddResponse
 import me.aberrantfox.aegeus.services.Configuration
@@ -74,8 +74,8 @@ fun suggestionCommands() = commands {
                 return@execute
             }
 
-            val channel = it.guild.textChannels.findLast {
-                channel -> channel.id == it.config.suggestionChannel
+            val channel = it.guild.textChannels.findLast { channel ->
+                channel.id == it.config.suggestionChannel
             }
 
             channel?.sendMessage(buildSuggestionMessage(suggestion, it.jda, SuggestionStatus.Review).build())?.queue {
@@ -96,8 +96,8 @@ fun suggestionCommands() = commands {
                 return@execute
             }
 
-            val channel = it.guild.textChannels.findLast {
-                channel -> channel.id == it.config.suggestionChannel
+            val channel = it.guild.textChannels.findLast { channel ->
+                channel.id == it.config.suggestionChannel
             }
 
             channel?.sendMessage(buildSuggestionMessage(suggestion, it.jda, SuggestionStatus.Review).build())?.queue {

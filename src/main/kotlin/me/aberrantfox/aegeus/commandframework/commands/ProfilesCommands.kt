@@ -2,7 +2,7 @@ package me.aberrantfox.aegeus.commandframework.commands
 
 import me.aberrantfox.aegeus.commandframework.ArgumentType
 import me.aberrantfox.aegeus.commandframework.CommandSet
-import me.aberrantfox.aegeus.commandframework.commands.dsl.commands
+import me.aberrantfox.aegeus.dsls.command.commands
 import me.aberrantfox.aegeus.extensions.idToName
 import me.aberrantfox.aegeus.services.AddResponse
 import me.aberrantfox.aegeus.services.UserElementPool

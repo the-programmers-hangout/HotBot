@@ -2,7 +2,7 @@ package me.aberrantfox.aegeus.commandframework.commands
 
 import me.aberrantfox.aegeus.commandframework.ArgumentType
 import me.aberrantfox.aegeus.commandframework.CommandSet
-import me.aberrantfox.aegeus.commandframework.commands.dsl.commands
+import me.aberrantfox.aegeus.dsls.command.commands
 import me.aberrantfox.aegeus.extensions.sendPrivateMessage
 import me.aberrantfox.aegeus.services.CommandDescriptor
 import me.aberrantfox.aegeus.services.Configuration
@@ -20,7 +20,7 @@ fun helpCommands() =
             execute {
                 val (args, config, _, _, author) = it
 
-                if(args.isEmpty()) {
+                if (args.isEmpty()) {
                     author.sendPrivateMessage(getZeroArgMessage(config))
                 } else if (args.size == 1) {
                     val selection = args[0] as String
@@ -29,7 +29,7 @@ fun helpCommands() =
                     when (argType) {
                         SelectionArgument.CommandName -> {
                             val descriptor = HelpConf.fetchCommandDescriptor(selection)
-                            if(descriptor != null) {
+                            if (descriptor != null) {
                                 author.sendPrivateMessage(buildCommandHelpMessage(config, descriptor))
                             } else {
                                 author.sendPrivateMessage("A descriptor was null, please notify the bot owner.")

@@ -2,7 +2,7 @@ package me.aberrantfox.aegeus.commandframework.commands
 
 import me.aberrantfox.aegeus.commandframework.ArgumentType
 import me.aberrantfox.aegeus.commandframework.CommandSet
-import me.aberrantfox.aegeus.commandframework.commands.dsl.commands
+import me.aberrantfox.aegeus.dsls.command.commands
 import me.aberrantfox.aegeus.listeners.antispam.NewPlayers
 
 
@@ -35,7 +35,7 @@ fun securityCommands() = commands {
 
     command("securitylevel") {
         execute {
-        it.respond("Current security level: ${SecurityLevelState.alertLevel}")
+            it.respond("Current security level: ${SecurityLevelState.alertLevel}")
         }
     }
 

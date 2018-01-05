@@ -3,7 +3,7 @@ package me.aberrantfox.aegeus.commandframework.commands
 import khttp.get as kget
 import me.aberrantfox.aegeus.commandframework.ArgumentType
 import me.aberrantfox.aegeus.commandframework.CommandSet
-import me.aberrantfox.aegeus.commandframework.commands.dsl.commands
+import me.aberrantfox.aegeus.dsls.command.commands
 import org.jsoup.Jsoup
 import java.net.URLEncoder
 

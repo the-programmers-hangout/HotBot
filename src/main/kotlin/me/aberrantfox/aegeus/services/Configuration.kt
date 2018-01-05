@@ -2,11 +2,10 @@ package me.aberrantfox.aegeus.services
 
 import com.github.salomonbrys.kotson.fromJson
 import com.google.gson.Gson
-import me.aberrantfox.aegeus.commandframework.commands.dsl.CommandsContainer
+import me.aberrantfox.aegeus.dsls.command.CommandsContainer
 import me.aberrantfox.aegeus.permissions.Permission
 import me.aberrantfox.aegeus.extensions.MuteRecord
 import java.io.File
-import java.lang.reflect.Method
 import java.util.*
 
 data class Configuration(val token: String = "insert-token",
