@@ -14,7 +14,7 @@ class BanReasonReminderListener(val config: Configuration) : ListenerAdapter() {
 
             if(entry?.reason.isNullOrEmpty()) {
                 event.guild.getTextChannelById(config.logChannel)
-                    .sendMessage("${ entry.user.asMention } -- The reason for ${event.user.fullName()}'s ban was null or empty, add a reason using ${config.prefix}addreason")
+                    .sendMessage("${ entry.user.asMention } -- The reason for ${event.user.fullName()}'s ban was null or empty, add a reason using ${config.prefix}setbanreason")
                     .queue()
             }
         }
