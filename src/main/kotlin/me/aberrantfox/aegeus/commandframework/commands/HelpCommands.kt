@@ -3,6 +3,7 @@ package me.aberrantfox.aegeus.commandframework.commands
 import me.aberrantfox.aegeus.commandframework.ArgumentType
 import me.aberrantfox.aegeus.commandframework.CommandSet
 import me.aberrantfox.aegeus.dsls.command.commands
+import me.aberrantfox.aegeus.dsls.embed.embed
 import me.aberrantfox.aegeus.extensions.sendPrivateMessage
 import me.aberrantfox.aegeus.services.CommandDescriptor
 import me.aberrantfox.aegeus.services.Configuration
@@ -49,33 +50,43 @@ fun helpCommands() =
     }
 
 private fun buildCommandHelpMessage(config: Configuration, descriptor: CommandDescriptor) =
-        EmbedBuilder().setTitle("${descriptor.category} - ${descriptor.name}")
-                .setDescription(descriptor.description)
-                .setColor(Color.CYAN)
-                .addField("Argument structure",
-                        if(descriptor.structure.isNullOrBlank()) "This command takes no arguments" else descriptor.structure,
-                        false)
-                .addField("Example Command",
-                        "${config.prefix}${descriptor.name} ${descriptor.example}",
-                        false)
-                .build()
+    embed {
+        title("${descriptor.category} - ${descriptor.name}")
+        setColor(Color.CYAN)
 
-private fun buildCategoryDescription(name: String, commands: String) =
-        EmbedBuilder().setTitle("Category $name Overview")
-                .setColor(Color.cyan)
-                .setDescription(HelpConf.configuration.categoryDescriptions[name])
-                .addField("Commands In this Category", commands, false)
-                .build()
+        field {
+            name = "Argument structure"
+            value = if(descriptor.structure.isNullOrBlank()) "This command takes no arguments" else descriptor.structure
+        }
+
+        field {
+            name = "Example Command"
+            value = "${config.prefix}${descriptor.name} ${descriptor.example}"
+        }
+    }
+
+private fun buildCategoryDescription(commandName: String, commands: String) =
+    embed {
+        title("Category $commandName Overview")
+        description(HelpConf.configuration.categoryDescriptions[commandName])
+        field {
+            name  = "Commands In this Category"
+            value = commands
+        }
+    }
 
 private fun getZeroArgMessage(config: Configuration) =
-        EmbedBuilder().setTitle("HotBot Help Menu")
-                .setColor(Color.MAGENTA)
-                .setDescription("This is the help menu. Use ${config.prefix}help <Command | Category>." +
-                        "If you want to know what commands you have access to, use ${config.prefix}listAvailable")
-                .setFooter("Bot by Fox, made with Kotlin", "http://i.imgur.com/SJPggeJ.png")
-                .setThumbnail("http://i.imgur.com/DFoaG7k.png")
-                .setTimestamp(LocalDateTime.now())
-                .addField("Currently Available Categories",
-                        HelpConf.fetchCategories(),
-                        false)
-                .build()
+    embed {
+        title("HotBot Help Menu")
+        setColor(Color.MAGENTA)
+        description("This is the help menu. Use ${config.prefix}help <Command | Category>." +
+            "If you want to know what commands you have access to, use ${config.prefix}listAvailable")
+        setFooter("Bot by Fox, made with Kotlin", "http://i.imgur.com/SJPggeJ.png")
+        setThumbnail("http://i.imgur.com/DFoaG7k.png")
+        setTimestamp(LocalDateTime.now())
+
+        field {
+            name = "Currently Available Categories"
+            value = HelpConf.fetchCategories()
+        }
+    }
