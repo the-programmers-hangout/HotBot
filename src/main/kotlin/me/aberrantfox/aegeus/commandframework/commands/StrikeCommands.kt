@@ -17,7 +17,7 @@ import java.awt.Color
 fun strikeCommands() =
     commands {
         command("warn") {
-            expect(ArgumentType.UserID, ArgumentType.Joiner)
+            expect(ArgumentType.UserID, ArgumentType.Sentence)
             execute {
                 strike(CommandEvent(listOf(it.args[0], 0, it.args[1]),
                     it.config, it.jda, it.channel,
@@ -26,7 +26,7 @@ fun strikeCommands() =
         }
 
         command("strike") {
-            expect(ArgumentType.UserID, ArgumentType.Integer, ArgumentType.Joiner)
+            expect(ArgumentType.UserID, ArgumentType.Integer, ArgumentType.Sentence)
             execute {
                 val args = it.args
                 val target = args[0] as String

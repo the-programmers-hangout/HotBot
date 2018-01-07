@@ -20,7 +20,7 @@ fun funCommands() =
         }
 
         command("ball") {
-            expect(ArgumentType.Joiner)
+            expect(ArgumentType.Sentence)
             execute {
                 val query = it.args[0] as String
                 val json = kget("https://8ball.delegator.com/magic/JSON/abc").jsonObject
@@ -43,7 +43,7 @@ fun funCommands() =
         }
 
         command("google") {
-            expect(ArgumentType.Joiner)
+            expect(ArgumentType.Sentence)
             execute {
                 val google = "http://www.google.com/search?q="
                 val search = it.args[0] as String

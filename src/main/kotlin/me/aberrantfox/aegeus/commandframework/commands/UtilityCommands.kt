@@ -89,7 +89,7 @@ fun utilCommands() = commands {
     }
 
     command("echo") {
-        expect(ArgumentType.String, ArgumentType.Joiner)
+        expect(ArgumentType.Word, ArgumentType.Sentence)
         execute {
             val target = it.args[0] as String
             val message = it.args[1] as String

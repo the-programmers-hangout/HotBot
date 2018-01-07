@@ -19,7 +19,7 @@ object SecurityLevelState {
 @CommandSet
 fun securityCommands() = commands {
     command("setSecuritylevel") {
-        expect(ArgumentType.String)
+        expect(ArgumentType.Word)
         execute {
             val targetLevel = (it.args[0] as String).capitalize()
 

@@ -35,7 +35,7 @@ fun embedCommands() =
         }
 
         command("settitle") {
-            expect(ArgumentType.Joiner)
+            expect(ArgumentType.Sentence)
             execute {
                 val title = it.args[0] as String
                 EHolder.embed.setTitle(title)
@@ -43,7 +43,7 @@ fun embedCommands() =
         }
 
         command("setdescription") {
-            expect(ArgumentType.Joiner)
+            expect(ArgumentType.Sentence)
             execute {
                 val description = it.args[0] as String
                 EHolder.embed.setDescription(description)
@@ -102,7 +102,7 @@ fun embedCommands() =
         }
 
         command("addblankfield") {
-            expect(ArgumentType.Boolean)
+            expect(ArgumentType.Choice)
             execute {
                 val inline = it.args[0] as Boolean
                 EHolder.embed.addBlankField(inline)
@@ -127,7 +127,7 @@ fun embedCommands() =
         command("clearfields") { EHolder.embed.clearFields() }
 
         command("setfname") {
-            expect(ArgumentType.Joiner)
+            expect(ArgumentType.Sentence)
             execute {
                 val name = it.args[0] as String
                 FHolder.name = name
@@ -135,7 +135,7 @@ fun embedCommands() =
         }
 
         command("setftext") {
-            expect(ArgumentType.Joiner)
+            expect(ArgumentType.Sentence)
             execute {
                 val text = it.args[0] as String
                 FHolder.text = text

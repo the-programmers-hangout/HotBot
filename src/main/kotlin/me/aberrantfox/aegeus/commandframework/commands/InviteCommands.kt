@@ -9,7 +9,7 @@ import me.aberrantfox.aegeus.listeners.antispam.RecentInvites
 fun inviteCommands() =
     commands {
         command("whitelistinvite") {
-            expect(ArgumentType.String)
+            expect(ArgumentType.Word)
             execute {
                 val inv = it.args[0] as String
                 RecentInvites.ignore.add(inv)
@@ -18,7 +18,7 @@ fun inviteCommands() =
         }
 
         command("unwhitelistinvite") {
-            expect(ArgumentType.String)
+            expect(ArgumentType.Word)
             execute {
                 val inv = it.args[0] as String
                 RecentInvites.ignore.remove(inv)

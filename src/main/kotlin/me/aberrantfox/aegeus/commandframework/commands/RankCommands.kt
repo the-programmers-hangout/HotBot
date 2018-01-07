@@ -52,21 +52,21 @@ object RankContainer {
 @CommandSet
 fun rankCommands() = commands {
     command("grant") {
-        expect(ArgumentType.String, ArgumentType.UserID)
+        expect(ArgumentType.Word, ArgumentType.UserID)
         execute {
             handleGrant(it, true)
         }
     }
 
     command("revoke") {
-        expect(ArgumentType.String, ArgumentType.UserID)
+        expect(ArgumentType.Word, ArgumentType.UserID)
         execute {
             handleGrant(it, false)
         }
     }
 
     command("makerolegrantable") {
-        expect(ArgumentType.String)
+        expect(ArgumentType.Word)
         execute {
             val role = it.args[0] as String
 
@@ -81,7 +81,7 @@ fun rankCommands() = commands {
     }
 
     command("makeroleungrantable") {
-        expect(ArgumentType.String)
+        expect(ArgumentType.Word)
         execute {
             val role = it.args[0] as String
 

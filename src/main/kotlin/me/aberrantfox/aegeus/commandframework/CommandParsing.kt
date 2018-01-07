@@ -7,11 +7,16 @@ import net.dv8tion.jda.core.JDA
 import org.reflections.Reflections
 import org.reflections.scanners.MethodAnnotationsScanner
 
-enum class ArgumentType {
-    Integer, Double, String, Boolean, Manual, Joiner, UserID, Splitter, URL
+enum class ArgumentType(val predicate: (String) -> Boolean = { true }) {
+    Integer(String::isInteger), Double(String::isDouble),
+    Choice(String::isBooleanValue),
+    Manual,
+    Word,
+    Sentence,
+    UserID,
+    Splitter,
+    URL(String::containsURl)
 }
-
-const val seperatorCharacter = "|"
 
 annotation class CommandSet
 
@@ -31,21 +36,12 @@ fun convertArguments(actual: List<String>, expected: List<ArgumentType>, jda: JD
     if(expected.contains(ArgumentType.Manual)) return actual
 
     if (actual.size != expected.size) {
-        if((!expected.contains(ArgumentType.Joiner) && !expected.contains(ArgumentType.Splitter))) {
+        if((!expected.contains(ArgumentType.Sentence) && !expected.contains(ArgumentType.Splitter))) {
             return null
         }
     }
 
-    val allMatch = actual.zip(expected).all {
-        when (it.second) {
-            ArgumentType.Integer -> it.first.isInteger()
-            ArgumentType.Double -> it.first.isDouble()
-            ArgumentType.Boolean -> it.first.isBooleanValue()
-            ArgumentType.UserID -> it.first.isUserID(jda)
-            ArgumentType.URL -> it.first.containsURl()
-            else -> true
-        }
-    }
+    val allMatch = actual.zip(expected).all { it.second.predicate(it.first) }
 
     if ( !(allMatch) ) return null
 
@@ -55,9 +51,9 @@ fun convertArguments(actual: List<String>, expected: List<ArgumentType>, jda: JD
         when(pair.second) {
             ArgumentType.Integer -> returnVals.add(pair.first.toInt())
             ArgumentType.Double -> returnVals.add(pair.first.toDouble())
-            ArgumentType.Boolean -> returnVals.add(pair.first.toBooleanValue())
+            ArgumentType.Choice -> returnVals.add(pair.first.toBooleanValue())
             ArgumentType.UserID -> returnVals.add(pair.first)
-            ArgumentType.Joiner -> returnVals.add(joinArgs(index, actual))
+            ArgumentType.Sentence -> returnVals.add(joinArgs(index, actual))
             ArgumentType.Splitter -> returnVals.add(splitArg(index, actual))
             else -> returnVals.add(pair.first)
         }
@@ -85,6 +81,7 @@ private fun joinArgs(start: Int, actual: List<String>) = actual.subList(start, a
 
 private fun splitArg(start: Int, actual: List<String>): List<String> {
     val joined = joinArgs(start, actual)
+    val seperatorCharacter = "|"
 
     if( !(joined.contains(seperatorCharacter)) ) return listOf(joined)
 

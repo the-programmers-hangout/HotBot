@@ -39,7 +39,7 @@ class Command(var expectedArgs: Array<out CommandArgument> = arrayOf(), var exec
     }
 
     fun expect(vararg args: ArgumentType) {
-        val clone = Array(args.size) { arg(ArgumentType.String) }
+        val clone = Array(args.size) { arg(ArgumentType.Word) }
 
         for (x in args.indices) {
             clone[x] = arg(args[x])

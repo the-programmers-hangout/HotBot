@@ -18,7 +18,7 @@ object Profiles {
 @CommandSet
 fun profileCommands() = commands {
     command("submitprofile") {
-        expect(ArgumentType.Joiner)
+        expect(ArgumentType.Sentence)
         execute {
             val profileText = it.args[0] as String
 

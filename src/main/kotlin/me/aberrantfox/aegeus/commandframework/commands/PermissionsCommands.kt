@@ -13,7 +13,7 @@ import java.util.*
 fun permissionCommands() =
     commands {
         command("setperm") {
-            expect(ArgumentType.String, ArgumentType.String)
+            expect(ArgumentType.Word, ArgumentType.Word)
             execute {
                 val commandName = it.args[0] as String
                 val desiredPermission = (it.args[1] as String).toUpperCase()
@@ -36,7 +36,7 @@ fun permissionCommands() =
         }
 
         command("getPerm") {
-            expect(ArgumentType.String)
+            expect(ArgumentType.Word)
             execute {
                 val commandName = it.args[0] as String
 

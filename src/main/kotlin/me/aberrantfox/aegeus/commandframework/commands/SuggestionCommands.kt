@@ -29,7 +29,7 @@ object Suggestions {
 @CommandSet
 fun suggestionCommands() = commands {
     command("suggest") {
-        expect(ArgumentType.Joiner)
+        expect(ArgumentType.Sentence)
         execute {
             val author = it.author.id
             val message = it.args[0] as String
@@ -123,7 +123,7 @@ fun suggestionCommands() = commands {
     }
 
     command("respond") {
-        expect(ArgumentType.String, ArgumentType.String, ArgumentType.Joiner)
+        expect(ArgumentType.Word, ArgumentType.Word, ArgumentType.Sentence)
         execute {
             val (args, config) = it
             val target = args[0] as String

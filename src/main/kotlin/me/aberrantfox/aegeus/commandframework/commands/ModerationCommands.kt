@@ -59,7 +59,7 @@ fun moderationCommands() = commands {
     }
 
     command("mute") {
-        expect(ArgumentType.UserID, ArgumentType.Integer, ArgumentType.Joiner)
+        expect(ArgumentType.UserID, ArgumentType.Integer, ArgumentType.Sentence)
         execute {
             if (it.guild != null) {
                 val args = it.args
@@ -82,7 +82,7 @@ fun moderationCommands() = commands {
     }
 
     command("prefix") {
-        expect(ArgumentType.String)
+        expect(ArgumentType.Word)
         execute {
             val newPrefix = it.args[0] as String
             it.config.prefix = newPrefix
@@ -93,7 +93,7 @@ fun moderationCommands() = commands {
     }
 
     command("setfilter") {
-        expect(ArgumentType.String)
+        expect(ArgumentType.Word)
         execute {
             val desiredLevel = stringToPermission((it.args[0] as String).toUpperCase())
 
@@ -107,7 +107,7 @@ fun moderationCommands() = commands {
 
     }
     command("move") {
-        expect(ArgumentType.String, ArgumentType.Integer, ArgumentType.String)
+        expect(ArgumentType.Word, ArgumentType.Integer, ArgumentType.Word)
         execute {
             val args = it.args
 
@@ -140,7 +140,7 @@ fun moderationCommands() = commands {
         }
     }
     command("badname") {
-        expect(ArgumentType.UserID, ArgumentType.Joiner)
+        expect(ArgumentType.UserID, ArgumentType.Sentence)
         execute {
             val args = it.args
             val target = args[0] as String
@@ -180,7 +180,7 @@ fun moderationCommands() = commands {
         }
     }
     command("setbanreason") {
-        expect(ArgumentType.String, ArgumentType.Joiner)
+        expect(ArgumentType.Word, ArgumentType.Sentence)
         execute {
             val target = (it.args[0] as String)
             val reason = it.args[1] as String
@@ -196,7 +196,7 @@ fun moderationCommands() = commands {
         }
     }
     command("getbanreason") {
-        expect(ArgumentType.String)
+        expect(ArgumentType.Word)
         execute {
             val target = it.args[0] as String
 

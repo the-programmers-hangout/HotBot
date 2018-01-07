@@ -16,7 +16,7 @@ private val mapLocation = "macros.json"
 fun macroCommands() =
     commands {
         command("addmacro") {
-            expect(ArgumentType.String, ArgumentType.Joiner)
+            expect(ArgumentType.Word, ArgumentType.Sentence)
             execute {
                 val key = (it.args[0] as String).toLowerCase()
 
@@ -37,7 +37,7 @@ fun macroCommands() =
         }
 
         command("removemacro") {
-            expect(ArgumentType.String)
+            expect(ArgumentType.Word)
             execute {
                 val key = (it.args[0] as String).toLowerCase()
 
