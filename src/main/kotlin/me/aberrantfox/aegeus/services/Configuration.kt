@@ -5,7 +5,9 @@ import com.google.gson.Gson
 import me.aberrantfox.aegeus.dsls.command.CommandsContainer
 import me.aberrantfox.aegeus.permissions.Permission
 import me.aberrantfox.aegeus.extensions.MuteRecord
+import me.aberrantfox.aegeus.logging.ChannelIdHolder
 import java.io.File
+import java.nio.channels.Channels
 import java.util.*
 
 data class Configuration(val token: String = "insert-token",
@@ -31,7 +33,8 @@ data class Configuration(val token: String = "insert-token",
                          val urlFilterPermissionLevel: Permission = Permission.MODERATOR,
                          val cleverbotAPIKey: String = "insert-api-key",
                          val profileChannel: String = "insert-channel-id",
-                         val cleverBotApiCallLimit: Int = 10000)
+                         val cleverBotApiCallLimit: Int = 10000,
+                         val logChannels: ChannelIdHolder = ChannelIdHolder())
 
 class PermissionRoles(val moderatorRoles: Array<String> = arrayOf("Moderator"),
                       val adminRoles: Array<String> = arrayOf("Admin"),
