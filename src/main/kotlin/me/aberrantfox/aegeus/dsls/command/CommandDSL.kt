@@ -35,6 +35,8 @@ class Command(var log: BotLogger, var expectedArgs: Array<out CommandArgument> =
 
     override fun warning(message: String) = log.warning(message)
 
+    override fun voice(message: String) = log.voice(message)
+
     val parameterCount = expectedArgs.size
 
     operator fun invoke(args: Command.() -> Unit) {}

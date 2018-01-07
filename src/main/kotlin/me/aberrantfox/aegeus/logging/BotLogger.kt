@@ -10,27 +10,31 @@ interface BotLogger {
     fun error(message: String)
     fun alert(message: String)
     fun warning(message: String)
+    fun voice(message: String)
 }
 
 data class ChannelIdHolder(val info: String = "insert-id-here",
                            val command: String = "insert-id-here",
                            val error: String = "insert-id-here",
                            val alert: String = "insert-id-here",
-                           val warning: String = "insert-id-here")
+                           val warning: String = "insert-id-here",
+                           val voice: String = "insert-id-here")
 
 fun convertChannels(holder: ChannelIdHolder, jda: JDA): BotLogger =
-    ChannelLogger(Channels (
+    ChannelLogger(Channels(
         jda.getTextChannelById(holder.info),
         jda.getTextChannelById(holder.command),
         jda.getTextChannelById(holder.error),
         jda.getTextChannelById(holder.alert),
-        jda.getTextChannelById(holder.warning)))
+        jda.getTextChannelById(holder.warning),
+        jda.getTextChannelById(holder.voice)))
 
 data class Channels(val info: TextChannel,
                     val command: TextChannel,
                     val error: TextChannel,
                     val alert: TextChannel,
-                    val warning: TextChannel)
+                    val warning: TextChannel,
+                    val voice: TextChannel)
 
 class DefaultLogger : BotLogger {
     override fun info(message: String) {}
@@ -41,6 +45,8 @@ class DefaultLogger : BotLogger {
     override fun alert(message: String) {}
 
     override fun warning(message: String) {}
+
+    override fun voice(message: String) {}
 }
 
 class ChannelLogger(private val channels: Channels) : BotLogger {
@@ -53,6 +59,8 @@ class ChannelLogger(private val channels: Channels) : BotLogger {
     override fun alert(message: String) = channels.alert.sendMessage(message).queue()
 
     override fun warning(message: String) = channels.warning.sendMessage(message).queue()
+
+    override fun voice(message: String) = channels.voice.sendMessage(message).queue()
 }
 
 
