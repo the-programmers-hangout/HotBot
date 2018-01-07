@@ -24,9 +24,7 @@ fun convertChannels(holder: ChannelIdHolder, jda: JDA) =
         jda.getTextChannelById(holder.command),
         jda.getTextChannelById(holder.error),
         jda.getTextChannelById(holder.alert),
-        jda.getTextChannelById(holder.warning)
-    )
-
+        jda.getTextChannelById(holder.warning))
 
 data class Channels(val info: TextChannel,
                     val command: TextChannel,
