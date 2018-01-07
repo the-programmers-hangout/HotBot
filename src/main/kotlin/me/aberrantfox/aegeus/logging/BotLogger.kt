@@ -18,19 +18,30 @@ data class ChannelIdHolder(val info: String = "insert-id-here",
                            val alert: String = "insert-id-here",
                            val warning: String = "insert-id-here")
 
-fun convertChannels(holder: ChannelIdHolder, jda: JDA) =
-    Channels (
+fun convertChannels(holder: ChannelIdHolder, jda: JDA): BotLogger =
+    ChannelLogger(Channels (
         jda.getTextChannelById(holder.info),
         jda.getTextChannelById(holder.command),
         jda.getTextChannelById(holder.error),
         jda.getTextChannelById(holder.alert),
-        jda.getTextChannelById(holder.warning))
+        jda.getTextChannelById(holder.warning)))
 
 data class Channels(val info: TextChannel,
                     val command: TextChannel,
                     val error: TextChannel,
                     val alert: TextChannel,
                     val warning: TextChannel)
+
+class DefaultLogger : BotLogger {
+    override fun info(message: String) {}
+    override fun command(message: String) {}
+
+    override fun error(message: String) {}
+
+    override fun alert(message: String) {}
+
+    override fun warning(message: String) {}
+}
 
 class ChannelLogger(private val channels: Channels) : BotLogger {
     override fun info(message: String) = channels.info.sendMessage(message).queue()
