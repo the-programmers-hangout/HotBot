@@ -27,15 +27,16 @@ object RankContainer {
         }
     }
 
-    fun canUse(role: String) = this.config.acceptableRanks.contains(role)
+
+    fun canUse(role: String) = this.config.acceptableRanks.contains(role.toLowerCase())
 
     fun add(role: String) {
-        this.config.acceptableRanks.add(role)
+        this.config.acceptableRanks.add(role.toLowerCase())
         this.save()
     }
 
     fun remove(role: String) {
-        this.config.acceptableRanks.remove(role)
+        this.config.acceptableRanks.remove(role.toLowerCase())
         this.save()
     }
 
@@ -75,6 +76,11 @@ fun rankCommands() = commands {
                 return@execute
             }
 
+            if (RankContainer.canUse(role)) {
+                it.respond("A role with that name is already grantable.")
+                return@execute
+            }
+
             RankContainer.add(role)
             it.respond("The role: $role has been added to the role whitelist, and can now be assigned via the grant command.")
         }
@@ -85,8 +91,8 @@ fun rankCommands() = commands {
         execute {
             val role = it.args[0] as String
 
-            if (!(it.jda.isRole(role))) {
-                it.respond("Error, that is not a role, or there are more than one roles by that name.")
+            if (!(RankContainer.canUse(role))) {
+                it.respond("Error: a role with that name hasn't been made grantable or doesn't exist")
                 return@execute
             }
 
