@@ -104,12 +104,6 @@ fun utilCommands() = commands {
             it.respond("${target.fullName()}'s account was made on ${target.creationTime}")
         }
     }
-
-    command("voicetest") {
-        execute {
-            voice("voice")
-        }
-    }
 }
 
 fun produceServerInfoEmbed(guild: Guild): MessageEmbed {
