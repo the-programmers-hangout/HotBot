@@ -6,12 +6,11 @@ import me.aberrantfox.aegeus.commandframework.CommandSet
 import me.aberrantfox.aegeus.services.saveConfig
 import me.aberrantfox.aegeus.extensions.fullName
 import me.aberrantfox.aegeus.dsls.command.commands
+import me.aberrantfox.aegeus.dsls.embed.embed
 import me.aberrantfox.aegeus.extensions.idToUser
 import me.aberrantfox.aegeus.services.Configuration
-import net.dv8tion.jda.core.EmbedBuilder
 import net.dv8tion.jda.core.OnlineStatus
 import net.dv8tion.jda.core.entities.Guild
-import net.dv8tion.jda.core.entities.MessageEmbed
 import java.awt.Color
 import java.util.*
 
@@ -106,24 +105,43 @@ fun utilCommands() = commands {
     }
 }
 
-fun produceServerInfoEmbed(guild: Guild): MessageEmbed {
-    val builder = EmbedBuilder()
-    builder.setTitle(guild.name)
-        .setColor(Color.MAGENTA)
-        .setDescription("The programmer's hangout is a programming server, made for persons of all skill levels, " +
-            "be you someone who has wrote 10 lines of code, or someone with 10 years of experience.")
-        .setFooter("Guild creation date: ${guild.creationTime}", "http://i.imgur.com/iwwEprG.png")
-        .setThumbnail("http://i.imgur.com/DFoaG7k.png")
+fun produceServerInfoEmbed(guild: Guild) =
+    embed {
+        title(guild.name)
+        setColor(Color.MAGENTA)
+        description("""
+        |The programmer's hangout is a programming server, made for persons of all skill levels,
+        |be you someone who has wrote 10 lines of code, or someone with 10 years of experience.""".trimMargin())
+        setFooter("Guild creation date: ${guild.creationTime}", "http://i.imgur.com/iwwEprG.png")
+        setThumbnail("http://i.imgur.com/DFoaG7k.png")
 
-    builder.addField("Users", "${guild.members.filter {
-        it.onlineStatus != OnlineStatus.OFFLINE
-    }.size}/${guild.members.size}", true)
+        field {
+            name = "Users"
+            value = "${guild.members.filter { it.onlineStatus != OnlineStatus.OFFLINE }.size}/${guild.members.size}"
+        }
 
-    builder.addField("Total Roles", "${guild.roles.size}", true)
-    builder.addField("Owner", guild.owner.fullName(), true)
-    builder.addField("Region", "${guild.region}", true)
-    builder.addField("Text Channels", "${guild.textChannels.size}", true)
-    builder.addField("Voice Channels", "${guild.voiceChannels.size}", true)
+        ifield {
+            name = "Total Roles"
+            value = guild.roles.size.toString()
+        }
 
-    return builder.build()
-}
+        ifield {
+            name = "Owner"
+            value = guild.owner.fullName()
+        }
+
+        ifield {
+            name = "Region"
+            value = guild.region.toString()
+        }
+
+        ifield {
+            name = "Text Channels"
+            value = guild.textChannelCache.size().toString()
+        }
+
+        ifield {
+            name = "Voice Channels"
+            value = guild.voiceChannels.size.toString()
+        }
+    }
