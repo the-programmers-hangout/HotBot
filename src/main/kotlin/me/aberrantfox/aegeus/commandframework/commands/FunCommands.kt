@@ -18,6 +18,13 @@ fun funCommands() =
                 it.respond(json.getString("file"))
             }
         }
+        
+        command("bird") {
+            execute {
+                val json = kget("https://birdsare.cool/bird.json?exclude=webm,mp4").jsonObject
+                it.respond(json.getString("url"))
+            }
+        }
 
         command("ball") {
             expect(ArgumentType.Sentence)
