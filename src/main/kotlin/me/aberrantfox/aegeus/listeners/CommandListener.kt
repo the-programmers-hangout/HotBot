@@ -77,7 +77,7 @@ data class CommandListener(val config: Configuration,
             return
         }
 
-        val event = CommandEvent(actual, config, jda, channel, author, message, guild)
+        val event = CommandEvent(parsedArgs, config, jda, channel, author, message, guild)
 
         if (command.parameterCount == 0) {
             command.execute(event)

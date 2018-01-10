@@ -7,16 +7,11 @@ import net.dv8tion.jda.core.JDA
 import org.reflections.Reflections
 import org.reflections.scanners.MethodAnnotationsScanner
 
-enum class ArgumentType(val predicate: (String) -> Boolean = { true }) {
-    Integer(String::isInteger), Double(String::isDouble),
-    Choice(String::isBooleanValue),
-    Manual,
-    Word,
-    Sentence,
-    UserID,
-    Splitter,
-    URL(String::containsURl)
+enum class ArgumentType {
+    Integer, Double, Word, Choice, Manual, Sentence, UserID, Splitter, URL
 }
+
+const val seperatorCharacter = "|"
 
 annotation class CommandSet
 
@@ -41,7 +36,16 @@ fun convertArguments(actual: List<String>, expected: List<ArgumentType>, jda: JD
         }
     }
 
-    val allMatch = actual.zip(expected).all { it.second.predicate(it.first) }
+    val allMatch = actual.zip(expected).all {
+        when (it.second) {
+            ArgumentType.Integer -> it.first.isInteger()
+            ArgumentType.Double -> it.first.isDouble()
+            ArgumentType.Choice -> it.first.isBooleanValue()
+            ArgumentType.UserID -> it.first.isUserID(jda)
+            ArgumentType.URL -> it.first.containsURl()
+            else -> true
+        }
+    }
 
     if ( !(allMatch) ) return null
 
@@ -81,7 +85,6 @@ private fun joinArgs(start: Int, actual: List<String>) = actual.subList(start, a
 
 private fun splitArg(start: Int, actual: List<String>): List<String> {
     val joined = joinArgs(start, actual)
-    val seperatorCharacter = "|"
 
     if( !(joined.contains(seperatorCharacter)) ) return listOf(joined)
 

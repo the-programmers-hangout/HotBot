@@ -9,7 +9,6 @@ import me.aberrantfox.aegeus.services.UserElementPool
 
 
 private val RejectionMessage = "There are no profiles in the pool."
-private val profileRegex = "(\\*\\*Who are you\\?\\*\\*)(.|\\n)*(\\*\\*What is your experience\\?*\\*)(.|\\n)*(\\*\\*What languages are you really, really comfortable with\\?\\*\\*)(.|\\n)*(\\*\\*What other languages have you used/do you know of\\?\\*\\*)(.|\\n)*(\\*\\*Anything else you'd like to say\\?\\*\\*)(.|\\n)*".toRegex()
 
 object Profiles {
     val pool: UserElementPool = UserElementPool(userLimit = 1, poolName = "Profiles")
@@ -21,11 +20,6 @@ fun profileCommands() = commands {
         expect(ArgumentType.Sentence)
         execute {
             val profileText = it.args[0] as String
-
-            if (!(profileText.matches(profileRegex))) {
-                it.respond("Your submitted profile does not follow the format. Please re-submit a profile using the format, findable in the FAQ channel.")
-                return@execute
-            }
 
             val response = Profiles.pool.addRecord(it.author.id, it.author.avatarUrl, profileText)
 

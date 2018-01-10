@@ -63,15 +63,22 @@ fun permissionCommands() =
             execute {
                 val permLevel = getHighestPermissionLevel(it.guild, it.config, it.jda, it.author.id)
                 val available = it.config.commandPermissionMap.filter { it.value <= permLevel }.keys.reduce { acc, s -> "$acc, $s" }
+
+                val cut = available.chunked(1020)
+
                 val response = EmbedBuilder()
                     .setTitle("Available Commands")
                     .setColor(Color.cyan)
                     .setDescription("Below you can find a set of commands that are available to based on your permission level," +
                         " which is $permLevel - if you need help using any of them, simply type ${it.config.prefix}help <command>.")
-                    .addField("Commands", available, false)
-                    .build()
 
-                it.respond(response)
+
+
+                for(x in cut.indices) {
+                    response.addField("Commands ${x + 1}", cut[x], false)
+                }
+
+                it.respond(response.build())
             }
         }
 
