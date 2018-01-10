@@ -26,15 +26,6 @@ fun funCommands() =
             }
         }
 
-        command("ball") {
-            expect(ArgumentType.Sentence)
-            execute {
-                val query = it.args[0] as String
-                val json = kget("https://8ball.delegator.com/magic/JSON/abc").jsonObject
-                it.respond(json.getJSONObject("magic").getString("answer"))
-            }
-        }
-
         command("flip") {
             execute {
                 val message = if (Random().nextBoolean()) "Heads" else "tails"
