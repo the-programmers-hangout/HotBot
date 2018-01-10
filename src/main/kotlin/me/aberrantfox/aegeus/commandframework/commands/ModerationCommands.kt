@@ -10,8 +10,8 @@ import me.aberrantfox.aegeus.extensions.muteMember
 import me.aberrantfox.aegeus.extensions.performActionIfIsID
 import me.aberrantfox.aegeus.services.MessageService
 import me.aberrantfox.aegeus.services.MessageType
-import me.aberrantfox.aegeus.services.database.getReason
-import me.aberrantfox.aegeus.services.database.updateOrSetReason
+import me.aberrantfox.aegeus.database.getReason
+import me.aberrantfox.aegeus.database.updateOrSetReason
 import net.dv8tion.jda.core.OnlineStatus
 import net.dv8tion.jda.core.entities.Game
 import net.dv8tion.jda.core.entities.Message

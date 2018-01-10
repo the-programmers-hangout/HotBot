@@ -9,7 +9,7 @@ import me.aberrantfox.aegeus.services.AddResponse
 import me.aberrantfox.aegeus.services.Configuration
 import me.aberrantfox.aegeus.services.PoolRecord
 import me.aberrantfox.aegeus.services.UserElementPool
-import me.aberrantfox.aegeus.services.database.*
+import me.aberrantfox.aegeus.database.*
 import net.dv8tion.jda.core.EmbedBuilder
 import net.dv8tion.jda.core.JDA
 import net.dv8tion.jda.core.entities.Guild

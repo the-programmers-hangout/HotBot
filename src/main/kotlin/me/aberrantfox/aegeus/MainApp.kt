@@ -9,7 +9,7 @@ import me.aberrantfox.aegeus.listeners.antispam.DuplicateMessageListener
 import me.aberrantfox.aegeus.listeners.antispam.InviteListener
 import me.aberrantfox.aegeus.logging.convertChannels
 import me.aberrantfox.aegeus.services.*
-import me.aberrantfox.aegeus.services.database.setupDatabaseSchema
+import me.aberrantfox.aegeus.database.setupDatabaseSchema
 import net.dv8tion.jda.core.*
 import net.dv8tion.jda.core.entities.Game
 import net.dv8tion.jda.core.entities.Guild
