@@ -26,15 +26,13 @@ fun moderationCommands() = commands {
     command("nuke") {
         expect(ArgumentType.Integer)
         execute {
-            if (it.guild != null) {
-                val amount = it.args[0] as Int
-                if (amount <= 0) {
-                    it.respond("Yea, what exactly is the point in nuking nothing... ?")
-                } else {
-                    it.channel.history.retrievePast(amount + 1).queue { past ->
-                        past.forEach { msg -> msg.delete().queue() }
-                        it.respond("Be nice. No spam.")
-                    }
+            val amount = it.args[0] as Int
+            if (amount <= 0) {
+                it.respond("Yea, what exactly is the point in nuking nothing... ?")
+            } else {
+                it.channel.history.retrievePast(amount + 1).queue { past ->
+                    past.forEach { msg -> msg.delete().queue() }
+                    it.respond("Be nice. No spam.")
                 }
             }
         }
@@ -43,17 +41,15 @@ fun moderationCommands() = commands {
     command("ignore") {
         expect(ArgumentType.Integer)
         execute {
-            if (it.guild != null) {
-                val config = it.config
-                val target = it.args[0] as String
+            val config = it.config
+            val target = it.args[0] as String
 
-                if (config.ignoredIDs.contains(target)) {
-                    config.ignoredIDs.remove(target)
-                    it.respond("Unignored $target")
-                } else {
-                    config.ignoredIDs.add(target)
-                    it.respond("$target? Who? What? Don't know what that is. ;)")
-                }
+            if (config.ignoredIDs.contains(target)) {
+                config.ignoredIDs.remove(target)
+                it.respond("Unignored $target")
+            } else {
+                config.ignoredIDs.add(target)
+                it.respond("$target? Who? What? Don't know what that is. ;)")
             }
         }
     }
@@ -61,15 +57,13 @@ fun moderationCommands() = commands {
     command("mute") {
         expect(ArgumentType.UserID, ArgumentType.Integer, ArgumentType.Sentence)
         execute {
-            if (it.guild != null) {
-                val args = it.args
+            val args = it.args
 
-                val user = (args[0] as String).idToUser(it.jda)
-                val time = (args[1] as Int).toLong() * 1000 * 60
-                val reason = args[2] as String
+            val user = (args[0] as String).idToUser(it.jda)
+            val time = (args[1] as Int).toLong() * 1000 * 60
+            val reason = args[2] as String
 
-                muteMember(it.guild, user, time, reason, it.config, it.author)
-            }
+            muteMember(it.guild, user, time, reason, it.config, it.author)
         }
     }
 
