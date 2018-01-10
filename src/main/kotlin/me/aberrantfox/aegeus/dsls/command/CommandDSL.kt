@@ -27,7 +27,7 @@ class Command(var log: BotLogger, var expectedArgs: Array<out CommandArgument> =
               var execute: (CommandEvent) -> Unit = {}, var requiresGuild: Boolean = false) : BotLogger {
     override fun info(message: String) = log.info(message)
 
-    override fun command(message: String) = log.command(message)
+    override fun cmd(message: String) = log.cmd(message)
 
     override fun error(message: String) = log.error(message)
 

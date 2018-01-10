@@ -6,7 +6,7 @@ import net.dv8tion.jda.core.entities.TextChannel
 
 interface BotLogger {
     fun info(message: String)
-    fun command(message: String)
+    fun cmd(message: String)
     fun error(message: String)
     fun alert(message: String)
     fun warning(message: String)
@@ -14,7 +14,7 @@ interface BotLogger {
 }
 
 data class ChannelIdHolder(val info: String = "insert-id-here",
-                           val command: String = "insert-id-here",
+                           val cmd: String = "insert-id-here",
                            val error: String = "insert-id-here",
                            val alert: String = "insert-id-here",
                            val warning: String = "insert-id-here",
@@ -23,14 +23,14 @@ data class ChannelIdHolder(val info: String = "insert-id-here",
 fun convertChannels(holder: ChannelIdHolder, jda: JDA): BotLogger =
     ChannelLogger(Channels(
         jda.getTextChannelById(holder.info),
-        jda.getTextChannelById(holder.command),
+        jda.getTextChannelById(holder.cmd),
         jda.getTextChannelById(holder.error),
         jda.getTextChannelById(holder.alert),
         jda.getTextChannelById(holder.warning),
         jda.getTextChannelById(holder.voice)))
 
 data class Channels(val info: TextChannel,
-                    val command: TextChannel,
+                    val cmd: TextChannel,
                     val error: TextChannel,
                     val alert: TextChannel,
                     val warning: TextChannel,
@@ -38,7 +38,7 @@ data class Channels(val info: TextChannel,
 
 class DefaultLogger : BotLogger {
     override fun info(message: String) {}
-    override fun command(message: String) {}
+    override fun cmd(message: String) {}
 
     override fun error(message: String) {}
 
@@ -52,7 +52,7 @@ class DefaultLogger : BotLogger {
 class ChannelLogger(private val channels: Channels) : BotLogger {
     override fun info(message: String) = channels.info.sendMessage(message).queue()
 
-    override fun command(message: String) = channels.command.sendMessage(message).queue()
+    override fun cmd(message: String) = channels.cmd.sendMessage(message).queue()
 
     override fun error(message: String) = channels.error.sendMessage(message).queue()
 
