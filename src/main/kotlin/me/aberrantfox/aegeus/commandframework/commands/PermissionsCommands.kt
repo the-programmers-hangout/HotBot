@@ -2,6 +2,7 @@ package me.aberrantfox.aegeus.commandframework.commands
 
 import me.aberrantfox.aegeus.commandframework.*
 import me.aberrantfox.aegeus.dsls.command.commands
+import me.aberrantfox.aegeus.dsls.embed.embed
 import me.aberrantfox.aegeus.permissions.Permission
 import me.aberrantfox.aegeus.permissions.getHighestPermissionLevel
 import me.aberrantfox.aegeus.permissions.stringToPermission
@@ -66,19 +67,18 @@ fun permissionCommands() =
 
                 val cut = available.chunked(1020)
 
-                val response = EmbedBuilder()
-                    .setTitle("Available Commands")
-                    .setColor(Color.cyan)
-                    .setDescription("Below you can find a set of commands that are available to based on your permission level," +
+                val response = embed {
+                    title("Available Commands")
+                    setColor(Color.cyan)
+                    description("Below you can find a set of commands that are available to based on your permission level," +
                         " which is $permLevel - if you need help using any of them, simply type ${it.config.prefix}help <command>.")
 
-
-
-                for(x in cut.indices) {
-                    response.addField("Commands ${x + 1}", cut[x], false)
+                    for(x in cut.indices) {
+                        addField("Commands ${x + 1}", cut[x], false)
+                    }
                 }
 
-                it.respond(response.build())
+                it.respond(response)
             }
         }
 
