@@ -27,7 +27,7 @@ fun setupDatabaseSchema(config: Configuration) {
     )
 
     transaction {
-        SchemaUtils.create(Strikes, Suggestions, BanRecords)
+        SchemaUtils.create(Strikes, Suggestions, BanRecords, CommandPermissions)
         logger.addLogger(StdOutSqlLogger)
     }
 }
@@ -54,4 +54,10 @@ object BanRecords : Table() {
     val id = varchar("id", 18).primaryKey()
     val reason = text("reason")
     val moderator = varchar("moderator", 18)
+}
+
+object CommandPermissions : Table() {
+    val id = integer("id").autoIncrement().primaryKey()
+    val roleID = varchar("roleID", 18)
+    val commandName = varchar("name", 256)
 }
