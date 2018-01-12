@@ -119,7 +119,7 @@ fun moderationCommands() = commands {
                 return@execute
             }
 
-            val channel = it.guild.textChannels.filter { it.id == chan }.first()
+            val channel = it.guild.textChannels.firstOrNull { it.id == chan }
 
             if (channel == null) {
                 it.respond("... to where?")
