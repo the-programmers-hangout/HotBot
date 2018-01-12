@@ -2,12 +2,12 @@ package me.aberrantfox.aegeus.commandframework.commands
 
 import me.aberrantfox.aegeus.commandframework.ArgumentType
 import me.aberrantfox.aegeus.commandframework.CommandSet
-import me.aberrantfox.aegeus.permissions.stringToPermission
 import me.aberrantfox.aegeus.dsls.command.commands
 import me.aberrantfox.aegeus.extensions.fullName
 import me.aberrantfox.aegeus.extensions.idToUser
 import me.aberrantfox.aegeus.extensions.muteMember
 import me.aberrantfox.aegeus.extensions.performActionIfIsID
+import me.aberrantfox.aegeus.permissions.stringToPermission
 import me.aberrantfox.aegeus.services.MessageService
 import me.aberrantfox.aegeus.services.MessageType
 import me.aberrantfox.aegeus.services.database.getReason
@@ -16,8 +16,8 @@ import net.dv8tion.jda.core.OnlineStatus
 import net.dv8tion.jda.core.entities.Game
 import net.dv8tion.jda.core.entities.Message
 import net.dv8tion.jda.core.entities.MessageChannel
-import java.text.SimpleDateFormat
 import java.io.File
+import java.text.SimpleDateFormat
 
 class ModerationCommands
 
@@ -109,8 +109,6 @@ fun moderationCommands() = commands {
             val searchSpace = args[1] as Int
             val chan = args[2] as String
 
-            it.message.delete().queue()
-
             if (searchSpace < 0) {
                 it.respond("... move what")
                 return@execute
@@ -127,6 +125,8 @@ fun moderationCommands() = commands {
                 it.respond("... to where?")
                 return@execute
             }
+
+            it.message.delete().queue()
 
             it.channel.history.retrievePast(searchSpace + 1).queue { past ->
                 handleResponse(past, channel, targets, it.channel, it.author.asMention)
