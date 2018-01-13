@@ -3,11 +3,10 @@ package me.aberrantfox.aegeus.commandframework.commands
 import me.aberrantfox.aegeus.commandframework.ArgumentType
 import me.aberrantfox.aegeus.commandframework.CommandSet
 import me.aberrantfox.aegeus.dsls.command.commands
-import me.aberrantfox.aegeus.extensions.fullName
-import me.aberrantfox.aegeus.extensions.idToUser
-import me.aberrantfox.aegeus.extensions.muteMember
-import me.aberrantfox.aegeus.extensions.performActionIfIsID
+import me.aberrantfox.aegeus.dsls.embed.embed
+import me.aberrantfox.aegeus.extensions.*
 import me.aberrantfox.aegeus.permissions.stringToPermission
+import me.aberrantfox.aegeus.services.Configuration
 import me.aberrantfox.aegeus.services.MessageService
 import me.aberrantfox.aegeus.services.MessageType
 import me.aberrantfox.aegeus.services.database.getReason
@@ -16,6 +15,7 @@ import net.dv8tion.jda.core.OnlineStatus
 import net.dv8tion.jda.core.entities.Game
 import net.dv8tion.jda.core.entities.Message
 import net.dv8tion.jda.core.entities.MessageChannel
+import java.awt.Color
 import java.io.File
 import java.text.SimpleDateFormat
 
@@ -129,7 +129,7 @@ fun moderationCommands() = commands {
             it.message.delete().queue()
 
             it.channel.history.retrievePast(searchSpace + 1).queue { past ->
-                handleResponse(past, channel, targets, it.channel, it.author.asMention)
+                handleResponse(past, channel, targets, it.channel, it.author.asMention, it.config)
             }
         }
     }
@@ -213,8 +213,20 @@ fun moderationCommands() = commands {
 }
 
 private fun handleResponse(past: List<Message>, channel: MessageChannel, targets: List<String>, error: MessageChannel,
-                           source: String) {
-    val messages = past.subList(1, past.size).filter { targets.contains(it.author.id) }
+                           source: String, config: Configuration) {
+
+    val messages = if (past.firstOrNull()?.isCommandInvocation(config) == true)
+                                     // Without ++move command invocation message
+                                     past.subList(1, past.size).filter { targets.contains(it.author.id)}
+                                 else
+                                     /*
+                                     Without extra message that could've been the ++move message but wasn't.
+                                     Side effect of having to search searchSpace+1 because of queue/API request timings
+                                     causing the possibility but not guarantee of the ++move command invocation being
+                                     included in the past List.
+                                     */
+                                     past.subList(0, past.size - 1).filter {targets.contains(it.author.id)}
+
     if (messages.isEmpty()) {
         error.sendMessage("No messages found").queue()
         return
