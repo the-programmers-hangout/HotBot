@@ -216,29 +216,55 @@ private fun handleResponse(past: List<Message>, channel: MessageChannel, targets
                            source: String, config: Configuration) {
 
     val messages = if (past.firstOrNull()?.isCommandInvocation(config) == true)
-                                     // Without ++move command invocation message
-                                     past.subList(1, past.size).filter { targets.contains(it.author.id)}
-                                 else
-                                     /*
-                                     Without extra message that could've been the ++move message but wasn't.
-                                     Side effect of having to search searchSpace+1 because of queue/API request timings
-                                     causing the possibility but not guarantee of the ++move command invocation being
-                                     included in the past List.
-                                     */
-                                     past.subList(0, past.size - 1).filter {targets.contains(it.author.id)}
+                       // Without ++move command invocation message
+                       past.subList(1, past.size).filter { targets.contains(it.author.id)}
+                   else
+                       /*
+                       Without extra message that could've been the ++move message but wasn't.
+                       Side effect of having to search searchSpace+1 because of queue/API request timings
+                       causing the possibility but not guarantee of the ++move command invocation being
+                       included in the past List.
+                       */
+                       past.subList(0, past.size - 1).filter {targets.contains(it.author.id)}
 
     if (messages.isEmpty()) {
         error.sendMessage("No messages found").queue()
         return
     }
 
-    val response = messages
-        .map { "${it.author.asMention} said ${it.rawContent}" }
-        .reduce { a, b -> "$a\n$b" }
+    val responseEmbed = buildResponseEmbed(error, source, messages)
 
-    channel.sendMessage("==Messages moved from ${error.name} to here by $source\n$response")
-        .queue { messages.forEach { it.delete().queue() } }
+    channel.sendMessage(responseEmbed).queue {
+        messages.forEach {
+            it.delete().queue()
+        }
+    }
 }
+
+private fun buildResponseEmbed(orig: MessageChannel, sourceMod: String, messages: List<Message>) =
+        embed {
+            title("__Moved Messages__")
+
+            ifield {
+                name = "Source Channel"
+                value = "<#${orig.id}>"
+            }
+
+            ifield {
+                name = "By Staff"
+                value = sourceMod
+            }
+
+            messages.reversed().forEach {
+                field {
+                    name = "Message"
+                    value = "${it.author.asMention}: ${it.contentRaw}" // Can't mention in 'name'
+                    inline = false
+                }
+            }
+
+            setColor(Color.CYAN)
+        }
 
 private fun getTargets(msg: String): List<String> =
     if (msg.contains(",")) {
