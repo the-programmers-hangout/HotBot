@@ -7,6 +7,7 @@ import me.aberrantfox.hotbot.dsls.command.commands
 import me.aberrantfox.hotbot.extensions.*
 import me.aberrantfox.hotbot.services.*
 import me.aberrantfox.hotbot.database.*
+import me.aberrantfox.hotbot.dsls.embed.embed
 import net.dv8tion.jda.core.EmbedBuilder
 import net.dv8tion.jda.core.entities.Guild
 import net.dv8tion.jda.core.entities.User
@@ -176,13 +177,12 @@ private fun strike(event: CommandEvent) {
 private fun administerPunishment(config: Configuration, user: User, strikeQuantity: Int, reason: String,
                                  guild: Guild, moderator: User, totalStrikes: Int) {
     user.openPrivateChannel().queue { chan ->
-        val punishmentAction = config.security.infractionActionMap[totalStrikes]
-        chan.sendMessage("${chan.user.asMention}, you have been infracted. Infractions are formal warnings from staff members" +
-                " on TPH. The infraction you just received was a $strikeQuantity strike infraction," +
-                " and you received it for reason: $reason\n" +
-                " Your current strike count is $totalStrikes/${config.security.strikeCeil}.\n" +
-                "The assigned punishment for this infraction is: $punishmentAction").queue {
+        val punishmentAction: String = config.security.infractionActionMap[totalStrikes]?.toString() ?: "None"
 
+        val infractionEmbed = buildInfractionEmbed(chan.user.asMention, reason, strikeQuantity,
+                totalStrikes, config.security.strikeCeil, punishmentAction)
+
+        chan.sendMessage(infractionEmbed).queue {
             when (config.security.infractionActionMap[totalStrikes]) {
                 InfractionAction.Warn -> {
                     chan.sendMessage("This is your warning - Do not break the rules again.").queue()
@@ -194,7 +194,7 @@ private fun administerPunishment(config: Configuration, user: User, strikeQuanti
                             }
                 }
                 InfractionAction.Mute -> {
-                    muteMember(guild, user, 1000 * 60 * 60 * 24, reason, config, moderator)
+                    muteMember(guild, user, 1000 * 60 * 60 * 24, "Infraction punishment.", config, moderator)
                 }
                 InfractionAction.Ban -> {
                     chan.sendMessage("Well... that happened. There may be an appeal system in the future. But for now, you're" +
@@ -206,3 +206,33 @@ private fun administerPunishment(config: Configuration, user: User, strikeQuanti
         }
     }
 }
+
+private fun buildInfractionEmbed(userMention: String, reason: String, strikeQuantity: Int, totalStrikes: Int,
+                                 strikeCeil: Int, punishmentAction: String) =
+        embed {
+            title("Infraction")
+            description("$userMention, you have been infracted.\nInfractions are formal warnings from staff members on TPH.")
+
+            ifield {
+                name = "Strike Quantity"
+                value = "$strikeQuantity"
+            }
+
+            ifield {
+                name = "Strike Count"
+                value = "$totalStrikes / $strikeCeil"
+            }
+
+            ifield {
+                name = "Punishment"
+                value = punishmentAction
+            }
+
+            field {
+                name = "__Reason__"
+                value = reason
+                inline = false
+            }
+
+            setColor(Color.RED)
+        }
