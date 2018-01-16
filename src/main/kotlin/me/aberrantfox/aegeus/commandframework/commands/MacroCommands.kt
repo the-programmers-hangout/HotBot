@@ -54,7 +54,7 @@ fun macroCommands() =
 
         command("listmacros") {
             execute {
-                val macros = macroMap.keys.reduce { acc, s -> "$acc, $s" }
+                val macros = macroMap.keys.toTypedArray().sortedArray().reduce { acc, s -> "$acc, $s" }
                 it.respond("Currently available macros: $macros.")
             }
         }
