@@ -6,7 +6,9 @@ import net.dv8tion.jda.core.entities.Guild
 import net.dv8tion.jda.core.entities.MessageEmbed
 import net.dv8tion.jda.core.entities.Role
 import net.dv8tion.jda.core.entities.User
+import java.awt.Color
 import java.util.*
+
 
 data class MuteRecord(val unmuteTime: Long, val reason: String, val moderator: String, val user: String, val guildId: String)
 
@@ -62,13 +64,11 @@ fun muteMember(guild: Guild, user: User, time: Long, reason: String, config: Con
 
         config.security.mutedMembers.add(record)
         unmute(guild, user, config, time, record)
-
     }
 
     moderator.openPrivateChannel().queue {
-        it.sendMessage("User ${user.asMention} has been muted for $timeString.").queue()
+        it.sendMessage("User ${user.asMention} has been muted for $timeString, with reason:\n\n$reason").queue()
     }
-
 }
 
 fun unmute(guild: Guild, user: User, config: Configuration, time: Long, muteRecord: MuteRecord) {
