@@ -1,6 +1,6 @@
 ### <Issue title>
 <!-- e.g: No issue guidelines -->
-<!-- A short and accurate title for the issue at hand. -->
+<!-- Describe the issue with a short and accurate title -->
 
 **Priority:**
 <3, 2, 1>
@@ -15,5 +15,5 @@
 <Solution>
 
 <!-- e.g: The provided template be saved as `ISSUE_TEMPLATE.md` in a new directory `.github` -->
-<!-- An explanation of how something can be fixed. -->
-<!--This does not need to be verbose and simply needs to explain how something _should_ work so we can discuss solutions from there on. -->
+<!-- Give an explanation of your proposed solution to the issue -->
+<!-- This does not need to be verbose and simply needs to explain how something should work so we can discuss solutions from there on. -->
