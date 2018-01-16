@@ -48,7 +48,9 @@ fun permMuteMember(guild: Guild, user: User, reason: String, config: Configurati
     guild.controller.addRolesToMember(guild.getMemberById(user.id), guild.getRolesByName(config.security.mutedRole, true)).queue()
 
     user.openPrivateChannel().queue {
-        it.sendMessage("You have been muted indefinitely, for reason: $reason").queue()
+        val muteEmbed = buildMuteEmbed("Indefinite", reason)
+
+        it.sendMessage(muteEmbed).queue()
     }
 }
 
@@ -60,7 +62,8 @@ fun muteMember(guild: Guild, user: User, time: Long, reason: String, config: Con
         val timeToUnmute = futureTime(time)
         val record = MuteRecord(timeToUnmute, reason, moderator.id, user.id, guild.id)
 
-        it.sendMessage("You have been muted for $timeString, reason: $reason").queue()
+        val muteEmbed = buildMuteEmbed(timeString, reason)
+        it.sendMessage(muteEmbed).queue()
 
         config.security.mutedMembers.add(record)
         unmute(guild, user, config, time, record)
@@ -70,6 +73,27 @@ fun muteMember(guild: Guild, user: User, time: Long, reason: String, config: Con
         it.sendMessage("User ${user.asMention} has been muted for $timeString, with reason:\n\n$reason").queue()
     }
 }
+
+private fun buildMuteEmbed(timeString: String, reason: String) =
+        embed {
+            title("Mute")
+            description("You have been muted for:")
+
+            field {
+                name = "Length"
+                value = timeString
+                inline = false
+            }
+
+            field {
+                name = "__Reason__"
+                value = reason
+                inline = false
+            }
+
+
+            setColor(Color.RED)
+        }
 
 fun unmute(guild: Guild, user: User, config: Configuration, time: Long, muteRecord: MuteRecord) {
     if (time <= 0) {
