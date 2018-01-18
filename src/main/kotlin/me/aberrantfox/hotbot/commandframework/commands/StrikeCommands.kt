@@ -48,7 +48,7 @@ fun strikeCommands() =
 
                 it.author.openPrivateChannel().queue {
                     it.sendMessage("User ${target.idToUser(it.jda).asMention} has been infracted with weight: $strikeQuantity," +
-                        " with reason $reason.").queue()
+                        " with reason:\n\n$reason.").queue()
                 }
 
                 var totalStrikes = getMaxStrikes(target)
@@ -132,7 +132,7 @@ private fun handleInfraction(event: CommandEvent) {
 
     event.author.openPrivateChannel().queue {
         it.sendMessage("User ${target.idToUser(event.jda).asMention} has been infracted with weight: $strikeQuantity," +
-            " with reason $reason.").queue()
+            " with reason:\n\n$reason.").queue()
     }
 
     var totalStrikes = getMaxStrikes(target)
@@ -164,7 +164,7 @@ private fun strike(event: CommandEvent) {
 
     event.author.openPrivateChannel().queue {
         it.sendMessage("User ${target.idToUser(event.jda).asMention} has been infracted with weight: $strikeQuantity," +
-            " with reason:\n\n$reason.").queue()
+            " with reason:\n\n$reason").queue()
     }
 
     var totalStrikes = getMaxStrikes(target)
