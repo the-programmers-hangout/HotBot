@@ -3,6 +3,7 @@ package me.aberrantfox.aegeus.commandframework.commands
 import com.google.gson.Gson
 import me.aberrantfox.aegeus.commandframework.ArgumentType
 import me.aberrantfox.aegeus.commandframework.CommandSet
+import me.aberrantfox.aegeus.database.savePermissions
 import me.aberrantfox.aegeus.services.saveConfig
 import me.aberrantfox.aegeus.extensions.fullName
 import me.aberrantfox.aegeus.dsls.command.commands
@@ -55,8 +56,11 @@ fun utilCommands() = commands {
 
     command("exit") {
         execute {
-            (it.config)
             it.respond("Exiting")
+            saveConfig(it.config)
+            info("saved configurations")
+            savePermissions(it.manager)
+            info("saved permissions to database prior to shut down.")
             System.exit(0)
         }
     }
