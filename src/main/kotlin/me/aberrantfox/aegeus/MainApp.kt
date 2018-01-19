@@ -1,6 +1,7 @@
 package me.aberrantfox.aegeus
 
 import me.aberrantfox.aegeus.commandframework.produceContainer
+import me.aberrantfox.aegeus.database.loadUpManager
 import me.aberrantfox.aegeus.extensions.hasRole
 import me.aberrantfox.aegeus.extensions.timeToDifference
 import me.aberrantfox.aegeus.extensions.unmute
@@ -10,6 +11,7 @@ import me.aberrantfox.aegeus.listeners.antispam.InviteListener
 import me.aberrantfox.aegeus.logging.convertChannels
 import me.aberrantfox.aegeus.services.*
 import me.aberrantfox.aegeus.database.setupDatabaseSchema
+import me.aberrantfox.aegeus.permissions.PermissionManager
 import net.dv8tion.jda.core.*
 import net.dv8tion.jda.core.entities.Game
 import net.dv8tion.jda.core.entities.Guild
@@ -25,26 +27,33 @@ fun main(args: Array<String>) {
     setupDatabaseSchema(config)
 
     val jda = JDABuilder(AccountType.BOT).setToken(config.token).buildBlocking()
-    val logChannel = jda.getTextChannelById(config.logChannel)
+    val logger = convertChannels(config.logChannels, jda)
+
+    logger.info("connected")
     val mutedRole = jda.getRolesByName(config.mutedRole, true).first()
     val tracker = MessageTracker(1)
     val guild = jda.getGuildById(config.guildid)
-    container.newLogger(convertChannels(config.logChannels, jda))
+    val manager = PermissionManager(roles = guild.roles)
+
+    loadUpManager(manager)
+
+    container.newLogger(logger)
 
     jda.addEventListener(
-            CommandListener(config, container, jda, logChannel, guild),
+            CommandListener(config, container, jda, logger, guild, manager),
             MemberListener(config),
             InviteListener(config),
             MentionListener(config, jda.selfUser.name),
-            VoiceChannelListener(logChannel),
+            VoiceChannelListener(logger),
             NewChannelListener(mutedRole),
-            DuplicateMessageListener(config, logChannel, tracker),
+            DuplicateMessageListener(config, logger, tracker),
             RoleListener(config))
 
     jda.presence.setPresence(OnlineStatus.ONLINE, Game.of("${config.prefix}help"))
     jda.guilds.forEach { setupMutedRole(it, config.mutedRole) }
 
     handleLTSMutes(config, jda)
+    logger.info("Fully setup, now ready for use.")
 }
 
 private fun setupMutedRole(guild: Guild, roleName: String) {
