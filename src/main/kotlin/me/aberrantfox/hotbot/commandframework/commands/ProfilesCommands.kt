@@ -21,7 +21,7 @@ fun profileCommands() = commands {
         execute {
             val profileText = it.args[0] as String
 
-            val response = Profiles.pool.addRecord(it.author.id, it.author.avatarUrl, profileText)
+            val response = Profiles.pool.addRecord(it.author.id, it.author.effectiveAvatarUrl, profileText)
 
             when (response) {
                 AddResponse.Accepted -> it.respond("Your profile has been added to the review pool. An administrator will review it shortly.")

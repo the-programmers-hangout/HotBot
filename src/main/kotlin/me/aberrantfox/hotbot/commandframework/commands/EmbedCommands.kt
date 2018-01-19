@@ -71,7 +71,7 @@ fun embedCommands() =
 
         command("setselfauthor") {
             execute {
-                EHolder.embed.setAuthor(it.author.fullName(), null, it.author.avatarUrl)
+                EHolder.embed.setAuthor(it.author.fullName(), null, it.author.effectiveAvatarUrl)
             }
         }
 
@@ -79,7 +79,7 @@ fun embedCommands() =
             expect(ArgumentType.UserID)
             execute {
                 val target = (it.args[0] as String).idToUser(it.jda)
-                EHolder.embed.setAuthor(target.fullName(), null, target.avatarUrl)
+                EHolder.embed.setAuthor(target.fullName(), null, target.effectiveAvatarUrl)
             }
         }
 
