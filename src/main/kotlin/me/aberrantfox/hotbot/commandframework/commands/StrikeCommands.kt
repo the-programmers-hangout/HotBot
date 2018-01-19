@@ -211,7 +211,8 @@ private fun buildInfractionEmbed(userMention: String, reason: String, strikeQuan
                                  strikeCeil: Int, punishmentAction: String) =
         embed {
             title("Infraction")
-            description("$userMention, you have been infracted.\nInfractions are formal warnings from staff members on TPH.")
+            description("$userMention, you have been infracted.\nInfractions are formal warnings from staff members on TPH.\n" +
+                        "If you think your infraction is undoubtedly unjustified, please **do not** post about it in a public channel but take it up with an administrator.")
 
             ifield {
                 name = "Strike Quantity"

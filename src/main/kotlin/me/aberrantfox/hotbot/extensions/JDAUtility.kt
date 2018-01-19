@@ -1,5 +1,6 @@
 package me.aberrantfox.hotbot.extensions
 
+import me.aberrantfox.hotbot.dsls.embed.embed
 import me.aberrantfox.hotbot.services.Configuration
 import net.dv8tion.jda.core.JDA
 import net.dv8tion.jda.core.entities.Guild
@@ -48,7 +49,7 @@ fun permMuteMember(guild: Guild, user: User, reason: String, config: Configurati
     guild.controller.addRolesToMember(guild.getMemberById(user.id), guild.getRolesByName(config.security.mutedRole, true)).queue()
 
     user.openPrivateChannel().queue {
-        val muteEmbed = buildMuteEmbed("Indefinite", reason)
+        val muteEmbed = buildMuteEmbed(user.asMention, "Indefinite", reason)
 
         it.sendMessage(muteEmbed).queue()
     }
@@ -62,7 +63,7 @@ fun muteMember(guild: Guild, user: User, time: Long, reason: String, config: Con
         val timeToUnmute = futureTime(time)
         val record = MuteRecord(timeToUnmute, reason, moderator.id, user.id, guild.id)
 
-        val muteEmbed = buildMuteEmbed(timeString, reason)
+        val muteEmbed = buildMuteEmbed(user.asMention, timeString, reason)
         it.sendMessage(muteEmbed).queue()
 
         config.security.mutedMembers.add(record)
@@ -74,10 +75,10 @@ fun muteMember(guild: Guild, user: User, time: Long, reason: String, config: Con
     }
 }
 
-private fun buildMuteEmbed(timeString: String, reason: String) =
+private fun buildMuteEmbed(userMention: String, timeString: String, reason: String) =
         embed {
             title("Mute")
-            description("You have been muted for:")
+            description("$userMention, you have been muted.\nA muted user cannot speak, post in channels, or react to messages.")
 
             field {
                 name = "Length"
