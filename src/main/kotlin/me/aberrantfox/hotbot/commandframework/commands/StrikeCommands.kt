@@ -99,6 +99,7 @@ fun strikeCommands() =
         }
 
         command("cleanse") {
+            expect(ArgumentType.UserID)
             execute {
                 val userId = it.args[0] as String
                 val amount = removeAllInfractions(userId)
