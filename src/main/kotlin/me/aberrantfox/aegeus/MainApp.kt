@@ -20,20 +20,20 @@ import net.dv8tion.jda.core.entities.Guild
 fun main(args: Array<String>) {
     println("Starting to load hotbot.")
     val container = produceContainer()
-    val config = loadConfig(container) ?: return
+    val config = loadConfig() ?: return
 
 
     saveConfig(config)
     setupDatabaseSchema(config)
 
-    val jda = JDABuilder(AccountType.BOT).setToken(config.token).buildBlocking()
+    val jda = JDABuilder(AccountType.BOT).setToken(config.serverInformation.token).buildBlocking()
     val logger = convertChannels(config.logChannels, jda)
 
     logger.info("connected")
-    val mutedRole = jda.getRolesByName(config.mutedRole, true).first()
+    val mutedRole = jda.getRolesByName(config.security.mutedRole, true).first()
     val tracker = MessageTracker(1)
-    val guild = jda.getGuildById(config.guildid)
-    val manager = PermissionManager(roles = guild.roles)
+    val guild = jda.getGuildById(config.serverInformation.guildid)
+    val manager = PermissionManager(HashMap(), guild.roles, guild, config)
 
     loadUpManager(manager)
 
@@ -41,16 +41,16 @@ fun main(args: Array<String>) {
 
     jda.addEventListener(
             CommandListener(config, container, jda, logger, guild, manager),
-            MemberListener(config),
-            InviteListener(config),
+            MemberListener(config, logger),
+            InviteListener(config, logger),
             MentionListener(config, jda.selfUser.name),
             VoiceChannelListener(logger),
             NewChannelListener(mutedRole),
             DuplicateMessageListener(config, logger, tracker),
             RoleListener(config))
 
-    jda.presence.setPresence(OnlineStatus.ONLINE, Game.of("${config.prefix}help"))
-    jda.guilds.forEach { setupMutedRole(it, config.mutedRole) }
+    jda.presence.setPresence(OnlineStatus.ONLINE, Game.of("${config.serverInformation.prefix}help"))
+    jda.guilds.forEach { setupMutedRole(it, config.security.mutedRole) }
 
     handleLTSMutes(config, jda)
     logger.info("Fully setup, now ready for use.")
@@ -80,7 +80,7 @@ private fun handleRole(guild: Guild, roleName: String) {
 }
 
 private fun handleLTSMutes(config: Configuration, jda: JDA) {
-    config.mutedMembers.forEach {
+    config.security.mutedMembers.forEach {
         val difference = timeToDifference(it.unmuteTime)
         val guild = jda.getGuildById(it.guildId)
         val user = guild.getMemberById(it.user)
