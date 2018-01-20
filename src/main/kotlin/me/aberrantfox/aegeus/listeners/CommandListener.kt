@@ -8,9 +8,10 @@ import me.aberrantfox.aegeus.dsls.command.arg
 import me.aberrantfox.aegeus.services.Configuration
 import me.aberrantfox.aegeus.commandframework.commands.macroMap
 import me.aberrantfox.aegeus.extensions.*
-import me.aberrantfox.aegeus.permissions.Permission
-import me.aberrantfox.aegeus.permissions.getHighestPermissionLevel
+import me.aberrantfox.aegeus.logging.BotLogger
+import me.aberrantfox.aegeus.permissions.PermissionManager
 import me.aberrantfox.aegeus.services.CommandRecommender
+import me.aberrantfox.aegeus.services.UserID
 import net.dv8tion.jda.core.JDA
 import net.dv8tion.jda.core.entities.*
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent
@@ -20,8 +21,9 @@ import net.dv8tion.jda.core.hooks.ListenerAdapter
 data class CommandListener(val config: Configuration,
                            val container: CommandsContainer,
                            val jda: JDA,
-                           val logChannel: MessageChannel,
-                           val guild: Guild) : ListenerAdapter() {
+                           val log: BotLogger,
+                           val guild: Guild,
+                           val manager: PermissionManager) : ListenerAdapter() {
     init {
         CommandRecommender.addAll(container.commands.keys.toList() + macroMap.keys.toList())
     }
@@ -34,20 +36,19 @@ data class CommandListener(val config: Configuration,
         if ( !(isUsableEvent(message, channel.id, author)) ) return
 
         val (commandName, actualArgs) = getCommandStruct(message.contentRaw, config)
-        val permission = getHighestPermissionLevel(guild, config, jda, author.id)
 
-        if (!(isValidCommand(permission, channel, message))) return
+        if (!(isValidCommand(channel, message, author.id))) return
 
         val command = container.get(commandName)
 
         when {
             command != null -> {
-                invokeCommand(command, commandName, actualArgs, message, author, permission, invokedInGuild)
-                logChannel.sendMessage("${author.descriptor()} -- invoked $commandName in ${channel.name}").queue()
+                invokeCommand(command, commandName, actualArgs, message, author, invokedInGuild)
+                log.cmd("${author.descriptor()} -- invoked $commandName in ${channel.name}")
             }
             macroMap.containsKey(commandName) -> {
                 channel.sendMessage(macroMap[commandName]).queue()
-                logChannel.sendMessage("${author.descriptor()} -- invoked $commandName in ${channel.name}").queue()
+                log.cmd("${author.descriptor()} -- invoked $commandName in ${channel.name}")
             }
             else -> {
                 val recommended = CommandRecommender.recommendCommand(commandName)
@@ -55,16 +56,14 @@ data class CommandListener(val config: Configuration,
             }
         }
 
-        if (invokedInGuild) handleDelete(message, config.prefix)
+        if (invokedInGuild) handleDelete(message, config.serverInformation.prefix)
     }
 
-    private fun invokeCommand(command: Command, name: String, actual: List<String>, message: Message, author: User,
-                              permission: Permission, invokedInGuild: Boolean) {
+    private fun invokeCommand(command: Command, name: String, actual: List<String>, message: Message, author: User, invokedInGuild: Boolean) {
         val channel = message.channel
-        val commandPermissionLevel = config.commandPermissionMap[name] ?: return
 
-        if (permission < commandPermissionLevel) {
-            channel.sendMessage(":unamused: Do you really think I would let you do that").queue()
+        if( !(manager.canUseCommand(author.id, name)) ) {
+            channel.sendMessage("Did you really think I would let you do that? :thinking:").queue()
             return
         }
 
@@ -77,7 +76,7 @@ data class CommandListener(val config: Configuration,
             return
         }
 
-        val event = CommandEvent(parsedArgs, config, jda, channel, author, message, guild)
+        val event = CommandEvent(parsedArgs, config, jda, channel, author, message, guild, manager, container)
 
         if (command.parameterCount == 0) {
             command.execute(event)
@@ -94,29 +93,29 @@ data class CommandListener(val config: Configuration,
     private fun isUsableEvent(message: Message, channel: String, author: User): Boolean {
         if (message.contentRaw.length > 1500) return false
 
-        if (config.lockDownMode && author.id != config.ownerID) return false
+        if (config.security.lockDownMode && author.id != config.serverInformation.ownerID) return false
 
         if (!(message.isCommandInvocation(config))) return false
 
-        if (config.ignoredIDs.contains(channel) || config.ignoredIDs.contains(author.id)) return false
+        if (config.security.ignoredIDs.contains(channel) || config.security.ignoredIDs.contains(author.id)) return false
 
         if (author.isBot) return false
 
         return true
     }
 
-    private fun isValidCommand(userPerm: Permission, channel: MessageChannel, message: Message): Boolean {
-        if (userPerm < config.mentionFilterLevel && message.mentionsSomeone()) {
+    private fun isValidCommand(channel: MessageChannel, message: Message, userID: UserID): Boolean {
+        if (manager.canPerformAction(userID, config.permissionedActions.commandMention) && message.mentionsSomeone()) {
             channel.sendMessage("Your permission level is below the required level to use a command mention.").queue()
             return false
         }
 
-        if (userPerm < config.invitePermissionLevel && message.containsInvite()) {
+        if (manager.canPerformAction(userID, config.permissionedActions.sendInvite) && message.containsInvite()) {
             channel.sendMessage("Ayyy lmao. Nice try, try that again. I dare you. :rllynow:").queue()
             return false
         }
 
-        if (userPerm < config.urlFilterPermissionLevel && message.containsURL()) {
+        if (manager.canPerformAction(userID, config.permissionedActions.sendURL) && message.containsURL()) {
             channel.sendMessage("Your permission level is below the required level to use a URL in a command.").queue()
             return false
         }
