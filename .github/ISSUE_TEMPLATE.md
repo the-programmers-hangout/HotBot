@@ -3,11 +3,11 @@
 <!-- Describe the issue with a short and accurate title -->
 
 **Priority:**
-<3, 2, 1>
+<1, 2, 3>
 
 <!-- e.g: 3 -->
 <!-- Proposed priority for the issue. -->
-<!-- 3 is the lowest. e.g: Documentation grammar errors -->
+<!-- 1 is the lowest. e.g: Documentation grammar errors -->
 <!-- 2 being medium. e.g: Strike system not muting people on 2 strikes -->
 <!-- 3 is high. e.g: HotBot is randomly banning people. -->
 
