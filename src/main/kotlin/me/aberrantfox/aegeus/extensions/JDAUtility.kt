@@ -4,6 +4,7 @@ import me.aberrantfox.aegeus.services.Configuration
 import net.dv8tion.jda.core.JDA
 import net.dv8tion.jda.core.entities.Guild
 import net.dv8tion.jda.core.entities.MessageEmbed
+import net.dv8tion.jda.core.entities.Role
 import net.dv8tion.jda.core.entities.User
 import java.util.*
 
@@ -24,6 +25,14 @@ fun Guild.hasRole(roleName: String): Boolean = this.roles.any { it.name.toLowerC
 
 fun JDA.isRole(role: String) = this.getRolesByName(role, true).size == 1
 
+fun User.toMember(guild: Guild) = guild.getMemberById(this.id)
+
+fun Role.isEqualOrHigherThan(other: Role?) = if(other == null) false else this.position >= other.position
+
+fun String.toRole(guild: Guild): Role? = guild.getRoleById(this)
+
+fun String.sanitiseMentions() = this.replace("@", "")
+
 fun Long.convertToTimeString(): String {
     val seconds = this / 1000
     val minutes = seconds / 60
@@ -34,7 +43,7 @@ fun Long.convertToTimeString(): String {
 }
 
 fun permMuteMember(guild: Guild, user: User, reason: String, config: Configuration, moderator: User) {
-    guild.controller.addRolesToMember(guild.getMemberById(user.id), guild.getRolesByName(config.mutedRole, true)).queue()
+    guild.controller.addRolesToMember(guild.getMemberById(user.id), guild.getRolesByName(config.security.mutedRole, true)).queue()
 
     user.openPrivateChannel().queue {
         it.sendMessage("You have been muted indefinitely, for reason: $reason").queue()
@@ -42,7 +51,7 @@ fun permMuteMember(guild: Guild, user: User, reason: String, config: Configurati
 }
 
 fun muteMember(guild: Guild, user: User, time: Long, reason: String, config: Configuration, moderator: User) {
-    guild.controller.addRolesToMember(guild.getMemberById(user.id), guild.getRolesByName(config.mutedRole, true)).queue()
+    guild.controller.addRolesToMember(guild.getMemberById(user.id), guild.getRolesByName(config.security.mutedRole, true)).queue()
     val timeString = time.convertToTimeString()
 
     user.openPrivateChannel().queue {
@@ -51,7 +60,7 @@ fun muteMember(guild: Guild, user: User, time: Long, reason: String, config: Con
 
         it.sendMessage("You have been muted for $timeString, reason: $reason").queue()
 
-        config.mutedMembers.add(record)
+        config.security.mutedMembers.add(record)
         unmute(guild, user, config, time, record)
 
     }
@@ -77,18 +86,18 @@ fun unmute(guild: Guild, user: User, config: Configuration, time: Long, muteReco
 
 fun removeMuteRole(guild: Guild, user: User, config: Configuration, record: MuteRecord) {
     if (user.mutualGuilds.isEmpty()) {
-        config.mutedMembers.remove(record)
+        config.security.mutedMembers.remove(record)
         return
     }
 
-    config.mutedMembers.remove(record)
+    config.security.mutedMembers.remove(record)
     removeMuteRole(guild, user, config)
 }
 
 fun removeMuteRole(guild: Guild, user: User, config: Configuration) =
     user.openPrivateChannel().queue {
         it.sendMessage("${user.name} - you have been unmuted. Please respect our rules to prevent further infractions.").queue {
-            guild.controller.removeRolesFromMember(guild.getMemberById(user.id), guild.getRolesByName(config.mutedRole, true)).queue()
+            guild.controller.removeRolesFromMember(guild.getMemberById(user.id), guild.getRolesByName(config.security.mutedRole, true)).queue()
         }
     }
 
