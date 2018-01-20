@@ -18,7 +18,9 @@ class MemberListener(val configuration: Configuration) : ListenerAdapter() {
         val response = MessageService.getMessage(MessageType.Join).replace("%name%", event.user.asMention)
         val userImage = event.user.avatarUrl ?: "http://i.imgur.com/HYkhEFO.jpg"
 
-        target?.sendMessage(buildJoinMessage(response, userImage))?.queue()
+        target?.sendMessage(buildJoinMessage(response, userImage))?.queue {
+            it.addReaction("\uD83D\uDC4B").queue()
+        }
     }
 
     override fun onGuildMemberLeave(event: GuildMemberLeaveEvent) {
