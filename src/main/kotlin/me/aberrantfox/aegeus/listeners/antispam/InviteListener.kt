@@ -1,10 +1,7 @@
 package me.aberrantfox.aegeus.listeners.antispam
 
-import me.aberrantfox.aegeus.permissions.getHighestPermissionLevel
-import me.aberrantfox.aegeus.extensions.containsInvite
-import me.aberrantfox.aegeus.extensions.deleteIfExists
-import me.aberrantfox.aegeus.extensions.fullName
-import me.aberrantfox.aegeus.extensions.idToName
+import me.aberrantfox.aegeus.extensions.*
+import me.aberrantfox.aegeus.logging.BotLogger
 import me.aberrantfox.aegeus.services.Configuration
 import me.aberrantfox.aegeus.services.PersistentSet
 import me.aberrantfox.aegeus.services.WeightTracker
@@ -28,7 +25,7 @@ object RecentInvites {
     }
 }
 
-class InviteListener(val config: Configuration) : ListenerAdapter() {
+class InviteListener(val config: Configuration, val logger: BotLogger) : ListenerAdapter() {
     override fun onGuildMessageUpdate(event: GuildMessageUpdateEvent) =
             handlePossibleInviteMessage(event.member, event.message, event.guild, event.channel, event.author.isBot, event.jda)
 
@@ -40,9 +37,9 @@ class InviteListener(val config: Configuration) : ListenerAdapter() {
         if (isBot) return
 
         val id = author.user.id
-        val maxPermissionLevel = getHighestPermissionLevel(guild, config, jda, id)
+        val highestRole = author.user.id.idToUser(message.jda).toMember(guild).getHighestRole()
 
-        if(maxPermissionLevel >= config.invitePermissionLevel) return
+        if(config.permissionedActions.sendInvite.toRole(guild)?.isEqualOrHigherThan(highestRole) == true) return
 
         if (RecentInvites.trimmedMessage(message.contentRaw).containsInvite()) {
             var messageContent = message.contentRaw
@@ -50,23 +47,16 @@ class InviteListener(val config: Configuration) : ListenerAdapter() {
             if (messageContent.contains('@')) messageContent = messageContent.replace("@", "`@`")
 
             RecentInvites.cache.addOrUpdate(id)
-            val logChannel = guild.textChannels.findLast { it.id == config.logChannel }
-
-            //TODO: Make the amount configurable.
             if(RecentInvites.value(id) >= 5) {
                 guild.controller.ban(author, 0, "You've been automatically banned for linking invitations. Advertising is not allowed, sorry.").queue {
-                    logChannel?.sendMessage("Banned user: ${author.fullName()} ($id for advertising automatically.")?.queue()
+                    logger.alert("Banned user: ${author.fullName()} ($id for advertising automatically.")
                 }
-                logChannel?.sendMessage("Banned: ${id.idToName(jda)} for ${RecentInvites.value(id)} invites.")?.queue()
+                logger.alert("Banned: ${id.idToName(jda)} for ${RecentInvites.value(id)} invites.")
                 RecentInvites.cache.map.remove(id)
             }
 
             message.deleteIfExists {
-                logChannel
-                    ?.sendMessage("Deleted message: $messageContent " +
-                        "by ${author.asMention} " +
-                        "in ${channel.asMention}")
-                    ?.queue()
+                logger.alert("Deleted message: $messageContent by ${author.asMention} in ${channel.asMention}")
             }
         }
     }
