@@ -19,7 +19,9 @@ class MemberListener(val configuration: Configuration, val logger: BotLogger) : 
         val response = MessageService.getMessage(MessageType.Join).replace("%name%", event.user.asMention)
         val userImage = event.user.avatarUrl ?: "http://i.imgur.com/HYkhEFO.jpg"
 
-        target?.sendMessage(buildJoinMessage(response, userImage))?.queue()
+        target?.sendMessage(buildJoinMessage(response, userImage))?.queue {
+            it.addReaction("\uD83D\uDC4B").queue()
+        }
     }
 
     override fun onGuildMemberLeave(e: GuildMemberLeaveEvent) = logger.info("${e.user.asMention} left the server")
