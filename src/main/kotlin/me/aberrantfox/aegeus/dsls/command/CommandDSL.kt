@@ -1,15 +1,18 @@
 package me.aberrantfox.aegeus.dsls.command
 
 import me.aberrantfox.aegeus.commandframework.ArgumentType
+import me.aberrantfox.aegeus.extensions.sanitiseMentions
 import me.aberrantfox.aegeus.logging.BotLogger
 import me.aberrantfox.aegeus.logging.ChannelLogger
 import me.aberrantfox.aegeus.logging.DefaultLogger
+import me.aberrantfox.aegeus.permissions.PermissionManager
 import me.aberrantfox.aegeus.services.Configuration
 import net.dv8tion.jda.core.JDA
 import net.dv8tion.jda.core.entities.*
 
 data class CommandEvent(val args: List<Any>, val config: Configuration, val jda: JDA, val channel: MessageChannel,
-                        val author: User, val message: Message, val guild: Guild) {
+                        val author: User, val message: Message, val guild: Guild, val manager: PermissionManager,
+                        val container: CommandsContainer) {
 
     fun respond(msg: String) =
         if(msg.length > 2000) {
@@ -20,6 +23,8 @@ data class CommandEvent(val args: List<Any>, val config: Configuration, val jda:
         }
 
     fun respond(embed: MessageEmbed) = this.channel.sendMessage(embed).queue()
+
+    fun safeRespond(msg: String) = respond(msg.sanitiseMentions())
 }
 
 @CommandTagMarker
@@ -79,7 +84,7 @@ data class CommandArgument(val type: ArgumentType, val optional: Boolean = false
 }
 
 @CommandTagMarker
-data class CommandsContainer(var log: BotLogger, val commands: HashMap<String, Command> = HashMap()) {
+data class CommandsContainer(var log: BotLogger, var commands: HashMap<String, Command> = HashMap()) {
     operator fun invoke(args: CommandsContainer.() -> Unit) {}
 
     fun command(name: String, construct: Command.() -> Unit): Command? {
