@@ -21,7 +21,7 @@ fun strikeCommands() =
             execute {
                 strike(CommandEvent(listOf(it.args[0], 0, it.args[1]),
                     it.config, it.jda, it.channel,
-                    it.author, it.message, it.guild))
+                    it.author, it.message, it.guild, it.manager, it.container))
             }
         }
 
@@ -52,7 +52,7 @@ fun strikeCommands() =
 
                 var totalStrikes = getMaxStrikes(target)
 
-                if (totalStrikes > it.config.strikeCeil) totalStrikes = it.config.strikeCeil
+                if (totalStrikes > it.config.security.strikeCeil) totalStrikes = it.config.security.strikeCeil
 
                 administerPunishment(it.config, target.idToUser(it.jda), strikeQuantity, reason, it.guild, it.author, totalStrikes)
             }
@@ -136,7 +136,7 @@ private fun handleInfraction(event: CommandEvent) {
 
     var totalStrikes = getMaxStrikes(target)
 
-    if(totalStrikes > event.config.strikeCeil) totalStrikes = event.config.strikeCeil
+    if(totalStrikes > event.config.security.strikeCeil) totalStrikes = event.config.security.strikeCeil
 
     administerPunishment(event.config, target.idToUser(event.jda), strikeQuantity, reason, event.guild, event.author, totalStrikes)
 }
@@ -168,7 +168,7 @@ private fun strike(event: CommandEvent) {
 
     var totalStrikes = getMaxStrikes(target)
 
-    if(totalStrikes > event.config.strikeCeil) totalStrikes = event.config.strikeCeil
+    if(totalStrikes > event.config.security.strikeCeil) totalStrikes = event.config.security.strikeCeil
 
     administerPunishment(event.config, target.idToUser(event.jda), strikeQuantity, reason, event.guild, event.author, totalStrikes)
 }
@@ -176,14 +176,14 @@ private fun strike(event: CommandEvent) {
 private fun administerPunishment(config: Configuration, user: User, strikeQuantity: Int, reason: String,
                                  guild: Guild, moderator: User, totalStrikes: Int) {
     user.openPrivateChannel().queue { chan ->
-        val punishmentAction = config.infractionActionMap[totalStrikes]
+        val punishmentAction = config.security.infractionActionMap[totalStrikes]
         chan.sendMessage("${chan.user.asMention}, you have been infracted. Infractions are formal warnings from staff members" +
                 " on TPH. The infraction you just received was a $strikeQuantity strike infraction," +
                 " and you received it for reason: $reason\n" +
-                " Your current strike count is $totalStrikes/${config.strikeCeil}.\n" +
+                " Your current strike count is $totalStrikes/${config.security.strikeCeil}.\n" +
                 "The assigned punishment for this infraction is: $punishmentAction").queue {
 
-            when (config.infractionActionMap[totalStrikes]) {
+            when (config.security.infractionActionMap[totalStrikes]) {
                 InfractionAction.Warn -> {
                     chan.sendMessage("This is your warning - Do not break the rules again.").queue()
                 }

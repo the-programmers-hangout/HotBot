@@ -53,7 +53,7 @@ fun profileCommands() = commands {
                 return@execute
             }
 
-            val target = it.jda.getTextChannelById(it.config.profileChannel)
+            val target = it.jda.getTextChannelById(it.config.messageChannels.profileChannel)
             target.sendMessage(
                 record.prettyPrint(it.jda, "Profile")
                     .setTitle("")

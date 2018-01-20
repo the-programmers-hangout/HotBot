@@ -3,11 +3,11 @@ package me.aberrantfox.aegeus.listeners.antispam
 import me.aberrantfox.aegeus.commandframework.commands.SecurityLevelState
 import me.aberrantfox.aegeus.extensions.fullName
 import me.aberrantfox.aegeus.extensions.permMuteMember
+import me.aberrantfox.aegeus.logging.BotLogger
 import me.aberrantfox.aegeus.services.AccurateMessage
 import me.aberrantfox.aegeus.services.Configuration
 import me.aberrantfox.aegeus.services.MessageTracker
 import me.aberrantfox.aegeus.services.PersistentSet
-import net.dv8tion.jda.core.entities.TextChannel
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent
 import net.dv8tion.jda.core.hooks.ListenerAdapter
 import org.joda.time.DateTime
@@ -16,7 +16,7 @@ object MutedRaiders {
     val set = PersistentSet("raiders.json")
 }
 
-class DuplicateMessageListener (val config: Configuration, val log: TextChannel, val tracker: MessageTracker) : ListenerAdapter() {
+class DuplicateMessageListener (val config: Configuration, val log: BotLogger, val tracker: MessageTracker) : ListenerAdapter() {
     override fun onGuildMessageReceived(event: GuildMessageReceivedEvent) {
         val time = DateTime.now()
 
@@ -61,7 +61,7 @@ class DuplicateMessageListener (val config: Configuration, val log: TextChannel,
 
         tracker.list(id)?.forEach { it.message.delete().queue() }
 
-        log.sendMessage("${event.author.fullName()} was muted for $reason").queue()
+        log.warning("${event.author.fullName()} was muted for $reason")
         tracker.removeUser(id)
     }
 }

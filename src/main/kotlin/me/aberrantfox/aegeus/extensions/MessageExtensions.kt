@@ -14,7 +14,7 @@ fun Message.containsInvite() = rawContent.containsInvite()
 
 fun Message.containsURL() = rawContent.containsURl()
 
-fun Message.isCommandInvocation(config: Configuration) = rawContent.startsWith(config.prefix)
+fun Message.isCommandInvocation(config: Configuration) = rawContent.startsWith(config.serverInformation.prefix)
 
 fun Message.deleteIfExists(runnable: () -> Unit = {}) = channel.getMessageById(id).queue { it?.delete()?.queue { runnable() } }
 

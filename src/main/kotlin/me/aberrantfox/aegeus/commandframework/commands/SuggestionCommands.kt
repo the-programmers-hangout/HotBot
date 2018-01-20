@@ -75,7 +75,7 @@ fun suggestionCommands() = commands {
             }
 
             val channel = it.guild.textChannels.findLast { channel ->
-                channel.id == it.config.suggestionChannel
+                channel.id == it.config.messageChannels.suggestionChannel
             }
 
             channel?.sendMessage(buildSuggestionMessage(suggestion, it.jda, SuggestionStatus.Review).build())?.queue {
@@ -97,7 +97,7 @@ fun suggestionCommands() = commands {
             }
 
             val channel = it.guild.textChannels.findLast { channel ->
-                channel.id == it.config.suggestionChannel
+                channel.id == it.config.messageChannels.suggestionChannel
             }
 
             channel?.sendMessage(buildSuggestionMessage(suggestion, it.jda, SuggestionStatus.Review).build())?.queue {
@@ -159,7 +159,7 @@ fun suggestionCommands() = commands {
     }
 }
 
-private fun fetchSuggestionChannel(guild: Guild, config: Configuration) = guild.getTextChannelById(config.suggestionChannel)
+private fun fetchSuggestionChannel(guild: Guild, config: Configuration) = guild.getTextChannelById(config.messageChannels.suggestionChannel)
 
 private fun inputToStatus(input: String): SuggestionStatus? = SuggestionStatus.values().findLast { it.name.toLowerCase() == input.toLowerCase() }
 

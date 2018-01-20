@@ -1,5 +1,6 @@
 package me.aberrantfox.aegeus.listeners
 
+import me.aberrantfox.aegeus.logging.BotLogger
 import me.aberrantfox.aegeus.services.Configuration
 import me.aberrantfox.aegeus.services.MessageService
 import me.aberrantfox.aegeus.services.MessageType
@@ -11,21 +12,17 @@ import java.awt.Color
 
 
 
-class MemberListener(val configuration: Configuration) : ListenerAdapter() {
+class MemberListener(val configuration: Configuration, val logger: BotLogger) : ListenerAdapter() {
 
     override fun onGuildMemberJoin(event: GuildMemberJoinEvent) {
-        val target = event.guild.textChannels.findLast { it.id == configuration.welcomeChannel }
+        val target = event.guild.textChannels.findLast { it.id == configuration.messageChannels.welcomeChannel }
         val response = MessageService.getMessage(MessageType.Join).replace("%name%", event.user.asMention)
         val userImage = event.user.avatarUrl ?: "http://i.imgur.com/HYkhEFO.jpg"
 
         target?.sendMessage(buildJoinMessage(response, userImage))?.queue()
     }
 
-    override fun onGuildMemberLeave(event: GuildMemberLeaveEvent) {
-        event.guild.textChannels.findLast { it.id == configuration.logChannel }
-                ?.sendMessage(configuration.leaveMessage.replace("%name%", event.user.asMention))
-                ?.queue()
-    }
+    override fun onGuildMemberLeave(e: GuildMemberLeaveEvent) = logger.info("${e.user.asMention} left the server")
 }
 
 private fun buildJoinMessage(response: String, image: String) =

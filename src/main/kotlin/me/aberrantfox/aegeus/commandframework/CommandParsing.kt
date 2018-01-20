@@ -1,5 +1,6 @@
 package me.aberrantfox.aegeus.commandframework
 
+import me.aberrantfox.aegeus.dsls.command.Command
 import me.aberrantfox.aegeus.dsls.command.CommandsContainer
 import me.aberrantfox.aegeus.extensions.*
 import me.aberrantfox.aegeus.services.Configuration
@@ -22,9 +23,19 @@ fun produceContainer(): CommandsContainer {
     val pack = "me.aberrantfox.aegeus.commandframework.commands"
     val cmds = Reflections(pack, MethodAnnotationsScanner()).getMethodsAnnotatedWith(CommandSet::class.java)
 
-    return cmds.map { it.invoke(null) }
+    val container = cmds.map { it.invoke(null) }
         .map { it as CommandsContainer }
         .reduce { a, b -> a.join(b) }
+
+    val lowMap = HashMap<String, Command>()
+
+    container.commands.keys.forEach {
+        lowMap.put(it.toLowerCase(), container.commands[it]!!)
+    }
+
+    container.commands = lowMap
+
+    return container
 }
 
 fun convertArguments(actual: List<String>, expected: List<ArgumentType>, jda: JDA): List<Any>? {
@@ -67,9 +78,9 @@ fun convertArguments(actual: List<String>, expected: List<ArgumentType>, jda: JD
 }
 
 fun getCommandStruct(message: String, config: Configuration): CommandStruct {
-    var trimmedMessage = message.substring(config.prefix.length)
+    var trimmedMessage = message.substring(config.serverInformation.prefix.length)
 
-    if(trimmedMessage.startsWith(config.prefix)) trimmedMessage = trimmedMessage.substring(config.prefix.length)
+    if(trimmedMessage.startsWith(config.serverInformation.prefix)) trimmedMessage = trimmedMessage.substring(config.serverInformation.prefix.length)
 
     if (!(message.contains(" "))) {
         return CommandStruct(trimmedMessage.toLowerCase())

@@ -2,99 +2,59 @@ package me.aberrantfox.aegeus.commandframework.commands
 
 import me.aberrantfox.aegeus.commandframework.*
 import me.aberrantfox.aegeus.dsls.command.commands
-import me.aberrantfox.aegeus.dsls.embed.embed
-import me.aberrantfox.aegeus.permissions.Permission
-import me.aberrantfox.aegeus.permissions.getHighestPermissionLevel
-import me.aberrantfox.aegeus.permissions.stringToPermission
-import net.dv8tion.jda.core.EmbedBuilder
-import java.awt.Color
-import java.util.*
+import me.aberrantfox.aegeus.extensions.getHighestRole
+import me.aberrantfox.aegeus.extensions.sanitiseMentions
+import me.aberrantfox.aegeus.extensions.toMember
+import me.aberrantfox.aegeus.extensions.toRole
 
 @CommandSet
 fun permissionCommands() =
     commands {
-        command("setperm") {
+        command("setPermission") {
             expect(ArgumentType.Word, ArgumentType.Word)
             execute {
                 val commandName = it.args[0] as String
-                val desiredPermission = (it.args[1] as String).toUpperCase()
+                val role = (it.args[1] as String).toRole(it.guild)
 
-                if (!(it.config.commandPermissionMap.contains(commandName))) {
-                    it.respond("Dunno what the command: $commandName is - run the help command?")
+                if (!(it.container.has(commandName))) {
+                    it.safeRespond("Dunno what the command: $commandName is - run the help command?")
                     return@execute
                 }
 
-                val permission = stringToPermission(desiredPermission)
-
-                if (permission == null) {
-                    it.respond("Yup. That permission level doesn't exist. Sorry")
+                if (role == null) {
+                    it.respond("Yup. That role doesn't exist. Sorry")
                     return@execute
                 }
 
-                it.config.commandPermissionMap[commandName] = permission
-                it.respond("Permission of $commandName is now $permission")
+                it.manager.addPermission(role.id, commandName)
+                it.safeRespond("$commandName can now be invoked by ${role.name}")
             }
         }
 
-        command("getPerm") {
+        command("getPermission") {
             expect(ArgumentType.Word)
             execute {
-                val commandName = it.args[0] as String
+                val name = it.args[0] as String
 
-                if (!(it.config.commandPermissionMap.containsKey(commandName))) {
-                    it.respond("What command is that, exactly?")
+                if( !(it.container.has(name)) ) {
+                    it.safeRespond("I do not know what $name is".sanitiseMentions())
                     return@execute
                 }
 
-                it.respond("Current permission level: ${it.config.commandPermissionMap[commandName]}")
-            }
-        }
 
-        command("listcommands") {
-            execute {
-                val messageBuilder = StringBuilder()
-                it.config.commandPermissionMap.keys.forEach { messageBuilder.append(it).append(", ") }
-
-                val message = messageBuilder.substring(0, messageBuilder.length - 2)
-                it.respond("Currently there are the following commands: $message.")
-            }
-        }
-
-        command("listavailable") {
-            execute {
-                val permLevel = getHighestPermissionLevel(it.guild, it.config, it.jda, it.author.id)
-                val available = it.config.commandPermissionMap.filter { it.value <= permLevel }.keys.reduce { acc, s -> "$acc, $s" }
-
-                val cut = available.chunked(1020)
-
-                val response = embed {
-                    title("Available Commands")
-                    setColor(Color.cyan)
-                    description("Below you can find a set of commands that are available to based on your permission level," +
-                        " which is $permLevel - if you need help using any of them, simply type ${it.config.prefix}help <command>.")
-
-                    for(x in cut.indices) {
-                        addField("Commands ${x + 1}", cut[x], false)
-                    }
-                }
-
-                it.respond(response)
-            }
-        }
-
-        command("listperms") {
-            execute {
-                it.channel.sendMessage(Permission.values().map { it.name }.reduceRight { acc, s ->
-                    "$acc, $s"
-                } + ".").queue()
+                it.safeRespond("The required role is: ${it.manager.roleRequired(name)?.name ?: "Only the owner can invoke this."}")
             }
         }
 
         command("listcommandperms") {
             execute {
-                val joiner = StringJoiner("\n")
-                it.config.commandPermissionMap.entries.forEach { joiner.add("${it.key} :: ${it.value}") }
-                it.respond(joiner.toString())
+                it.safeRespond(it.manager.listAvailableCommands(it.author.toMember(it.guild).getHighestRole()?.id))
+            }
+        }
+
+        command("roleids") {
+            execute {
+                it.guild.roles.forEach { role -> it.safeRespond("${role.name} :: ${role.id}") }
             }
         }
     }

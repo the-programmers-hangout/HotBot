@@ -2,16 +2,12 @@ package me.aberrantfox.aegeus.commandframework.commands
 
 import me.aberrantfox.aegeus.commandframework.ArgumentType
 import me.aberrantfox.aegeus.commandframework.CommandSet
-import me.aberrantfox.aegeus.permissions.stringToPermission
 import me.aberrantfox.aegeus.dsls.command.commands
-import me.aberrantfox.aegeus.extensions.fullName
-import me.aberrantfox.aegeus.extensions.idToUser
-import me.aberrantfox.aegeus.extensions.muteMember
-import me.aberrantfox.aegeus.extensions.performActionIfIsID
 import me.aberrantfox.aegeus.services.MessageService
 import me.aberrantfox.aegeus.services.MessageType
 import me.aberrantfox.aegeus.database.getReason
 import me.aberrantfox.aegeus.database.updateOrSetReason
+import me.aberrantfox.aegeus.extensions.*
 import net.dv8tion.jda.core.OnlineStatus
 import net.dv8tion.jda.core.entities.Game
 import net.dv8tion.jda.core.entities.Message
@@ -44,11 +40,11 @@ fun moderationCommands() = commands {
             val config = it.config
             val target = it.args[0] as String
 
-            if (config.ignoredIDs.contains(target)) {
-                config.ignoredIDs.remove(target)
+            if (config.security.ignoredIDs.contains(target)) {
+                config.security.ignoredIDs.remove(target)
                 it.respond("Unignored $target")
             } else {
-                config.ignoredIDs.add(target)
+                config.security.ignoredIDs.add(target)
                 it.respond("$target? Who? What? Don't know what that is. ;)")
             }
         }
@@ -70,8 +66,8 @@ fun moderationCommands() = commands {
     command("lockdown") {
         execute {
             val config = it.config
-            config.lockDownMode = !config.lockDownMode
-            it.respond("Lockdown mode is now set to: ${config.lockDownMode}.")
+            config.security.lockDownMode = !config.security.lockDownMode
+            it.respond("Lockdown mode is now set to: ${config.security.lockDownMode}.")
         }
     }
 
@@ -79,22 +75,22 @@ fun moderationCommands() = commands {
         expect(ArgumentType.Word)
         execute {
             val newPrefix = it.args[0] as String
-            it.config.prefix = newPrefix
+            it.config.serverInformation.prefix = newPrefix
             it.respond("Prefix is now $newPrefix. Please invoke commands using that prefix in the future." +
                 "To save this configuration, use the saveconfigurations command.")
-            it.jda.presence.setPresence(OnlineStatus.ONLINE, Game.of("${it.config.prefix}help"))
+            it.jda.presence.setPresence(OnlineStatus.ONLINE, Game.of("${it.config.serverInformation.prefix}help"))
         }
     }
 
     command("setfilter") {
         expect(ArgumentType.Word)
         execute {
-            val desiredLevel = stringToPermission((it.args[0] as String).toUpperCase())
+            val desiredLevel = (it.args[0] as String).toRole(it.guild)
 
             if (desiredLevel == null) {
                 it.respond("Don't know that permission level boss... ")
             } else {
-                it.config.mentionFilterLevel = desiredLevel
+                it.config.permissionedActions.commandMention = desiredLevel.id
                 it.respond("Permission level now set to: ${desiredLevel.name} ; be sure to save configurations.")
             }
         }

@@ -8,16 +8,16 @@ import net.dv8tion.jda.core.hooks.ListenerAdapter
 
 
 class MentionListener(val config: Configuration, val selfName: String) : ListenerAdapter() {
-    private val rateLimiter = APIRateLimiter(config.cleverBotApiCallLimit, 0, "CleverBot")
+    private val rateLimiter = APIRateLimiter(config.apiConfiguration.cleverBotApiCallLimit, 0, "CleverBot")
 
     override fun onGuildMessageReceived(event: GuildMessageReceivedEvent) {
         if( !(rateLimiter.canCall()) ) return
 
         if(event.author.isBot) return
 
-        if(config.ignoredIDs.contains(event.channel.id)) return
+        if(config.security.ignoredIDs.contains(event.channel.id)) return
 
-        if(config.ignoredIDs.contains(event.author.id)) return
+        if(config.security.ignoredIDs.contains(event.author.id)) return
 
         if(event.message.rawContent.toLowerCase().contains(event.jda.selfUser.name.toLowerCase())
             || event.message.isMentioned(event.jda.selfUser)) {
@@ -35,7 +35,7 @@ class MentionListener(val config: Configuration, val selfName: String) : Listene
             .replace("@here", "cleverbot")
 
     private fun cleverResponse(input: String): String {
-        val query = CleverBotQuery(config.cleverbotAPIKey, input)
+        val query = CleverBotQuery(config.apiConfiguration.cleverbotAPIKey, input)
 
         query.sendRequest()
         return query.response

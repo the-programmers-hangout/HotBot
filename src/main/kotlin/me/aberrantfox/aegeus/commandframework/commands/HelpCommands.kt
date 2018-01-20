@@ -61,7 +61,7 @@ private fun buildCommandHelpMessage(config: Configuration, descriptor: CommandDe
 
         field {
             name = "Example Command"
-            value = "${config.prefix}${descriptor.name} ${descriptor.example}"
+            value = "${config.serverInformation.prefix}${descriptor.name} ${descriptor.example}"
         }
     }
 
@@ -79,8 +79,8 @@ private fun getZeroArgMessage(config: Configuration) =
     embed {
         title("HotBot Help Menu")
         setColor(Color.MAGENTA)
-        description("This is the help menu. Use ${config.prefix}help <Command | Category>." +
-            "If you want to know what commands you have access to, use ${config.prefix}listAvailable")
+        description("This is the help menu. Use ${config.serverInformation.prefix}help <Command | Category>." +
+            "If you want to know what commands you have access to, use ${config.serverInformation.prefix}listAvailable")
         setFooter("Bot by Fox, made with Kotlin", "http://i.imgur.com/SJPggeJ.png")
         setThumbnail("http://i.imgur.com/DFoaG7k.png")
         setTimestamp(LocalDateTime.now())
