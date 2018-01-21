@@ -67,7 +67,7 @@ fun strikeCommands() =
                 val builder = EmbedBuilder()
                     .setTitle("${target.idToName(it.jda)}'s Record")
                     .setColor(Color.MAGENTA)
-                    .setThumbnail(target.idToUser(it.jda).avatarUrl)
+                    .setThumbnail(target.idToUser(it.jda).effectiveAvatarUrl)
 
                 records.forEach { record ->
                     builder.addField("Strike ID: ${record.id}",
@@ -100,6 +100,7 @@ fun strikeCommands() =
         }
 
         command("cleanse") {
+            expect(ArgumentType.UserID)
             execute {
                 val userId = it.args[0] as String
                 val amount = removeAllInfractions(userId)
