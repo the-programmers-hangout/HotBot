@@ -6,6 +6,7 @@ import me.aberrantfox.hotbot.extensions.fullName
 import me.aberrantfox.hotbot.extensions.idToUser
 import me.aberrantfox.hotbot.dsls.command.commands
 import me.aberrantfox.hotbot.extensions.isBooleanValue
+import me.aberrantfox.hotbot.extensions.toBooleanValue
 import net.dv8tion.jda.core.EmbedBuilder
 import net.dv8tion.jda.core.entities.MessageEmbed
 import java.awt.Color
@@ -55,6 +56,46 @@ fun embedCommands() =
                     { error -> // Failure
                         it.respond("Message retrieval failed.")
                     })
+            }
+        }
+
+        command("editfield") {
+            expect(ArgumentType.Integer, ArgumentType.Word, ArgumentType.Sentence)
+            execute {
+                val fields = EHolder.embed.fields
+
+                val fieldIndex = it.args[0] as Int
+                if (fieldIndex < 0 || fieldIndex > fields.size - 1) {
+                    it.respond("Not a valid field index")
+                    return@execute
+                }
+
+                val property = (it.args[1] as String).toLowerCase()
+                val newValue = it.args[2] as String
+
+                val field = fields[fieldIndex]
+                var name = field.name
+                var text = field.value
+                var inline = field.isInline
+
+                when(property) {
+                    "name" -> name = newValue
+                    "text", "value" -> text = newValue
+                    "inline" -> {
+                        if(!newValue.isBooleanValue()) {
+                            it.respond("You haven't supplied a boolean value")
+                            return@execute
+                        }
+
+                        inline = newValue.toBooleanValue()
+                    }
+                    else -> {
+                        it.respond("That isn't a valid property")
+                        return@execute
+                    }
+                }
+
+                fields[fieldIndex] = MessageEmbed.Field(name, text, inline)
             }
         }
 
