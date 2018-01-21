@@ -5,7 +5,9 @@ import me.aberrantfox.hotbot.commandframework.CommandSet
 import me.aberrantfox.hotbot.extensions.fullName
 import me.aberrantfox.hotbot.extensions.idToUser
 import me.aberrantfox.hotbot.dsls.command.commands
+import me.aberrantfox.hotbot.extensions.isBooleanValue
 import net.dv8tion.jda.core.EmbedBuilder
+import net.dv8tion.jda.core.entities.MessageEmbed
 import java.awt.Color
 import java.time.Instant
 
@@ -50,7 +52,11 @@ fun embedCommands() =
             }
         }
 
-        command("addtimestamp") { EHolder.embed.setTimestamp(Instant.now()) }
+        command("addtimestamp") {
+            execute {
+                EHolder.embed.setTimestamp(Instant.now())
+            }
+        }
 
         command("setcolour") {
             expect(ArgumentType.Double, ArgumentType.Double, ArgumentType.Double)
@@ -110,7 +116,9 @@ fun embedCommands() =
         }
 
         command("addfield") {
-            EHolder.embed.addField(FHolder.name, FHolder.text, false)
+            execute {
+                EHolder.embed.addField(FHolder.name, FHolder.text, false)
+            }
         }
 
         command("addIfield") {
@@ -120,11 +128,17 @@ fun embedCommands() =
         }
 
         command("clearFieldHolder") {
-            FHolder.name = ""
-            FHolder.text = ""
+            execute {
+                FHolder.name = ""
+                FHolder.text = ""
+            }
         }
 
-        command("clearfields") { EHolder.embed.clearFields() }
+        command("clearfields") {
+            execute {
+                EHolder.embed.clearFields()
+            }
+        }
 
         command("setfname") {
             expect(ArgumentType.Sentence)
