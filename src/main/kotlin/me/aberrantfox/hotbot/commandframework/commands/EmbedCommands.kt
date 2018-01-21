@@ -36,6 +36,28 @@ fun embedCommands() =
             }
         }
 
+        command("copyembed") {
+            expect(ArgumentType.Word)
+            execute {
+                val messageId = it.args[0] as String
+
+                it.channel.getMessageById(messageId).queue(
+                    { msg -> // Success
+                        val embed = msg?.embeds?.firstOrNull()
+
+                        if (embed == null) {
+                            it.respond("Message doesn't contain any embeds")
+                            return@queue
+                        }
+
+                        EHolder.embed = EmbedBuilder(embed)
+                    },
+                    { error -> // Failure
+                        it.respond("Message retrieval failed.")
+                    })
+            }
+        }
+
         command("settitle") {
             expect(ArgumentType.Sentence)
             execute {
