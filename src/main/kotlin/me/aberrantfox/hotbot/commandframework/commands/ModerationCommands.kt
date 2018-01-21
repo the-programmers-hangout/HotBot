@@ -7,13 +7,16 @@ import me.aberrantfox.hotbot.services.MessageService
 import me.aberrantfox.hotbot.services.MessageType
 import me.aberrantfox.hotbot.database.getReason
 import me.aberrantfox.hotbot.database.updateOrSetReason
+import me.aberrantfox.hotbot.dsls.embed.embed
 import me.aberrantfox.hotbot.extensions.*
+import me.aberrantfox.hotbot.services.Configuration
 import net.dv8tion.jda.core.OnlineStatus
 import net.dv8tion.jda.core.entities.Game
 import net.dv8tion.jda.core.entities.Message
 import net.dv8tion.jda.core.entities.MessageChannel
-import java.text.SimpleDateFormat
+import java.awt.Color
 import java.io.File
+import java.text.SimpleDateFormat
 
 class ModerationCommands
 
@@ -105,8 +108,6 @@ fun moderationCommands() = commands {
             val searchSpace = args[1] as Int
             val chan = args[2] as String
 
-            it.message.delete().queue()
-
             if (searchSpace < 0) {
                 it.respond("... move what")
                 return@execute
@@ -117,15 +118,17 @@ fun moderationCommands() = commands {
                 return@execute
             }
 
-            val channel = it.guild.textChannels.filter { it.id == chan }.first()
+            val channel = it.guild.textChannels.firstOrNull { it.id == chan }
 
             if (channel == null) {
                 it.respond("... to where?")
                 return@execute
             }
 
+            it.message.delete().queue()
+
             it.channel.history.retrievePast(searchSpace + 1).queue { past ->
-                handleResponse(past, channel, targets, it.channel, it.author.asMention)
+                handleResponse(past, channel, targets, it.channel, it.author.asMention, it.config)
             }
         }
     }
@@ -209,20 +212,64 @@ fun moderationCommands() = commands {
 }
 
 private fun handleResponse(past: List<Message>, channel: MessageChannel, targets: List<String>, error: MessageChannel,
-                           source: String) {
-    val messages = past.subList(1, past.size).filter { targets.contains(it.author.id) }
+                           source: String, config: Configuration) {
+
+    val messages = if (past.firstOrNull()?.isCommandInvocation(config) == true)
+                       // Without ++move command invocation message
+                       past.subList(1, past.size).filter { targets.contains(it.author.id)}
+                   else
+                       /*
+                       Without extra message that could've been the ++move message but wasn't.
+                       Side effect of having to search searchSpace+1 because of queue/API request timings
+                       causing the possibility but not guarantee of the ++move command invocation being
+                       included in the past List.
+                       */
+                       past.subList(0, past.size - 1).filter {targets.contains(it.author.id)}
+
     if (messages.isEmpty()) {
         error.sendMessage("No messages found").queue()
         return
     }
 
-    val response = messages
-        .map { "${it.author.asMention} said ${it.rawContent}" }
-        .reduce { a, b -> "$a\n$b" }
+    val responseEmbed = buildResponseEmbed(error, source, messages)
 
-    channel.sendMessage("==Messages moved from ${error.name} to here by $source\n$response")
-        .queue { messages.forEach { it.delete().queue() } }
+    channel.sendMessage(responseEmbed).queue {
+        messages.forEach {
+            it.delete().queue()
+        }
+    }
 }
+
+private fun buildResponseEmbed(orig: MessageChannel, sourceMod: String, messages: List<Message>) =
+        embed {
+            title("__Moved Messages__")
+
+            ifield {
+                name = "Source Channel"
+                value = "<#${orig.id}>"
+            }
+
+            ifield {
+                name = "By Staff"
+                value = sourceMod
+            }
+
+            messages.reversed().forEach {
+                val attachments = it.attachments
+                val content = if (attachments.size > 0 && attachments[0].isImage())
+                                  attachments[0].proxyUrl
+                              else
+                                  it.contentRaw
+
+                field {
+                    name = "Message"
+                    value = "${it.author.asMention}: $content" // Can't mention in 'name'
+                    inline = false
+                }
+            }
+
+            setColor(Color.CYAN)
+        }
 
 private fun getTargets(msg: String): List<String> =
     if (msg.contains(",")) {
