@@ -9,7 +9,7 @@
     <version>4.1.4</version>
 
     <properties>
-        <main.class>me.aberrantfox.aegeus.MainAppKt</main.class>
+        <main.class>me.aberrantfox.hotbot.MainAppKt</main.class>
         <kotlin.version>1.2.10</kotlin.version>
         <junit.version>4.12</junit.version>
         <jupiter.version>5.0.0-M4</jupiter.version>

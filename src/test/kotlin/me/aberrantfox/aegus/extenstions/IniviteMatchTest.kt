@@ -1,6 +1,6 @@
 package me.aberrantfox.aegus.extenstions
 
-import me.aberrantfox.aegeus.extensions.containsInvite
+import me.aberrantfox.hotbot.extensions.containsInvite
 import net.dv8tion.jda.core.MessageBuilder
 import org.junit.Assert
 import org.junit.Test
