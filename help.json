@@ -310,6 +310,20 @@
       "example": ""
     },
     {
+      "name": "copyembed",
+      "category": "embed",
+      "description": "Copies the embed from the message with the given id into the embed builder. You have to be in the same channel as the embed message to copy it.",
+      "structure": "{messageId}",
+      "example": "404551348739112961"
+    },
+    {
+      "name": "editfield",
+      "category": "embed",
+      "description": "Edits a field in the current embed being worked on. The passed index should be from 0 to fields.size - 1. Properties: name, text (or value), inline.",
+      "structure": "{fieldIndex} {property} {newValue}",
+      "example": "0 name New title of field"
+    },
+    {
       "name": "setTitle",
       "category": "embed",
       "description": "Set the title of the embed in memory",
