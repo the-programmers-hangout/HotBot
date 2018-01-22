@@ -312,8 +312,8 @@
     {
       "name": "copyembed",
       "category": "embed",
-      "description": "Copies the embed from the message with the given id into the embed builder. You have to be in the same channel as the embed message to copy it.",
-      "structure": "{messageId}",
+      "description": "Copies the embed from the message with the given id into the embed builder. The channelId from which to get the embed is optional and will default to the one you invoked the command in.",
+      "structure": "{messageId} [channelId]",
       "example": "404551348739112961"
     },
     {
