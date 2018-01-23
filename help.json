@@ -12,7 +12,8 @@
     "profiles": "Commands relating to the profile queue for posting developer profiles or introductions",
     "security": "Commands for modifying security features and thresholds of the bot.",
     "invites": "Commands for dictating how the bot will handle invites",
-    "rank": "Commands for granting and removing ranks."
+    "rank": "Commands for granting and removing ranks.",
+    "resources": "Commands related to channel resources"
   },
   "commands": [
     {
@@ -679,6 +680,41 @@
       "description": "google a thing",
       "structure": "{search term}",
       "example": "Stackoverflow"
+    },
+    {
+      "name": "addresource",
+      "category": "resources",
+      "description": "Add a channel resource to the current channel.",
+      "structure": "{section}|{info text}",
+      "example": "Books|Some Book - https://some.book.url/"
+    },
+    {
+      "name": "listresources",
+      "category": "resources",
+      "description": "List current channel resources",
+      "structure": "",
+      "example": ""
+    },
+    {
+      "name": "listresourcesids",
+      "category": "resources",
+      "description": "List current channel resources (w/ ids shown, for removeresource)",
+      "structure": "",
+      "example": ""
+    },
+    {
+      "name": "removeresource",
+      "category": "resources",
+      "description": "Remove one or more of current channel resources",
+      "structure": "{resourceID}|{resourceID}|...",
+      "example": "123|456|789"
+    },
+    {
+      "name": "resetresources",
+      "category": "resources",
+      "description": "Remove all of current channel resources.",
+      "structure": "",
+      "example": ""
     }
   ]
 }
