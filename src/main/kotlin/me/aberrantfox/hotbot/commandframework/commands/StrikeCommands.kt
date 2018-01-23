@@ -7,6 +7,7 @@ import me.aberrantfox.hotbot.dsls.command.commands
 import me.aberrantfox.hotbot.extensions.*
 import me.aberrantfox.hotbot.services.*
 import me.aberrantfox.hotbot.database.*
+import me.aberrantfox.hotbot.dsls.embed.embed
 import net.dv8tion.jda.core.EmbedBuilder
 import net.dv8tion.jda.core.entities.Guild
 import net.dv8tion.jda.core.entities.User
@@ -62,29 +63,7 @@ fun strikeCommands() =
             expect(ArgumentType.UserID)
             execute {
                 val target = it.args[0] as String
-                val records = getHistory(target)
-                val builder = EmbedBuilder()
-                    .setTitle("${target.idToName(it.jda)}'s Record")
-                    .setColor(Color.MAGENTA)
-                    .setThumbnail(target.idToUser(it.jda).avatarUrl)
-
-                records.forEach { record ->
-                    builder.addField("Strike ID: ${record.id}",
-                        "**Acting moderator**: ${record.moderator.idToName(it.jda)}" +
-                            "\n**Reason**: ${record.reason}" +
-                            "\n**Weight**: ${record.strikes}" +
-                            "\n**Date**: ${record.dateTime.toString(DateTimeFormat.forPattern("dd/MM/yyyy"))}," +
-                            "\n**Expired:** ${record.isExpired}",
-                        false)
-                }
-
-                if (builder.fields.size == 0) {
-                    builder.addField("Strikes",
-                        "Clean as a whistle sir",
-                        false)
-                }
-
-                it.respond(builder.build())
+                it.respond(buildHistoryEmbed(target, true, getHistory(target), it))
             }
         }
 
@@ -106,23 +85,70 @@ fun strikeCommands() =
                 it.respond("Infractions for ${userId.idToUser(it.jda).asMention} have been wiped. Total removed: $amount")
             }
         }
+
+        command("selfhistory") {
+            execute {
+                val target = it.author.id
+                target.idToUser(it.jda).sendPrivateMessage(buildHistoryEmbed(target, false, getHistory(target), it))
+            }
+        }
     }
 
 
+private fun buildHistoryEmbed(target: String, includeModerator: Boolean, records: List<StrikeRecord>, it: CommandEvent) =
+    embed {
+        val targetUser = target.idToUser(it.jda)
+
+        title("${target.idToName(it.jda)}'s Record")
+        description("${target.idToName(it.jda)} has **${records.size}** infractions(s). Of these infractions, " +
+            "**${records.filter { it.isExpired }.size}** are expired and **${records.filter { !it.isExpired }.size}** are still in effect." +
+            "\nCurrent strike value of **${getMaxStrikes(target)}/${it.config.security.strikeCeil}**" +
+            "\nJoin date: **${targetUser.toMember(it.guild).joinDate.toString().formatJdaDate()}**" +
+            "\nCreation date: **${targetUser.creationTime.toString().formatJdaDate()}**")
+        setColor(Color.MAGENTA)
+        setThumbnail(targetUser.effectiveAvatarUrl)
+
+        records.forEach { record ->
+            field {
+                name = "ID :: __${record.id}__ :: Weight :: __${record.strikes}__"
+                value = "Issued by **${record.moderator.idToName(it.jda)}** on **${record.dateTime.toString(DateTimeFormat.forPattern("dd/MM/yyyy"))}**"
+                inline = false
+
+                if(includeModerator) {
+                    value += "\nThis infraction is **${expired(record.isExpired)}**."
+                }
+            }
+
+            field {
+                name = "Infraction Reasoning Given"
+                value = record.reason
+            }
+
+            addBlankField(false)
+        }
+
+        if (this.fields.isEmpty()) {
+            ifield {
+                name = "Strikes"
+                value = "Clean as a whistle, sir."
+            }
+        }
+    }
+
 private fun handleInfraction(event: CommandEvent) {
-    if(event.guild == null) return
+    if (event.guild == null) return
 
     val args = event.args
     val target = args[0] as String
     val strikeQuantity = args[1] as Int
     val reason = args[2] as String
 
-    if(strikeQuantity < 0 || strikeQuantity > 3) {
+    if (strikeQuantity < 0 || strikeQuantity > 3) {
         event.respond("Strike weight should be between 0 and 3")
         return
     }
 
-    if( !(event.guild.members.map { it.user.id }.contains(target)) ) {
+    if (!(event.guild.members.map { it.user.id }.contains(target))) {
         event.respond("Cannot find the member by the id: $target")
         return
     }
@@ -136,25 +162,25 @@ private fun handleInfraction(event: CommandEvent) {
 
     var totalStrikes = getMaxStrikes(target)
 
-    if(totalStrikes > event.config.security.strikeCeil) totalStrikes = event.config.security.strikeCeil
+    if (totalStrikes > event.config.security.strikeCeil) totalStrikes = event.config.security.strikeCeil
 
     administerPunishment(event.config, target.idToUser(event.jda), strikeQuantity, reason, event.guild, event.author, totalStrikes)
 }
 
 private fun strike(event: CommandEvent) {
-    if(event.guild == null) return
+    if (event.guild == null) return
 
     val args = event.args
     val target = args[0] as String
     val strikeQuantity = args[1] as Int
     val reason = args[2] as String
 
-    if(strikeQuantity < 0 || strikeQuantity > 3) {
+    if (strikeQuantity < 0 || strikeQuantity > 3) {
         event.respond("Strike weight should be between 0 and 3")
         return
     }
 
-    if( !(event.guild.members.map { it.user.id }.contains(target)) ) {
+    if (!(event.guild.members.map { it.user.id }.contains(target))) {
         event.respond("Cannot find the member by the id: $target")
         return
     }
@@ -168,20 +194,22 @@ private fun strike(event: CommandEvent) {
 
     var totalStrikes = getMaxStrikes(target)
 
-    if(totalStrikes > event.config.security.strikeCeil) totalStrikes = event.config.security.strikeCeil
+    if (totalStrikes > event.config.security.strikeCeil) totalStrikes = event.config.security.strikeCeil
 
     administerPunishment(event.config, target.idToUser(event.jda), strikeQuantity, reason, event.guild, event.author, totalStrikes)
 }
+
+private fun expired(boolean: Boolean) = if (boolean) "expired" else "not expired"
 
 private fun administerPunishment(config: Configuration, user: User, strikeQuantity: Int, reason: String,
                                  guild: Guild, moderator: User, totalStrikes: Int) {
     user.openPrivateChannel().queue { chan ->
         val punishmentAction = config.security.infractionActionMap[totalStrikes]
         chan.sendMessage("${chan.user.asMention}, you have been infracted. Infractions are formal warnings from staff members" +
-                " on TPH. The infraction you just received was a $strikeQuantity strike infraction," +
-                " and you received it for reason: $reason\n" +
-                " Your current strike count is $totalStrikes/${config.security.strikeCeil}.\n" +
-                "The assigned punishment for this infraction is: $punishmentAction").queue {
+            " on TPH. The infraction you just received was a $strikeQuantity strike infraction," +
+            " and you received it for reason: $reason\n" +
+            " Your current strike count is $totalStrikes/${config.security.strikeCeil}.\n" +
+            "The assigned punishment for this infraction is: $punishmentAction").queue {
 
             when (config.security.infractionActionMap[totalStrikes]) {
                 InfractionAction.Warn -> {
@@ -189,16 +217,16 @@ private fun administerPunishment(config: Configuration, user: User, strikeQuanti
                 }
                 InfractionAction.Kick -> {
                     chan.sendMessage("You may return via this: https://discord.gg/BQN6BYE - please be mindful of the rules next time.")
-                            .queue {
-                                guild.controller.kick(user.id, reason).queue()
-                            }
+                        .queue {
+                            guild.controller.kick(user.id, reason).queue()
+                        }
                 }
                 InfractionAction.Mute -> {
                     muteMember(guild, user, 1000 * 60 * 60 * 24, reason, config, moderator)
                 }
                 InfractionAction.Ban -> {
                     chan.sendMessage("Well... that happened. There may be an appeal system in the future. But for now, you're" +
-                            " permanently banned. Sorry about that :) ").queue {
+                        " permanently banned. Sorry about that :) ").queue {
                         guild.controller.ban(user.id, 0, reason).queue()
                     }
                 }
