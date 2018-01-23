@@ -2,10 +2,13 @@ package me.aberrantfox.hotbot.commandframework.commands
 
 import me.aberrantfox.hotbot.commandframework.ArgumentType
 import me.aberrantfox.hotbot.commandframework.CommandSet
-import me.aberrantfox.hotbot.extensions.fullName
-import me.aberrantfox.hotbot.extensions.idToUser
 import me.aberrantfox.hotbot.dsls.command.commands
+import me.aberrantfox.hotbot.extensions.*
 import net.dv8tion.jda.core.EmbedBuilder
+import net.dv8tion.jda.core.entities.Channel
+import net.dv8tion.jda.core.entities.MessageChannel
+import net.dv8tion.jda.core.entities.MessageEmbed
+import net.dv8tion.jda.core.entities.TextChannel
 import java.awt.Color
 import java.time.Instant
 
@@ -34,6 +37,95 @@ fun embedCommands() =
             }
         }
 
+        command("copyembed") {
+            expect(ArgumentType.Manual)
+            execute {
+                if (it.args.size > 2) {
+                    it.respond("A maximum of 2 arguments should be given")
+                    return@execute
+                }
+
+                val messageId = it.args.firstOrNull() as String?
+                val channelId = it.args.getOrNull(1) as String?
+
+                if (messageId == null) {
+                    it.respond("You must pass at least a message id")
+                    return@execute
+                }
+
+                val channel =
+                        if (channelId == null)
+                            it.channel
+                        else {
+                            if (!channelId.isLong()) {
+                                it.respond("Not a valid channel id")
+                                return@execute
+                            }
+                            it.jda.getTextChannelById(channelId) // throws exception if channelId can't be converted to Long
+                        }
+
+                if (channel == null) {
+                    it.respond("Channel not found with the given id")
+                    return@execute
+                }
+
+                channel.getMessageById(messageId).queue(
+                    { msg -> // Success
+                        val embed = msg?.embeds?.firstOrNull()
+                        if (embed == null) {
+                            it.respond("Message doesn't contain any embeds")
+                            return@queue
+                        }
+
+                        EHolder.embed = EmbedBuilder(embed)
+                    },
+                    { error -> // Failure
+                        it.respond("Message retrieval failed. A message with that id may not exist in this channel.")
+                    }
+                )
+            }
+        }
+
+        command("editfield") {
+            expect(ArgumentType.Integer, ArgumentType.Word, ArgumentType.Sentence)
+            execute {
+                val fields = EHolder.embed.fields
+
+                val fieldIndex = it.args[0] as Int
+                if (fieldIndex < 0 || fieldIndex > fields.size - 1) {
+                    it.respond("Not a valid field index")
+                    return@execute
+                }
+
+                val property = (it.args[1] as String).toLowerCase()
+                val newValue = it.args[2] as String
+
+                val field = fields[fieldIndex]
+                var name = field.name
+                var text = field.value
+                var inline = field.isInline
+
+                when(property) {
+                    "name" -> name = newValue
+                    "text", "value" -> text = newValue
+                    "inline" -> {
+                        if(!newValue.isBooleanValue()) {
+                            it.respond("You haven't supplied a boolean value")
+                            return@execute
+                        }
+
+                        inline = newValue.toBooleanValue()
+                    }
+                    else -> {
+                        it.respond("That isn't a valid property")
+                        return@execute
+                    }
+                }
+
+                fields[fieldIndex] = MessageEmbed.Field(name, text, inline)
+            }
+        }
+
         command("settitle") {
             expect(ArgumentType.Sentence)
             execute {
@@ -50,7 +142,11 @@ fun embedCommands() =
             }
         }
 
-        command("addtimestamp") { EHolder.embed.setTimestamp(Instant.now()) }
+        command("addtimestamp") {
+            execute {
+                EHolder.embed.setTimestamp(Instant.now())
+            }
+        }
 
         command("setcolour") {
             expect(ArgumentType.Double, ArgumentType.Double, ArgumentType.Double)
@@ -71,7 +167,7 @@ fun embedCommands() =
 
         command("setselfauthor") {
             execute {
-                EHolder.embed.setAuthor(it.author.fullName(), null, it.author.avatarUrl)
+                EHolder.embed.setAuthor(it.author.fullName(), null, it.author.effectiveAvatarUrl)
             }
         }
 
@@ -79,7 +175,7 @@ fun embedCommands() =
             expect(ArgumentType.UserID)
             execute {
                 val target = (it.args[0] as String).idToUser(it.jda)
-                EHolder.embed.setAuthor(target.fullName(), null, target.avatarUrl)
+                EHolder.embed.setAuthor(target.fullName(), null, target.effectiveAvatarUrl)
             }
         }
 
@@ -110,7 +206,9 @@ fun embedCommands() =
         }
 
         command("addfield") {
-            EHolder.embed.addField(FHolder.name, FHolder.text, false)
+            execute {
+                EHolder.embed.addField(FHolder.name, FHolder.text, false)
+            }
         }
 
         command("addIfield") {
@@ -120,11 +218,17 @@ fun embedCommands() =
         }
 
         command("clearFieldHolder") {
-            FHolder.name = ""
-            FHolder.text = ""
+            execute {
+                FHolder.name = ""
+                FHolder.text = ""
+            }
         }
 
-        command("clearfields") { EHolder.embed.clearFields() }
+        command("clearfields") {
+            execute {
+                EHolder.embed.clearFields()
+            }
+        }
 
         command("setfname") {
             expect(ArgumentType.Sentence)

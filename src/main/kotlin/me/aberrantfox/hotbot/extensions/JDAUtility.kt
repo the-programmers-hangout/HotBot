@@ -1,12 +1,15 @@
 package me.aberrantfox.hotbot.extensions
 
+import me.aberrantfox.hotbot.dsls.embed.embed
 import me.aberrantfox.hotbot.services.Configuration
 import net.dv8tion.jda.core.JDA
 import net.dv8tion.jda.core.entities.Guild
 import net.dv8tion.jda.core.entities.MessageEmbed
 import net.dv8tion.jda.core.entities.Role
 import net.dv8tion.jda.core.entities.User
+import java.awt.Color
 import java.util.*
+
 
 data class MuteRecord(val unmuteTime: Long, val reason: String, val moderator: String, val user: String, val guildId: String)
 
@@ -46,7 +49,9 @@ fun permMuteMember(guild: Guild, user: User, reason: String, config: Configurati
     guild.controller.addRolesToMember(guild.getMemberById(user.id), guild.getRolesByName(config.security.mutedRole, true)).queue()
 
     user.openPrivateChannel().queue {
-        it.sendMessage("You have been muted indefinitely, for reason: $reason").queue()
+        val muteEmbed = buildMuteEmbed(user.asMention, "Indefinite", reason)
+
+        it.sendMessage(muteEmbed).queue()
     }
 }
 
@@ -58,18 +63,38 @@ fun muteMember(guild: Guild, user: User, time: Long, reason: String, config: Con
         val timeToUnmute = futureTime(time)
         val record = MuteRecord(timeToUnmute, reason, moderator.id, user.id, guild.id)
 
-        it.sendMessage("You have been muted for $timeString, reason: $reason").queue()
+        val muteEmbed = buildMuteEmbed(user.asMention, timeString, reason)
+        it.sendMessage(muteEmbed).queue()
 
         config.security.mutedMembers.add(record)
         unmute(guild, user, config, time, record)
-
     }
 
     moderator.openPrivateChannel().queue {
-        it.sendMessage("User ${user.asMention} has been muted for $timeString.").queue()
+        it.sendMessage("User ${user.asMention} has been muted for $timeString, with reason:\n\n$reason").queue()
     }
-
 }
+
+private fun buildMuteEmbed(userMention: String, timeString: String, reason: String) =
+        embed {
+            title("Mute")
+            description("$userMention, you have been muted.\nA muted user cannot speak, post in channels, or react to messages.")
+
+            field {
+                name = "Length"
+                value = timeString
+                inline = false
+            }
+
+            field {
+                name = "__Reason__"
+                value = reason
+                inline = false
+            }
+
+
+            setColor(Color.RED)
+        }
 
 fun unmute(guild: Guild, user: User, config: Configuration, time: Long, muteRecord: MuteRecord) {
     if (time <= 0) {

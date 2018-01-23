@@ -17,7 +17,7 @@ class MemberListener(val configuration: Configuration, val logger: BotLogger) : 
     override fun onGuildMemberJoin(event: GuildMemberJoinEvent) {
         val target = event.guild.textChannels.findLast { it.id == configuration.messageChannels.welcomeChannel }
         val response = MessageService.getMessage(MessageType.Join).replace("%name%", event.user.asMention)
-        val userImage = event.user.avatarUrl ?: "http://i.imgur.com/HYkhEFO.jpg"
+        val userImage = event.user.effectiveAvatarUrl
 
         target?.sendMessage(buildJoinMessage(response, userImage))?.queue {
             it.addReaction("\uD83D\uDC4B").queue()

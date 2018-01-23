@@ -34,7 +34,7 @@ fun suggestionCommands() = commands {
             val author = it.author.id
             val message = it.args[0] as String
 
-            val response = Suggestions.pool.addRecord(author, it.author.avatarUrl, message)
+            val response = Suggestions.pool.addRecord(author, it.author.effectiveAvatarUrl, message)
 
             when (response) {
                 AddResponse.PoolFull -> it.respond("You have enough suggestions in the pool for now...")
