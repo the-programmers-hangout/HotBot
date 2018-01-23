@@ -112,11 +112,11 @@ private fun buildHistoryEmbed(target: String, includeModerator: Boolean, records
         records.forEach { record ->
             field {
                 name = "ID :: __${record.id}__ :: Weight :: __${record.strikes}__"
-                value = "Issued by **${record.moderator.idToName(it.jda)}** on **${record.dateTime.toString(DateTimeFormat.forPattern("dd/MM/yyyy"))}**"
+                value += "\nThis infraction is **${expired(record.isExpired)}**."
                 inline = false
 
                 if(includeModerator) {
-                    value += "\nThis infraction is **${expired(record.isExpired)}**."
+                    value = "Issued by **${record.moderator.idToName(it.jda)}** on **${record.dateTime.toString(DateTimeFormat.forPattern("dd/MM/yyyy"))}**"
                 }
             }
 
