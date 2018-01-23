@@ -28,6 +28,14 @@ fun String.isInteger(): Boolean =
             false
         }
 
+fun String.isLong(): Boolean =
+        try {
+            this.toLong()
+            true
+        } catch (e: NumberFormatException) {
+            false
+        }
+
 fun String.isDouble(): Boolean =
         try {
             this.toDouble()
