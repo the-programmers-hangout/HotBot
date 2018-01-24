@@ -27,7 +27,7 @@ fun setupDatabaseSchema(config: Configuration) {
     )
 
     transaction {
-        SchemaUtils.create(Strikes, Suggestions, BanRecords, CommandPermissions)
+        SchemaUtils.create(Strikes, Suggestions, BanRecords, CommandPermissions, ChannelResources)
         logger.addLogger(StdOutSqlLogger)
     }
 }
@@ -60,4 +60,11 @@ object CommandPermissions : Table() {
     val id = integer("id").autoIncrement().primaryKey()
     val roleID = varchar("roleID", 18)
     val commandName = varchar("name", 256)
+}
+
+object ChannelResources : Table() {
+    val id = integer("id").autoIncrement().primaryKey()
+    val channel = varchar("channel", 18)
+    val section = varchar("section", 64)
+    val info = varchar("info", 255)
 }
