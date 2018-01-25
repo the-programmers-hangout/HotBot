@@ -65,13 +65,19 @@ object HelpConf {
         val docCommandNames = docCommands.map { it.name.toLowerCase() }
 
         val duplicates = docCommands.groupBy { it.name.toLowerCase() }.filter { it.value.size > 1 }
-        duplicates.forEach { errors.add("Duplicate command: ${it.key}") }
+        if (duplicates.isNotEmpty()) {
+            errors.add("Duplicate Commands: ${duplicates.keys.joinToString(", ")}")
+        }
 
         val undocumentedCommands = commandNames.filterNot { docCommandNames.contains(it) }
-        undocumentedCommands.forEach { errors.add("Undocumented command: $it") }
+        if (undocumentedCommands.isNotEmpty()) {
+            errors.add("Undocumented Commands: ${undocumentedCommands.joinToString(", ")}")
+        }
 
         val unknownCommands = docCommandNames.filterNot { commandNames.contains(it) }
-        unknownCommands.forEach { errors.add("Unknown command: $it") }
+        if (unknownCommands.isNotEmpty()) {
+            errors.add("Unknown Commands: ${unknownCommands.joinToString(", ")}")
+        }
 
         return errors
     }
