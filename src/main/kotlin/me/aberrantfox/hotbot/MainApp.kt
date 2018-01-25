@@ -22,8 +22,16 @@ fun main(args: Array<String>) {
     val container = produceContainer()
     val config = loadConfig() ?: return
 
-
     saveConfig(config)
+
+    val helpErrors = HelpConf.getDocumentationErrors(container)
+    if (helpErrors.isNotEmpty()) {
+        println("The help documentation needs to be updated:")
+        helpErrors.forEach(::println)
+
+        return
+    }
+
     setupDatabaseSchema(config)
 
     val jda = JDABuilder(AccountType.BOT).setToken(config.serverInformation.token).buildBlocking()

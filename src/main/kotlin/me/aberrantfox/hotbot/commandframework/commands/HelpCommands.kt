@@ -52,6 +52,7 @@ fun helpCommands() =
 private fun buildCommandHelpMessage(config: Configuration, descriptor: CommandDescriptor) =
     embed {
         title("${descriptor.category} - ${descriptor.name}")
+        description(descriptor.description)
         setColor(Color.CYAN)
 
         field {

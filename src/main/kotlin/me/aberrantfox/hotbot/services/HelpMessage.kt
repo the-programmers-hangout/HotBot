@@ -1,6 +1,7 @@
 package me.aberrantfox.hotbot.services
 
 import com.google.gson.Gson
+import me.aberrantfox.hotbot.dsls.command.CommandsContainer
 import java.io.File
 
 
@@ -55,4 +56,29 @@ object HelpConf {
                     .map { it.category }
                     .toSet()
                     .reduce { a, b ->  "$a, $b"}
+
+    fun getDocumentationErrors(container: CommandsContainer): List<String> {
+        val errors = ArrayList<String>()
+        val commandNames = container.commands.keys.map { it.toLowerCase() }
+
+        val docCommands = configuration.commands
+        val docCommandNames = docCommands.map { it.name.toLowerCase() }
+
+        val duplicates = docCommands.groupBy { it.name.toLowerCase() }.filter { it.value.size > 1 }
+        if (duplicates.isNotEmpty()) {
+            errors.add("Duplicate Commands: ${duplicates.keys.joinToString(", ")}")
+        }
+
+        val undocumentedCommands = commandNames.filterNot { docCommandNames.contains(it) }
+        if (undocumentedCommands.isNotEmpty()) {
+            errors.add("Undocumented Commands: ${undocumentedCommands.joinToString(", ")}")
+        }
+
+        val unknownCommands = docCommandNames.filterNot { commandNames.contains(it) }
+        if (unknownCommands.isNotEmpty()) {
+            errors.add("Unknown Commands: ${unknownCommands.joinToString(", ")}")
+        }
+
+        return errors
+    }
 }
