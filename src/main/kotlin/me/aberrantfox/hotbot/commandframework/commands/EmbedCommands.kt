@@ -5,10 +5,7 @@ import me.aberrantfox.hotbot.commandframework.CommandSet
 import me.aberrantfox.hotbot.dsls.command.commands
 import me.aberrantfox.hotbot.extensions.*
 import net.dv8tion.jda.core.EmbedBuilder
-import net.dv8tion.jda.core.entities.Channel
-import net.dv8tion.jda.core.entities.MessageChannel
-import net.dv8tion.jda.core.entities.MessageEmbed
-import net.dv8tion.jda.core.entities.TextChannel
+import net.dv8tion.jda.core.entities.*
 import java.awt.Color
 import java.time.Instant
 
@@ -174,7 +171,7 @@ fun embedCommands() =
         command("setauthor") {
             expect(ArgumentType.UserID)
             execute {
-                val target = (it.args[0] as String).idToUser(it.jda)
+                val target = it.args.component1() as User
                 EHolder.embed.setAuthor(target.fullName(), null, target.effectiveAvatarUrl)
             }
         }

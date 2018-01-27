@@ -30,7 +30,7 @@ fun strikeCommands() =
             expect(ArgumentType.UserID, ArgumentType.Integer, ArgumentType.Sentence)
             execute {
                 val args = it.args
-                val target = args[0] as String
+                val target = args[0] as User
                 val strikeQuantity = args[1] as Int
                 val reason = args[2] as String
 
@@ -39,23 +39,21 @@ fun strikeCommands() =
                     return@execute
                 }
 
-                if (!(it.guild.members.map { it.user.id }.contains(target))) {
+                if (!(it.guild.hasMember(target.id))) {
                     it.respond("Cannot find the member by the id: $target")
                     return@execute
                 }
 
-                insertInfraction(target, it.author.id, strikeQuantity, reason)
+                insertInfraction(target.id, it.author.id, strikeQuantity, reason)
 
-                it.author.openPrivateChannel().queue {
-                    it.sendMessage("User ${target.idToUser(it.jda).asMention} has been infracted with weight: $strikeQuantity," +
-                        " with reason:\n\n$reason.").queue()
-                }
+                val res = "User ${target.asMention} has been infracted with weight: $strikeQuantity, with reason:\n\n$reason."
+                it.author.sendPrivateMessage(res)
 
-                var totalStrikes = getMaxStrikes(target)
+                var totalStrikes = getMaxStrikes(target.id)
 
                 if (totalStrikes > it.config.security.strikeCeil) totalStrikes = it.config.security.strikeCeil
 
-                administerPunishment(it.config, target.idToUser(it.jda), strikeQuantity, reason, it.guild, it.author, totalStrikes)
+                administerPunishment(it.config, target, strikeQuantity, reason, it.guild, it.author, totalStrikes)
             }
         }
 
@@ -80,10 +78,10 @@ fun strikeCommands() =
         command("cleanse") {
             expect(ArgumentType.UserID)
             execute {
-                val userId = it.args[0] as String
-                val amount = removeAllInfractions(userId)
+                val user = it.args[0] as User
+                val amount = removeAllInfractions(user.id)
 
-                it.respond("Infractions for ${userId.idToUser(it.jda).asMention} have been wiped. Total removed: $amount")
+                it.respond("Infractions for ${user.asMention} have been wiped. Total removed: $amount")
             }
         }
 

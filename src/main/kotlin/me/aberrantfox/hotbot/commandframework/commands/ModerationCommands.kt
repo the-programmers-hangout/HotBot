@@ -10,10 +10,12 @@ import me.aberrantfox.hotbot.database.updateOrSetReason
 import me.aberrantfox.hotbot.dsls.embed.embed
 import me.aberrantfox.hotbot.extensions.*
 import me.aberrantfox.hotbot.services.Configuration
+import me.aberrantfox.hotbot.services.UserID
 import net.dv8tion.jda.core.OnlineStatus
 import net.dv8tion.jda.core.entities.Game
 import net.dv8tion.jda.core.entities.Message
 import net.dv8tion.jda.core.entities.MessageChannel
+import net.dv8tion.jda.core.entities.User
 import java.awt.Color
 import java.io.File
 import java.text.SimpleDateFormat
@@ -58,7 +60,7 @@ fun moderationCommands() = commands {
         execute {
             val args = it.args
 
-            val user = (args[0] as String).idToUser(it.jda)
+            val user = args[0] as User
             val time = (args[1] as Int).toLong() * 1000 * 60
             val reason = args[2] as String
 
@@ -135,25 +137,22 @@ fun moderationCommands() = commands {
     command("badname") {
         expect(ArgumentType.UserID, ArgumentType.Sentence)
         execute {
-            val args = it.args
-            val target = args[0] as String
-            val reason = args[1] as String
+            val target = it.args[0] as User
+            val reason = it.args[1] as String
 
-            val targetMember = it.guild.getMemberById(target)
+            val targetMember = it.guild.getMember(target)
 
             it.guild.controller.setNickname(targetMember, MessageService.getMessage(MessageType.Name)).queue {
-                targetMember.user.openPrivateChannel().queue {
-                    it.sendMessage("Your name has been changed forcefully by a member of staff for reason: $reason").queue()
-                }
+                target.sendPrivateMessage("Your name has been changed forcefully by a member of staff for reason: $reason")
             }
         }
     }
     command("joindate") {
         expect(ArgumentType.UserID)
         execute {
-            val target = it.args[0] as String
+            val target = it.args[0] as User
+            val member = it.guild.getMember(target)
 
-            val member = it.guild.getMemberById(target)
             val dateFormat = SimpleDateFormat("yyyy-MM-dd")
             val joinDateParsed = dateFormat.parse(member.joinDate.toString())
             val joinDate = dateFormat.format(joinDateParsed)

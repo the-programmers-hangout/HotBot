@@ -7,6 +7,7 @@ import me.aberrantfox.hotbot.extensions.fullName
 import me.aberrantfox.hotbot.extensions.idToUser
 import me.aberrantfox.hotbot.extensions.removeMuteRole
 import me.aberrantfox.hotbot.listeners.antispam.MutedRaiders
+import net.dv8tion.jda.core.entities.User
 
 @CommandSet
 fun raidCommands() = commands {
@@ -29,7 +30,7 @@ fun raidCommands() = commands {
                 return@execute
             }
 
-            val user = (it.args[0] as String).idToUser(it.jda)
+            val user = it.args[0] as User
 
             if (!(MutedRaiders.set.contains(user.id))) {
                 it.respond("That user is not a raider.")
@@ -59,7 +60,7 @@ fun raidCommands() = commands {
     command("banraider") {
         expect(ArgumentType.UserID, ArgumentType.Integer)
         execute {
-            val user = (it.args[0] as String).idToUser(it.jda)
+            val user = it.args[0] as User
             val delDays = (it.args[1] as Int)
 
             if (!(MutedRaiders.set.contains(user.id))) {

@@ -5,8 +5,10 @@ import me.aberrantfox.hotbot.commandframework.ArgumentType
 import me.aberrantfox.hotbot.commandframework.CommandSet
 import me.aberrantfox.hotbot.dsls.command.CommandEvent
 import me.aberrantfox.hotbot.dsls.command.commands
+import me.aberrantfox.hotbot.extensions.fullName
 import me.aberrantfox.hotbot.extensions.idToName
 import me.aberrantfox.hotbot.extensions.isRole
+import net.dv8tion.jda.core.entities.User
 import java.io.File
 
 private const val rankConfigPath = "rankconfig.json"
@@ -109,11 +111,9 @@ fun rankCommands() = commands {
 }
 
 private fun handleGrant(event: CommandEvent, grant: Boolean) {
-    if (event.guild == null) return
-
     val roleName = event.args[0] as String
-    val target = event.args[1] as String
-    val member = event.guild.getMemberById(target)
+    val target = event.args[1] as User
+    val member = event.guild.getMember(target)
 
     if (!(event.jda.isRole(roleName))) {
         event.respond("That is not a known role")
@@ -129,9 +129,9 @@ private fun handleGrant(event: CommandEvent, grant: Boolean) {
 
     if (grant) {
         event.guild.controller.addRolesToMember(member, role).queue()
-        event.respond("$roleName assigned to ${target.idToName(event.jda)}")
+        event.respond("$roleName assigned to ${target.fullName()}")
     } else {
         event.guild.controller.removeRolesFromMember(member, role).queue()
-        event.respond("$roleName removed from ${target.idToName(event.jda)}")
+        event.respond("$roleName removed from ${target.fullName()}")
     }
 }
