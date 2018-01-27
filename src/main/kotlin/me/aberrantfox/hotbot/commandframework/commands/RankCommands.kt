@@ -6,7 +6,6 @@ import me.aberrantfox.hotbot.commandframework.CommandSet
 import me.aberrantfox.hotbot.dsls.command.CommandEvent
 import me.aberrantfox.hotbot.dsls.command.commands
 import me.aberrantfox.hotbot.extensions.fullName
-import me.aberrantfox.hotbot.extensions.idToName
 import me.aberrantfox.hotbot.extensions.isRole
 import net.dv8tion.jda.core.entities.User
 import java.io.File
@@ -55,14 +54,14 @@ object RankContainer {
 @CommandSet
 fun rankCommands() = commands {
     command("grant") {
-        expect(ArgumentType.Word, ArgumentType.UserID)
+        expect(ArgumentType.Word, ArgumentType.User)
         execute {
             handleGrant(it, true)
         }
     }
 
     command("revoke") {
-        expect(ArgumentType.Word, ArgumentType.UserID)
+        expect(ArgumentType.Word, ArgumentType.User)
         execute {
             handleGrant(it, false)
         }

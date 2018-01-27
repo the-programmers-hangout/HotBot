@@ -169,7 +169,7 @@ fun embedCommands() =
         }
 
         command("setauthor") {
-            expect(ArgumentType.UserID)
+            expect(ArgumentType.User)
             execute {
                 val target = it.args.component1() as User
                 EHolder.embed.setAuthor(target.fullName(), null, target.effectiveAvatarUrl)

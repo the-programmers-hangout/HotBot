@@ -8,7 +8,6 @@ import me.aberrantfox.hotbot.extensions.*
 import me.aberrantfox.hotbot.services.*
 import me.aberrantfox.hotbot.database.*
 import me.aberrantfox.hotbot.dsls.embed.embed
-import net.dv8tion.jda.core.EmbedBuilder
 import net.dv8tion.jda.core.entities.Guild
 import net.dv8tion.jda.core.entities.User
 import org.joda.time.format.DateTimeFormat
@@ -18,7 +17,7 @@ import java.awt.Color
 fun strikeCommands() =
     commands {
         command("warn") {
-            expect(ArgumentType.UserID, ArgumentType.Sentence)
+            expect(ArgumentType.User, ArgumentType.Sentence)
             execute {
                 val newArgs = listOf(it.args[0], 0, it.args[1])
                 val e = CommandEvent(it.config, it.jda, it.channel, it.author, it.message, it.guild, it.manager, it.container, newArgs)
@@ -27,7 +26,7 @@ fun strikeCommands() =
         }
 
         command("strike") {
-            expect(ArgumentType.UserID, ArgumentType.Integer, ArgumentType.Sentence)
+            expect(ArgumentType.User, ArgumentType.Integer, ArgumentType.Sentence)
             execute {
                 val args = it.args
                 val target = args[0] as User
@@ -58,7 +57,7 @@ fun strikeCommands() =
         }
 
         command("history") {
-            expect(ArgumentType.UserID)
+            expect(ArgumentType.User)
             execute {
                 val target = it.args[0] as User
                 it.respond(buildHistoryEmbed(target, true, getHistory(target.id), it))
@@ -76,7 +75,7 @@ fun strikeCommands() =
         }
 
         command("cleanse") {
-            expect(ArgumentType.UserID)
+            expect(ArgumentType.User)
             execute {
                 val user = it.args[0] as User
                 val amount = removeAllInfractions(user.id)

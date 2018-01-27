@@ -10,7 +10,6 @@ import me.aberrantfox.hotbot.database.updateOrSetReason
 import me.aberrantfox.hotbot.dsls.embed.embed
 import me.aberrantfox.hotbot.extensions.*
 import me.aberrantfox.hotbot.services.Configuration
-import me.aberrantfox.hotbot.services.UserID
 import net.dv8tion.jda.core.OnlineStatus
 import net.dv8tion.jda.core.entities.Game
 import net.dv8tion.jda.core.entities.Message
@@ -56,7 +55,7 @@ fun moderationCommands() = commands {
     }
 
     command("mute") {
-        expect(ArgumentType.UserID, ArgumentType.Integer, ArgumentType.Sentence)
+        expect(ArgumentType.User, ArgumentType.Integer, ArgumentType.Sentence)
         execute {
             val args = it.args
 
@@ -135,7 +134,7 @@ fun moderationCommands() = commands {
         }
     }
     command("badname") {
-        expect(ArgumentType.UserID, ArgumentType.Sentence)
+        expect(ArgumentType.User, ArgumentType.Sentence)
         execute {
             val target = it.args[0] as User
             val reason = it.args[1] as String
@@ -148,7 +147,7 @@ fun moderationCommands() = commands {
         }
     }
     command("joindate") {
-        expect(ArgumentType.UserID)
+        expect(ArgumentType.User)
         execute {
             val target = it.args[0] as User
             val member = it.guild.getMember(target)

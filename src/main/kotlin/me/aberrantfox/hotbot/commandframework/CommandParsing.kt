@@ -7,12 +7,11 @@ import me.aberrantfox.hotbot.dsls.command.CommandsContainer
 import me.aberrantfox.hotbot.extensions.*
 import me.aberrantfox.hotbot.listeners.CommandListener
 import me.aberrantfox.hotbot.services.Configuration
-import net.dv8tion.jda.core.JDA
 import org.reflections.Reflections
 import org.reflections.scanners.MethodAnnotationsScanner
 
 enum class ArgumentType {
-    Integer, Double, Word, Choice, Manual, Sentence, UserID, Splitter, URL
+    Integer, Double, Word, Choice, Manual, Sentence, User, Splitter, URL
 }
 
 const val seperatorCharacter = "|"
@@ -64,7 +63,7 @@ fun convertAndQueue(actual: List<String>, expected: List<ArgumentType>, instance
 
     event.args = standardParsed
 
-    if (expected.contains(ArgumentType.UserID)) {
+    if (expected.contains(ArgumentType.User)) {
         dispatchRequestRequiredEvent(expected, standardParsed, event, command, instance, invokedInGuild)
     } else {
         instance.executeEvent(command, event, invokedInGuild)
@@ -79,7 +78,7 @@ private fun dispatchRequestRequiredEvent(expected: List<ArgumentType>, standard:
         val fullyParsed = ArrayList<Any>()
 
         zip.forEach {
-            if (it.second == ArgumentType.UserID) {
+            if (it.second == ArgumentType.User) {
                 val parsedUser = event.jda.retrieveUserById(it.first as String).complete()
 
                 if(parsedUser == null) {
@@ -119,7 +118,7 @@ private fun parseStandardArgs(actual: List<String>, expected: List<ArgumentType>
             ArgumentType.Integer -> returnVals.add(pair.first.toInt())
             ArgumentType.Double -> returnVals.add(pair.first.toDouble())
             ArgumentType.Choice -> returnVals.add(pair.first.toBooleanValue())
-            ArgumentType.UserID -> returnVals.add(pair.first)
+            ArgumentType.User -> returnVals.add(pair.first)
             ArgumentType.Sentence -> returnVals.add(joinArgs(index, actual))
             ArgumentType.Splitter -> returnVals.add(splitArg(index, actual))
             else -> returnVals.add(pair.first)

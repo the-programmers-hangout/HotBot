@@ -23,7 +23,7 @@ fun raidCommands() = commands {
     }
 
     command("freeRaider") {
-        expect(ArgumentType.UserID)
+        expect(ArgumentType.User)
         execute {
             if (MutedRaiders.set.isEmpty()) {
                 it.respond("There are no raiders...")
@@ -58,7 +58,7 @@ fun raidCommands() = commands {
     }
 
     command("banraider") {
-        expect(ArgumentType.UserID, ArgumentType.Integer)
+        expect(ArgumentType.User, ArgumentType.Integer)
         execute {
             val user = it.args[0] as User
             val delDays = (it.args[1] as Int)
