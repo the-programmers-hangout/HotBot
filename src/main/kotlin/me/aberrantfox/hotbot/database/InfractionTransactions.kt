@@ -73,4 +73,7 @@ fun isExpired(infractionID: Int): Boolean =
             DateTime.now().isAfter(date.plusDays(30))
         }
 
-fun getMaxStrikes(userId: String) = getHistory(userId).filter { !it.isExpired }.map { it.strikes }.reduce{ a, b -> a + b }
+fun getMaxStrikes(userId: String) = getHistory(userId)
+        .filter { !it.isExpired }
+        .map { it.strikes }
+        .sum()
