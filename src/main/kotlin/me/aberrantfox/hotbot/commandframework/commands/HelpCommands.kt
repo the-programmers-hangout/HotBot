@@ -19,7 +19,7 @@ fun helpCommands() =
         command("help") {
             expect(ArgumentType.Manual)
             execute {
-                val (args, config, _, _, author) = it
+                val (config, _, _, author, _, _, _, _, args) = it
 
                 if (args.isEmpty()) {
                     author.sendPrivateMessage(getZeroArgMessage(config))

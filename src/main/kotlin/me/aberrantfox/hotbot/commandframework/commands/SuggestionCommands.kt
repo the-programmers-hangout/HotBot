@@ -125,7 +125,9 @@ fun suggestionCommands() = commands {
     command("respond") {
         expect(ArgumentType.Word, ArgumentType.Word, ArgumentType.Sentence)
         execute {
-            val (args, config) = it
+            val config = it.config
+            val args = it.args
+
             val target = args[0] as String
             val response = args[1] as String
             val reason = args[2] as String

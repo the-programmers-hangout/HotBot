@@ -2,11 +2,11 @@ package me.aberrantfox.hotbot.listeners
 
 import me.aberrantfox.hotbot.commandframework.*
 import me.aberrantfox.hotbot.dsls.command.Command
-import me.aberrantfox.hotbot.dsls.command.CommandEvent
 import me.aberrantfox.hotbot.dsls.command.CommandsContainer
 import me.aberrantfox.hotbot.dsls.command.arg
 import me.aberrantfox.hotbot.services.Configuration
 import me.aberrantfox.hotbot.commandframework.commands.macroMap
+import me.aberrantfox.hotbot.dsls.command.CommandEvent
 import me.aberrantfox.hotbot.extensions.*
 import me.aberrantfox.hotbot.logging.BotLogger
 import me.aberrantfox.hotbot.permissions.PermissionManager
@@ -69,22 +69,18 @@ data class CommandListener(val config: Configuration,
 
         if (!(argsMatch(actual, command, channel))) return
 
-        val parsedArgs = convertArguments(actual, command.expectedArgs.map { it.type }.toList(), jda)
+        val event = CommandEvent(config, jda, channel, author, message, guild, manager, container, actual)
+        convertAndQueue(actual, command.expectedArgs.map { it.type }.toList(), this, event, invokedInGuild, command, config)
+    }
 
-        if (parsedArgs == null) {
-            channel.sendMessage(":unamused: Yea, you'll need to learn how to use that properly.").queue()
-            return
-        }
-
-        val event = CommandEvent(parsedArgs, config, jda, channel, author, message, guild, manager, container)
-
+    fun executeEvent(command: Command, event: CommandEvent, invokedInGuild: Boolean) {
         if (command.parameterCount == 0) {
             command.execute(event)
             return
         }
 
         if (command.requiresGuild && !invokedInGuild) {
-            channel.sendMessage("This command must be invoked in a guild channel, and not through PM").queue()
+            event.respond("This command must be invoked in a guild channel, and not through PM")
         } else {
             command.execute(event)
         }

@@ -10,9 +10,9 @@ import me.aberrantfox.hotbot.services.Configuration
 import net.dv8tion.jda.core.JDA
 import net.dv8tion.jda.core.entities.*
 
-data class CommandEvent(val args: List<Any>, val config: Configuration, val jda: JDA, val channel: MessageChannel,
+data class CommandEvent(val config: Configuration, val jda: JDA, val channel: MessageChannel,
                         val author: User, val message: Message, val guild: Guild, val manager: PermissionManager,
-                        val container: CommandsContainer) {
+                        val container: CommandsContainer, var args: List<Any> = listOf()) {
 
     fun respond(msg: String) =
         if(msg.length > 2000) {

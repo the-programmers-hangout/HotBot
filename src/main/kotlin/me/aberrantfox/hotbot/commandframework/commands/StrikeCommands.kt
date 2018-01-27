@@ -20,9 +20,9 @@ fun strikeCommands() =
         command("warn") {
             expect(ArgumentType.UserID, ArgumentType.Sentence)
             execute {
-                strike(CommandEvent(listOf(it.args[0], 0, it.args[1]),
-                    it.config, it.jda, it.channel,
-                    it.author, it.message, it.guild, it.manager, it.container))
+                val newArgs = listOf(it.args[0], 0, it.args[1])
+                val e = CommandEvent(it.config, it.jda, it.channel, it.author, it.message, it.guild, it.manager, it.container, newArgs)
+                strike(e)
             }
         }
 
@@ -62,8 +62,8 @@ fun strikeCommands() =
         command("history") {
             expect(ArgumentType.UserID)
             execute {
-                val target = it.args[0] as String
-                it.respond(buildHistoryEmbed(target, true, getHistory(target), it))
+                val target = it.args[0] as User
+                it.respond(buildHistoryEmbed(target, true, getHistory(target.id), it))
             }
         }
 
@@ -89,25 +89,23 @@ fun strikeCommands() =
 
         command("selfhistory") {
             execute {
-                val target = it.author.id
-                target.idToUser(it.jda).sendPrivateMessage(buildHistoryEmbed(target, false, getHistory(target), it))
+                val target = it.author.id.idToUser(it.jda)
+                target.sendPrivateMessage(buildHistoryEmbed(target, false, getHistory(target.id), it))
             }
         }
     }
 
 
-private fun buildHistoryEmbed(target: String, includeModerator: Boolean, records: List<StrikeRecord>, it: CommandEvent) =
+private fun buildHistoryEmbed(target: User, includeModerator: Boolean, records: List<StrikeRecord>, it: CommandEvent) =
     embed {
-        val targetUser = target.idToUser(it.jda)
-
-        title("${target.idToName(it.jda)}'s Record")
-        description("${target.idToName(it.jda)} has **${records.size}** infractions(s). Of these infractions, " +
+        title("${target.fullName()}'s Record")
+        description("${target.fullName()} has **${records.size}** infractions(s). Of these infractions, " +
             "**${records.filter { it.isExpired }.size}** are expired and **${records.filter { !it.isExpired }.size}** are still in effect." +
-            "\nCurrent strike value of **${getMaxStrikes(target)}/${it.config.security.strikeCeil}**" +
-            "\nJoin date: **${targetUser.toMember(it.guild).joinDate.toString().formatJdaDate()}**" +
-            "\nCreation date: **${targetUser.creationTime.toString().formatJdaDate()}**")
+            "\nCurrent strike value of **${getMaxStrikes(target.id)}/${it.config.security.strikeCeil}**" +
+            "\nJoin date: **${guildStatus(target, it)}**" +
+            "\nCreation date: **${target.creationTime.toString().formatJdaDate()}**")
         setColor(Color.MAGENTA)
-        setThumbnail(targetUser.effectiveAvatarUrl)
+        setThumbnail(target.effectiveAvatarUrl)
 
         records.forEach { record ->
             field {
@@ -134,6 +132,13 @@ private fun buildHistoryEmbed(target: String, includeModerator: Boolean, records
                 value = "Clean as a whistle, sir."
             }
         }
+    }
+
+private fun guildStatus(target: User, event: CommandEvent) =
+    if(event.guild.members.any { it.user.id  == target.id }) {
+        target.toMember(event.guild).joinDate.toString().formatJdaDate()
+    } else {
+        "This user is not current in this guild."
     }
 
 private fun handleInfraction(event: CommandEvent) {
