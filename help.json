@@ -31,6 +31,20 @@
       "example": ""
     },
     {
+      "name": "dog",
+      "category": "fun",
+      "description": "Display a picture of a dog",
+      "structure": "",
+      "example": ""
+    },
+    {
+      "name": "bird",
+      "category": "fun",
+      "description": "Display a picture of a bird",
+      "structure": "",
+      "example": ""
+    },
+    {
       "name": "addmacro",
       "category": "macro",
       "description": "Adds a macro which will respond with the given message when invoked by the given name.",
@@ -101,44 +115,30 @@
       "example": "moderator"
     },
     {
-      "name": "setperm",
+      "name": "setPermission",
       "category": "permissions",
       "description": "Set the permission level of the given command to the given permission level.",
       "structure": "{commandName} {permissionLevel}",
       "example": "nuke moderator"
     },
     {
-      "name": "getPerm",
+      "name": "getPermission",
       "category": "permissions",
       "description": "Get the current required permission level for a particular command.",
       "structure": "{commandName}",
       "example": "nuke"
     },
     {
-      "name": "listcommands",
-      "category": "permissions",
-      "description": "List all commands",
-      "structure": "",
-      "example": ""
-    },
-    {
-      "name": "listavailable",
-      "category": "permissions",
-      "description": "List what commands are available to you.",
-      "structure": "",
-      "example": ""
-    },
-    {
-      "name": "listPerms",
-      "category": "permissions",
-      "description": "List all available permission levels.",
-      "structure": "",
-      "example": ""
-    },
-    {
       "name": "listCommandPerms",
       "category": "permissions",
       "description": "Display all current commands and the corresponding required permission level to use each of them.",
+      "structure": "",
+      "example": ""
+    },
+    {
+      "name": "roleids",
+      "category": "permissions",
+      "description": "Display each role in the server with its corresponding ID",
       "structure": "",
       "example": ""
     },
@@ -176,6 +176,13 @@
       "description": "Completely wipe a user of all infractions. (Permanently deletes them)",
       "structure": "{userID}",
       "example": "12093810293810293"
+    },
+    {
+      "name": "selfhistory",
+      "category": "infractions",
+      "description": "See your own infraction history.",
+      "structure": "",
+      "example": ""
     },
     {
       "name": "ping",
@@ -230,20 +237,6 @@
       "name": "uptime",
       "category": "utility",
       "description": "Displays how long you have kept me, HOTBOT, AWAKE!",
-      "structure": "",
-      "example": ""
-    },
-    {
-      "name": "info",
-      "category": "utility",
-      "description": "Display some information about me",
-      "structure": "",
-      "example": ""
-    },
-    {
-      "name": "dog",
-      "category": "fun",
-      "description": "Display a picture of a dog",
       "structure": "",
       "example": ""
     },
@@ -430,48 +423,6 @@
       "example": "www.imgur.com/exampleImage.png"
     },
     {
-      "name": "addQueueTargets",
-      "category": "banqueue",
-      "description": "Add all of the listed IDS to the banqueue.",
-      "structure": "{id|id|id|...}",
-      "example": "12312354252435|2134234234324324234234|234234234"
-    },
-    {
-      "name": "showRaid",
-      "category": "banqueue",
-      "description": "Show what IDs are in the raid.",
-      "structure": "",
-      "example": ""
-    },
-    {
-      "name": "banraid",
-      "category": "banqueue",
-      "description": "Ban all members you have added as a part of the current raid",
-      "structure": "",
-      "example": ""
-    },
-    {
-      "name": "setQueueReason",
-      "category": "banqueue",
-      "description": "Sets the reason members of the raid will be banned for.",
-      "structure": "{reason}",
-      "example": "voice trolling"
-    },
-    {
-      "name": "removeTarget",
-      "category": "banqueue",
-      "description": "Remove a specific member from the raid queue.",
-      "structure": "{id}",
-      "example": "4285825823823500"
-    },
-    {
-      "name": "clearQueue",
-      "category": "banqueue",
-      "description": "Clear out all IDs from the BanQueue",
-      "structure": "",
-      "example": ""
-    },
-    {
       "name": "echo",
       "category": "utility",
       "description": "Echo a message to a channel",
@@ -554,13 +505,6 @@
       "description": "Allow an invite to be posted.",
       "structure": "{invite}",
       "example": "discord.gg/programming"
-    },
-    {
-      "name": "ball",
-      "category": "fun",
-      "description": "Ask the magic 8ball a question.",
-      "structure": "{question}",
-      "example": "Is fox cool? (Yes, he is. You shouldn't need to ask this... :) )"
     },
     {
       "name": "makerolegrantable",
