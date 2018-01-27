@@ -101,17 +101,17 @@ data class CommandListener(val config: Configuration,
     }
 
     private fun isValidCommand(channel: MessageChannel, message: Message, userID: UserID): Boolean {
-        if (manager.canPerformAction(userID, config.permissionedActions.commandMention) && message.mentionsSomeone()) {
+        if (!manager.canPerformAction(userID, config.permissionedActions.commandMention) && message.mentionsSomeone()) {
             channel.sendMessage("Your permission level is below the required level to use a command mention.").queue()
             return false
         }
 
-        if (manager.canPerformAction(userID, config.permissionedActions.sendInvite) && message.containsInvite()) {
+        if (!manager.canPerformAction(userID, config.permissionedActions.sendInvite) && message.containsInvite()) {
             channel.sendMessage("Ayyy lmao. Nice try, try that again. I dare you. :rllynow:").queue()
             return false
         }
 
-        if (manager.canPerformAction(userID, config.permissionedActions.sendURL) && message.containsURL()) {
+        if (!manager.canPerformAction(userID, config.permissionedActions.sendURL) && message.containsURL()) {
             channel.sendMessage("Your permission level is below the required level to use a URL in a command.").queue()
             return false
         }

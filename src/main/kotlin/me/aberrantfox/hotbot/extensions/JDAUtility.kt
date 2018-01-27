@@ -145,9 +145,9 @@ fun JDA.performActionIfIsID(id: String, action: (User) -> Unit) =
         action(it)
     }
 
-private fun String.trimToID(): String =
+fun String.trimToID(): String =
     if (this.startsWith("<@") && this.endsWith(">")) {
-        this.substring(2, this.length - 1)
+        replace("<", "").replace(">", "").replace("@", "")
     } else {
         this
     }

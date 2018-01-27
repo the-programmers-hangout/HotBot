@@ -79,7 +79,7 @@ private fun dispatchRequestRequiredEvent(expected: List<ArgumentType>, standard:
 
         zip.forEach {
             if (it.second == ArgumentType.User) {
-                val parsedUser = event.jda.retrieveUserById(it.first as String).complete()
+                val parsedUser = event.jda.retrieveUserById((it.first as String).trimToID()).complete()
 
                 if(parsedUser == null) {
                     event.respond("Error, cannot find user by ID: ${it.first}")
