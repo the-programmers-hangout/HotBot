@@ -21,38 +21,15 @@ fun strikeCommands() =
             execute {
                 val newArgs = listOf(it.args[0], 0, it.args[1])
                 val e = CommandEvent(it.config, it.jda, it.channel, it.author, it.message, it.guild, it.manager, it.container, newArgs)
-                strike(e)
+
+                infract(e)
             }
         }
 
         command("strike") {
             expect(ArgumentType.User, ArgumentType.Integer, ArgumentType.Sentence)
             execute {
-                val args = it.args
-                val target = args[0] as User
-                val strikeQuantity = args[1] as Int
-                val reason = args[2] as String
-
-                if (strikeQuantity < 0 || strikeQuantity > 3) {
-                    it.respond("Strike weight should be between 0 and 3")
-                    return@execute
-                }
-
-                if (!(it.guild.isMember(target))) {
-                    it.respond("Cannot find the member by the id: $target")
-                    return@execute
-                }
-
-                insertInfraction(target.id, it.author.id, strikeQuantity, reason)
-
-                val res = "User ${target.asMention} has been infracted with weight: $strikeQuantity, with reason:\n\n$reason."
-                it.author.sendPrivateMessage(res)
-
-                var totalStrikes = getMaxStrikes(target.id)
-
-                if (totalStrikes > it.config.security.strikeCeil) totalStrikes = it.config.security.strikeCeil
-
-                administerPunishment(it.config, target, strikeQuantity, reason, it.guild, it.author, totalStrikes)
+                infract(it)
             }
         }
 
@@ -107,11 +84,11 @@ private fun buildHistoryEmbed(target: User, includeModerator: Boolean, records: 
         records.forEach { record ->
             field {
                 name = "ID :: __${record.id}__ :: Weight :: __${record.strikes}__"
-                value += "\nThis infraction is **${expired(record.isExpired)}**."
+                value = "This infraction is **${expired(record.isExpired)}**."
                 inline = false
 
                 if(includeModerator) {
-                    value = "Issued by **${record.moderator.idToName(it.jda)}** on **${record.dateTime.toString(DateTimeFormat.forPattern("dd/MM/yyyy"))}**"
+                    value += "\nIssued by **${record.moderator.idToName(it.jda)}** on **${record.dateTime.toString(DateTimeFormat.forPattern("dd/MM/yyyy"))}**"
                 }
             }
 
@@ -133,9 +110,9 @@ private fun buildHistoryEmbed(target: User, includeModerator: Boolean, records: 
 
 
 
-private fun strike(event: CommandEvent) {
+private fun infract(event: CommandEvent) {
     val args = event.args
-    val target = args[0] as String
+    val target = args[0] as User
     val strikeQuantity = args[1] as Int
     val reason = args[2] as String
 
@@ -144,23 +121,20 @@ private fun strike(event: CommandEvent) {
         return
     }
 
-    if (!(event.guild.members.map { it.user.id }.contains(target))) {
-        event.respond("Cannot find the member by the id: $target")
+    if (!(event.guild.isMember(target))) {
+        event.respond("Cannot find the member by the id: ${target.id}")
         return
     }
 
-    insertInfraction(target, event.author.id, strikeQuantity, reason)
+    insertInfraction(target.id, event.author.id, strikeQuantity, reason)
 
-    event.author.openPrivateChannel().queue {
-        it.sendMessage("User ${target.idToUser(event.jda).asMention} has been infracted with weight: $strikeQuantity," +
-            " with reason:\n\n$reason").queue()
-    }
+    event.author.sendPrivateMessage("User ${target.asMention} has been infracted with weight: $strikeQuantity, with reason:\n$reason")
 
-    var totalStrikes = getMaxStrikes(target)
+    var totalStrikes = getMaxStrikes(target.id)
 
     if (totalStrikes > event.config.security.strikeCeil) totalStrikes = event.config.security.strikeCeil
 
-    administerPunishment(event.config, target.idToUser(event.jda), strikeQuantity, reason, event.guild, event.author, totalStrikes)
+    administerPunishment(event.config, target, strikeQuantity, reason, event.guild, event.author, totalStrikes)
 }
 
 private fun administerPunishment(config: Configuration, user: User, strikeQuantity: Int, reason: String,
