@@ -38,7 +38,7 @@ fun strikeCommands() =
                     return@execute
                 }
 
-                if (!(it.guild.hasMember(target.id))) {
+                if (!(it.guild.isMember(target))) {
                     it.respond("Cannot find the member by the id: $target")
                     return@execute
                 }
@@ -99,7 +99,7 @@ private fun buildHistoryEmbed(target: User, includeModerator: Boolean, records: 
         description("${target.fullName()} has **${records.size}** infractions(s). Of these infractions, " +
             "**${records.filter { it.isExpired }.size}** are expired and **${records.filter { !it.isExpired }.size}** are still in effect." +
             "\nCurrent strike value of **${getMaxStrikes(target.id)}/${it.config.security.strikeCeil}**" +
-            "\nJoin date: **${guildStatus(target, it)}**" +
+            "\nJoin date: **${it.guild.getMemberJoinString(target)}**" +
             "\nCreation date: **${target.creationTime.toString().formatJdaDate()}**")
         setColor(Color.MAGENTA)
         setThumbnail(target.effectiveAvatarUrl)
@@ -131,12 +131,7 @@ private fun buildHistoryEmbed(target: User, includeModerator: Boolean, records: 
         }
     }
 
-private fun guildStatus(target: User, event: CommandEvent) =
-    if(event.guild.members.any { it.user.id  == target.id }) {
-        target.toMember(event.guild).joinDate.toString().formatJdaDate()
-    } else {
-        "This user is not current in this guild."
-    }
+
 
 private fun strike(event: CommandEvent) {
     val args = event.args
