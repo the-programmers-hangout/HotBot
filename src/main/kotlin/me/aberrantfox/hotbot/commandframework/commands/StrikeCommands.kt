@@ -139,8 +139,6 @@ private fun guildStatus(target: User, event: CommandEvent) =
     }
 
 private fun strike(event: CommandEvent) {
-    if (event.guild == null) return
-
     val args = event.args
     val target = args[0] as String
     val strikeQuantity = args[1] as Int
@@ -169,8 +167,6 @@ private fun strike(event: CommandEvent) {
 
     administerPunishment(event.config, target.idToUser(event.jda), strikeQuantity, reason, event.guild, event.author, totalStrikes)
 }
-
-private fun expired(boolean: Boolean) = if (boolean) "expired" else "not expired"
 
 private fun administerPunishment(config: Configuration, user: User, strikeQuantity: Int, reason: String,
                                  guild: Guild, moderator: User, totalStrikes: Int) {
@@ -234,3 +230,5 @@ private fun buildInfractionEmbed(userMention: String, reason: String, strikeQuan
 
             setColor(Color.RED)
         }
+
+private fun expired(boolean: Boolean) = if (boolean) "expired" else "not expired"
