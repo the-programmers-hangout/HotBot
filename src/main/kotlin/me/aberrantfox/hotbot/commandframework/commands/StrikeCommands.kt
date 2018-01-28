@@ -138,38 +138,6 @@ private fun guildStatus(target: User, event: CommandEvent) =
         "This user is not current in this guild."
     }
 
-private fun handleInfraction(event: CommandEvent) {
-    if (event.guild == null) return
-
-    val args = event.args
-    val target = args[0] as String
-    val strikeQuantity = args[1] as Int
-    val reason = args[2] as String
-
-    if (strikeQuantity < 0 || strikeQuantity > 3) {
-        event.respond("Strike weight should be between 0 and 3")
-        return
-    }
-
-    if (!(event.guild.members.map { it.user.id }.contains(target))) {
-        event.respond("Cannot find the member by the id: $target")
-        return
-    }
-
-    insertInfraction(target, event.author.id, strikeQuantity, reason)
-
-    event.author.openPrivateChannel().queue {
-        it.sendMessage("User ${target.idToUser(event.jda).asMention} has been infracted with weight: $strikeQuantity," +
-            " with reason:\n\n$reason.").queue()
-    }
-
-    var totalStrikes = getMaxStrikes(target)
-
-    if (totalStrikes > event.config.security.strikeCeil) totalStrikes = event.config.security.strikeCeil
-
-    administerPunishment(event.config, target.idToUser(event.jda), strikeQuantity, reason, event.guild, event.author, totalStrikes)
-}
-
 private fun strike(event: CommandEvent) {
     if (event.guild == null) return
 
