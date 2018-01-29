@@ -2,6 +2,7 @@ package me.aberrantfox.hotbot.listeners.antispam
 
 import me.aberrantfox.hotbot.extensions.*
 import me.aberrantfox.hotbot.logging.BotLogger
+import me.aberrantfox.hotbot.services.configPath
 import me.aberrantfox.hotbot.services.Configuration
 import me.aberrantfox.hotbot.services.PersistentSet
 import me.aberrantfox.hotbot.services.WeightTracker
@@ -13,7 +14,7 @@ import net.dv8tion.jda.core.hooks.ListenerAdapter
 
 object RecentInvites {
     val cache = WeightTracker(6)
-    val ignore = PersistentSet("invite-whitelist.json")
+    val ignore = PersistentSet(configPath("invite-whitelist.json"))
 
     fun value(id: String) = cache.map[id]!!
 

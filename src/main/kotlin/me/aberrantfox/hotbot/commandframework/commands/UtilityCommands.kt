@@ -5,6 +5,7 @@ import me.aberrantfox.hotbot.commandframework.ArgumentType
 import me.aberrantfox.hotbot.commandframework.CommandSet
 import me.aberrantfox.hotbot.database.savePermissions
 import me.aberrantfox.hotbot.dsls.command.CommandEvent
+import me.aberrantfox.hotbot.services.configPath
 import me.aberrantfox.hotbot.services.saveConfig
 import me.aberrantfox.hotbot.extensions.fullName
 import me.aberrantfox.hotbot.dsls.command.commands
@@ -23,7 +24,7 @@ object Project {
     val properties: Properties
 
     init {
-        val propFile = Configuration::class.java.getResource("/properties.json").readText()
+        val propFile = Configuration::class.java.getResource(configPath("properties.json")).readText()
         val gson = Gson()
         properties = gson.fromJson(propFile, Properties::class.java)
     }

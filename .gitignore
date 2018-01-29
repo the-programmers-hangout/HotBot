@@ -10,3 +10,9 @@ ratelimit/**
 invite-whitelist.json
 rankconfig.json
 raiders.json
+
+config/config.json
+config/rankconfig.json
+config/raiders.json
+config/macros.json
+data/

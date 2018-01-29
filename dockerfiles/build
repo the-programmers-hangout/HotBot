@@ -1,0 +1,7 @@
+# This container is meant for building Hotbot. The created jar file should be used in a lighter container.
+
+FROM maven:3-jdk-8
+ADD . /code
+WORKDIR /code
+
+CMD ["mvn", "package"]

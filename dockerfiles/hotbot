@@ -1,0 +1,5 @@
+FROM openjdk:8-jre-alpine
+ADD target/hotbot*-jar-with-dependencies.jar /hotbot/hotbot.jar
+WORKDIR /hotbot/
+
+CMD ["java", "-jar", "hotbot.jar"]
