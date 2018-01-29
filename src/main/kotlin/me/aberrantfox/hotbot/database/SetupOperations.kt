@@ -27,7 +27,7 @@ fun setupDatabaseSchema(config: Configuration) {
     )
 
     transaction {
-        SchemaUtils.create(Strikes, Suggestions, BanRecords, CommandPermissions, ChannelResources)
+        SchemaUtils.create(Strikes, Suggestions, BanRecords, CommandPermissions, ChannelResources, Notes)
         logger.addLogger(StdOutSqlLogger)
     }
 }
@@ -38,6 +38,14 @@ object Strikes : Table() {
     val member = varchar("member", 18)
     val strikes = integer("strikes")
     val reason = text("reason")
+    val date = date("date")
+}
+
+object Notes: Table() {
+    val id = integer("id").autoIncrement().primaryKey()
+    val moderator = varchar("moderator", 18)
+    val member = varchar("member", 18)
+    val note = text("note")
     val date = date("date")
 }
 
