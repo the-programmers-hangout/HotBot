@@ -13,7 +13,8 @@
     "security": "Commands for modifying security features and thresholds of the bot.",
     "invites": "Commands for dictating how the bot will handle invites",
     "rank": "Commands for granting and removing ranks.",
-    "resources": "Commands related to channel resources"
+    "resources": "Commands related to channel resources",
+    "poll": "Commands related to polling questions and answers"
   },
   "commands": [
     {
@@ -680,6 +681,13 @@
       "description": "Remove all of current channel resources.",
       "structure": "",
       "example": ""
+    },
+    {
+      "name": "poll",
+      "category": "poll",
+      "description": "Create a poll with one question and 2 to 9 answers.",
+      "structure": "Question|Answer1|Answer2| ... | Answer9",
+      "example": "What is my name|Jimothy|Bob Stevens"
     }
   ]
 }
