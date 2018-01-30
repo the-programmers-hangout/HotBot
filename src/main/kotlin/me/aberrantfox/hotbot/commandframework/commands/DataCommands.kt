@@ -8,7 +8,7 @@ import me.aberrantfox.hotbot.extensions.fullName
 import me.aberrantfox.hotbot.services.UserID
 import java.awt.Color
 
-data class PollContainer(val question: String, val answers: List<String>, val creator: UserID)
+data class PollContainer(val question: String, val answers: List<String>, val creator: UserID, val channel: String)
 
 
 object Polls {
@@ -50,7 +50,38 @@ fun dataCommands() = commands {
                 answers.forEachIndexed { i, _ ->
                     msg.addReaction(numberMap[i + 1]).queue()
                 }
-                Polls.map.put(msg.id, PollContainer(question, answers, it.author.id))
+                Polls.map.put(msg.id, PollContainer(question, answers, it.author.id, it.channel.id))
+            }
+        }
+    }
+    command("finishpoll") {
+        expect(ArgumentType.Word)
+        execute {
+            val pollID = it.args.component1() as String
+
+            if( !(Polls.map.containsKey(pollID)) ) {
+                it.respond("Error, unknown poll ID: $pollID")
+                return@execute
+            }
+
+            val poll = Polls.map[pollID]!!
+
+            it.guild.getTextChannelById(poll.channel).getMessageById(pollID).queue { msg ->
+                val highestAnswersSize = msg.reactions.maxBy { it.count }!!.count
+
+                if(msg.reactions.all { it.count == highestAnswersSize }) {
+                    it.respond("Poll inconclusive.")
+                    Polls.map.remove(pollID)
+                    return@queue
+                }
+
+                val highestAnswers = msg.reactions.filter { it.count == highestAnswersSize }
+                val answerString = highestAnswers
+                    .map { it.reactionEmote.name }
+                    .reduceRight { a, b -> "$a, $b"}
+
+                it.respond("The highest rated answers were: $answerString")
+                println("test")
             }
         }
     }
