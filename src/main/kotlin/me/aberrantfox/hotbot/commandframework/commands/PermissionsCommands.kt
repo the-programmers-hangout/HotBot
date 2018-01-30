@@ -37,7 +37,7 @@ fun permissionCommands() =
                 val name = it.args[0] as String
 
                 if( !(it.container.has(name)) ) {
-                    it.safeRespond("I do not know what $name is".sanitiseMentions())
+                    it.safeRespond("I do not know what $name is")
                     return@execute
                 }
 
