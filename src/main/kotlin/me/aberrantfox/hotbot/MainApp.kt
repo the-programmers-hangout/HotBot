@@ -55,7 +55,8 @@ fun main(args: Array<String>) {
             VoiceChannelListener(logger),
             NewChannelListener(mutedRole),
             DuplicateMessageListener(config, logger, tracker),
-            RoleListener(config))
+            RoleListener(config),
+            PollListener())
 
     jda.presence.setPresence(OnlineStatus.ONLINE, Game.of("${config.serverInformation.prefix}help"))
     jda.guilds.forEach { setupMutedRole(it, config.security.mutedRole) }
