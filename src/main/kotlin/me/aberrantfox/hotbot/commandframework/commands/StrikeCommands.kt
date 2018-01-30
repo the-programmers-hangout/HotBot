@@ -37,7 +37,8 @@ fun strikeCommands() =
             expect(ArgumentType.User)
             execute {
                 val target = it.args[0] as User
-                it.respond(buildHistoryEmbed(target, true, getHistory(target.id), it))
+                it.respond(buildHistoryEmbed(target, true, getHistory(target.id),
+                        getNotesByUser(target.id), it))
             }
         }
 
@@ -64,7 +65,9 @@ fun strikeCommands() =
         command("selfhistory") {
             execute {
                 val target = it.author.id.idToUser(it.jda)
-                target.sendPrivateMessage(buildHistoryEmbed(target, false, getHistory(target.id), it))
+
+                target.sendPrivateMessage(buildHistoryEmbed(target, false, getHistory(target.id),
+                        null, it))
             }
         }
     }
@@ -134,16 +137,36 @@ private fun administerPunishment(config: Configuration, user: User, strikeQuanti
     }
 }
 
-private fun buildHistoryEmbed(target: User, includeModerator: Boolean, records: List<StrikeRecord>, it: CommandEvent) =
+private fun buildHistoryEmbed(target: User, includeModerator: Boolean, records: List<StrikeRecord>,
+                              notes: List<NoteRecord>?, it: CommandEvent) =
         embed {
             title("${target.fullName()}'s Record")
-            description("${target.fullName()} has **${records.size}** infractions(s). Of these infractions, " +
-                    "**${records.filter { it.isExpired }.size}** are expired and **${records.filter { !it.isExpired }.size}** are still in effect." +
-                    "\nCurrent strike value of **${getMaxStrikes(target.id)}/${it.config.security.strikeCeil}**" +
-                    "\nJoin date: **${it.guild.getMemberJoinString(target)}**" +
-                    "\nCreation date: **${target.creationTime.toString().formatJdaDate()}**")
             setColor(Color.MAGENTA)
             setThumbnail(target.effectiveAvatarUrl)
+
+            field {
+                name = ""
+                value = "__**Summary**__"
+                inline = false
+            }
+
+            field {
+                name = "Information"
+                value = "${target.fullName()} has **${records.size}** infractions(s).\nOf these infractions, " +
+                        "**${records.filter { it.isExpired }.size}** are expired and **${records.filter { !it.isExpired }.size}** are still in effect." +
+                        "\nCurrent strike value of **${getMaxStrikes(target.id)}/${it.config.security.strikeCeil}**" +
+                        "\nJoin date: **${it.guild.getMemberJoinString(target)}**" +
+                        "\nCreation date: **${target.creationTime.toString().formatJdaDate()}**"
+                inline = false
+            }
+
+            addBlankField(false)
+
+            field {
+                name = ""
+                value = "__**Infractions**__"
+                inline = false
+            }
 
             records.forEach { record ->
                 field {
@@ -159,17 +182,56 @@ private fun buildHistoryEmbed(target: User, includeModerator: Boolean, records: 
                 field {
                     name = "Infraction Reasoning Given"
                     value = record.reason
+                    inline = false
                 }
 
                 addBlankField(false)
             }
 
-            if (this.fields.isEmpty()) {
-                ifield {
-                    name = "Strikes"
+            if (records.isEmpty()) {
+                field {
+                    name = "No Infractions"
                     value = "Clean as a whistle, sir."
+                    inline = false
+                }
+
+                addBlankField(false)
+            }
+
+            if (!includeModerator || notes == null) {
+                return@embed
+            }
+
+            field {
+                name = ""
+                value = "__**Notes**__"
+                inline = false
+            }
+
+            if(notes.isEmpty()) {
+                field {
+                    name = "No Notes"
+                    value = "User has no notes written"
+                    inline = false
                 }
             }
+
+            notes.forEach { note ->
+                field {
+                    name = "ID :: __${note.id}__ :: Staff :: __${note.moderator.idToName(it.jda)}__"
+                    value = "Noted on **${note.dateTime.toString(DateTimeFormat.forPattern("dd/MM/yyyy"))}**"
+                    inline = false
+                }
+
+                field {
+                    name = "Note Message"
+                    value = note.note
+                    inline = false
+                }
+
+                addBlankField(false)
+            }
+
         }
 
 

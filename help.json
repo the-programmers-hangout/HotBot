@@ -185,6 +185,27 @@
       "example": ""
     },
     {
+      "name": "note",
+      "category": "infractions",
+      "description": "Add a note to a user's history",
+      "structure": "{noteMessage}",
+      "example": "This is a note"
+    },
+    {
+      "name": "removeNote",
+      "category": "infractions",
+      "description": "Removes a note by ID (listed in history)",
+      "structure": "{noteId}",
+      "example": "17"
+    },
+    {
+      "name": "cleanseNotes",
+      "category": "infractions",
+      "description": "Wipes all notes from a user (permanently deleted).",
+      "structure": "",
+      "example": ""
+    },
+    {
       "name": "ping",
       "category": "utility",
       "description": "Pong!",

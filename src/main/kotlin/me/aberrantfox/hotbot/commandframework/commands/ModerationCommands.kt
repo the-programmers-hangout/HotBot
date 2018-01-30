@@ -2,11 +2,10 @@ package me.aberrantfox.hotbot.commandframework.commands
 
 import me.aberrantfox.hotbot.commandframework.ArgumentType
 import me.aberrantfox.hotbot.commandframework.CommandSet
+import me.aberrantfox.hotbot.database.*
 import me.aberrantfox.hotbot.dsls.command.commands
 import me.aberrantfox.hotbot.services.MessageService
 import me.aberrantfox.hotbot.services.MessageType
-import me.aberrantfox.hotbot.database.getReason
-import me.aberrantfox.hotbot.database.updateOrSetReason
 import me.aberrantfox.hotbot.dsls.embed.embed
 import me.aberrantfox.hotbot.extensions.*
 import me.aberrantfox.hotbot.services.Configuration
@@ -98,8 +97,8 @@ fun moderationCommands() = commands {
                 it.respond("Permission level now set to: ${desiredLevel.name} ; be sure to save configurations.")
             }
         }
-
     }
+
     command("move") {
         expect(ArgumentType.Word, ArgumentType.Integer, ArgumentType.Word)
         execute {
@@ -133,6 +132,7 @@ fun moderationCommands() = commands {
             }
         }
     }
+
     command("badname") {
         expect(ArgumentType.User, ArgumentType.Sentence)
         execute {
@@ -146,6 +146,7 @@ fun moderationCommands() = commands {
             }
         }
     }
+
     command("joindate") {
         expect(ArgumentType.User)
         execute {
@@ -159,6 +160,7 @@ fun moderationCommands() = commands {
             it.respond("${member.fullName()}'s join date: $joinDate")
         }
     }
+
     command("restart") {
         execute {
             val javaBin = System.getProperty("java.home") + File.separator + "bin" + File.separator + "java"
@@ -170,6 +172,7 @@ fun moderationCommands() = commands {
             System.exit(0)
         }
     }
+
     command("setbanreason") {
         expect(ArgumentType.Word, ArgumentType.Sentence)
         execute {
@@ -186,6 +189,7 @@ fun moderationCommands() = commands {
             }
         }
     }
+
     command("getbanreason") {
         expect(ArgumentType.Word)
         execute {
@@ -205,6 +209,38 @@ fun moderationCommands() = commands {
             } catch (e: IllegalArgumentException) {
                 it.respond("$target is not a valid ID")
             }
+        }
+    }
+
+    command("note") {
+        expect(ArgumentType.User, ArgumentType.Sentence)
+        execute {
+            val target = it.args.component1() as User
+            val note = it.args.component2() as String
+
+            insertNote(target.id, it.author.id, note)
+
+            it.respond("Note added.")
+        }
+    }
+
+    command("removenote") {
+        expect(ArgumentType.Integer)
+        execute {
+            val noteId = it.args.component1() as Int
+            val notesRemoved = removeNoteById(noteId)
+
+            it.respond("Number of notes removed: $notesRemoved")
+        }
+    }
+
+    command("cleansenotes") {
+        expect(ArgumentType.User)
+        execute {
+            val target = it.args.component1() as User
+            val amount = removeAllNotesByUser(target.id)
+
+            it.respond("Notes for ${target.asMention} have been wiped. Total removed: $amount")
         }
     }
 }
