@@ -82,13 +82,13 @@ private fun dispatchRequestRequiredEvent(expected: List<ArgumentType>, standard:
                 try{
                     val parsedUser = event.jda.retrieveUserById((it.first as String).trimToID()).complete()
                     if(parsedUser == null) {
-                        event.respond("Error, cannot find user by ID: ${it.first}")
+                        event.safeRespond("Error, cannot find user by ID: ${it.first}")
                         return@runBlocking
                     }
 
                     fullyParsed.add(parsedUser)
                 } catch (e: Exception) {
-                    event.respond("Error, cannot find user: ${it.first}")
+                    event.safeRespond("Error, cannot find user: ${it.first}")
                     return@runBlocking
                 }
             } else {
