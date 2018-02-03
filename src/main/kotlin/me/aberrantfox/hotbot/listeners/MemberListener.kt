@@ -9,7 +9,8 @@ import net.dv8tion.jda.core.events.guild.member.GuildMemberJoinEvent
 import net.dv8tion.jda.core.events.guild.member.GuildMemberLeaveEvent
 import net.dv8tion.jda.core.hooks.ListenerAdapter
 import java.awt.Color
-
+import java.util.*
+import kotlin.concurrent.schedule
 
 
 class MemberListener(val configuration: Configuration, val logger: BotLogger) : ListenerAdapter() {
@@ -19,8 +20,13 @@ class MemberListener(val configuration: Configuration, val logger: BotLogger) : 
         val response = MessageService.getMessage(MessageType.Join).replace("%name%", event.user.asMention)
         val userImage = event.user.effectiveAvatarUrl
 
-        target?.sendMessage(buildJoinMessage(response, userImage))?.queue {
-            it.addReaction("\uD83D\uDC4B").queue()
+        target?.sendMessage(buildJoinMessage(response, userImage))?.queue { msg->
+            msg.addReaction("\uD83D\uDC4B").queue {
+                WelcomeMessages.map.put(event.user.id, msg.id)
+                Timer().schedule(1000 * 60 * 60) {
+                    WelcomeMessages.map.takeIf { it.containsKey(event.user.id) }?.remove(event.user.id)
+                }
+            }
         }
     }
 
