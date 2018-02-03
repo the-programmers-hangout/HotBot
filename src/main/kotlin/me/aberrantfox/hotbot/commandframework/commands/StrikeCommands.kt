@@ -138,6 +138,20 @@ fun strikeCommands() =
             }
         }
 
+        command("listrequests") {
+            execute {
+                if(StrikeRequests.map.isEmpty()) {
+                    it.respond("No requests currently in place.")
+                    return@execute
+                }
+                val response = StrikeRequests.map.values
+                    .map { "${it.user.asMention }, requested by ${it.moderator.fullName()}" }
+                    .reduce {a, b -> "$a \n$b" }
+
+                it.respond(response)
+            }
+        }
+
         command("history") {
             expect(ArgumentType.User)
             execute {
