@@ -702,6 +702,13 @@
       "description": "Display the bot information.",
       "structure": "",
       "example": ""
+    },
+    {
+      "name": "gag",
+      "category": "moderation",
+      "description": "Temporarily mute a user for a few minutes so that you can deal with something.",
+      "structure": "{userId}",
+      "example": "134932042994309234"
     }
   ]
 }

@@ -51,6 +51,14 @@ fun moderationCommands() = commands {
         }
     }
 
+    command("gag") {
+        expect(ArgumentType.User)
+        execute {
+            val user = it.args.component1() as User
+            muteMember(it.guild, user, 5 * 1000 * 60, it.mService.messages.gagResponse, it.config, it.author)
+        }
+    }
+
     command("mute") {
         expect(ArgumentType.User, ArgumentType.Integer, ArgumentType.Sentence)
         execute {
