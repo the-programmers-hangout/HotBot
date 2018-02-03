@@ -709,6 +709,20 @@
       "description": "Temporarily mute a user for a few minutes so that you can deal with something.",
       "structure": "{userId}",
       "example": "134932042994309234"
+    },
+    {
+      "name": "strikerequest",
+      "category": "infractions",
+      "description": "Quite like the strike command, except another moderator reviews it before it is accepted.",
+      "structure": "{userId} {amount of Strikes} {reason}",
+      "example": "@Fox 2 Being a bad user."
+    },
+    {
+      "name": "acceptrequest",
+      "category": "infractions",
+      "description": "Accept a request for striking a user by another moderator. This will infract the target user.",
+      "structure": "{moderatorUserID}",
+      "example": "@Fox 2 Being a bad user."
     }
   ]
 }
