@@ -744,6 +744,13 @@
       "description": "Reject a request for a strike on a user. This will notify the invoker and delete the request.",
       "structure": "{targetUserID}",
       "example": "@Fox"
+    },
+    {
+      "name": "listrequests",
+      "category": "infractions",
+      "description": "List all current strike requests",
+      "structure": "",
+      "example": ""
     }
   ]
 }
