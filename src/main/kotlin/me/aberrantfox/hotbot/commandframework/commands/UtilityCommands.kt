@@ -4,6 +4,7 @@ import com.google.gson.Gson
 import me.aberrantfox.hotbot.commandframework.ArgumentType
 import me.aberrantfox.hotbot.commandframework.CommandSet
 import me.aberrantfox.hotbot.database.savePermissions
+import me.aberrantfox.hotbot.dsls.command.CommandEvent
 import me.aberrantfox.hotbot.services.saveConfig
 import me.aberrantfox.hotbot.extensions.fullName
 import me.aberrantfox.hotbot.dsls.command.commands
@@ -37,9 +38,36 @@ fun utilCommands() = commands {
         }
     }
 
+    command("botinfo") {
+        execute {
+            it.respond(embed {
+                title(it.jda.selfUser.fullName())
+                description(it.mService.messages.botDescription)
+                setColor(Color.red)
+                setThumbnail(it.jda.selfUser.effectiveAvatarUrl)
+
+                field {
+                    name = "Author"
+                    value = "Fox#0001"
+                    inline = false
+                }
+                field {
+                    name = "Technologies"
+                    value = "Kotlin, JDA, SQL, Maven"
+                    inline = false
+                }
+                field {
+                    name = "Repository link"
+                    value = "https://github.com/AberrantFox/hotbot"
+                    inline = false
+                }
+            })
+        }
+    }
+
     command("serverinfo") {
         execute {
-            val embed = produceServerInfoEmbed(it.guild)
+            val embed = produceServerInfoEmbed(it)
             it.respond(embed)
         }
     }
@@ -109,13 +137,13 @@ fun utilCommands() = commands {
     }
 }
 
-fun produceServerInfoEmbed(guild: Guild) =
+fun produceServerInfoEmbed(event: CommandEvent) =
     embed {
+        val guild = event.guild
+
         title(guild.name)
         setColor(Color.MAGENTA)
-        description("""
-        |The programmer's hangout is a programming server, made for persons of all skill levels,
-        |be you someone who has wrote 10 lines of code, or someone with 10 years of experience.""".trimMargin())
+        description(event.mService.messages.serverDescription)
         setFooter("Guild creation date: ${guild.creationTime}", "http://i.imgur.com/iwwEprG.png")
         setThumbnail("http://i.imgur.com/DFoaG7k.png")
 
