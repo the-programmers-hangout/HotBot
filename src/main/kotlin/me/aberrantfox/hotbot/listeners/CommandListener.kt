@@ -11,6 +11,7 @@ import me.aberrantfox.hotbot.extensions.*
 import me.aberrantfox.hotbot.logging.BotLogger
 import me.aberrantfox.hotbot.permissions.PermissionManager
 import me.aberrantfox.hotbot.services.CommandRecommender
+import me.aberrantfox.hotbot.services.MService
 import me.aberrantfox.hotbot.services.UserID
 import net.dv8tion.jda.core.JDA
 import net.dv8tion.jda.core.entities.*
@@ -23,7 +24,8 @@ data class CommandListener(val config: Configuration,
                            val jda: JDA,
                            val log: BotLogger,
                            val guild: Guild,
-                           val manager: PermissionManager) : ListenerAdapter() {
+                           val manager: PermissionManager,
+                           val mService: MService) : ListenerAdapter() {
     init {
         CommandRecommender.addAll(container.commands.keys.toList() + macroMap.keys.toList())
     }
@@ -69,7 +71,7 @@ data class CommandListener(val config: Configuration,
 
         if (!(argsMatch(actual, command, channel))) return
 
-        val event = CommandEvent(config, jda, channel, author, message, guild, manager, container, actual)
+        val event = CommandEvent(config, jda, channel, author, message, guild, manager, container, mService, actual)
         convertAndQueue(actual, command.expectedArgs.map { it.type }.toList(), this, event, invokedInGuild, command, config)
     }
 

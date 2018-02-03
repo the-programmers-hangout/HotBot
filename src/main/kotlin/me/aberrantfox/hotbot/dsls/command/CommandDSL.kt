@@ -3,16 +3,17 @@ package me.aberrantfox.hotbot.dsls.command
 import me.aberrantfox.hotbot.commandframework.ArgumentType
 import me.aberrantfox.hotbot.extensions.sanitiseMentions
 import me.aberrantfox.hotbot.logging.BotLogger
-import me.aberrantfox.hotbot.logging.ChannelLogger
 import me.aberrantfox.hotbot.logging.DefaultLogger
 import me.aberrantfox.hotbot.permissions.PermissionManager
 import me.aberrantfox.hotbot.services.Configuration
+import me.aberrantfox.hotbot.services.MService
 import net.dv8tion.jda.core.JDA
 import net.dv8tion.jda.core.entities.*
 
 data class CommandEvent(val config: Configuration, val jda: JDA, val channel: MessageChannel,
                         val author: User, val message: Message, val guild: Guild, val manager: PermissionManager,
-                        val container: CommandsContainer, var args: List<Any> = listOf()) {
+                        val container: CommandsContainer, val mService: MService,
+                        var args: List<Any> = listOf()) {
 
     fun respond(msg: String) =
         if(msg.length > 2000) {

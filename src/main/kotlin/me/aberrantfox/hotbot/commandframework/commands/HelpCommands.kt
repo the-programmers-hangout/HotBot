@@ -9,7 +9,6 @@ import me.aberrantfox.hotbot.services.CommandDescriptor
 import me.aberrantfox.hotbot.services.Configuration
 import me.aberrantfox.hotbot.services.HelpConf
 import me.aberrantfox.hotbot.services.SelectionArgument
-import net.dv8tion.jda.core.EmbedBuilder
 import java.awt.Color
 import java.time.LocalDateTime
 
@@ -19,7 +18,9 @@ fun helpCommands() =
         command("help") {
             expect(ArgumentType.Manual)
             execute {
-                val (config, _, _, author, _, _, _, _, args) = it
+                val author = it.author
+                val config = it.config
+                val args = it.args
 
                 if (args.isEmpty()) {
                     author.sendPrivateMessage(getZeroArgMessage(config))

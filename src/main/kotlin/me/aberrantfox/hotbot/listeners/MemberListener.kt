@@ -1,9 +1,9 @@
 package me.aberrantfox.hotbot.listeners
 
+import me.aberrantfox.hotbot.extensions.randomListItem
 import me.aberrantfox.hotbot.logging.BotLogger
 import me.aberrantfox.hotbot.services.Configuration
-import me.aberrantfox.hotbot.services.MessageService
-import me.aberrantfox.hotbot.services.MessageType
+import me.aberrantfox.hotbot.services.MService
 import net.dv8tion.jda.core.EmbedBuilder
 import net.dv8tion.jda.core.events.guild.member.GuildMemberJoinEvent
 import net.dv8tion.jda.core.events.guild.member.GuildMemberLeaveEvent
@@ -13,11 +13,11 @@ import java.util.*
 import kotlin.concurrent.schedule
 
 
-class MemberListener(val configuration: Configuration, val logger: BotLogger) : ListenerAdapter() {
+class MemberListener(val configuration: Configuration, val logger: BotLogger, val mService: MService) : ListenerAdapter() {
 
     override fun onGuildMemberJoin(event: GuildMemberJoinEvent) {
         val target = event.guild.textChannels.findLast { it.id == configuration.messageChannels.welcomeChannel }
-        val response = MessageService.getMessage(MessageType.Join).replace("%name%", event.user.asMention)
+        val response = mService.messages.onJoin.randomListItem().replace("%name%", event.user.asMention)
         val userImage = event.user.effectiveAvatarUrl
 
         target?.sendMessage(buildJoinMessage(response, userImage))?.queue { msg->

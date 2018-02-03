@@ -4,8 +4,6 @@ import me.aberrantfox.hotbot.commandframework.ArgumentType
 import me.aberrantfox.hotbot.commandframework.CommandSet
 import me.aberrantfox.hotbot.database.*
 import me.aberrantfox.hotbot.dsls.command.commands
-import me.aberrantfox.hotbot.services.MessageService
-import me.aberrantfox.hotbot.services.MessageType
 import me.aberrantfox.hotbot.dsls.embed.embed
 import me.aberrantfox.hotbot.extensions.*
 import me.aberrantfox.hotbot.services.Configuration
@@ -141,7 +139,7 @@ fun moderationCommands() = commands {
 
             val targetMember = it.guild.getMember(target)
 
-            it.guild.controller.setNickname(targetMember, MessageService.getMessage(MessageType.Name)).queue {
+            it.guild.controller.setNickname(targetMember, it.mService.messages.names.randomListItem()).queue {
                 target.sendPrivateMessage("Your name has been changed forcefully by a member of staff for reason: $reason")
             }
         }

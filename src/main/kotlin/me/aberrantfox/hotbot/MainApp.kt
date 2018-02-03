@@ -42,14 +42,15 @@ fun main(args: Array<String>) {
     val tracker = MessageTracker(1)
     val guild = jda.getGuildById(config.serverInformation.guildid)
     val manager = PermissionManager(HashMap(), guild.roles, guild, config)
+    val messageService = MService()
 
     loadUpManager(manager)
 
     container.newLogger(logger)
 
     jda.addEventListener(
-            CommandListener(config, container, jda, logger, guild, manager),
-            MemberListener(config, logger),
+            CommandListener(config, container, jda, logger, guild, manager, messageService),
+            MemberListener(config, logger, messageService),
             InviteListener(config, logger),
             MentionListener(config, jda.selfUser.name),
             VoiceChannelListener(logger),

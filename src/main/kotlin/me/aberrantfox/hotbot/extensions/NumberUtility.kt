@@ -20,6 +20,8 @@ fun randomInt(min: Int, max: Int): Int {
 
 fun <T> randomListItem(list: List<T>) = list[randomInt(0, list.size - 1)]
 
+fun <T> ArrayList<T>.randomListItem() = this[me.aberrantfox.hotbot.extensions.randomInt(0, size - 1)]
+
 fun String.isInteger(): Boolean =
         try {
             this.toInt()
