@@ -8,10 +8,17 @@ import me.aberrantfox.hotbot.extensions.*
 import me.aberrantfox.hotbot.services.*
 import me.aberrantfox.hotbot.database.*
 import me.aberrantfox.hotbot.dsls.embed.embed
+import me.aberrantfox.hotbot.listeners.MessageID
 import net.dv8tion.jda.core.entities.Guild
 import net.dv8tion.jda.core.entities.User
 import org.joda.time.format.DateTimeFormat
 import java.awt.Color
+
+data class StrikeRequest(val user: User, val reason: String, val amount: Int, val moderator: User)
+
+object StrikeRequests {
+    val map = HashMap<MessageID, StrikeRequest>()
+}
 
 @CommandSet
 fun strikeCommands() =
@@ -30,6 +37,96 @@ fun strikeCommands() =
             expect(ArgumentType.User, ArgumentType.Integer, ArgumentType.Sentence)
             execute {
                 infract(it)
+            }
+        }
+
+        command("strikerequest") {
+            expect(ArgumentType.User, ArgumentType.Integer, ArgumentType.Sentence)
+            execute {
+                val target = it.args.component1() as User
+                val amount = it.args.component2() as Int
+                val reason = it.args.component3() as String
+
+                if(amount > it.config.security.strikeCeil) {
+                    it.respond("Error, strike quantity above strike ceiling. ")
+                    return@execute
+                }
+
+                val request = StrikeRequest(target, reason, amount, it.author)
+
+                StrikeRequests.map.put(it.author.id, request)
+                it.respond("This has been logged and will be accepted or declined, thank you.")
+                info("${it.author.fullName()} has a new strike request. Use viewRequest ${it.author.id} to see it.")
+            }
+        }
+
+        command("viewRequest") {
+            expect(ArgumentType.User)
+            execute {
+                val user = it.args.component1() as User
+
+                if( !(StrikeRequests.map.containsKey(user.id)) ) {
+                    it.respond("That user does not currently have a strike request.")
+                    return@execute
+                }
+
+                val request = StrikeRequests.map[user.id]!!
+
+                it.respond(embed {
+                    title("${request.moderator.fullName()}'s request")
+
+                    field {
+                        name = "Target"
+                        value = "${request.user.asMention}(${request.user.fullName()})"
+                        inline = false
+                    }
+
+                    field {
+                        name = "Reasoning"
+                        value = request.reason
+                        inline = false
+                    }
+
+                    field {
+                        name =  "Amount"
+                        value = "${request.amount}"
+                        inline = false
+                    }
+                })
+            }
+        }
+
+        command("acceptrequest") {
+            expect(ArgumentType.User)
+            execute {
+                val user = it.args.component1() as User
+
+                if( !(StrikeRequests.map.containsKey(user.id)) ) {
+                    it.respond("That user does not currently have a strike request.")
+                    return@execute
+                }
+
+                val request = StrikeRequests.map[user.id]!!
+                val newArgs = listOf(request.user, request.amount, request.reason)
+                infract(it.copy(args=newArgs))
+
+                StrikeRequests.map.remove(user.id)
+                user.sendPrivateMessage("Strike request was accepted. Thanks a bunch!" )
+            }
+        }
+
+        command("declinerequest") {
+            expect(ArgumentType.User)
+            execute {
+                val user = it.args.component1() as User
+
+                if( !(StrikeRequests.map.containsKey(user.id)) ) {
+                    it.respond("That user does not currently have a strike request.")
+                    return@execute
+                }
+
+                StrikeRequests.map.remove(user.id)
+                user.sendPrivateMessage("Strike request was declined, better lucky next time :)")
             }
         }
 
