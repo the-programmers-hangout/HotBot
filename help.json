@@ -695,6 +695,13 @@
       "description": "Conclude a poll, based on the embed message ID of the poll.",
       "structure": "pollMessageID",
       "example": "408017609359884298"
+    },
+    {
+      "name": "botinfo",
+      "category": "utility",
+      "description": "Display the bot information.",
+      "structure": "",
+      "example": ""
     }
   ]
 }
