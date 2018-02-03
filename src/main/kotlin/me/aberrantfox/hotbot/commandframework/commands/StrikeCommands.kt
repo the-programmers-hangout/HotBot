@@ -8,7 +8,6 @@ import me.aberrantfox.hotbot.extensions.*
 import me.aberrantfox.hotbot.services.*
 import me.aberrantfox.hotbot.database.*
 import me.aberrantfox.hotbot.dsls.embed.embed
-import me.aberrantfox.hotbot.listeners.MessageID
 import net.dv8tion.jda.core.entities.Guild
 import net.dv8tion.jda.core.entities.User
 import org.joda.time.format.DateTimeFormat
@@ -17,7 +16,7 @@ import java.awt.Color
 data class StrikeRequest(val user: User, val reason: String, val amount: Int, val moderator: User)
 
 object StrikeRequests {
-    val map = HashMap<MessageID, StrikeRequest>()
+    val map = HashMap<UserID, StrikeRequest>()
 }
 
 @CommandSet
@@ -54,9 +53,9 @@ fun strikeCommands() =
 
                 val request = StrikeRequest(target, reason, amount, it.author)
 
-                StrikeRequests.map.put(it.author.id, request)
+                StrikeRequests.map.put(target.id, request)
                 it.respond("This has been logged and will be accepted or declined, thank you.")
-                info("${it.author.fullName()} has a new strike request. Use viewRequest ${it.author.id} to see it.")
+                info("${it.author.fullName()} has a new strike request. Use viewRequest ${target.asMention} to see it.")
             }
         }
 
@@ -65,10 +64,7 @@ fun strikeCommands() =
             execute {
                 val user = it.args.component1() as User
 
-                if( !(StrikeRequests.map.containsKey(user.id)) ) {
-                    it.respond("That user does not currently have a strike request.")
-                    return@execute
-                }
+                if( !(strikeAgainst(user, it)) ) return@execute
 
                 val request = StrikeRequests.map[user.id]!!
 
@@ -101,10 +97,7 @@ fun strikeCommands() =
             execute {
                 val user = it.args.component1() as User
 
-                if( !(StrikeRequests.map.containsKey(user.id)) ) {
-                    it.respond("That user does not currently have a strike request.")
-                    return@execute
-                }
+                if( !(strikeAgainst(user, it)) ) return@execute
 
                 val request = StrikeRequests.map[user.id]!!
                 val newArgs = listOf(request.user, request.amount, request.reason)
@@ -120,13 +113,28 @@ fun strikeCommands() =
             execute {
                 val user = it.args.component1() as User
 
-                if( !(StrikeRequests.map.containsKey(user.id)) ) {
-                    it.respond("That user does not currently have a strike request.")
-                    return@execute
-                }
+                if( !(strikeAgainst(user, it)) ) return@execute
 
                 StrikeRequests.map.remove(user.id)
                 user.sendPrivateMessage("Strike request was declined, better lucky next time :)")
+            }
+        }
+
+        command("deleteRequest") {
+            expect(ArgumentType.User)
+            execute {
+                val user = it.args.component1() as User
+
+                if( !(strikeAgainst(user, it)) ) return@execute
+
+                val byInvoker = StrikeRequests.map[user.id]!!.moderator.id == it.author.id
+
+                if(byInvoker) {
+                    StrikeRequests.map.remove(user.id)
+                    it.respond("Request removed.")
+                } else {
+                    it.respond("You did not make that request and as such cannot delete it.")
+                }
             }
         }
 
@@ -167,6 +175,14 @@ fun strikeCommands() =
                         null, it))
             }
         }
+    }
+
+private fun strikeAgainst(user: User, event: CommandEvent) =
+    if( !(StrikeRequests.map.containsKey(user.id)) ) {
+        event.respond("That user does not currently have a strike request.")
+        false
+    } else {
+        true
     }
 
 private fun infract(event: CommandEvent) {
