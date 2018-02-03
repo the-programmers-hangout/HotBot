@@ -17,5 +17,6 @@
   ],
   "serverDescription" : "The programmer's hangout is a programming server, made for persons of all skill levels, be you someone who has wrote 10 lines of code, or someone with 10 years of experience.",
   "botDescription": "A bot with many features, specifically geared for running on *one* server at a time.",
-  "permanentInviteLink": "discord.gg/programming"
+  "permanentInviteLink": "discord.gg/programming",
+  "gagMessage": "You have been temporarily muted for a few minutes so that a moderator can deal with a rule break. You'll be unmuted shortly :)"
 }
