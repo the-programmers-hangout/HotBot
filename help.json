@@ -179,6 +179,13 @@
       "example": "12093810293810293"
     },
     {
+      "name": "badpfp",
+      "category": "infractions",
+      "description": "Kicks a user and sends them a message telling them to change their profile picture. Will ban the user on being told a second time.",
+      "structure": "{userID}",
+      "example": "12093810293810293"
+    },
+    {
       "name": "selfhistory",
       "category": "infractions",
       "description": "See your own infraction history.",
