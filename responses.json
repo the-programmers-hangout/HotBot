@@ -14,5 +14,8 @@
   ],
   "names": [
     "Stephen", "Bob", "Joe", "Timmy", "Arnold", "Jeff", "Tim"
-  ]
+  ],
+  "serverDescription" : "The programmer's hangout is a programming server, made for persons of all skill levels, be you someone who has wrote 10 lines of code, or someone with 10 years of experience.",
+  "botDescription": "A bot with many features, specifically geared for running on *one* server at a time.",
+  "permanentInviteLink": "discord.gg/programming"
 }
