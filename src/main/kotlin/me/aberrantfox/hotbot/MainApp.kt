@@ -11,6 +11,7 @@ import me.aberrantfox.hotbot.listeners.antispam.InviteListener
 import me.aberrantfox.hotbot.logging.convertChannels
 import me.aberrantfox.hotbot.services.*
 import me.aberrantfox.hotbot.database.setupDatabaseSchema
+import me.aberrantfox.hotbot.listeners.antispam.TooManyMentionsListener
 import me.aberrantfox.hotbot.permissions.PermissionManager
 import net.dv8tion.jda.core.*
 import net.dv8tion.jda.core.entities.Game
@@ -58,7 +59,8 @@ fun main(args: Array<String>) {
             DuplicateMessageListener(config, logger, tracker),
             RoleListener(config),
             PollListener(),
-            BanListener(config))
+            BanListener(config),
+            TooManyMentionsListener(logger, mutedRole))
 
     jda.presence.setPresence(OnlineStatus.ONLINE, Game.of("${config.serverInformation.prefix}help"))
     jda.guilds.forEach { setupMutedRole(it, config.security.mutedRole) }
