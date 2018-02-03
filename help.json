@@ -721,8 +721,29 @@
       "name": "acceptrequest",
       "category": "infractions",
       "description": "Accept a request for striking a user by another moderator. This will infract the target user.",
-      "structure": "{moderatorUserID}",
-      "example": "@Fox 2 Being a bad user."
+      "structure": "{targetUserID}",
+      "example": "@Fox"
+    },
+    {
+      "name": "deleterequest",
+      "category": "infractions",
+      "description": "Delete a request made by yourself.",
+      "structure": "{targetUserID}",
+      "example": "@Fox"
+    },
+    {
+      "name": "viewrequest",
+      "category": "infractions",
+      "description": "View the current strike request, if any, on the given user.",
+      "structure": "{targetUserID}",
+      "example": "@Fox"
+    },
+    {
+      "name": "declinerequest",
+      "category": "infractions",
+      "description": "Reject a request for a strike on a user. This will notify the invoker and delete the request.",
+      "structure": "{targetUserID}",
+      "example": "@Fox"
     }
   ]
 }
