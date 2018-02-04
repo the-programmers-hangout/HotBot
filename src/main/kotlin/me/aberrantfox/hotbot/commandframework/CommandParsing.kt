@@ -47,13 +47,6 @@ fun convertAndQueue(actual: List<String>, expected: List<ArgumentType>, instance
         return
     }
 
-    if (actual.size != expected.size) {
-        if ((!expected.contains(ArgumentType.Sentence) && !expected.contains(ArgumentType.Splitter))) {
-            event.respond("You do not have the minimum number of arguments. Required:${expected.size}, given: ${actual.size}")
-            return
-        }
-    }
-
     val standardParsed = parseStandardArgs(actual, expected, event)
 
     if (standardParsed == null) {
