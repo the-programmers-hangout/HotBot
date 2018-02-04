@@ -12,9 +12,13 @@ import net.dv8tion.jda.core.entities.Game
 import net.dv8tion.jda.core.entities.Message
 import net.dv8tion.jda.core.entities.MessageChannel
 import net.dv8tion.jda.core.entities.User
+import org.jsoup.Jsoup
 import java.awt.Color
 import java.io.File
+import java.net.URL
 import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.concurrent.schedule
 
 class ModerationCommands
 
@@ -253,20 +257,22 @@ fun moderationCommands() = commands {
     command("badpfp") {
         expect(ArgumentType.User)
         execute {
-            val user = it.args[0] as User
-            val records = getHistory(user.id).count { it.reason == "Bad Profile Picture." }
+            val user = it.args.component1() as User
+            val avatar = user.effectiveAvatarUrl
 
-            if (records == 1) {
-                it.guild.controller.ban(user, 0, "Bad Profile Picture x2").queue { _ ->
-                    it.container.log.alert("Banned user: ${user.fullName()} for second strike bad profile picture.")
+            user.sendPrivateMessage("We have flagged your profile picture as inappropriate. " +
+                "Please change it withing the next 30 minutes or you will be banned.")
+
+            Timer().schedule(1000 * 60 * 30) {
+                if(avatar == it.jda.getUserById(user.id).effectiveAvatarUrl) {
+                    user.sendPrivateMessage("Hi, since you failed to change your profile picture, you are being banned.")
+                    Timer().schedule(1000 * 10) {
+                        it.guild.controller.ban(user, 1, "Having a bad profile picture and refusing to change it.").queue()
+                    }
+                } else {
+                    user.sendPrivateMessage("Thank you for changing your avatar. You will not be banned.")
                 }
-                return@execute
             }
-
-            insertInfraction(user.id, it.author.id, 0, "Bad Profile Picture.")
-
-            user.sendPrivateMessage("You have been kicked for having an inappropriate profile picture. Please change it before rejoining.")
-            it.container.log.alert("Kicked user: ${user.fullName()} for first strike bad profile picture.")
         }
     }
 }
