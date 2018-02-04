@@ -60,7 +60,8 @@ fun main(args: Array<String>) {
             RoleListener(config),
             PollListener(),
             BanListener(config),
-            TooManyMentionsListener(logger, mutedRole))
+            TooManyMentionsListener(logger, mutedRole),
+            MessageDeleteListener(logger))
 
     jda.presence.setPresence(OnlineStatus.ONLINE, Game.of("${config.serverInformation.prefix}help"))
     jda.guilds.forEach { setupMutedRole(it, config.security.mutedRole) }
