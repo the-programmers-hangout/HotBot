@@ -13,6 +13,7 @@ import me.aberrantfox.hotbot.extensions.idToUser
 import me.aberrantfox.hotbot.services.Configuration
 import net.dv8tion.jda.core.OnlineStatus
 import net.dv8tion.jda.core.entities.Guild
+import net.dv8tion.jda.core.entities.User
 import java.awt.Color
 import java.util.*
 
@@ -130,8 +131,9 @@ fun utilCommands() = commands {
     }
 
     command("viewcreationdate") {
+        expect(ArgumentType.User)
         execute {
-            val target = (it.args[0] as String).idToUser(it.jda)
+            val target = it.args.component1() as User
             it.respond("${target.fullName()}'s account was made on ${target.creationTime}")
         }
     }
