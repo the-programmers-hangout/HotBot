@@ -249,6 +249,26 @@ fun moderationCommands() = commands {
             it.respond("Notes for ${target.asMention} have been wiped. Total removed: $amount")
         }
     }
+
+    command("badpfp") {
+        expect(ArgumentType.User)
+        execute {
+            val user = it.args[0] as User
+            val records = getHistory(user.id).count { it.reason == "Bad Profile Picture." }
+
+            if (records == 1) {
+                it.guild.controller.ban(user, 0, "Bad Profile Picture x2").queue { _ ->
+                    it.container.log.alert("Banned user: ${user.fullName()} for second strike bad profile picture.")
+                }
+                return@execute
+            }
+
+            insertInfraction(user.id, it.author.id, 0, "Bad Profile Picture.")
+
+            user.sendPrivateMessage("You have been kicked for having an inappropriate profile picture. Please change it before rejoining.")
+            it.container.log.alert("Kicked user: ${user.fullName()} for first strike bad profile picture.")
+        }
+    }
 }
 
 private fun handleResponse(past: List<Message>, channel: MessageChannel, targets: List<String>, error: MessageChannel,
