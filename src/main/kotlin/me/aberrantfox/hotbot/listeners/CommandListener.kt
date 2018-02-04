@@ -129,15 +129,18 @@ data class CommandListener(val config: Configuration,
         }
 
     private fun argsMatch(actual: List<String>, cmd: Command, channel: MessageChannel): Boolean {
+        val optionalCount = cmd.expectedArgs.filter { it.optional }.size
+
         if (cmd.expectedArgs.contains(arg(ArgumentType.Sentence)) || cmd.expectedArgs.contains(arg(ArgumentType.Splitter))) {
-            if (actual.size < cmd.expectedArgs.size) {
-                channel.sendMessage("You didn't enter the minimum amount of required arguments.").queue()
+            if (actual.size < cmd.expectedArgs.size - optionalCount) {
+                channel.sendMessage("You didn't enter the minimum number of required arguments: ${cmd.expectedArgs.size - optionalCount}.").queue()
                 return false
             }
         } else {
-            if (actual.size != cmd.expectedArgs.size) {
+            if(!(actual.size >= (cmd.expectedArgs.size - optionalCount)
+                            && (actual.size <= cmd.expectedArgs.size))) {
                 if (!cmd.expectedArgs.contains(arg(ArgumentType.Manual))) {
-                    channel.sendMessage("This command requires ${cmd.expectedArgs.size} arguments.").queue()
+                    channel.sendMessage("This command requires at least ${cmd.expectedArgs.size - optionalCount} and a maximum of ${cmd.expectedArgs.size} arguments.").queue()
                     return false
                 }
             }
