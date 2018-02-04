@@ -32,16 +32,25 @@ data class CommandEvent(val config: Configuration, val jda: JDA, val channel: Me
 class Command(var log: BotLogger, var expectedArgs: Array<out CommandArgument> = arrayOf(),
               var execute: (CommandEvent) -> Unit = {}, var requiresGuild: Boolean = false) : BotLogger {
     override fun info(message: String) = log.info(message)
+    override fun info(message: MessageEmbed) = log.info(message)
 
     override fun cmd(message: String) = log.cmd(message)
+    override fun cmd(message: MessageEmbed) = log.cmd(message)
 
     override fun error(message: String) = log.error(message)
+    override fun error(message: MessageEmbed) = log.error(message)
 
     override fun alert(message: String) = log.alert(message)
+    override fun alert(message: MessageEmbed) = log.alert(message)
 
     override fun warning(message: String) = log.warning(message)
+    override fun warning(message: MessageEmbed) = log.warning(message)
 
     override fun voice(message: String) = log.voice(message)
+    override fun voice(message: MessageEmbed) = log.voice(message)
+
+    override fun history(message: String) = log.history(message)
+    override fun history(message: MessageEmbed) = log.history(message)
 
     val parameterCount = expectedArgs.size
 
