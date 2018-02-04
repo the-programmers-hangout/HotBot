@@ -72,7 +72,7 @@ data class CommandListener(val config: Configuration,
         if (!(argsMatch(actual, command, channel))) return
 
         val event = CommandEvent(config, jda, channel, author, message, guild, manager, container, mService, actual)
-        convertAndQueue(actual, command.expectedArgs.map { it.type }.toList(), this, event, invokedInGuild, command, config)
+        convertAndQueue(actual, command.expectedArgs.toList(), this, event, invokedInGuild, command, config)
     }
 
     fun executeEvent(command: Command, event: CommandEvent, invokedInGuild: Boolean) {
