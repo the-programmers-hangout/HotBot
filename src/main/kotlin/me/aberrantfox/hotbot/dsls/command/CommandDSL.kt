@@ -133,4 +133,4 @@ fun commands(construct: CommandsContainer.() -> Unit): CommandsContainer {
     return commands
 }
 
-fun arg(type: ArgumentType, optional: Boolean = false) = CommandArgument(type, optional)
+fun arg(type: ArgumentType, optional: Boolean = false, default: Any = "") = CommandArgument(type, optional, default)
