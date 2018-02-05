@@ -28,6 +28,11 @@ fun schedulerCommands() = commands {
                 .map(String::toLowerCase)
                 .takeWhile { toTimeElement(it) != null }
 
+            if(timeElements.isEmpty()) {
+                it.respond("Error, one or more of your time elements didn't parse correctly. Please run the help command and try again.")
+                return@execute
+            }
+
             val timeList = timeElements.map(::toTimeElement)
             val timeString = timeElements.joinToString(" ")
             val title = args.substring(timeString.length)
