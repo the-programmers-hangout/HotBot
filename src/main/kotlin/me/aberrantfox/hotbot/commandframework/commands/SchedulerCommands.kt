@@ -84,15 +84,19 @@ fun schedulerCommands() = commands {
 }
 
 fun toTimeElement(element: String): Any? {
-    val quantity = toQuantity(element)
+    val both = toBoth(element)
 
-    if (quantity != null) return quantity
+    if(both != null) return both
 
     val quantifier = toQuantifier(element)
 
     if (quantifier != null) return quantifier
 
-    return toBoth(element)
+    val quantity = toQuantity(element)
+
+    if (quantity != null) return quantity
+
+    return null
 }
 
 fun toQuantifier(element: String) = if (timeStringToSeconds.containsKey(element)) element else null
