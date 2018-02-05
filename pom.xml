@@ -6,7 +6,7 @@
 
     <groupId>me.aberrantfox.</groupId>
     <artifactId>hotbot</artifactId>
-    <version>4.1.4</version>
+    <version>5.0.0</version>
 
     <properties>
         <main.class>me.aberrantfox.hotbot.MainAppKt</main.class>
