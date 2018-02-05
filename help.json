@@ -758,6 +758,13 @@
       "description": "List all current strike requests",
       "structure": "",
       "example": ""
+    },
+    {
+      "name": "remindme",
+      "category": "utility",
+      "description": "A command that'll remind you about something after the specified time.",
+      "structure": "{timeString} {reminder}",
+      "example": "1 day 1h 2 minutes 3m 2s Take out the trash"
     }
   ]
 }
