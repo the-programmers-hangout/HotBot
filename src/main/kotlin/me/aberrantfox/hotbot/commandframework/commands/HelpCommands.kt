@@ -2,6 +2,7 @@ package me.aberrantfox.hotbot.commandframework.commands
 
 import me.aberrantfox.hotbot.commandframework.ArgumentType
 import me.aberrantfox.hotbot.commandframework.CommandSet
+import me.aberrantfox.hotbot.dsls.command.arg
 import me.aberrantfox.hotbot.dsls.command.commands
 import me.aberrantfox.hotbot.dsls.embed.embed
 import me.aberrantfox.hotbot.extensions.sendPrivateMessage
@@ -16,35 +17,33 @@ import java.time.LocalDateTime
 fun helpCommands() =
     commands {
         command("help") {
-            expect(ArgumentType.Manual)
+            expect(arg(ArgumentType.Word, optional = true, default = "help menu"))
+            // "help menu" to avoid conflicts with any future commands
             execute {
                 val author = it.author
                 val config = it.config
-                val args = it.args
+                val selection = it.args.component1() as String
 
-                if (args.isEmpty()) {
+                if (selection == "help menu") {
                     author.sendPrivateMessage(getZeroArgMessage(config))
-                } else if (args.size == 1) {
-                    val selection = args[0] as String
-                    val argType = HelpConf.fetchArgumentType(selection)
+                    return@execute
+                }
 
-                    when (argType) {
-                        SelectionArgument.CommandName -> {
-                            val descriptor = HelpConf.fetchCommandDescriptor(selection)
-                            if (descriptor != null) {
-                                author.sendPrivateMessage(buildCommandHelpMessage(config, descriptor))
-                            } else {
-                                author.sendPrivateMessage("A descriptor was null, please notify the bot owner.")
-                            }
+                val argType = HelpConf.fetchArgumentType(selection)
+                when (argType) {
+                    SelectionArgument.CommandName -> {
+                        val descriptor = HelpConf.fetchCommandDescriptor(selection)
+                        if (descriptor != null) {
+                            author.sendPrivateMessage(buildCommandHelpMessage(config, descriptor))
+                        } else {
+                            author.sendPrivateMessage("A descriptor was null, please notify the bot owner.")
                         }
-                        SelectionArgument.CategoryName -> {
-                            val categories = HelpConf.fetchCommandsInCategory(selection)
-                            author.sendPrivateMessage(buildCategoryDescription(selection.toLowerCase(), categories))
-                        }
-                        else -> author.sendPrivateMessage("Not a command or category... maybe try the default help command?")
                     }
-                } else {
-                    author.sendPrivateMessage("Uhh... this command takes either 0 or 1 arguments.")
+                    SelectionArgument.CategoryName -> {
+                        val categories = HelpConf.fetchCommandsInCategory(selection)
+                        author.sendPrivateMessage(buildCategoryDescription(selection.toLowerCase(), categories))
+                    }
+                    else -> author.sendPrivateMessage("Not a command or category... maybe try the default help command?")
                 }
             }
         }
