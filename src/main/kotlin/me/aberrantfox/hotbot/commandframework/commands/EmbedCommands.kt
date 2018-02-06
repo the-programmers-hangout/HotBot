@@ -2,6 +2,7 @@ package me.aberrantfox.hotbot.commandframework.commands
 
 import me.aberrantfox.hotbot.commandframework.ArgumentType
 import me.aberrantfox.hotbot.commandframework.CommandSet
+import me.aberrantfox.hotbot.dsls.command.arg
 import me.aberrantfox.hotbot.dsls.command.commands
 import me.aberrantfox.hotbot.extensions.*
 import net.dv8tion.jda.core.EmbedBuilder
@@ -35,50 +36,39 @@ fun embedCommands() =
         }
 
         command("copyembed") {
-            expect(ArgumentType.Manual)
+            expect(arg(ArgumentType.Word),
+                   arg(ArgumentType.Word, optional = true, default = { it.channel.id }))
             execute {
-                if (it.args.size > 2) {
-                    it.respond("A maximum of 2 arguments should be given")
+                val messageId = it.args.component1() as String
+                val channelId = it.args.component2() as String
+
+                // exception if channelId can't be converted to Long in getTextChannelById
+                if (!channelId.isLong()) {
+                    it.respond("Not a valid channel id")
                     return@execute
                 }
 
-                val messageId = it.args.firstOrNull() as String?
-                val channelId = it.args.getOrNull(1) as String?
-
-                if (messageId == null) {
-                    it.respond("You must pass at least a message id")
-                    return@execute
-                }
-
-                val channel =
-                        if (channelId == null)
-                            it.channel
-                        else {
-                            if (!channelId.isLong()) {
-                                it.respond("Not a valid channel id")
-                                return@execute
-                            }
-                            it.jda.getTextChannelById(channelId) // throws exception if channelId can't be converted to Long
-                        }
-
+                val channel = it.jda.getTextChannelById(channelId)
                 if (channel == null) {
                     it.respond("Channel not found with the given id")
                     return@execute
                 }
 
                 channel.getMessageById(messageId).queue(
-                    { msg -> // Success
-                        val embed = msg?.embeds?.firstOrNull()
-                        if (embed == null) {
-                            it.respond("Message doesn't contain any embeds")
-                            return@queue
-                        }
+                        { msg ->
+                            // Success
+                            val embed = msg?.embeds?.firstOrNull()
+                            if (embed == null) {
+                                it.respond("Message doesn't contain any embeds")
+                                return@queue
+                            }
 
-                        EHolder.embed = EmbedBuilder(embed)
-                    },
-                    { error -> // Failure
-                        it.respond("Message retrieval failed. A message with that id may not exist in this channel.")
-                    }
+                            EHolder.embed = EmbedBuilder(embed)
+                        },
+                        { error ->
+                            // Failure
+                            it.respond("Message retrieval failed. A message with that id may not exist in this channel.")
+                        }
                 )
             }
         }
@@ -103,7 +93,7 @@ fun embedCommands() =
                 var inline = field.isInline
 
                 when(property) {
-                    "name" -> name = newValue
+                    "name", "title" -> name = newValue
                     "text", "value" -> text = newValue
                     "inline" -> {
                         if(!newValue.isBooleanValue()) {

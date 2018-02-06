@@ -7,6 +7,7 @@ import me.aberrantfox.hotbot.dsls.command.commands
 import me.aberrantfox.hotbot.extensions.*
 import me.aberrantfox.hotbot.services.*
 import me.aberrantfox.hotbot.database.*
+import me.aberrantfox.hotbot.dsls.command.arg
 import me.aberrantfox.hotbot.dsls.embed.embed
 import net.dv8tion.jda.core.entities.Guild
 import net.dv8tion.jda.core.entities.User
@@ -33,7 +34,9 @@ fun strikeCommands() =
         }
 
         command("strike") {
-            expect(ArgumentType.User, ArgumentType.Integer, ArgumentType.Sentence)
+            expect(arg(ArgumentType.User),
+                   arg(ArgumentType.Integer, optional = true, default = 1),
+                   arg(ArgumentType.Sentence))
             execute {
                 infract(it)
             }
