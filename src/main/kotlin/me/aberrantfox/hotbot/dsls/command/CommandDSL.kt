@@ -134,3 +134,5 @@ fun commands(construct: CommandsContainer.() -> Unit): CommandsContainer {
 }
 
 fun arg(type: ArgumentType, optional: Boolean = false, default: Any = "") = CommandArgument(type, optional, default)
+
+fun arg(type: ArgumentType, optional: Boolean = false, default: (CommandEvent) -> Any) = CommandArgument(type, optional, default)

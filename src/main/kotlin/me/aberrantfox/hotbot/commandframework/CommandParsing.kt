@@ -10,6 +10,7 @@ import me.aberrantfox.hotbot.listeners.CommandListener
 import me.aberrantfox.hotbot.services.Configuration
 import org.reflections.Reflections
 import org.reflections.scanners.MethodAnnotationsScanner
+import java.util.function.Function
 
 enum class ArgumentType {
     Integer, Double, Word, Choice, Manual, Sentence, User, Splitter, URL
@@ -120,7 +121,6 @@ private fun parseStandardArgs(actual: List<String>, expected: List<CommandArgume
 
     // TODO: prioritise non-optional args by not just first but filter and sort?
     // TODO: Unit tests
-    // TODO: User parsing
 
     // Fill in optional args or error out if non-optional not filled
     returnVals.forEachIndexed { index, returnVal ->
@@ -128,7 +128,10 @@ private fun parseStandardArgs(actual: List<String>, expected: List<CommandArgume
             val expectedArg = expected[index]
 
             if (expectedArg.optional) {
-                returnVals[index] = expectedArg.defaultValue
+                if(expectedArg.defaultValue is kotlin.Function<*>)
+                    returnVals[index] = (expectedArg.defaultValue as (CommandEvent) -> Any).invoke(event)
+                else
+                    returnVals[index] = expectedArg.defaultValue
             } else return null
         }
     }
