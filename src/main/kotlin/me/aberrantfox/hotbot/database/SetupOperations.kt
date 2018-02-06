@@ -21,7 +21,7 @@ fun setupDatabaseSchema(config: Configuration) {
 
     Database.connect(
             url = url,
-            driver = "com.mysql.cj.jdbc.Driver",
+            driver = "com.mysql.jdbc.Driver",
             password = config.databaseCredentials.password,
             user = config.databaseCredentials.username
     )
