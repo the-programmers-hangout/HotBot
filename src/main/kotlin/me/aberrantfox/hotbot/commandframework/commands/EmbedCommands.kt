@@ -37,24 +37,18 @@ fun embedCommands() =
 
         command("copyembed") {
             expect(arg(ArgumentType.Word),
-                   arg(ArgumentType.Word, optional = true, default = "here"))
+                   arg(ArgumentType.Word, optional = true, default = { it.channel.id }))
             execute {
                 val messageId = it.args.component1() as String
                 val channelId = it.args.component2() as String
 
-                val channel =
-                        if (channelId == "here") {
-                            it.channel
-                        } else {
-                            // exception below if channelId can't be converted to Long
-                            if (!channelId.isLong()) {
-                                it.respond("Not a valid channel id")
-                                return@execute
-                            }
+                // exception if channelId can't be converted to Long in getTextChannelById
+                if (!channelId.isLong()) {
+                    it.respond("Not a valid channel id")
+                    return@execute
+                }
 
-                            it.jda.getTextChannelById(channelId)
-                        }
-
+                val channel = it.jda.getTextChannelById(channelId)
                 if (channel == null) {
                     it.respond("Channel not found with the given id")
                     return@execute

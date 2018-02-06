@@ -119,9 +119,6 @@ private fun parseStandardArgs(actual: List<String>, expected: List<CommandArgume
         if (expected[nextMatchingIndex].type == ArgumentType.Sentence) break
     }
 
-    // TODO: prioritise non-optional args by not just first but filter and sort?
-    // TODO: Unit tests
-
     // Fill in optional args or error out if non-optional not filled
     returnVals.forEachIndexed { index, returnVal ->
         if (returnVal == null) {
