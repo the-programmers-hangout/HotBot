@@ -50,7 +50,7 @@ fun permissionCommands() =
 
         command("roleids") {
             execute {
-                it.guild.roles.forEach { role -> it.safeRespond("${role.name} :: ${role.id}") }
+                it.safeRespond(it.guild.roles.joinToString("\n") { role -> "${role.name} :: ${role.id}" })
             }
         }
 
