@@ -13,7 +13,8 @@ data class Configuration(val serverInformation: ServerInformation = ServerInform
                          val apiConfiguration: ApiConfiguration = ApiConfiguration(),
                          val databaseCredentials: DatabaseCredentials = DatabaseCredentials(),
                          val logChannels: ChannelIdHolder = ChannelIdHolder(),
-                         val permissionedActions: PermissionedActions = PermissionedActions())
+                         val permissionedActions: PermissionedActions = PermissionedActions(),
+                         val botInformation: BotInformation = BotInformation())
 
 data class ServerInformation(val token: String = "insert-token",
                              val ownerID: String = "insert-id",
@@ -43,6 +44,8 @@ data class DatabaseCredentials(val username: String = "db-username",
                                val password: String = "db-password",
                                val hostname: String = "db-hostname",
                                val database: String = "db-database")
+
+data class BotInformation(val developmentMode: Boolean = true)
 
 enum class InfractionAction {
     Warn, Mute, Kick, Ban
