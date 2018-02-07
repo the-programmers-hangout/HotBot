@@ -97,6 +97,8 @@ data class CommandArgument(val type: ArgumentType, val optional: Boolean = false
 data class CommandsContainer(var log: BotLogger, var commands: HashMap<String, Command> = HashMap()) {
     operator fun invoke(args: CommandsContainer.() -> Unit) {}
 
+    fun listCommands() = this.commands.keys.toList()
+
     fun command(name: String, construct: Command.() -> Unit): Command? {
         val command = Command(log)
         command.construct()
