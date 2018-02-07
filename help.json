@@ -765,6 +765,13 @@
       "description": "A command that'll remind you about something after the specified time.",
       "structure": "{timeString} {reminder}",
       "example": "1 day 1h 2 minutes 3m 2s Take out the trash"
+    },
+    {
+      "name": "setAllPermissions",
+      "category": "utility",
+      "description": "Set the permission of all commands to a specific role. Only available to the bot owner.",
+      "structure": "{role}",
+      "example": "moderator"
     }
   ]
 }
