@@ -34,7 +34,8 @@ data class MessageChannels(val welcomeChannel: String = "insert-id",
                            val profileChannel: String = "insert-channel-id")
 
 data class ApiConfiguration(val cleverbotAPIKey: String = "insert-api-key",
-                            val cleverBotApiCallLimit: Int = 10000)
+                            val cleverBotApiCallLimit: Int = 10000,
+                            val enableCleverBot: Boolean = false)
 
 data class PermissionedActions(var sendInvite: String = "insert-role-id",
                                var sendURL: String = "insert-role-id",

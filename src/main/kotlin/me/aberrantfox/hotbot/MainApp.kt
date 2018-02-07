@@ -55,7 +55,6 @@ fun main(args: Array<String>) {
             CommandListener(config, container, jda, logger, guild, manager, messageService),
             MemberListener(config, logger, messageService),
             InviteListener(config, logger),
-            MentionListener(config, jda.selfUser.name),
             VoiceChannelListener(logger),
             NewChannelListener(mutedRole),
             DuplicateMessageListener(config, logger, tracker),
@@ -64,6 +63,11 @@ fun main(args: Array<String>) {
             BanListener(config),
             TooManyMentionsListener(logger, mutedRole),
             MessageDeleteListener(logger))
+
+    if(config.apiConfiguration.enableCleverBot) {
+        println("Enabling cleverbot integration.")
+        jda.addEventListener(MentionListener(config, jda.selfUser.name))
+    }
 
     jda.presence.setPresence(OnlineStatus.ONLINE, Game.of("${config.serverInformation.prefix}help"))
     jda.guilds.forEach { setupMutedRole(it, config.security.mutedRole) }
