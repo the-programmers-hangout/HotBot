@@ -111,12 +111,14 @@ private fun parseStandardArgs(actual: List<String>, expected: List<CommandArgume
 
             matchesArgType(actualArg, argValue.type) && returnVals[argIndex] == null
         }
+
         if (nextMatchingIndex == -1) return null
 
         returnVals[nextMatchingIndex] = convertArgument(actualArg, expected[nextMatchingIndex].type, index, actual)
 
         // rest of arguments are the sentence
-        if (expected[nextMatchingIndex].type == ArgumentType.Sentence) break
+        if (expected[nextMatchingIndex].type == ArgumentType.Sentence ||
+            expected[nextMatchingIndex].type == ArgumentType.Splitter) break
     }
 
     // Fill in optional args or error out if non-optional not filled

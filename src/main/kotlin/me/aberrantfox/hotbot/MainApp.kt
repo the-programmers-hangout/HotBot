@@ -30,7 +30,7 @@ fun main(args: Array<String>) {
         println("The help documentation needs to be updated:")
         helpErrors.forEach(::println)
 
-        return
+
     }
 
     setupDatabaseSchema(config)
