@@ -3,6 +3,7 @@ package me.aberrantfox.hotbot.commandframework.commands
 import me.aberrantfox.hotbot.commandframework.*
 import me.aberrantfox.hotbot.dsls.command.commands
 import me.aberrantfox.hotbot.extensions.*
+import me.aberrantfox.hotbot.services.HelpConf
 
 @CommandSet
 fun permissionCommands() =
@@ -70,6 +71,29 @@ fun permissionCommands() =
                 }
 
                 it.container.listCommands().forEach { command -> it.manager.addPermission(role.id, command) }
+            }
+        }
+
+        command("setPermissions") {
+            expect(ArgumentType.Word, ArgumentType.Word)
+            execute {
+                val target = it.args.component1() as String
+                val role = it.guild.getRoleByIdOrName(it.args.component2() as String)
+
+                if(role == null) {
+                    it.safeRespond("Unknown role")
+                    return@execute
+                }
+
+                val commands = HelpConf.listCommandsinCategory(target).map { it.name }
+
+                if(commands.isEmpty()) {
+                    it.respond("Either this category ($target) contains 0 commands, or it is not a real category :thinking:")
+                    return@execute
+                }
+
+                commands.forEach { command -> it.manager.addPermission(role.id, command) }
+                it.safeRespond("${role.name} now has access to: ${commands.joinToString(prefix = "`", postfix = "`")}")
             }
         }
     }

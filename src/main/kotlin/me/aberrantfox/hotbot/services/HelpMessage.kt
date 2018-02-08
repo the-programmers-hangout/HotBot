@@ -25,6 +25,8 @@ object HelpConf {
         configuration = gson.fromJson(data, HelpFile::class.java)
     }
 
+    fun listCommandsinCategory(name: String) = configuration.commands.filter { it.category == name }
+
     fun fetchArgumentType(value: String): SelectionArgument? {
         val isCategory = configuration.commands.any { it.category.toLowerCase() == value.toLowerCase() }
 
