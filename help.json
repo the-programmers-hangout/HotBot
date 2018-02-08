@@ -772,6 +772,13 @@
       "description": "Set the permission of all commands to a specific role. Only available to the bot owner.",
       "structure": "{role}",
       "example": "moderator"
+    },
+    {
+      "name": "setPermissions",
+      "category": "utility",
+      "description": "Set the permission of all commands in a category to a specific role (i.e. allow that role and roles above to use these commands). ",
+      "structure": "{commandCategory} {role}",
+      "example": "moderation moderator"
     }
   ]
 }
