@@ -92,8 +92,8 @@ private fun parseCowsayArgs(arguments: List<String>): String {
     val flagsWithNoArgs = Regex("-b|-d|-g|-l|-n|-p|-s|-t|-w|-y")
 
     if(!arguments.mapIndexedNotNull{index, s -> if (flagsWithArgs.matches(s)) index + 1 else null }
-            .all { it < arguments.size && !arguments[it].startsWith("-") }){
-        return "one of your flags is missing an argument"
+            .all { it < arguments.size && !arguments[it].startsWith("-") && !arguments[it].contains(Regex("/|\\\\")) }){
+        return "one of your flags is missing an argument, or the supplied argument is invalid"
     }
 
     var skipNextArg = false
