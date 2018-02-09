@@ -18,7 +18,7 @@ enum class SelectionArgument { CommandName, CategoryName }
 object HelpConf {
     val configuration: HelpFile
 
-    init {
+    init     {
         val data = File("help.json").readText()
         val gson = Gson()
 
@@ -52,6 +52,8 @@ object HelpConf {
 
     fun fetchCommandDescriptor(command: String) =
             HelpConf.configuration.commands.findLast { it.name.toLowerCase() == command.toLowerCase() }
+
+    fun listCategories() = HelpConf.configuration.commands.map { it.category }.distinct()
 
     fun fetchCategories() =
             HelpConf.configuration.commands

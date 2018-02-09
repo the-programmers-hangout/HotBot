@@ -1,7 +1,9 @@
 package me.aberrantfox.hotbot.commandframework.commands
 
 import me.aberrantfox.hotbot.commandframework.*
+import me.aberrantfox.hotbot.dsls.command.arg
 import me.aberrantfox.hotbot.dsls.command.commands
+import me.aberrantfox.hotbot.dsls.embed.embed
 import me.aberrantfox.hotbot.extensions.*
 import me.aberrantfox.hotbot.services.HelpConf
 
@@ -14,7 +16,7 @@ fun permissionCommands() =
                 val commandName = it.args[0] as String
                 val role = it.guild.getRoleByIdOrName(it.args[1] as String)
 
-                if(role == null) {
+                if (role == null) {
                     it.respond("Unknown role.")
                     return@execute
                 }
@@ -34,12 +36,13 @@ fun permissionCommands() =
             execute {
                 val name = it.args[0] as String
 
-                if( !(it.container.has(name)) ) {
+                if (!(it.container.has(name))) {
                     it.safeRespond("I do not know what $name is")
                     return@execute
                 }
 
-                it.safeRespond("The required role is: ${it.manager.roleRequired(name)?.name ?: "Only the owner can invoke this."}")
+                it.safeRespond("The required role is: ${it.manager.roleRequired(name)?.name
+                    ?: "Only the owner can invoke this."}")
             }
         }
 
@@ -60,12 +63,12 @@ fun permissionCommands() =
             execute {
                 val role = it.guild.getRoleByIdOrName(it.args.component1() as String)
 
-                if(role == null) {
+                if (role == null) {
                     it.respond("Unknown role")
                     return@execute
                 }
 
-                if(it.config.serverInformation.ownerID != it.author.id) {
+                if (it.config.serverInformation.ownerID != it.author.id) {
                     it.respond("Sorry, this command can only be run by the owner marked in the configuration file.")
                     return@execute
                 }
@@ -80,20 +83,45 @@ fun permissionCommands() =
                 val target = it.args.component1() as String
                 val role = it.guild.getRoleByIdOrName(it.args.component2() as String)
 
-                if(role == null) {
+                if (role == null) {
                     it.safeRespond("Unknown role")
                     return@execute
                 }
 
                 val commands = HelpConf.listCommandsinCategory(target).map { it.name }
 
-                if(commands.isEmpty()) {
+                if (commands.isEmpty()) {
                     it.respond("Either this category ($target) contains 0 commands, or it is not a real category :thinking:")
                     return@execute
                 }
 
                 commands.forEach { command -> it.manager.addPermission(role.id, command) }
                 it.safeRespond("${role.name} now has access to: ${commands.joinToString(prefix = "`", postfix = "`")}")
+            }
+        }
+
+        command("viewpermissions") {
+            execute {
+                it.respond(embed {
+                    title("Command Permissions")
+                    description("Below you can see all of the different command categories, along with all of their " +
+                        "respective commands and the associated permission required to use those commands.")
+
+
+                    HelpConf.listCategories()
+                        .map { cat ->
+                            val commandsInCategory = HelpConf.listCommandsinCategory(cat)
+                            val text = commandsInCategory.joinToString("\n") { cmd -> "${cmd.name} -- ${it.manager.roleRequired(cmd.name)?.name ?: "Owner"}" }
+                            Pair(cat, text)
+                        }
+                        .forEach {
+                            field {
+                                name = it.first
+                                value = it.second.sanitiseMentions()
+                                inline = false
+                            }
+                        }
+                })
             }
         }
     }
