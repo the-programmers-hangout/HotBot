@@ -10,18 +10,13 @@ import me.aberrantfox.hotbot.listeners.CommandListener
 import me.aberrantfox.hotbot.services.Configuration
 import org.reflections.Reflections
 import org.reflections.scanners.MethodAnnotationsScanner
-import java.util.function.Function
 
-enum class ArgumentType {
-    Integer, Double, Word, Choice, Manual, Sentence, User, Splitter, URL
-}
 
 const val seperatorCharacter = "|"
 
 annotation class CommandSet
 
 data class CommandStruct(val commandName: String, val commandArgs: List<String> = listOf())
-
 
 fun produceContainer(): CommandsContainer {
     val pack = "me.aberrantfox.hotbot.commandframework.commands"
@@ -42,8 +37,10 @@ fun produceContainer(): CommandsContainer {
     return container
 }
 
-fun convertAndQueue(actual: List<String>, expected: List<CommandArgument>, instance: CommandListener, event: CommandEvent, invokedInGuild: Boolean,
-                    command: Command, config: Configuration) {
+fun convertAndQueue(actual: List<String>, expected: List<CommandArgument>,
+                    instance: CommandListener, event: CommandEvent,
+                    invokedInGuild: Boolean, command: Command,
+                    config: Configuration) {
 
     val expectedTypes = expected.map { it.type }
 
@@ -52,17 +49,19 @@ fun convertAndQueue(actual: List<String>, expected: List<CommandArgument>, insta
         return
     }
 
-    val standardParsed = parseStandardArgs(actual, expected, event)
+    val convertedArgs = convertMainArgs(actual, expected)
 
-    if (standardParsed == null) {
+    if (convertedArgs == null) {
         event.respond("Incorrect arguments passed to command, try viewing the help documentation via: ${config.serverInformation.prefix}help <commandName>")
         return
     }
 
-    event.args = standardParsed
+    val filledArgs = convertOptionalArgs(convertedArgs, expected, event)
+
+    event.args = filledArgs
 
     if (expectedTypes.contains(ArgumentType.User)) {
-        dispatchRequestRequiredEvent(expectedTypes, standardParsed, event, command, instance, invokedInGuild)
+        dispatchRequestRequiredEvent(expectedTypes, filledArgs, event, command, instance, invokedInGuild)
     } else {
         instance.executeEvent(command, event, invokedInGuild)
     }
@@ -98,68 +97,6 @@ private fun dispatchRequestRequiredEvent(expected: List<ArgumentType>, standard:
     }
 }
 
-private fun parseStandardArgs(actual: List<String>, expected: List<CommandArgument>, event: CommandEvent): List<Any>? {
-    val returnVals = arrayListOf<Any?>()
-    expected.mapTo(returnVals) { null }
-
-    for (index in 0 until actual.size) { // Need `break`, so can't use forEachIndexed
-        val actualArg = actual[index]
-
-        val nextMatchingIndex = expected.withIndex().indexOfFirst { arg ->
-            val argIndex = arg.index
-            val argValue = arg.value
-
-            matchesArgType(actualArg, argValue.type) && returnVals[argIndex] == null
-        }
-
-        if (nextMatchingIndex == -1) return null
-
-        returnVals[nextMatchingIndex] = convertArgument(actualArg, expected[nextMatchingIndex].type, index, actual)
-
-        // rest of arguments are the sentence
-        if (expected[nextMatchingIndex].type == ArgumentType.Sentence ||
-            expected[nextMatchingIndex].type == ArgumentType.Splitter) break
-    }
-
-    // Fill in optional args or error out if non-optional not filled
-    returnVals.forEachIndexed { index, returnVal ->
-        if (returnVal == null) {
-            val expectedArg = expected[index]
-
-            if (expectedArg.optional) {
-                if(expectedArg.defaultValue is kotlin.Function<*>)
-                    returnVals[index] = (expectedArg.defaultValue as (CommandEvent) -> Any).invoke(event)
-                else
-                    returnVals[index] = expectedArg.defaultValue
-            } else return null
-        }
-    }
-
-    return returnVals.filterNotNull()
-}
-
-private fun matchesArgType(arg: String, type: ArgumentType): Boolean {
-    return when (type) {
-        ArgumentType.Integer -> arg.isInteger()
-        ArgumentType.Double -> arg.isDouble()
-        ArgumentType.Choice -> arg.isBooleanValue()
-        ArgumentType.URL -> arg.containsURl()
-        else -> true
-    }
-}
-
-private fun convertArgument(arg: String, type: ArgumentType, index: Int, actual: List<String>): Any {
-    return when (type) {
-        ArgumentType.Integer -> arg.toInt()
-        ArgumentType.Double -> arg.toDouble()
-        ArgumentType.Choice -> arg.toBooleanValue()
-        ArgumentType.User -> arg
-        ArgumentType.Sentence -> joinArgs(index, actual)
-        ArgumentType.Splitter -> splitArg(index, actual)
-        else -> arg
-    }
-}
-
 fun getCommandStruct(message: String, config: Configuration): CommandStruct {
     var trimmedMessage = message.substring(config.serverInformation.prefix.length)
 
@@ -175,12 +112,3 @@ fun getCommandStruct(message: String, config: Configuration): CommandStruct {
     return CommandStruct(commandName, commandArgs)
 }
 
-private fun joinArgs(start: Int, actual: List<String>) = actual.subList(start, actual.size).reduce { a, b -> "$a $b" }
-
-private fun splitArg(start: Int, actual: List<String>): List<String> {
-    val joined = joinArgs(start, actual)
-
-    if (!(joined.contains(seperatorCharacter))) return listOf(joined)
-
-    return joined.split(seperatorCharacter).toList()
-}
