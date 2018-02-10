@@ -1,4 +1,4 @@
-package me.aberrantfox.aegus.security
+package me.aberrantfox.hotbot.security
 
 import me.aberrantfox.hotbot.listeners.antispam.NewPlayers
 import org.joda.time.DateTime

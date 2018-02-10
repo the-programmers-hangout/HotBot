@@ -1,6 +1,5 @@
-package me.aberrantfox.aegus.extenstions
+package me.aberrantfox.hotbot.extensions
 
-import me.aberrantfox.hotbot.extensions.containsURL
 import org.junit.Assert
 import org.junit.Test
 
