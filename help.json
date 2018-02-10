@@ -18,6 +18,13 @@
   },
   "commands": [
     {
+	  "name": "cowsay",
+	  "category": "fun",
+	  "description": "use cowsay through hotbot",
+	  "structure": "{arguments...} {message}",
+	  "example": "cowsay moo, i am a cow!"
+	},
+    {
       "name": "cat",
       "category": "fun",
       "description": "Displays a picture of a cat.",
