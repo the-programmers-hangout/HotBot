@@ -2,7 +2,6 @@ package me.aberrantfox.hotbot.services
 
 import com.github.salomonbrys.kotson.fromJson
 import com.google.gson.Gson
-import me.aberrantfox.hotbot.extensions.MuteRecord
 import me.aberrantfox.hotbot.logging.ChannelIdHolder
 import java.io.File
 import java.util.*
@@ -23,7 +22,6 @@ data class ServerInformation(val token: String = "insert-token",
                              val suggestionPoolLimit: Int = 20)
 
 data class Security(val ignoredIDs: MutableSet<String> = mutableSetOf(),
-                    val mutedMembers: ArrayList<MuteRecord> = ArrayList(),
                     var lockDownMode: Boolean = false,
                     val infractionActionMap: HashMap<Int, InfractionAction> = HashMap(),
                     val mutedRole: String = "Muted",

@@ -1,10 +1,11 @@
 package me.aberrantfox.hotbot
 
 import me.aberrantfox.hotbot.commandframework.produceContainer
+import me.aberrantfox.hotbot.database.getAllMutedMembers
 import me.aberrantfox.hotbot.database.loadUpManager
 import me.aberrantfox.hotbot.extensions.hasRole
 import me.aberrantfox.hotbot.extensions.timeToDifference
-import me.aberrantfox.hotbot.extensions.unmute
+import me.aberrantfox.hotbot.extensions.scheduleUnmute
 import me.aberrantfox.hotbot.listeners.*
 import me.aberrantfox.hotbot.listeners.antispam.DuplicateMessageListener
 import me.aberrantfox.hotbot.listeners.antispam.InviteListener
@@ -100,13 +101,13 @@ private fun handleRole(guild: Guild, roleName: String) {
 }
 
 private fun handleLTSMutes(config: Configuration, jda: JDA) {
-    config.security.mutedMembers.forEach {
+    getAllMutedMembers().forEach {
         val difference = timeToDifference(it.unmuteTime)
         val guild = jda.getGuildById(it.guildId)
         val user = guild.getMemberById(it.user)
 
         if(user != null) {
-            unmute(guild, user.user, config, difference, it)
+            scheduleUnmute(guild, user.user, config, difference, it)
         }
     }
 }

@@ -1,5 +1,7 @@
 package me.aberrantfox.hotbot.extensions
 
+import me.aberrantfox.hotbot.database.deleteMutedMember
+import me.aberrantfox.hotbot.database.insertMutedMember
 import me.aberrantfox.hotbot.dsls.embed.embed
 import me.aberrantfox.hotbot.services.Configuration
 import net.dv8tion.jda.core.JDA
@@ -66,8 +68,8 @@ fun muteMember(guild: Guild, user: User, time: Long, reason: String, config: Con
         val muteEmbed = buildMuteEmbed(user.asMention, timeString, reason)
         it.sendMessage(muteEmbed).queue()
 
-        config.security.mutedMembers.add(record)
-        unmute(guild, user, config, time, record)
+        insertMutedMember(record)
+        scheduleUnmute(guild, user, config, time, record)
     }
 
     moderator.openPrivateChannel().queue {
@@ -96,7 +98,7 @@ private fun buildMuteEmbed(userMention: String, timeString: String, reason: Stri
             setColor(Color.RED)
         }
 
-fun unmute(guild: Guild, user: User, config: Configuration, time: Long, muteRecord: MuteRecord) {
+fun scheduleUnmute(guild: Guild, user: User, config: Configuration, time: Long, muteRecord: MuteRecord) {
     if (time <= 0) {
         removeMuteRole(guild, user, config, muteRecord)
         return
@@ -111,11 +113,11 @@ fun unmute(guild: Guild, user: User, config: Configuration, time: Long, muteReco
 
 fun removeMuteRole(guild: Guild, user: User, config: Configuration, record: MuteRecord) {
     if (user.mutualGuilds.isEmpty()) {
-        config.security.mutedMembers.remove(record)
+        deleteMutedMember(record)
         return
     }
 
-    config.security.mutedMembers.remove(record)
+    deleteMutedMember(record)
     removeMuteRole(guild, user, config)
 }
 

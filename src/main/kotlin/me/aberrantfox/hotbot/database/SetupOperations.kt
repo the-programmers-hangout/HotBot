@@ -27,7 +27,7 @@ fun setupDatabaseSchema(config: Configuration) {
     )
 
     transaction {
-        SchemaUtils.create(Strikes, Suggestions, BanRecords, CommandPermissions, ChannelResources, Notes)
+        SchemaUtils.create(Strikes, Suggestions, BanRecords, CommandPermissions, ChannelResources, Notes, MutedMember)
         logger.addLogger(StdOutSqlLogger)
     }
 }
@@ -75,4 +75,13 @@ object ChannelResources : Table() {
     val channel = varchar("channel", 18)
     val section = varchar("section", 64)
     val info = varchar("info", 255)
+}
+
+object MutedMember : Table() {
+    val id = integer("id").autoIncrement().primaryKey()
+    val member = varchar("member", 18)
+    val unmuteTime = long("unmuteTime")
+    val reason = text("reason")
+    val moderator = varchar("moderator", 18)
+    val guildId = varchar("guildId", 18)
 }
