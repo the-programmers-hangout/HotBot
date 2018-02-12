@@ -7,10 +7,11 @@ import me.aberrantfox.hotbot.dsls.command.CommandEvent
 import me.aberrantfox.hotbot.dsls.command.commands
 import me.aberrantfox.hotbot.extensions.fullName
 import me.aberrantfox.hotbot.extensions.isRole
+import me.aberrantfox.hotbot.services.configPath
 import net.dv8tion.jda.core.entities.User
 import java.io.File
 
-private const val rankConfigPath = "rankconfig.json"
+private val rankConfigPath = configPath("rankconfig.json")
 
 internal data class RankConfiguration(val acceptableRanks: HashSet<String> = HashSet())
 

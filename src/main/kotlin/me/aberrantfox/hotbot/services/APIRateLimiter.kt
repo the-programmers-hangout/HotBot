@@ -4,12 +4,13 @@ import com.google.gson.Gson
 import org.joda.time.DateTime
 import java.io.File
 import kotlin.concurrent.timer
+import me.aberrantfox.hotbot.services.configPath
 
 private data class Datum(var current: Int)
 
 data class APIRateLimiter(private val limit: Int, private var current: Int, val name: String) {
     private val gson = Gson()
-    private val file = File("ratelimit/$name.json")
+    private val file = File(configPath("ratelimit/$name.json"))
 
     init {
         val parent = file.parentFile

@@ -41,10 +41,10 @@ data class PermissionedActions(var sendInvite: String = "insert-role-id",
                                var sendURL: String = "insert-role-id",
                                var commandMention: String = "insert-role-id")
 
-data class DatabaseCredentials(val username: String = "db-username",
-                               val password: String = "db-password",
-                               val hostname: String = "db-hostname",
-                               val database: String = "db-database")
+data class DatabaseCredentials(val username: String = "root",
+                               val password: String = "",
+                               val hostname: String = "hotbotdb",
+                               val database: String = "hotbot")
 
 data class BotInformation(val developmentMode: Boolean = true)
 
@@ -52,11 +52,14 @@ enum class InfractionAction {
     Warn, Mute, Kick, Ban
 }
 
+private val configDir = System.getenv("HOTBOT_CONFIG_DIR") ?: "config"
 private val configLocation = "config.json"
 private val gson = Gson()
 
+fun configPath(fileName: String) = "${configDir}/${fileName}"
+
 fun loadConfig(): Configuration? {
-    val configFile = File(configLocation)
+    val configFile = File(configPath(configLocation))
 
     if(!configFile.exists()) {
         val jsonData = gson.toJson(Configuration())

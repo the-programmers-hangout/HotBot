@@ -2,6 +2,7 @@ package me.aberrantfox.hotbot.services
 
 import com.google.gson.Gson
 import me.aberrantfox.hotbot.dsls.command.CommandsContainer
+import me.aberrantfox.hotbot.services.configPath
 import java.io.File
 
 
@@ -19,7 +20,7 @@ object HelpConf {
     val configuration: HelpFile
 
     init     {
-        val data = File("help.json").readText()
+        val data = File(configPath("help.json")).readText()
         val gson = Gson()
 
         configuration = gson.fromJson(data, HelpFile::class.java)

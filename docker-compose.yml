@@ -1,0 +1,27 @@
+version: '3'
+
+services:
+    build:
+        build:
+            context: .
+            dockerfile: dockerfiles/build
+        volumes:
+            - .:/code
+
+    hotbotdb:
+        image: mysql:5.7
+        environment:
+            - MYSQL_ALLOW_EMPTY_PASSWORD=1
+        volumes:
+            - ./data/:/var/lib/mysql
+        restart: always
+
+    hotbot:
+        depends_on:
+            - hotbotdb
+        build:
+            context: .
+            dockerfile: dockerfiles/hotbot
+        volumes:
+            - ./config/:/hotbot/config
+        restart: always

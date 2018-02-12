@@ -5,6 +5,7 @@ import me.aberrantfox.hotbot.extensions.fullName
 import me.aberrantfox.hotbot.extensions.permMuteMember
 import me.aberrantfox.hotbot.logging.BotLogger
 import me.aberrantfox.hotbot.services.AccurateMessage
+import me.aberrantfox.hotbot.services.configPath
 import me.aberrantfox.hotbot.services.Configuration
 import me.aberrantfox.hotbot.services.MessageTracker
 import me.aberrantfox.hotbot.services.PersistentSet
@@ -13,7 +14,7 @@ import net.dv8tion.jda.core.hooks.ListenerAdapter
 import org.joda.time.DateTime
 
 object MutedRaiders {
-    val set = PersistentSet("raiders.json")
+    val set = PersistentSet(configPath("raiders.json"))
 }
 
 class DuplicateMessageListener (val config: Configuration, val log: BotLogger, val tracker: MessageTracker) : ListenerAdapter() {

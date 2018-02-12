@@ -11,7 +11,7 @@ data class Messages(val onJoin: ArrayList<String> = ArrayList(),
                     var gagResponse: String = "You've been muted temporarily so that a mod can handle something.")
 
 
-private const val messageFileLocation = "responses.json"
+private const val messageFileLocation = configPath("responses.json")
 
 class MService {
     private val messageFile: File = File(messageFileLocation)

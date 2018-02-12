@@ -7,10 +7,11 @@ import me.aberrantfox.hotbot.commandframework.CommandSet
 import me.aberrantfox.hotbot.dsls.command.commands
 import me.aberrantfox.hotbot.commandframework.produceContainer
 import me.aberrantfox.hotbot.services.CommandRecommender
+import me.aberrantfox.hotbot.services.configPath
 import java.io.File
 
+private val mapLocation = configPath("macros.json")
 val macroMap = loadMacroMap()
-private val mapLocation = "macros.json"
 
 @CommandSet
 fun macroCommands() =

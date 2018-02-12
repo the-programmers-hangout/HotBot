@@ -7,6 +7,7 @@ import java.io.File
 import java.util.*
 import com.google.gson.GsonBuilder
 import me.aberrantfox.hotbot.extensions.idToName
+import me.aberrantfox.hotbot.services.configPath
 import net.dv8tion.jda.core.EmbedBuilder
 import net.dv8tion.jda.core.JDA
 import net.dv8tion.jda.core.entities.MessageEmbed
@@ -39,7 +40,7 @@ enum class AddResponse {
 }
 
 class UserElementPool(val userLimit: Int = 3, val poolLimit: Int = 20, val poolName: String) {
-    private val saveLocation = File("pools/$poolName.json")
+    private val saveLocation = File(configPath("pools/$poolName.json"))
     private val pool: Queue<PoolRecord> = LinkedList<PoolRecord>()
     private val gson = Converters.registerDateTime(GsonBuilder()).create()
 
