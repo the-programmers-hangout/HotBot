@@ -63,7 +63,7 @@ fun main(args: Array<String>) {
             PollListener(),
             BanListener(config),
             TooManyMentionsListener(logger, mutedRole),
-            MessageDeleteListener(logger))
+            MessageDeleteListener(logger, manager, config))
 
     if(config.apiConfiguration.enableCleverBot) {
         println("Enabling cleverbot integration.")

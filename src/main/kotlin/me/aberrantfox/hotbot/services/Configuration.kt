@@ -37,7 +37,8 @@ data class ApiConfiguration(val cleverbotAPIKey: String = "insert-api-key",
 
 data class PermissionedActions(var sendInvite: String = "insert-role-id",
                                var sendURL: String = "insert-role-id",
-                               var commandMention: String = "insert-role-id")
+                               var commandMention: String = "insert-role-id",
+                               val ignoreLogging: String = "insert-rold-id")
 
 data class DatabaseCredentials(val username: String = "root",
                                val password: String = "",
@@ -73,7 +74,7 @@ fun loadConfig(): Configuration? {
 }
 
 fun saveConfig(config: Configuration) {
-    val file = File(configLocation)
+    val file = File(configPath(configLocation))
     val json = gson.toJson(config)
 
     file.delete()
