@@ -21,7 +21,7 @@ class DuplicateMessageListener (val config: Configuration, val log: BotLogger, v
     override fun onGuildMessageReceived(event: GuildMessageReceivedEvent) {
         val time = DateTime.now()
 
-        if(event.member.roles.size > 0) return
+        if((event.member?.roles?.size ?: 0) > 0) return
         if(event.author.isBot) return
 
         val id = event.author.id

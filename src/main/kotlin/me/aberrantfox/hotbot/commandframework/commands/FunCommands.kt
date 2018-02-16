@@ -63,7 +63,7 @@ fun funCommands() =
 
                 val response = parseCowsayArgs(sentence.split(" "))
                 if(!response.isBlank()){
-                    it.respond(response)
+                    it.safeRespond(response)
                     return@execute
                 }
 
@@ -76,11 +76,11 @@ fun funCommands() =
                 if(!result.isBlank()){
                     val response = Cowsay.say(args)
                     if (response.length > 1994){
-                        it.respond("that message was too long, moo!")
+                        it.safeRespond("that message was too long, moo!")
                         return@execute
                     }
 
-                    it.respond("```" + Cowsay.say(args) + "```")
+                    it.safeRespond("```" + Cowsay.say(args) + "```")
                 }
             }
         }

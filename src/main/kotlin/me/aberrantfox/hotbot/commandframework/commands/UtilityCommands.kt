@@ -24,7 +24,7 @@ object Project {
     val properties: Properties
 
     init {
-        val propFile = Configuration::class.java.getResource(configPath("properties.json")).readText()
+        val propFile = Configuration::class.java.getResource("/properties.json").readText()
         val gson = Gson()
         properties = gson.fromJson(propFile, Properties::class.java)
     }

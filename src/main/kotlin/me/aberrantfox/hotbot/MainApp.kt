@@ -41,6 +41,8 @@ fun main(args: Array<String>) {
     val jda = JDABuilder(AccountType.BOT).setToken(config.serverInformation.token).buildBlocking()
     val logger = convertChannels(config.logChannels, jda)
 
+    jda.guilds.forEach { setupMutedRole(it, config.security.mutedRole) }
+
     logger.info("connected")
     val mutedRole = jda.getRolesByName(config.security.mutedRole, true).first()
     val tracker = MessageTracker(1)
@@ -71,19 +73,14 @@ fun main(args: Array<String>) {
     }
 
     jda.presence.setPresence(OnlineStatus.ONLINE, Game.of("${config.serverInformation.prefix}help"))
-    jda.guilds.forEach { setupMutedRole(it, config.security.mutedRole) }
+
 
     handleLTSMutes(config, jda)
     logger.info("Fully setup, now ready for use.")
 }
 
 private fun setupMutedRole(guild: Guild, roleName: String) {
-    if (!guild.hasRole(roleName)) {
-        guild.controller.createRole().setName(roleName).queue {
-            handleRole(guild, roleName)
-        }
-        return
-    }
+    if (!guild.hasRole(roleName)) guild.controller.createRole().setName(roleName).complete()
 
     handleRole(guild, roleName)
 }
@@ -92,7 +89,7 @@ private fun handleRole(guild: Guild, roleName: String) {
     val role = guild.getRolesByName(roleName, true).first()
 
     guild.textChannels.forEach {
-        val hasOverride = it.permissionOverrides.any {
+        val hasOverride = it.rolePermissionOverrides.any {
             it.role.name.toLowerCase() == roleName.toLowerCase()
         }
 
