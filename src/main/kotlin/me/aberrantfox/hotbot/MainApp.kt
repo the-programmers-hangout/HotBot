@@ -92,7 +92,7 @@ private fun handleRole(guild: Guild, roleName: String) {
     val role = guild.getRolesByName(roleName, true).first()
 
     guild.textChannels.forEach {
-        val hasOverride = it.permissionOverrides.any {
+        val hasOverride = it.rolePermissionOverrides.any {
             it.role.name.toLowerCase() == roleName.toLowerCase()
         }
 
