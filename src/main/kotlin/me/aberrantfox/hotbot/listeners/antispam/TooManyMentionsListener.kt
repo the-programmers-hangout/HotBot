@@ -9,7 +9,7 @@ import net.dv8tion.jda.core.hooks.ListenerAdapter
 
 class TooManyMentionsListener(val log: BotLogger, val mutedRole: Role) : ListenerAdapter() {
     override fun onGuildMessageReceived(event: GuildMessageReceivedEvent) {
-        if(event.member.roles.isNotEmpty()) return
+        if(event.member?.roles?.isNotEmpty() != false) return // either has roles or is null (WebHookMessage)
 
         if(event.message.mentionedUsers.size >= 7) {
             event.message.delete().queue()

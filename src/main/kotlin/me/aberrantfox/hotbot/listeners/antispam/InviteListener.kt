@@ -33,9 +33,9 @@ class InviteListener(val config: Configuration, val logger: BotLogger) : Listene
     override fun onGuildMessageReceived(event: GuildMessageReceivedEvent) =
             handlePossibleInviteMessage(event.member, event.message, event.guild, event.channel, event.author.isBot, event.jda)
 
-    private fun handlePossibleInviteMessage(author: Member, message: Message, guild: Guild, channel: TextChannel,
+    private fun handlePossibleInviteMessage(author: Member?, message: Message, guild: Guild, channel: TextChannel,
                                             isBot: Boolean, jda: JDA) {
-        if (isBot) return
+        if (isBot || author == null) return
 
         val id = author.user.id
         val highestRole = author.user.id.idToUser(message.jda).toMember(guild).getHighestRole()
