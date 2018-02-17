@@ -12,6 +12,7 @@ import me.aberrantfox.hotbot.listeners.antispam.InviteListener
 import me.aberrantfox.hotbot.logging.convertChannels
 import me.aberrantfox.hotbot.services.*
 import me.aberrantfox.hotbot.database.setupDatabaseSchema
+import me.aberrantfox.hotbot.listeners.antispam.NewJoinListener
 import me.aberrantfox.hotbot.listeners.antispam.TooManyMentionsListener
 import me.aberrantfox.hotbot.permissions.PermissionManager
 import net.dv8tion.jda.core.*
@@ -65,7 +66,8 @@ fun main(args: Array<String>) {
             PollListener(),
             BanListener(config),
             TooManyMentionsListener(logger, mutedRole),
-            MessageDeleteListener(logger, manager, config))
+            MessageDeleteListener(logger, manager, config),
+            NewJoinListener())
 
     if(config.apiConfiguration.enableCleverBot) {
         println("Enabling cleverbot integration.")

@@ -1,5 +1,6 @@
 package me.aberrantfox.hotbot.listeners
 
+import me.aberrantfox.hotbot.extensions.fullName
 import me.aberrantfox.hotbot.extensions.randomListItem
 import me.aberrantfox.hotbot.logging.BotLogger
 import me.aberrantfox.hotbot.services.Configuration
@@ -17,7 +18,7 @@ class MemberListener(val configuration: Configuration, val logger: BotLogger, va
 
     override fun onGuildMemberJoin(event: GuildMemberJoinEvent) {
         val target = event.guild.textChannels.findLast { it.id == configuration.messageChannels.welcomeChannel }
-        val response = mService.messages.onJoin.randomListItem().replace("%name%", event.user.asMention)
+        val response = mService.messages.onJoin.randomListItem().replace("%name%", "${event.user.asMention}(${event.user.fullName()})")
         val userImage = event.user.effectiveAvatarUrl
 
         target?.sendMessage(buildJoinMessage(response, userImage))?.queue { msg->
