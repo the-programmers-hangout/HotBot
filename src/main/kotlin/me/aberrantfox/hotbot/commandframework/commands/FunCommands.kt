@@ -67,7 +67,10 @@ fun funCommands() =
                     return@execute
                 }
 
-                val args = sentence.replace("\n", " ")
+                val specialChars = Regex("(`+|@|<@[0-9]+>)")
+                val args = sentence
+                        .replace("\n", " ")
+                        .replace(specialChars, "")
                         .split(" ")
                         .toTypedArray()
 
