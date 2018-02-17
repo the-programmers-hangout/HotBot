@@ -23,3 +23,10 @@ fun Message.mentionsSomeone() = (mentionsEveryone() || mentionedUsers.size > 0 |
 fun String.containsURl() = urlRegexes.any { this.replace("\n", "").contains(it) }
 
 fun String.containsInvite() = inviteRegex.matches(this)
+
+fun Message.isImagePost() =
+    if(attachments.isNotEmpty()) {
+        attachments.first().isImage && contentRaw.isNullOrBlank()
+    } else {
+        false
+    }

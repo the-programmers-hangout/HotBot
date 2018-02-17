@@ -2,6 +2,7 @@ package me.aberrantfox.hotbot.listeners.antispam
 
 import me.aberrantfox.hotbot.commandframework.commands.SecurityLevelState
 import me.aberrantfox.hotbot.extensions.fullName
+import me.aberrantfox.hotbot.extensions.isImagePost
 import me.aberrantfox.hotbot.extensions.permMuteMember
 import me.aberrantfox.hotbot.logging.BotLogger
 import me.aberrantfox.hotbot.services.AccurateMessage
@@ -19,6 +20,8 @@ object MutedRaiders {
 
 class DuplicateMessageListener (val config: Configuration, val log: BotLogger, val tracker: MessageTracker) : ListenerAdapter() {
     override fun onGuildMessageReceived(event: GuildMessageReceivedEvent) {
+        if(event.message.isImagePost()) return
+
         val time = DateTime.now()
 
         if((event.member?.roles?.size ?: 0) > 0) return
