@@ -14,30 +14,26 @@ data class PermissionManager(val map: HashMap<RoleID, HashSet<CommandName>> = Ha
                              val guild: Guild, val config: Configuration) {
 
     fun addPermission(roleID: RoleID, name: CommandName) {
+        val lower = name.toLowerCase()
         map.keys.map { map[it]!! }
-            .filter { it.contains(name) }
-            .forEach { it.remove(name) }
+            .filter { it.contains(lower) }
+            .forEach { it.remove(lower) }
 
         if(map.containsKey(roleID)) {
-            map.get(roleID)!!.add(name)
+            map[roleID]!!.add(lower)
         } else {
-            map.put(roleID, hashSetOf(name))
+            map[roleID] = hashSetOf(lower)
         }
 
         savePermissions(this)
     }
 
     fun roleRequired(commandName: CommandName): Role? {
-        val containingMap = map.entries.firstOrNull { it.value.contains(commandName) }
-
-        if(containingMap != null) {
-            return containingMap.key.toRole(guild)
-        } else {
-            return null
-        }
+        val containingMap = map.entries.firstOrNull { it.value.contains(commandName.toLowerCase()) }
+        return containingMap?.key?.toRole(guild)
     }
 
-    fun knowsCommand(commandName: CommandName) = map.containsKey(commandName)
+    fun knowsCommand(commandName: CommandName) = map.containsKey(commandName.toLowerCase())
 
     fun canPerformAction(userId: UserID, actionRoleID: RoleID): Boolean {
         if(userId == config.serverInformation.ownerID) return true
@@ -63,7 +59,7 @@ data class PermissionManager(val map: HashMap<RoleID, HashSet<CommandName>> = Ha
 
         if(roles.isEmpty()) return "None"
 
-        return roles.map { map.get(it) }
+        return roles.map { map[it] }
             .reduceRight { a, b -> a!!.addAll(b!!) ; a }!!
             .joinToString(", ") { a -> a }
     }
