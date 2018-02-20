@@ -20,9 +20,9 @@
     {
 	  "name": "cowsay",
 	  "category": "fun",
-	  "description": "use cowsay through hotbot",
-	  "structure": "{arguments...} {message}",
-	  "example": "cowsay moo, i am a cow!"
+	  "description": "Displays a cowsay with a given message",
+	  "structure": "{message}",
+	  "example": "moo, i am a cow!"
 	},
     {
       "name": "cat",
