@@ -10,6 +10,7 @@ import me.aberrantfox.hotbot.database.*
 import me.aberrantfox.hotbot.dsls.command.arg
 import me.aberrantfox.hotbot.dsls.embed.embed
 import net.dv8tion.jda.core.entities.Guild
+import net.dv8tion.jda.core.entities.MessageEmbed
 import net.dv8tion.jda.core.entities.User
 import org.joda.time.format.DateTimeFormat
 import java.awt.Color
@@ -290,8 +291,6 @@ private fun buildHistoryEmbed(target: User, includeModerator: Boolean, records: 
                 inline = false
             }
 
-            addBlankField(false)
-
             field {
                 name = ""
                 value = "__**Infractions**__"
@@ -300,7 +299,7 @@ private fun buildHistoryEmbed(target: User, includeModerator: Boolean, records: 
 
             records.forEach { record ->
                 field {
-                    name = "ID :: __${record.id}__ :: Weight :: __${record.strikes}__"
+                    name = "ID :: ${record.id} :: Weight :: ${record.strikes}"
                     value = "This infraction is **${expired(record.isExpired)}**."
                     inline = false
 
@@ -309,13 +308,7 @@ private fun buildHistoryEmbed(target: User, includeModerator: Boolean, records: 
                     }
                 }
 
-                field {
-                    name = "Infraction Reasoning Given"
-                    value = record.reason
-                    inline = false
-                }
-
-                addBlankField(false)
+                produceFields("Infraction Reasoning Given", record.reason).forEach { addField(it) }
             }
 
             if (records.isEmpty()) {
@@ -324,8 +317,6 @@ private fun buildHistoryEmbed(target: User, includeModerator: Boolean, records: 
                     value = "Clean as a whistle, sir."
                     inline = false
                 }
-
-                addBlankField(false)
             }
 
             if (!includeModerator || notes == null) {
@@ -353,17 +344,14 @@ private fun buildHistoryEmbed(target: User, includeModerator: Boolean, records: 
                     inline = false
                 }
 
-                field {
-                    name = "Note Message"
-                    value = note.note
-                    inline = false
-                }
-
-                addBlankField(false)
+                produceFields("NoteMessage", note.note).forEach { addField(it) }
             }
 
         }
 
+fun produceFields(title: String, message: String) = message.chunked(1024).mapIndexed { index, chunk ->
+    MessageEmbed.Field("$title -- $index", chunk, false)
+}
 
 private fun buildInfractionEmbed(userMention: String, reason: String, strikeQuantity: Int, totalStrikes: Int,
                                  strikeCeil: Int, punishmentAction: String) =
@@ -389,7 +377,7 @@ private fun buildInfractionEmbed(userMention: String, reason: String, strikeQuan
 
             field {
                 name = "__Reason__"
-                value = reason
+                value = reason.limit(1024)
                 inline = false
             }
 
