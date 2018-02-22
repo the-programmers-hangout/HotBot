@@ -5,7 +5,9 @@ import me.aberrantfox.hotbot.dsls.command.arg
 import me.aberrantfox.hotbot.dsls.command.commands
 import me.aberrantfox.hotbot.dsls.embed.embed
 import me.aberrantfox.hotbot.extensions.*
+import me.aberrantfox.hotbot.services.CommandDescriptor
 import me.aberrantfox.hotbot.services.HelpConf
+import java.awt.Color
 
 @CommandSet
 fun permissionCommands() =
@@ -121,6 +123,32 @@ fun permissionCommands() =
                                 inline = false
                             }
                         }
+                })
+            }
+        }
+
+        command("listavailable") {
+            execute {
+                val available = HelpConf.listCategories().map { cat ->
+                    val cmds =  HelpConf.listCommandsinCategory(cat)
+                        .filter { cmd -> it.manager.canUseCommand(it.author.id, cmd.name) }
+                        .map(CommandDescriptor::name)
+                        .joinToString()
+
+                    Pair(cat, cmds)
+                }
+
+                it.respond(embed {
+                    title("Commands available to you")
+                    setColor(Color.green)
+                    setThumbnail(it.author.effectiveAvatarUrl)
+                    available.forEach {
+                        field {
+                            name = it.first
+                            value = it.second
+                            inline = false
+                        }
+                    }
                 })
             }
         }

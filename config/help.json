@@ -793,6 +793,13 @@
       "description": "View all of the commands by category, listed with their associated permission.",
       "structure": "{commandCategory} {role}",
       "example": "moderation moderator"
+    },
+    {
+      "name": "listavailable",
+      "category": "permissions",
+      "description": "View commands available to you, based on your permission level.",
+      "structure": "",
+      "example": ""
     }
   ]
 }
