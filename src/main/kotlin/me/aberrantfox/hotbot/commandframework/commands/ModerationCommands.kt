@@ -40,7 +40,7 @@ fun moderationCommands() = commands {
     }
 
     command("ignore") {
-        expect(ArgumentType.Integer)
+        expect(ArgumentType.Word)
         execute {
             val config = it.config
             val target = it.args[0] as String
