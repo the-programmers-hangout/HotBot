@@ -136,7 +136,7 @@ fun permissionCommands() =
                         .joinToString()
 
                     Pair(cat, cmds)
-                }
+                }.filter { it.second.isNotEmpty() }
 
                 it.respond(embed {
                     title("Commands available to you")
