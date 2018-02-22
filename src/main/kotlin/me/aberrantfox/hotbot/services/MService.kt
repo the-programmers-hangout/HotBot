@@ -8,7 +8,8 @@ data class Messages(val onJoin: ArrayList<String> = ArrayList(),
                     var serverDescription: String = "Insert Server Description here!",
                     var botDescription: String = "Insert bot description here",
                     var permanentInviteLink: String = "discord.gg/programming",
-                    var gagResponse: String = "You've been muted temporarily so that a mod can handle something.")
+                    var gagResponse: String = "You've been muted temporarily so that a mod can handle something.",
+                    var welcomeDescription: String = "This will be displayed underneath the greeting.")
 
 
 private val messageFileLocation = configPath("responses.json")

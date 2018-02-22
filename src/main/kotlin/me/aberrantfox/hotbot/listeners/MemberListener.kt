@@ -32,16 +32,16 @@ class MemberListener(val configuration: Configuration, val logger: BotLogger, va
     }
 
     override fun onGuildMemberLeave(e: GuildMemberLeaveEvent) = logger.info("${e.user.asMention} left the server")
+
+    private fun buildJoinMessage(response: String, image: String) =
+        EmbedBuilder()
+            .setTitle("Player Get!")
+            .setDescription(response)
+            .setColor(Color.red)
+            .setThumbnail(image)
+            .addField("How do I start?", mService.messages.welcomeDescription, false)
+            .build()
 }
 
-private fun buildJoinMessage(response: String, image: String) =
-        EmbedBuilder()
-                .setTitle("Player Get!")
-                .setDescription(response)
-                .setColor(Color.red)
-                .setThumbnail(image)
-                .addField("How do I start?",
-                         "Take a read of #faq, alongside #rules-and-info. When you are done, scan up and down the " +
-                                 "channel list. Don't forget to say hi ;).", false)
-                .build()
+
 
