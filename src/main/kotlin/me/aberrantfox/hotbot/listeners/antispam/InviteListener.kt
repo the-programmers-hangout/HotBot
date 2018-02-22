@@ -2,6 +2,7 @@ package me.aberrantfox.hotbot.listeners.antispam
 
 import me.aberrantfox.hotbot.extensions.*
 import me.aberrantfox.hotbot.logging.BotLogger
+import me.aberrantfox.hotbot.permissions.PermissionManager
 import me.aberrantfox.hotbot.services.configPath
 import me.aberrantfox.hotbot.services.Configuration
 import me.aberrantfox.hotbot.services.PersistentSet
@@ -26,7 +27,7 @@ object RecentInvites {
     }
 }
 
-class InviteListener(val config: Configuration, val logger: BotLogger) : ListenerAdapter() {
+class InviteListener(val config: Configuration, val logger: BotLogger, val manager: PermissionManager) : ListenerAdapter() {
     override fun onGuildMessageUpdate(event: GuildMessageUpdateEvent) =
             handlePossibleInviteMessage(event.member, event.message, event.guild, event.channel, event.author.isBot, event.jda)
 
@@ -38,9 +39,8 @@ class InviteListener(val config: Configuration, val logger: BotLogger) : Listene
         if (isBot || author == null) return
 
         val id = author.user.id
-        val highestRole = author.user.id.idToUser(message.jda).toMember(guild).getHighestRole()
 
-        if(config.permissionedActions.sendInvite.toRole(guild)?.isEqualOrHigherThan(highestRole) == true) return
+        if(manager.canPerformAction(id, config.permissionedActions.sendInvite)) return
 
         if (RecentInvites.trimmedMessage(message.contentRaw).containsInvite()) {
             var messageContent = message.contentRaw

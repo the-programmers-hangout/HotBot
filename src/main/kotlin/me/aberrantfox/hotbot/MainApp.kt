@@ -58,7 +58,7 @@ fun main(args: Array<String>) {
     jda.addEventListener(
             CommandListener(config, container, jda, logger, guild, manager, messageService),
             MemberListener(config, logger, messageService),
-            InviteListener(config, logger),
+            InviteListener(config, logger, manager),
             VoiceChannelListener(logger),
             NewChannelListener(mutedRole),
             DuplicateMessageListener(config, logger, tracker),
