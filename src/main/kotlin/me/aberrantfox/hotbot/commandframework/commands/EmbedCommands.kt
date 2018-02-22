@@ -38,6 +38,11 @@ fun embedCommands() =
 
         command("sendembed") {
             execute {
+                if (EHolder.embed.isEmpty) {
+                    it.respond("No embed to send.")
+                    return@execute
+                }
+
                 it.respond(EHolder.embed.build())
             }
         }
@@ -57,12 +62,10 @@ fun embedCommands() =
                 }
 
                 message.editMessage(EHolder.embed.build()).queue(
-                        { _ ->
-                            // Success
+                        { embedMessage ->
                             it.respond("Embed updated.")
                         },
-                        { _ ->
-                            // Failure
+                        { error ->
                             it.respond("Failed to edit message. It may have been deleted.")
                         }
                 )
