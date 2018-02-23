@@ -5,8 +5,8 @@ import me.aberrantfox.hotbot.commandframework.ArgumentType
 import me.aberrantfox.hotbot.commandframework.CommandSet
 import me.aberrantfox.hotbot.dsls.command.CommandEvent
 import me.aberrantfox.hotbot.dsls.command.commands
-import me.aberrantfox.hotbot.extensions.fullName
-import me.aberrantfox.hotbot.extensions.isRole
+import me.aberrantfox.hotbot.extensions.jda.fullName
+import me.aberrantfox.hotbot.extensions.jda.isRole
 import me.aberrantfox.hotbot.services.configPath
 import net.dv8tion.jda.core.entities.User
 import java.io.File

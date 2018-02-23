@@ -1,6 +1,9 @@
 package me.aberrantfox.hotbot.listeners.antispam
 
-import me.aberrantfox.hotbot.extensions.*
+import me.aberrantfox.hotbot.extensions.jda.deleteIfExists
+import me.aberrantfox.hotbot.extensions.jda.fullName
+import me.aberrantfox.hotbot.extensions.stdlib.containsInvite
+import me.aberrantfox.hotbot.extensions.stdlib.idToName
 import me.aberrantfox.hotbot.logging.BotLogger
 import me.aberrantfox.hotbot.permissions.PermissionManager
 import me.aberrantfox.hotbot.services.configPath

@@ -7,7 +7,7 @@ import me.aberrantfox.hotbot.dsls.command.arg
 import me.aberrantfox.hotbot.services.Configuration
 import me.aberrantfox.hotbot.commandframework.commands.macroMap
 import me.aberrantfox.hotbot.dsls.command.CommandEvent
-import me.aberrantfox.hotbot.extensions.*
+import me.aberrantfox.hotbot.extensions.jda.*
 import me.aberrantfox.hotbot.logging.BotLogger
 import me.aberrantfox.hotbot.permissions.PermissionManager
 import me.aberrantfox.hotbot.services.CommandRecommender

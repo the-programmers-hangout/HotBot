@@ -3,7 +3,7 @@ package me.aberrantfox.hotbot.commandframework.commands
 import me.aberrantfox.hotbot.commandframework.ArgumentType
 import me.aberrantfox.hotbot.commandframework.CommandSet
 import me.aberrantfox.hotbot.dsls.command.commands
-import me.aberrantfox.hotbot.extensions.fullName
+import me.aberrantfox.hotbot.extensions.jda.fullName
 import me.aberrantfox.hotbot.listeners.antispam.RecentInvites
 
 @CommandSet

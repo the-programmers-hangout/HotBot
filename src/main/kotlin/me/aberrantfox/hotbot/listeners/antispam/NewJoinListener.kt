@@ -1,7 +1,7 @@
 package me.aberrantfox.hotbot.listeners.antispam
 
 
-import me.aberrantfox.hotbot.extensions.idToName
+import me.aberrantfox.hotbot.extensions.stdlib.idToName
 import me.aberrantfox.hotbot.services.DateTracker
 import net.dv8tion.jda.core.JDA
 import net.dv8tion.jda.core.events.guild.member.GuildMemberJoinEvent

@@ -5,7 +5,7 @@ import me.aberrantfox.hotbot.commandframework.CommandSet
 import me.aberrantfox.hotbot.dsls.command.arg
 import me.aberrantfox.hotbot.dsls.command.commands
 import me.aberrantfox.hotbot.dsls.embed.embed
-import me.aberrantfox.hotbot.extensions.sendPrivateMessage
+import me.aberrantfox.hotbot.extensions.jda.sendPrivateMessage
 import me.aberrantfox.hotbot.services.CommandDescriptor
 import me.aberrantfox.hotbot.services.Configuration
 import me.aberrantfox.hotbot.services.HelpConf

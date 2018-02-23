@@ -1,10 +1,13 @@
 package me.aberrantfox.hotbot.commandframework.commands
 
 import me.aberrantfox.hotbot.commandframework.*
-import me.aberrantfox.hotbot.dsls.command.arg
 import me.aberrantfox.hotbot.dsls.command.commands
 import me.aberrantfox.hotbot.dsls.embed.embed
 import me.aberrantfox.hotbot.extensions.*
+import me.aberrantfox.hotbot.extensions.jda.getHighestRole
+import me.aberrantfox.hotbot.extensions.jda.getRoleByIdOrName
+import me.aberrantfox.hotbot.extensions.jda.toMember
+import me.aberrantfox.hotbot.extensions.stdlib.sanitiseMentions
 import me.aberrantfox.hotbot.services.CommandDescriptor
 import me.aberrantfox.hotbot.services.HelpConf
 import java.awt.Color

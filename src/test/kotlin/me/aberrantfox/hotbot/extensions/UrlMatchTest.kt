@@ -1,5 +1,6 @@
 package me.aberrantfox.hotbot.extensions
 
+import me.aberrantfox.hotbot.extensions.jda.containsURL
 import org.junit.Assert
 import org.junit.Test
 

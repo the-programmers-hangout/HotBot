@@ -9,6 +9,14 @@ import me.aberrantfox.hotbot.services.*
 import me.aberrantfox.hotbot.database.*
 import me.aberrantfox.hotbot.dsls.command.arg
 import me.aberrantfox.hotbot.dsls.embed.embed
+import me.aberrantfox.hotbot.extensions.jda.fullName
+import me.aberrantfox.hotbot.extensions.jda.getMemberJoinString
+import me.aberrantfox.hotbot.extensions.jda.sendPrivateMessage
+import me.aberrantfox.hotbot.extensions.stdlib.formatJdaDate
+import me.aberrantfox.hotbot.extensions.stdlib.idToName
+import me.aberrantfox.hotbot.extensions.stdlib.idToUser
+import me.aberrantfox.hotbot.extensions.stdlib.limit
+import me.aberrantfox.hotbot.utility.muteMember
 import net.dv8tion.jda.core.entities.Guild
 import net.dv8tion.jda.core.entities.MessageEmbed
 import net.dv8tion.jda.core.entities.User

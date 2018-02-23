@@ -1,6 +1,6 @@
 package me.aberrantfox.hotbot.listeners.antispam
 
-import me.aberrantfox.hotbot.extensions.fullName
+import me.aberrantfox.hotbot.extensions.jda.fullName
 import me.aberrantfox.hotbot.logging.BotLogger
 import net.dv8tion.jda.core.entities.Role
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent

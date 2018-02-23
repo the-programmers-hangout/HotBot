@@ -2,6 +2,11 @@ package me.aberrantfox.hotbot.permissions
 
 import me.aberrantfox.hotbot.database.savePermissions
 import me.aberrantfox.hotbot.extensions.*
+import me.aberrantfox.hotbot.extensions.jda.getHighestRole
+import me.aberrantfox.hotbot.extensions.jda.isEqualOrHigherThan
+import me.aberrantfox.hotbot.extensions.jda.toMember
+import me.aberrantfox.hotbot.extensions.stdlib.idToUser
+import me.aberrantfox.hotbot.extensions.stdlib.toRole
 import me.aberrantfox.hotbot.services.Configuration
 import me.aberrantfox.hotbot.services.UserID
 import net.dv8tion.jda.core.entities.Guild
@@ -32,8 +37,6 @@ data class PermissionManager(val map: HashMap<RoleID, HashSet<CommandName>> = Ha
         val containingMap = map.entries.firstOrNull { it.value.contains(commandName.toLowerCase()) }
         return containingMap?.key?.toRole(guild)
     }
-
-    fun knowsCommand(commandName: CommandName) = map.containsKey(commandName.toLowerCase())
 
     fun canPerformAction(userId: UserID, actionRoleID: RoleID): Boolean {
         if(userId == config.serverInformation.ownerID) return true

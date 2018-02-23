@@ -3,10 +3,10 @@ package me.aberrantfox.hotbot.commandframework.commands
 import me.aberrantfox.hotbot.commandframework.ArgumentType
 import me.aberrantfox.hotbot.commandframework.CommandSet
 import me.aberrantfox.hotbot.dsls.command.commands
-import me.aberrantfox.hotbot.extensions.fullName
-import me.aberrantfox.hotbot.extensions.isDigitOrPeriod
-import me.aberrantfox.hotbot.extensions.isDouble
-import me.aberrantfox.hotbot.extensions.sendPrivateMessage
+import me.aberrantfox.hotbot.extensions.jda.fullName
+import me.aberrantfox.hotbot.extensions.stdlib.isDigitOrPeriod
+import me.aberrantfox.hotbot.extensions.stdlib.isDouble
+import me.aberrantfox.hotbot.extensions.jda.sendPrivateMessage
 import java.util.*
 import kotlin.concurrent.schedule
 import kotlin.math.roundToLong

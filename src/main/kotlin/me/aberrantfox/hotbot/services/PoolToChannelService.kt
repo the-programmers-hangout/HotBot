@@ -6,8 +6,7 @@ import org.joda.time.DateTime
 import java.io.File
 import java.util.*
 import com.google.gson.GsonBuilder
-import me.aberrantfox.hotbot.extensions.idToName
-import me.aberrantfox.hotbot.services.configPath
+import me.aberrantfox.hotbot.extensions.stdlib.idToName
 import net.dv8tion.jda.core.EmbedBuilder
 import net.dv8tion.jda.core.JDA
 import net.dv8tion.jda.core.entities.MessageEmbed

@@ -1,6 +1,6 @@
 package me.aberrantfox.hotbot.listeners
 
-import me.aberrantfox.hotbot.extensions.descriptor
+import me.aberrantfox.hotbot.extensions.jda.descriptor
 import me.aberrantfox.hotbot.logging.BotLogger
 import net.dv8tion.jda.core.events.guild.voice.GuildVoiceJoinEvent
 import net.dv8tion.jda.core.events.guild.voice.GuildVoiceLeaveEvent

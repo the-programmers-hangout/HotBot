@@ -5,7 +5,7 @@ import me.aberrantfox.hotbot.dsls.command.Command
 import me.aberrantfox.hotbot.dsls.command.CommandArgument
 import me.aberrantfox.hotbot.dsls.command.CommandEvent
 import me.aberrantfox.hotbot.dsls.command.CommandsContainer
-import me.aberrantfox.hotbot.extensions.*
+import me.aberrantfox.hotbot.extensions.stdlib.trimToID
 import me.aberrantfox.hotbot.listeners.CommandListener
 import me.aberrantfox.hotbot.services.Configuration
 import org.reflections.Reflections

@@ -1,7 +1,7 @@
 package me.aberrantfox.hotbot.dsls.command
 
 import me.aberrantfox.hotbot.commandframework.ArgumentType
-import me.aberrantfox.hotbot.extensions.sanitiseMentions
+import me.aberrantfox.hotbot.extensions.stdlib.sanitiseMentions
 import me.aberrantfox.hotbot.logging.BotLogger
 import me.aberrantfox.hotbot.logging.DefaultLogger
 import me.aberrantfox.hotbot.permissions.PermissionManager

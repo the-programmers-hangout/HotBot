@@ -1,6 +1,6 @@
 package me.aberrantfox.hotbot.database
 
-import me.aberrantfox.hotbot.extensions.MuteRecord
+import me.aberrantfox.hotbot.utility.MuteRecord
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 

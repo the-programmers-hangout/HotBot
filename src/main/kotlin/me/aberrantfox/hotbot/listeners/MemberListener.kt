@@ -1,7 +1,7 @@
 package me.aberrantfox.hotbot.listeners
 
-import me.aberrantfox.hotbot.extensions.fullName
-import me.aberrantfox.hotbot.extensions.randomListItem
+import me.aberrantfox.hotbot.extensions.jda.fullName
+import me.aberrantfox.hotbot.extensions.stdlib.randomListItem
 import me.aberrantfox.hotbot.logging.BotLogger
 import me.aberrantfox.hotbot.services.Configuration
 import me.aberrantfox.hotbot.services.MService

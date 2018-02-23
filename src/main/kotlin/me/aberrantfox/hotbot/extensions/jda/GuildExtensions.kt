@@ -1,12 +1,10 @@
-package me.aberrantfox.hotbot.extensions
+package me.aberrantfox.hotbot.extensions.jda
 
-import me.aberrantfox.hotbot.dsls.command.CommandEvent
+import me.aberrantfox.hotbot.extensions.stdlib.formatJdaDate
 import net.dv8tion.jda.core.entities.Guild
 import net.dv8tion.jda.core.entities.Role
 import net.dv8tion.jda.core.entities.User
 
-
-fun Guild.isMember(id: String) = this.isMember(id.idToUser(this.jda))
 
 fun Guild.getMemberJoinString(target: User) =
         if(this.isMember(target)) {
@@ -31,3 +29,5 @@ fun Guild.getRoleByIdOrName(idOrName: String): Role? {
         null
     }
 }
+
+fun Guild.hasRole(roleName: String): Boolean = this.roles.any { it.name.toLowerCase() == roleName.toLowerCase() }

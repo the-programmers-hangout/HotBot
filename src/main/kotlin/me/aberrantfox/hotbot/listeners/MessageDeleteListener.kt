@@ -1,7 +1,7 @@
 package me.aberrantfox.hotbot.listeners
 
 import me.aberrantfox.hotbot.dsls.embed.embed
-import me.aberrantfox.hotbot.extensions.fullName
+import me.aberrantfox.hotbot.extensions.jda.fullName
 import me.aberrantfox.hotbot.logging.BotLogger
 import me.aberrantfox.hotbot.permissions.PermissionManager
 import me.aberrantfox.hotbot.services.Configuration

@@ -5,15 +5,12 @@ import me.aberrantfox.hotbot.commandframework.ArgumentType
 import me.aberrantfox.hotbot.commandframework.CommandSet
 import me.aberrantfox.hotbot.database.savePermissions
 import me.aberrantfox.hotbot.dsls.command.CommandEvent
-import me.aberrantfox.hotbot.services.configPath
 import me.aberrantfox.hotbot.services.saveConfig
-import me.aberrantfox.hotbot.extensions.fullName
 import me.aberrantfox.hotbot.dsls.command.commands
 import me.aberrantfox.hotbot.dsls.embed.embed
-import me.aberrantfox.hotbot.extensions.idToUser
+import me.aberrantfox.hotbot.extensions.jda.fullName
 import me.aberrantfox.hotbot.services.Configuration
 import net.dv8tion.jda.core.OnlineStatus
-import net.dv8tion.jda.core.entities.Guild
 import net.dv8tion.jda.core.entities.User
 import java.awt.Color
 import java.util.*

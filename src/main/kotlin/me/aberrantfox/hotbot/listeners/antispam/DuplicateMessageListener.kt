@@ -1,15 +1,15 @@
 package me.aberrantfox.hotbot.listeners.antispam
 
 import me.aberrantfox.hotbot.commandframework.commands.SecurityLevelState
-import me.aberrantfox.hotbot.extensions.fullName
-import me.aberrantfox.hotbot.extensions.isImagePost
-import me.aberrantfox.hotbot.extensions.permMuteMember
+import me.aberrantfox.hotbot.extensions.jda.fullName
+import me.aberrantfox.hotbot.extensions.jda.isImagePost
 import me.aberrantfox.hotbot.logging.BotLogger
 import me.aberrantfox.hotbot.services.AccurateMessage
 import me.aberrantfox.hotbot.services.configPath
 import me.aberrantfox.hotbot.services.Configuration
 import me.aberrantfox.hotbot.services.MessageTracker
 import me.aberrantfox.hotbot.services.PersistentSet
+import me.aberrantfox.hotbot.utility.permMuteMember
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent
 import net.dv8tion.jda.core.hooks.ListenerAdapter
 import org.joda.time.DateTime

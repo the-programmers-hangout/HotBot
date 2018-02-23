@@ -5,6 +5,10 @@ import me.aberrantfox.hotbot.commandframework.CommandSet
 import me.aberrantfox.hotbot.dsls.command.arg
 import me.aberrantfox.hotbot.dsls.command.commands
 import me.aberrantfox.hotbot.extensions.*
+import me.aberrantfox.hotbot.extensions.jda.fullName
+import me.aberrantfox.hotbot.extensions.stdlib.isBooleanValue
+import me.aberrantfox.hotbot.extensions.stdlib.isLong
+import me.aberrantfox.hotbot.extensions.stdlib.toBooleanValue
 import net.dv8tion.jda.core.EmbedBuilder
 import net.dv8tion.jda.core.entities.*
 import java.awt.Color

@@ -2,7 +2,7 @@ package me.aberrantfox.hotbot.commandframework
 
 import me.aberrantfox.hotbot.dsls.command.CommandArgument
 import me.aberrantfox.hotbot.dsls.command.CommandEvent
-import me.aberrantfox.hotbot.extensions.*
+import me.aberrantfox.hotbot.extensions.stdlib.*
 
 enum class ArgumentType {
     Integer, Double, Word, Choice, Manual, Sentence, User, Splitter, URL

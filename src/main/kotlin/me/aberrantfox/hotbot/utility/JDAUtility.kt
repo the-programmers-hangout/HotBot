@@ -1,51 +1,17 @@
-package me.aberrantfox.hotbot.extensions
+package me.aberrantfox.hotbot.utility
 
 import me.aberrantfox.hotbot.database.deleteMutedMember
 import me.aberrantfox.hotbot.database.insertMutedMember
 import me.aberrantfox.hotbot.dsls.embed.embed
+import me.aberrantfox.hotbot.extensions.stdlib.convertToTimeString
 import me.aberrantfox.hotbot.services.Configuration
-import net.dv8tion.jda.core.JDA
 import net.dv8tion.jda.core.entities.Guild
-import net.dv8tion.jda.core.entities.MessageEmbed
-import net.dv8tion.jda.core.entities.Role
 import net.dv8tion.jda.core.entities.User
 import java.awt.Color
 import java.util.*
 
 
 data class MuteRecord(val unmuteTime: Long, val reason: String, val moderator: String, val user: String, val guildId: String)
-
-fun String.isUserID(jda: JDA): Boolean =
-    try {
-        jda.getUserById(this.trimToID()) != null
-    } catch (e: NumberFormatException) {
-        false
-    }
-
-fun String.idToName(jda: JDA): String = jda.getUserById(this).name
-
-fun String.idToUser(jda: JDA): User = jda.getUserById(this.trimToID())
-
-fun Guild.hasRole(roleName: String): Boolean = this.roles.any { it.name.toLowerCase() == roleName.toLowerCase() }
-
-fun JDA.isRole(role: String) = this.getRolesByName(role, true).size == 1
-
-fun User.toMember(guild: Guild) = guild.getMemberById(this.id)
-
-fun Role.isEqualOrHigherThan(other: Role?) = if(other == null) false else this.position >= other.position
-
-fun String.toRole(guild: Guild): Role? = guild.getRoleById(this)
-
-fun String.sanitiseMentions() = this.replace("@", "")
-
-fun Long.convertToTimeString(): String {
-    val seconds = this / 1000
-    val minutes = seconds / 60
-    val hours = minutes / 60
-    val days = hours / 24
-
-    return "$days days, ${hours % 24} hours, ${minutes % 60} minutes, ${seconds % 60} seconds"
-}
 
 fun permMuteMember(guild: Guild, user: User, reason: String, config: Configuration, moderator: User) {
     guild.controller.addRolesToMember(guild.getMemberById(user.id), guild.getRolesByName(config.security.mutedRole, true)).queue()
@@ -78,25 +44,25 @@ fun muteMember(guild: Guild, user: User, time: Long, reason: String, config: Con
 }
 
 private fun buildMuteEmbed(userMention: String, timeString: String, reason: String) =
-        embed {
-            title("Mute")
-            description("$userMention, you have been muted.\nA muted user cannot speak, post in channels, or react to messages.")
+    embed {
+        title("Mute")
+        description("$userMention, you have been muted.\nA muted user cannot speak, post in channels, or react to messages.")
 
-            field {
-                name = "Length"
-                value = timeString
-                inline = false
-            }
-
-            field {
-                name = "__Reason__"
-                value = reason
-                inline = false
-            }
-
-
-            setColor(Color.RED)
+        field {
+            name = "Length"
+            value = timeString
+            inline = false
         }
+
+        field {
+            name = "__Reason__"
+            value = reason
+            inline = false
+        }
+
+
+        setColor(Color.RED)
+    }
 
 fun scheduleUnmute(guild: Guild, user: User, config: Configuration, time: Long, muteRecord: MuteRecord) {
     if (time <= 0) {
@@ -127,33 +93,3 @@ fun removeMuteRole(guild: Guild, user: User, config: Configuration) =
             guild.controller.removeRolesFromMember(guild.getMemberById(user.id), guild.getRolesByName(config.security.mutedRole, true)).queue()
         }
     }
-
-
-fun User.sendPrivateMessage(msg: MessageEmbed) =
-    openPrivateChannel().queue {
-        it.sendMessage(msg).queue()
-    }
-
-
-fun User.sendPrivateMessage(msg: String) =
-    openPrivateChannel().queue {
-        it.sendMessage(msg).queue()
-    }
-
-fun List<String>.isUserIDList(jda: JDA) = this.all { it.isUserID(jda) }
-
-fun JDA.performActionIfIsID(id: String, action: (User) -> Unit) =
-    retrieveUserById(id).queue {
-        action(it)
-    }
-
-fun String.trimToID(): String =
-        if (this.startsWith("<@") && this.endsWith(">")) {
-            replace("<", "")
-                    .replace(">", "")
-                    .replace("@", "")
-                    .replace("!", "") // Mentions with nicknames
-                    .replace("&", "") // Role mentions
-        } else {
-            this
-        }
