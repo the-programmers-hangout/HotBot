@@ -16,6 +16,7 @@ import java.time.Instant
 
 private object EHolder {
     var embed: EmbedBuilder = EmbedBuilder()
+    var message: Message? = null
 }
 
 private object FHolder {
@@ -29,13 +30,45 @@ fun embedCommands() =
         command("clearembed") {
             execute {
                 EHolder.embed = EmbedBuilder()
+                EHolder.message = null
+
                 it.respond("Embed cleared")
             }
         }
 
         command("sendembed") {
             execute {
+                if (EHolder.embed.isEmpty) {
+                    it.respond("No embed to send.")
+                    return@execute
+                }
+
                 it.respond(EHolder.embed.build())
+            }
+        }
+
+        command("updateEmbed") {
+            execute {
+                val message = EHolder.message
+
+                if (message == null || EHolder.embed.isEmpty) {
+                    it.respond("No embed currently copied.")
+                    return@execute
+                }
+
+                if (message.author != it.jda.selfUser) {
+                    it.respond("You can only edit messages sent by the bot.")
+                    return@execute
+                }
+
+                message.editMessage(EHolder.embed.build()).queue(
+                        { embedMessage ->
+                            it.respond("Embed updated.")
+                        },
+                        { error ->
+                            it.respond("Failed to edit message. It may have been deleted.")
+                        }
+                )
             }
         }
 
@@ -68,6 +101,7 @@ fun embedCommands() =
                             }
 
                             EHolder.embed = EmbedBuilder(embed)
+                            EHolder.message = msg
                         },
                         { error ->
                             // Failure

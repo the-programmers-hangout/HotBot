@@ -340,6 +340,13 @@
       "example": ""
     },
     {
+      "name": "updateEmbed",
+      "category": "embed",
+      "description": "Update the original message of the embed copied with copyembed.",
+      "structure": "",
+      "example": ""
+    },
+    {
       "name": "copyembed",
       "category": "embed",
       "description": "Copies the embed from the message with the given id into the embed builder. The channelId from which to get the embed is optional and will default to the one you invoked the command in.",
