@@ -246,7 +246,11 @@ private fun administerPunishment(config: Configuration, user: User, strikeQuanti
         val punishmentAction = config.security.infractionActionMap[totalStrikes]?.toString() ?: "None"
         val infractionEmbed = buildInfractionEmbed(user.asMention, reason, strikeQuantity,
                 totalStrikes, config.security.strikeCeil, punishmentAction)
+        try {
 
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
         chan.sendMessage(infractionEmbed).queue {
             when (config.security.infractionActionMap[totalStrikes]) {
                 InfractionAction.Warn -> {
