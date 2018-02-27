@@ -122,7 +122,7 @@ data class CommandListener(val config: Configuration,
     }
 
     private fun handleDelete(message: Message, prefix: String) =
-        if (!message.rawContent.startsWith(prefix + prefix)) {
+        if (!message.contentRaw.startsWith(prefix + prefix)) {
             message.deleteIfExists()
         } else {
             Unit

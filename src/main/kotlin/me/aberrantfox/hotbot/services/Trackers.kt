@@ -50,7 +50,7 @@ class MessageTracker(trackTime: Int) : IdTracker<LimitedList<AccurateMessage>>(t
 
         map.putIfAbsent(who, LimitedList(20))
 
-        val matches = map[who]!!.map { calc.apply(it.message.rawContent, acMsg.message.rawContent) }
+        val matches = map[who]!!.map { calc.apply(it.message.contentRaw, acMsg.message.contentRaw) }
             .filter { it <=  2 }
             .count()
 
@@ -58,7 +58,6 @@ class MessageTracker(trackTime: Int) : IdTracker<LimitedList<AccurateMessage>>(t
 
         return matches
     }
-
 
     fun count(who: String) = map.getOrDefault(who, LimitedList(20)).size
 

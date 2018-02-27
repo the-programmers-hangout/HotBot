@@ -74,9 +74,6 @@ fun main(args: Array<String>) {
         jda.addEventListener(MentionListener(config, jda.selfUser.name))
     }
 
-    jda.presence.setPresence(OnlineStatus.ONLINE, Game.of("${config.serverInformation.prefix}help"))
-
-
     handleLTSMutes(config, jda)
     logger.info("Fully setup, now ready for use.")
 }

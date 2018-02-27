@@ -96,7 +96,6 @@ fun moderationCommands() = commands {
             it.config.serverInformation.prefix = newPrefix
             it.respond("Prefix is now $newPrefix. Please invoke commands using that prefix in the future." +
                 "To save this configuration, use the saveconfigurations command.")
-            it.jda.presence.setPresence(OnlineStatus.ONLINE, Game.of("${it.config.serverInformation.prefix}help"))
         }
     }
 

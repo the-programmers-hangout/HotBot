@@ -25,7 +25,7 @@ fun macroCommands() =
                     produceContainer().commands.containsKey(key) -> it.respond("You dummy. There is a command with that name already...")
                     macroMap.containsKey(key) -> it.respond("Yea... that macro exists...")
                     else -> {
-                        val value = it.message.rawContent.substring("addmacro ".length + key.length + it.config.serverInformation.prefix.length + 1)
+                        val value = it.message.contentRaw.substring("addmacro ".length + key.length + it.config.serverInformation.prefix.length + 1)
 
                         macroMap[key] = value
                         it.respond("**$key** will now respond with: **$value**")
