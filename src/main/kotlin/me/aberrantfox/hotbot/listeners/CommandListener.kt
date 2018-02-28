@@ -1,20 +1,21 @@
 package me.aberrantfox.hotbot.listeners
 
 import me.aberrantfox.hotbot.commandframework.*
-import me.aberrantfox.hotbot.dsls.command.Command
-import me.aberrantfox.hotbot.dsls.command.CommandsContainer
-import me.aberrantfox.hotbot.dsls.command.arg
-import me.aberrantfox.hotbot.services.Configuration
 import me.aberrantfox.hotbot.commandframework.commands.macroMap
+import me.aberrantfox.hotbot.dsls.command.Command
 import me.aberrantfox.hotbot.dsls.command.CommandEvent
+import me.aberrantfox.hotbot.dsls.command.CommandsContainer
 import me.aberrantfox.hotbot.extensions.jda.*
 import me.aberrantfox.hotbot.logging.BotLogger
 import me.aberrantfox.hotbot.permissions.PermissionManager
 import me.aberrantfox.hotbot.services.CommandRecommender
+import me.aberrantfox.hotbot.services.Configuration
 import me.aberrantfox.hotbot.services.MService
-import me.aberrantfox.hotbot.services.UserID
 import net.dv8tion.jda.core.JDA
-import net.dv8tion.jda.core.entities.*
+import net.dv8tion.jda.core.entities.Guild
+import net.dv8tion.jda.core.entities.Message
+import net.dv8tion.jda.core.entities.MessageChannel
+import net.dv8tion.jda.core.entities.User
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent
 import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent
 import net.dv8tion.jda.core.hooks.ListenerAdapter
@@ -68,7 +69,10 @@ data class CommandListener(val config: Configuration,
             return
         }
 
-        if (!(argsMatch(actual, command, channel))) return
+        getArgCountError(actual, command)?.let {
+            channel.sendMessage(it).queue()
+            return
+        }
 
         val event = CommandEvent(config, jda, channel, author, message, jda.getGuildById(config.serverInformation.guildid), manager, container, mService, actual)
         convertAndQueue(actual, command.expectedArgs.toList(), this, event, invokedInGuild, command, config)
@@ -123,29 +127,7 @@ data class CommandListener(val config: Configuration,
     private fun handleDelete(message: Message, prefix: String) =
         if (!message.contentRaw.startsWith(prefix + prefix)) {
             message.deleteIfExists()
-        } else {
-            Unit
-        }
+        } else Unit
 
-    private fun argsMatch(actual: List<String>, cmd: Command, channel: MessageChannel): Boolean {
-        val optionalCount = cmd.expectedArgs.filter { it.optional }.size
-
-        if (cmd.expectedArgs.contains(arg(ArgumentType.Sentence)) || cmd.expectedArgs.contains(arg(ArgumentType.Splitter))) {
-            if (actual.size < cmd.expectedArgs.size - optionalCount) {
-                channel.sendMessage("You didn't enter the minimum number of required arguments: ${cmd.expectedArgs.size - optionalCount}.").queue()
-                return false
-            }
-        } else {
-            if(!(actual.size >= (cmd.expectedArgs.size - optionalCount)
-                            && (actual.size <= cmd.expectedArgs.size))) {
-                if (!cmd.expectedArgs.contains(arg(ArgumentType.Manual))) {
-                    channel.sendMessage("This command requires at least ${cmd.expectedArgs.size - optionalCount} and a maximum of ${cmd.expectedArgs.size} arguments.").queue()
-                    return false
-                }
-            }
-        }
-
-        return true
-    }
 }
 
