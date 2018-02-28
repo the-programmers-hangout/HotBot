@@ -8,6 +8,7 @@ import me.aberrantfox.hotbot.services.Configuration
 import me.aberrantfox.hotbot.services.LimitedList
 import me.aberrantfox.hotbot.services.UserID
 import net.dv8tion.jda.core.entities.Message
+import net.dv8tion.jda.core.entities.User
 import net.dv8tion.jda.core.events.message.guild.GuildMessageDeleteEvent
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent
 import net.dv8tion.jda.core.events.message.guild.GuildMessageUpdateEvent
@@ -23,7 +24,7 @@ class MessageDeleteListener(val logger: BotLogger,
     override fun onGuildMessageUpdate(event: GuildMessageUpdateEvent) {
         if(event.author.isBot) return
 
-        if(shouldBeLogged(event.author.id)) return
+        if(shouldBeLogged(event.author)) return
 
         val found = list.find { it == event.message }
 
@@ -55,7 +56,7 @@ class MessageDeleteListener(val logger: BotLogger,
     override fun onGuildMessageReceived(event: GuildMessageReceivedEvent) {
         if(event.author.isBot) return
 
-        if(shouldBeLogged(event.author.id)) return
+        if(shouldBeLogged(event.author)) return
 
         list.add(event.message)
     }
@@ -78,5 +79,5 @@ class MessageDeleteListener(val logger: BotLogger,
         }
     }
 
-    private fun shouldBeLogged(userID: UserID) = manager.canPerformAction(userID, config.permissionedActions.ignoreLogging)
+    private fun shouldBeLogged(user: User) = manager.canPerformAction(user, config.permissionedActions.ignoreLogging)
 }

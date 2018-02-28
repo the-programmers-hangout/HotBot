@@ -43,7 +43,7 @@ class InviteListener(val config: Configuration, val logger: BotLogger, val manag
 
         val id = author.user.id
 
-        if(manager.canPerformAction(id, config.permissionedActions.sendInvite)) return
+        if(manager.canPerformAction(author.user, config.permissionedActions.sendInvite)) return
 
         if (RecentInvites.trimmedMessage(message.contentRaw).containsInvite()) {
             var messageContent = message.contentRaw
