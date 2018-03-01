@@ -9,6 +9,8 @@ import me.aberrantfox.hotbot.services.Configuration
 import me.aberrantfox.hotbot.services.MService
 import net.dv8tion.jda.core.JDA
 import net.dv8tion.jda.core.entities.*
+import org.reflections.Reflections
+import org.reflections.scanners.MethodAnnotationsScanner
 
 annotation class CommandSet
 
@@ -119,7 +121,7 @@ data class CommandsContainer(var log: BotLogger, var commands: HashMap<String, C
 
     fun has(name: String) = this.commands.containsKey(name)
 
-    fun get(name: String) = this.commands.get(name)
+    operator fun get(name: String) = this.commands.get(name)
 
     fun newLogger(log: BotLogger) {
         this.log = log
