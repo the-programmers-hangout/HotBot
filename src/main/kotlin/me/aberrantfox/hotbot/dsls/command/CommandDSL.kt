@@ -10,6 +10,8 @@ import me.aberrantfox.hotbot.services.MService
 import net.dv8tion.jda.core.JDA
 import net.dv8tion.jda.core.entities.*
 
+annotation class CommandSet
+
 data class CommandEvent(val config: Configuration, val jda: JDA, val channel: MessageChannel,
                         val author: User, val message: Message, val guild: Guild, val manager: PermissionManager,
                         val container: CommandsContainer, val mService: MService,
@@ -126,6 +128,24 @@ data class CommandsContainer(var log: BotLogger, var commands: HashMap<String, C
     }
 }
 
+fun produceContainer(): CommandsContainer {
+    val pack = "me.aberrantfox.hotbot.commandframework.commands"
+    val cmds = Reflections(pack, MethodAnnotationsScanner()).getMethodsAnnotatedWith(CommandSet::class.java)
+
+    val container = cmds.map { it.invoke(null) }
+            .map { it as CommandsContainer }
+            .reduce { a, b -> a.join(b) }
+
+    val lowMap = HashMap<String, Command>()
+
+    container.commands.keys.forEach {
+        lowMap.put(it.toLowerCase(), container.commands[it]!!)
+    }
+
+    container.commands = lowMap
+
+    return container
+}
 @DslMarker
 annotation class CommandTagMarker
 

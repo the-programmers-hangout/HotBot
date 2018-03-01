@@ -5,35 +5,14 @@ import me.aberrantfox.hotbot.dsls.command.arg
 import me.aberrantfox.hotbot.services.Configuration
 
 
-annotation class CommandSet
-
 data class CommandStruct(val commandName: String, val commandArgs: List<String> = listOf())
 
-fun produceContainer(): CommandsContainer {
-    val pack = "me.aberrantfox.hotbot.commandframework.commands"
-    val cmds = Reflections(pack, MethodAnnotationsScanner()).getMethodsAnnotatedWith(CommandSet::class.java)
-
-    val container = cmds.map { it.invoke(null) }
-        .map { it as CommandsContainer }
-        .reduce { a, b -> a.join(b) }
-
-    val lowMap = HashMap<String, Command>()
-
-    container.commands.keys.forEach {
-        lowMap.put(it.toLowerCase(), container.commands[it]!!)
-    }
-
-    container.commands = lowMap
-
-    return container
-}
-
-fun getCommandStruct(message: String, config: Configuration): CommandStruct {
+fun cleanCommandMessage(message: String, config: Configuration): CommandStruct {
     var trimmedMessage = message.substring(config.serverInformation.prefix.length)
 
     if (trimmedMessage.startsWith(config.serverInformation.prefix)) trimmedMessage = trimmedMessage.substring(config.serverInformation.prefix.length)
 
-    if (!(message.contains(" "))) {
+    if (!message.contains(" ")) {
         return CommandStruct(trimmedMessage.toLowerCase())
     }
 

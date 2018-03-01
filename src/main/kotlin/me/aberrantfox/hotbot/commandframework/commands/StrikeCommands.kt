@@ -1,7 +1,7 @@
 package me.aberrantfox.hotbot.commandframework.commands
 
 import me.aberrantfox.hotbot.commandframework.ArgumentType
-import me.aberrantfox.hotbot.commandframework.CommandSet
+import me.aberrantfox.hotbot.dsls.command.CommandSet
 import me.aberrantfox.hotbot.database.*
 import me.aberrantfox.hotbot.dsls.command.CommandEvent
 import me.aberrantfox.hotbot.dsls.command.arg
