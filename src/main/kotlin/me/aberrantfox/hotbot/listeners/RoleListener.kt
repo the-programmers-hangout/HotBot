@@ -1,9 +1,9 @@
 package me.aberrantfox.hotbot.listeners
 
-import net.dv8tion.jda.core.hooks.ListenerAdapter
-import net.dv8tion.jda.core.events.role.update.RoleUpdateNameEvent
-import me.aberrantfox.hotbot.services.Configuration
 import me.aberrantfox.hotbot.commandframework.commands.RankContainer
+import me.aberrantfox.hotbot.services.Configuration
+import net.dv8tion.jda.core.events.role.update.RoleUpdateNameEvent
+import net.dv8tion.jda.core.hooks.ListenerAdapter
 
 class RoleListener(val configuration: Configuration) : ListenerAdapter() {
     override fun onRoleUpdateName(event: RoleUpdateNameEvent) {

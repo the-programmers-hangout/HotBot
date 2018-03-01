@@ -14,8 +14,6 @@ import me.aberrantfox.hotbot.extensions.stdlib.randomListItem
 import me.aberrantfox.hotbot.extensions.stdlib.toRole
 import me.aberrantfox.hotbot.services.Configuration
 import me.aberrantfox.hotbot.utility.muteMember
-import net.dv8tion.jda.core.OnlineStatus
-import net.dv8tion.jda.core.entities.Game
 import net.dv8tion.jda.core.entities.Message
 import net.dv8tion.jda.core.entities.MessageChannel
 import net.dv8tion.jda.core.entities.User
