@@ -1,5 +1,6 @@
 package me.aberrantfox.hotbot
 
+import me.aberrantfox.hotbot.commandframework.CommandExecutor
 import me.aberrantfox.hotbot.commandframework.commands.macroMap
 import me.aberrantfox.hotbot.database.getAllMutedMembers
 import me.aberrantfox.hotbot.database.loadUpManager
@@ -59,7 +60,7 @@ fun main(args: Array<String>) {
     container.newLogger(logger)
 
     jda.addEventListener(
-            CommandListener(config, container, jda, logger, manager, messageService),
+            CommandExecutor(config, container, jda, logger, manager, messageService),
             MemberListener(config, logger, messageService),
             InviteListener(config, logger, manager),
             VoiceChannelListener(logger),

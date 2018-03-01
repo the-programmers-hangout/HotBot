@@ -1,7 +1,8 @@
 package me.aberrantfox.hotbot.commandframework
 
-import me.aberrantfox.hotbot.commandframework.ArgumentType.*
-import me.aberrantfox.hotbot.commandframework.ArgumentType.Double
+import me.aberrantfox.hotbot.commandframework.parsing.ArgumentType.*
+import me.aberrantfox.hotbot.commandframework.parsing.ArgumentType.Double
+import me.aberrantfox.hotbot.commandframework.parsing.convertMainArgs
 import me.aberrantfox.hotbot.dsls.command.CommandArgument
 import me.aberrantfox.hotbot.dsls.command.arg
 import org.junit.jupiter.api.Assertions

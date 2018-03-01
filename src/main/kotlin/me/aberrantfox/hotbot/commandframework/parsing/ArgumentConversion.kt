@@ -1,4 +1,4 @@
-package me.aberrantfox.hotbot.commandframework
+package me.aberrantfox.hotbot.commandframework.parsing
 
 import me.aberrantfox.hotbot.dsls.command.CommandArgument
 import me.aberrantfox.hotbot.dsls.command.CommandEvent

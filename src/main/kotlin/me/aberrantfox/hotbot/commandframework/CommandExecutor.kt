@@ -1,9 +1,9 @@
-package me.aberrantfox.hotbot.listeners
+package me.aberrantfox.hotbot.commandframework
 
-import me.aberrantfox.hotbot.commandframework.cleanCommandMessage
+import me.aberrantfox.hotbot.commandframework.parsing.cleanCommandMessage
 import me.aberrantfox.hotbot.commandframework.commands.macroMap
-import me.aberrantfox.hotbot.commandframework.convertArguments
-import me.aberrantfox.hotbot.commandframework.getArgCountError
+import me.aberrantfox.hotbot.commandframework.parsing.convertArguments
+import me.aberrantfox.hotbot.commandframework.parsing.getArgCountError
 import me.aberrantfox.hotbot.dsls.command.Command
 import me.aberrantfox.hotbot.dsls.command.CommandEvent
 import me.aberrantfox.hotbot.dsls.command.CommandsContainer
@@ -22,7 +22,7 @@ import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent
 import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent
 import net.dv8tion.jda.core.hooks.ListenerAdapter
 
-class CommandListener(val config: Configuration,
+class CommandExecutor(val config: Configuration,
                       val container: CommandsContainer,
                       val jda: JDA,
                       val log: BotLogger,
