@@ -1,7 +1,9 @@
 package me.aberrantfox.hotbot.listeners
 
-import me.aberrantfox.hotbot.commandframework.*
+import me.aberrantfox.hotbot.commandframework.cleanCommandMessage
 import me.aberrantfox.hotbot.commandframework.commands.macroMap
+import me.aberrantfox.hotbot.commandframework.convertArguments
+import me.aberrantfox.hotbot.commandframework.getArgCountError
 import me.aberrantfox.hotbot.dsls.command.Command
 import me.aberrantfox.hotbot.dsls.command.CommandEvent
 import me.aberrantfox.hotbot.dsls.command.CommandsContainer
@@ -20,26 +22,24 @@ import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent
 import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent
 import net.dv8tion.jda.core.hooks.ListenerAdapter
 
-data class CommandListener(val config: Configuration,
-                           val container: CommandsContainer,
-                           val jda: JDA,
-                           val log: BotLogger,
-                           val manager: PermissionManager,
-                           val mService: MService) : ListenerAdapter() {
-    init {
-        CommandRecommender.addAll(container.commands.keys.toList() + macroMap.keys.toList())
-    }
+class CommandListener(val config: Configuration,
+                      val container: CommandsContainer,
+                      val jda: JDA,
+                      val log: BotLogger,
+                      val manager: PermissionManager,
+                      val mService: MService) : ListenerAdapter() {
+
 
     override fun onGuildMessageReceived(e: GuildMessageReceivedEvent) = handleInvocation(e.channel, e.message, e.author, true)
 
     override fun onPrivateMessageReceived(e: PrivateMessageReceivedEvent) = handleInvocation(e.channel, e.message, e.author, false)
 
     private fun handleInvocation(channel: MessageChannel, message: Message, author: User, invokedInGuild: Boolean) {
-        if ( !(isUsableEvent(message, channel.id, author)) ) return
+        if (!(isUsableCommand(message, channel.id, author))) return
 
-        val (commandName, actualArgs) = getCommandStruct(message.contentRaw, config)
+        val (commandName, actualArgs) = cleanCommandMessage(message.contentRaw, config)
 
-        if (!(isValidCommand(channel, message, author))) return
+        if (!(canPerformCommand(channel, message, author))) return
 
         val command = container.get(commandName)
 
@@ -101,7 +101,7 @@ data class CommandListener(val config: Configuration,
         }
     }
 
-    private fun isUsableEvent(message: Message, channel: String, author: User): Boolean {
+    private fun isUsableCommand(message: Message, channel: String, author: User): Boolean {
         if (message.contentRaw.length > 1500) return false
 
         if (config.security.lockDownMode && author.id != config.serverInformation.ownerID) return false
@@ -115,7 +115,7 @@ data class CommandListener(val config: Configuration,
         return true
     }
 
-    private fun isValidCommand(channel: MessageChannel, message: Message, user: User): Boolean {
+    private fun canPerformCommand(channel: MessageChannel, message: Message, user: User): Boolean {
         if (!manager.canPerformAction(user, config.permissionedActions.commandMention) && message.mentionsSomeone()) {
             channel.sendMessage("Your permission level is below the required level to use a command mention.").queue()
             return false

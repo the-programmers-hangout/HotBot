@@ -1,22 +1,25 @@
 package me.aberrantfox.hotbot
 
-import me.aberrantfox.hotbot.commandframework.produceContainer
+import me.aberrantfox.hotbot.commandframework.commands.macroMap
 import me.aberrantfox.hotbot.database.getAllMutedMembers
 import me.aberrantfox.hotbot.database.loadUpManager
-import me.aberrantfox.hotbot.utility.timeToDifference
+import me.aberrantfox.hotbot.database.setupDatabaseSchema
+import me.aberrantfox.hotbot.dsls.command.produceContainer
+import me.aberrantfox.hotbot.extensions.jda.hasRole
 import me.aberrantfox.hotbot.listeners.*
 import me.aberrantfox.hotbot.listeners.antispam.DuplicateMessageListener
 import me.aberrantfox.hotbot.listeners.antispam.InviteListener
-import me.aberrantfox.hotbot.logging.convertChannels
-import me.aberrantfox.hotbot.services.*
-import me.aberrantfox.hotbot.database.setupDatabaseSchema
-import me.aberrantfox.hotbot.extensions.jda.hasRole
 import me.aberrantfox.hotbot.listeners.antispam.NewJoinListener
 import me.aberrantfox.hotbot.listeners.antispam.TooManyMentionsListener
+import me.aberrantfox.hotbot.logging.convertChannels
 import me.aberrantfox.hotbot.permissions.PermissionManager
+import me.aberrantfox.hotbot.services.*
 import me.aberrantfox.hotbot.utility.scheduleUnmute
-import net.dv8tion.jda.core.*
-import net.dv8tion.jda.core.entities.Game
+import me.aberrantfox.hotbot.utility.timeToDifference
+import net.dv8tion.jda.core.AccountType
+import net.dv8tion.jda.core.JDA
+import net.dv8tion.jda.core.JDABuilder
+import net.dv8tion.jda.core.Permission
 import net.dv8tion.jda.core.entities.Guild
 
 
@@ -68,6 +71,8 @@ fun main(args: Array<String>) {
             TooManyMentionsListener(logger, mutedRole),
             MessageDeleteListener(logger, manager, config),
             NewJoinListener())
+
+    CommandRecommender.addAll(container.commands.keys.toList() + macroMap.keys.toList())
 
     if(config.apiConfiguration.enableCleverBot) {
         println("Enabling cleverbot integration.")
