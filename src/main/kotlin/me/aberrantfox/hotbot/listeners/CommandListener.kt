@@ -74,11 +74,21 @@ data class CommandListener(val config: Configuration,
             return
         }
 
+
         val event = CommandEvent(config, jda, channel, author, message, jda.getGuildById(config.serverInformation.guildid), manager, container, mService, actual)
-        convertAndQueue(actual, command.expectedArgs.toList(), this, event, invokedInGuild, command, config)
+
+        val (convertedArgs, conversionError) = convertArguments(actual, command.expectedArgs.toList(), event, config.serverInformation.prefix)
+        if (conversionError != null || convertedArgs == null) {
+            event.safeRespond(conversionError.toString())
+            return
+        }
+
+        event.args = convertedArgs.requireNoNulls()
+
+        executeCommand(command, event, invokedInGuild)
     }
 
-    fun executeEvent(command: Command, event: CommandEvent, invokedInGuild: Boolean) {
+    private fun executeCommand(command: Command, event: CommandEvent, invokedInGuild: Boolean) {
         if (command.parameterCount == 0) {
             command.execute(event)
             return

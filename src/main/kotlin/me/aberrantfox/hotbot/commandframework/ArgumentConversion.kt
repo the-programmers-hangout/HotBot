@@ -10,9 +10,34 @@ enum class ArgumentType {
     Integer, Double, Word, Choice, Manual, Sentence, User, Splitter, URL
 }
 
+data class ConversionResult(val args: List<Any?>? = null, val error: String? = null)
 val argsRequiredAtMessageEnd = listOf(ArgumentType.Sentence, ArgumentType.Splitter)
 
-data class ConversionResult(val args: List<Any>? = null, val error: String? = null)
+fun convertArguments(actual: List<String>, expected: List<CommandArgument>,
+                     event: CommandEvent, prefix: String): ConversionResult {
+    val expectedTypes = expected.map { it.type }
+
+    if (expectedTypes.contains(ArgumentType.Manual)) return ConversionResult(actual)
+
+    val convertedArgs = convertMainArgs(actual, expected)
+            ?: return ConversionResult(null, "Incorrect arguments passed. Try viewing the help documentation via: ${prefix}help <commandName>")
+
+    val usersConverted =
+            if (expectedTypes.contains(ArgumentType.User)) {
+                val (usersConverted, userConversionError) = retrieveUserArguments(expected, convertedArgs, event.jda)
+
+                if (userConversionError != null || usersConverted == null)
+                    return ConversionResult(null, userConversionError)
+
+                usersConverted
+            } else {
+                convertedArgs
+            }
+
+    val filledArgs = convertOptionalArgs(usersConverted, expected, event)
+
+    return ConversionResult(filledArgs)
+}
 
 fun retrieveUserArguments(expected: List<CommandArgument>, filledArgs: List<Any?>, jda: JDA): ConversionResult {
     val zip = filledArgs.zip(expected)
@@ -21,7 +46,7 @@ fun retrieveUserArguments(expected: List<CommandArgument>, filledArgs: List<Any?
             zip.map {
                 val (arg, expectedArg) = it
 
-                if (expectedArg.type != ArgumentType.User) return@map arg
+                if (expectedArg.type != ArgumentType.User || arg == null) return@map arg
 
                 val parsedUser =
                         try {

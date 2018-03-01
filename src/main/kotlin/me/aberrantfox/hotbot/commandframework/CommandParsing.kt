@@ -30,37 +30,6 @@ fun produceContainer(): CommandsContainer {
     return container
 }
 
-fun convertAndQueue(actual: List<String>, expected: List<CommandArgument>,
-                    instance: CommandListener, event: CommandEvent,
-                    invokedInGuild: Boolean, command: Command,
-                    config: Configuration) {
-
-    val expectedTypes = expected.map { it.type }
-
-    if (expectedTypes.contains(ArgumentType.Manual)) {
-        instance.executeEvent(command, event, invokedInGuild)
-        return
-    }
-
-    val convertedArgs = convertMainArgs(actual, expected)
-
-    if (convertedArgs == null) {
-        event.respond("Incorrect arguments passed to command, try viewing the help documentation via: ${config.serverInformation.prefix}help <commandName>")
-        return
-    }
-
-    val filledArgs = convertOptionalArgs(convertedArgs, expected, event)
-
-    event.args = filledArgs
-
-    if (expectedTypes.contains(ArgumentType.User)) {
-        dispatchRequestRequiredEvent(expectedTypes, filledArgs, event, command, instance, invokedInGuild)
-    } else {
-        instance.executeEvent(command, event, invokedInGuild)
-    }
-}
-
-
 fun getCommandStruct(message: String, config: Configuration): CommandStruct {
     var trimmedMessage = message.substring(config.serverInformation.prefix.length)
 
