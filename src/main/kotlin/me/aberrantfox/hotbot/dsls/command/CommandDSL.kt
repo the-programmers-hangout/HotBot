@@ -54,9 +54,10 @@ class Command(var log: BotLogger, var expectedArgs: Array<out CommandArgument> =
     override fun history(message: String) = log.history(message)
     override fun history(message: MessageEmbed) = log.history(message)
 
-    val parameterCount = expectedArgs.size
-
     operator fun invoke(args: Command.() -> Unit) {}
+
+    val parameterCount: Int
+        get() = this.expectedArgs.size
 
     fun requiresGuild(requiresGuild: Boolean) {
         this.requiresGuild = requiresGuild
