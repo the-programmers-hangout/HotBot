@@ -3,15 +3,17 @@ package me.aberrantfox.hotbot.commandframework
 import me.aberrantfox.hotbot.dsls.command.CommandArgument
 import me.aberrantfox.hotbot.dsls.command.CommandEvent
 import me.aberrantfox.hotbot.extensions.stdlib.*
-import me.aberrantfox.hotbot.services.Configuration
 import net.dv8tion.jda.core.JDA
+
+const val separatorCharacter = "|"
+
+val multiplePartArgTypes = listOf(ArgumentType.Sentence, ArgumentType.Splitter)
 
 enum class ArgumentType {
     Integer, Double, Word, Choice, Manual, Sentence, User, Splitter, URL
 }
 
 data class ConversionResult(val args: List<Any?>? = null, val error: String? = null)
-val argsRequiredAtMessageEnd = listOf(ArgumentType.Sentence, ArgumentType.Splitter)
 
 fun convertArguments(actual: List<String>, expected: List<CommandArgument>,
                      event: CommandEvent, prefix: String): ConversionResult {
@@ -92,7 +94,7 @@ fun convertMainArgs(actual: List<String>,
 
         converted[nextMatchingIndex] = convertArg(actualArg, expected[nextMatchingIndex].type, index, actual)
 
-        if (expected[nextMatchingIndex].type in argsRequiredAtMessageEnd) break
+        if (expected[nextMatchingIndex].type in multiplePartArgTypes) break
     }
 
     if (converted.filterIndexed { i, arg -> arg == null && !expected[i].optional }.isNotEmpty())
@@ -100,6 +102,7 @@ fun convertMainArgs(actual: List<String>,
 
     return converted.toList()
 }
+
 
 /**
  * Converts any null arguments in a list of converted arguments to their default value
@@ -110,6 +113,7 @@ fun convertMainArgs(actual: List<String>,
  * @return A list of arguments with the optionals filled
  *
  */
+@Suppress("UNCHECKED_CAST")
 fun convertOptionalArgs(args: List<Any?>, expected: List<CommandArgument>, event: CommandEvent) =
         args.mapIndexed { i, arg ->
             arg ?: if (expected[i].defaultValue is Function<*>)
@@ -147,8 +151,8 @@ private fun joinArgs(start: Int, actual: List<String>) = actual.subList(start, a
 private fun splitArg(start: Int, actual: List<String>): List<String> {
     val joined = joinArgs(start, actual)
 
-    if (!(joined.contains(seperatorCharacter))) return listOf(joined)
+    if (!(joined.contains(separatorCharacter))) return listOf(joined)
 
-    return joined.split(seperatorCharacter).toList()
+    return joined.split(separatorCharacter).toList()
 }
 

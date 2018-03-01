@@ -5,8 +5,6 @@ import me.aberrantfox.hotbot.dsls.command.arg
 import me.aberrantfox.hotbot.services.Configuration
 
 
-const val seperatorCharacter = "|"
-
 annotation class CommandSet
 
 data class CommandStruct(val commandName: String, val commandArgs: List<String> = listOf())
