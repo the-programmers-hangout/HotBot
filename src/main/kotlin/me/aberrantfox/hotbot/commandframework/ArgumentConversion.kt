@@ -3,12 +3,40 @@ package me.aberrantfox.hotbot.commandframework
 import me.aberrantfox.hotbot.dsls.command.CommandArgument
 import me.aberrantfox.hotbot.dsls.command.CommandEvent
 import me.aberrantfox.hotbot.extensions.stdlib.*
+import me.aberrantfox.hotbot.services.Configuration
+import net.dv8tion.jda.core.JDA
 
 enum class ArgumentType {
     Integer, Double, Word, Choice, Manual, Sentence, User, Splitter, URL
 }
 
 val argsRequiredAtMessageEnd = listOf(ArgumentType.Sentence, ArgumentType.Splitter)
+
+data class ConversionResult(val args: List<Any>? = null, val error: String? = null)
+
+fun retrieveUserArguments(expected: List<CommandArgument>, filledArgs: List<Any?>, jda: JDA): ConversionResult {
+    val zip = filledArgs.zip(expected)
+
+    val usersConverted =
+            zip.map {
+                val (arg, expectedArg) = it
+
+                if (expectedArg.type != ArgumentType.User) return@map arg
+
+                val parsedUser =
+                        try {
+                            jda.retrieveUserById((arg as String).trimToID()).complete()
+                        } catch (e: RuntimeException) {
+                            null
+                        }
+
+                if (parsedUser == null) return ConversionResult(null, "Couldn't retrieve user: $arg")
+
+                return@map parsedUser
+            }
+
+    return ConversionResult(usersConverted)
+}
 
 /**
  * Converts a list of strings to the matching expected argument types

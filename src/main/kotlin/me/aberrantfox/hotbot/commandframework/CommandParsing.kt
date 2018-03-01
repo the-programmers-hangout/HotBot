@@ -60,35 +60,6 @@ fun convertAndQueue(actual: List<String>, expected: List<CommandArgument>,
     }
 }
 
-private fun dispatchRequestRequiredEvent(expected: List<ArgumentType>, standard: List<Any>, event: CommandEvent, command: Command,
-                                         instance: CommandListener, invokedInGuild: Boolean) {
-    val zip = standard.zip(expected)
-
-    runBlocking {
-        val fullyParsed = ArrayList<Any>()
-
-        zip.forEach {
-            if (it.second == ArgumentType.User) {
-                try{
-                    val parsedUser = event.jda.retrieveUserById((it.first as String).trimToID()).complete()
-                    if(parsedUser == null) {
-                        event.safeRespond("Error, cannot find user by ID: ${it.first}")
-                        return@runBlocking
-                    }
-
-                    fullyParsed.add(parsedUser)
-                } catch (e: Exception) {
-                    event.safeRespond("Error, cannot find user: ${it.first}")
-                    return@runBlocking
-                }
-            } else {
-                fullyParsed.add(it.first)
-            }
-        }
-        event.args = fullyParsed
-        instance.executeEvent(command, event, invokedInGuild)
-    }
-}
 
 fun getCommandStruct(message: String, config: Configuration): CommandStruct {
     var trimmedMessage = message.substring(config.serverInformation.prefix.length)
