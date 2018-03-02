@@ -23,7 +23,6 @@ data class CommandListener(val config: Configuration,
                            val container: CommandsContainer,
                            val jda: JDA,
                            val log: BotLogger,
-                           val guild: Guild,
                            val manager: PermissionManager,
                            val mService: MService) : ListenerAdapter() {
     init {
@@ -71,7 +70,7 @@ data class CommandListener(val config: Configuration,
 
         if (!(argsMatch(actual, command, channel))) return
 
-        val event = CommandEvent(config, jda, channel, author, message, guild, manager, container, mService, actual)
+        val event = CommandEvent(config, jda, channel, author, message, jda.getGuildById(config.serverInformation.guildid), manager, container, mService, actual)
         convertAndQueue(actual, command.expectedArgs.toList(), this, event, invokedInGuild, command, config)
     }
 

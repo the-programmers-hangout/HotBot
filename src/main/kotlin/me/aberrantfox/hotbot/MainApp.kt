@@ -47,8 +47,8 @@ fun main(args: Array<String>) {
     logger.info("connected")
     val mutedRole = jda.getRolesByName(config.security.mutedRole, true).first()
     val tracker = MessageTracker(1)
-    val guild = jda.getGuildById(config.serverInformation.guildid)
-    val manager = PermissionManager(HashMap(), guild.roles, guild, config)
+
+    val manager = PermissionManager(HashMap(), jda, config)
     val messageService = MService()
 
     loadUpManager(manager)
@@ -56,7 +56,7 @@ fun main(args: Array<String>) {
     container.newLogger(logger)
 
     jda.addEventListener(
-            CommandListener(config, container, jda, logger, guild, manager, messageService),
+            CommandListener(config, container, jda, logger, manager, messageService),
             MemberListener(config, logger, messageService),
             InviteListener(config, logger, manager),
             VoiceChannelListener(logger),

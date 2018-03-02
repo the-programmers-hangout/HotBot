@@ -8,15 +8,14 @@ import me.aberrantfox.hotbot.extensions.stdlib.idToUser
 import me.aberrantfox.hotbot.extensions.stdlib.toRole
 import me.aberrantfox.hotbot.services.Configuration
 import me.aberrantfox.hotbot.services.UserID
-import net.dv8tion.jda.core.entities.Guild
+import net.dv8tion.jda.core.JDA
 import net.dv8tion.jda.core.entities.Role
 import net.dv8tion.jda.core.entities.User
 
 typealias RoleID = String
 typealias CommandName = String
 
-data class PermissionManager(val map: HashMap<RoleID, HashSet<CommandName>> = HashMap(), private val roles: List<Role>,
-                             val guild: Guild, val config: Configuration) {
+data class PermissionManager(val map: HashMap<RoleID, HashSet<CommandName>> = HashMap(), val jda: JDA, val config: Configuration) {
 
     fun addPermission(roleID: RoleID, name: CommandName) {
         val lower = name.toLowerCase()
@@ -35,14 +34,14 @@ data class PermissionManager(val map: HashMap<RoleID, HashSet<CommandName>> = Ha
 
     fun roleRequired(commandName: CommandName): Role? {
         val containingMap = map.entries.firstOrNull { it.value.contains(commandName.toLowerCase()) }
-        return containingMap?.key?.toRole(guild)
+        return containingMap?.key?.toRole(jda.getGuildById(config.serverInformation.guildid))
     }
 
     fun canPerformAction(user: User, actionRoleID: RoleID): Boolean {
         if(user.id == config.serverInformation.ownerID) return true
 
-        val highestRole = user.toMember(guild).getHighestRole()
-        val actionRole = actionRoleID.toRole(guild)
+        val highestRole = user.toMember(jda.getGuildById(config.serverInformation.guildid)).getHighestRole()
+        val actionRole = actionRoleID.toRole(jda.getGuildById(config.serverInformation.guildid))
 
         return highestRole?.isEqualOrHigherThan(actionRole) ?: false
     }
@@ -50,7 +49,7 @@ data class PermissionManager(val map: HashMap<RoleID, HashSet<CommandName>> = Ha
     fun canUseCommand(userId: UserID, commandName: CommandName): Boolean {
         if(userId == config.serverInformation.ownerID) return true
 
-        val highestRole = userId.idToUser(guild.jda).toMember(guild).getHighestRole()
+        val highestRole = userId.idToUser(jda).toMember(jda.getGuildById(config.serverInformation.guildid)).getHighestRole()
         val roles = getAllRelevantRoleIds(highestRole?.id)
 
         return roles.map { map[it] }
@@ -70,8 +69,10 @@ data class PermissionManager(val map: HashMap<RoleID, HashSet<CommandName>> = Ha
     private fun getAllRelevantRoleIds(roleID: RoleID?): List<String> {
         if(roleID == null) return ArrayList()
 
-        val role = roles.first { it.id == roleID }
-        val lowerRoles = ArrayList(roles
+        val guild = jda.getGuildById(config.serverInformation.guildid)
+
+        val role = guild.roles.first { it.id == roleID }
+        val lowerRoles = ArrayList(guild.roles
             .filter { it.position < role.position }
             .map { it.id }
             .toList())
