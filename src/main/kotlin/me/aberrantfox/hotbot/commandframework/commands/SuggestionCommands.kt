@@ -87,28 +87,6 @@ fun suggestionCommands() = commands {
         }
     }
 
-    command("poolaccept") {
-        execute {
-            val suggestion = Suggestions.pool.top()
-
-            if (suggestion == null) {
-                it.respond("The suggestion pool is empty... :)")
-                return@execute
-            }
-
-            val channel = it.guild.textChannels.findLast { channel ->
-                channel.id == it.config.messageChannels.suggestionChannel
-            }
-
-            channel?.sendMessage(buildSuggestionMessage(suggestion, it.jda, SuggestionStatus.Review).build())?.queue {
-                trackSuggestion(suggestion, SuggestionStatus.Review, it.id)
-
-                it.addReaction("⬆").queue()
-                it.addReaction("⬇").queue()
-            }
-        }
-    }
-
     command("pooldeny") {
         execute {
             val rejected = Suggestions.pool.top()
