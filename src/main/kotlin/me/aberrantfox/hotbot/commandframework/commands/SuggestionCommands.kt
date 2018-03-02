@@ -10,11 +10,12 @@ import me.aberrantfox.hotbot.services.Configuration
 import me.aberrantfox.hotbot.services.UserElementPool
 import me.aberrantfox.hotbot.database.*
 import me.aberrantfox.hotbot.dsls.embed.embed
+import me.aberrantfox.hotbot.extensions.jda.sendPrivateMessage
+import me.aberrantfox.hotbot.extensions.stdlib.idToUser
 import me.aberrantfox.hotbot.services.PoolRecord
 import net.dv8tion.jda.core.EmbedBuilder
 import net.dv8tion.jda.core.JDA
 import net.dv8tion.jda.core.entities.Guild
-import sun.java2d.SunGraphicsEnvironment
 import java.awt.Color
 
 
@@ -131,6 +132,9 @@ fun suggestionCommands() = commands {
                 val message = buildSuggestionMessage(suggestion.poolInfo, it.jda, status)
                 val reasonTitle = "Reason for Status"
 
+                val suggestionUpdateMessage = buildSuggestionUpdateEmbed(suggestion, reason, status)
+                suggestion.member.idToUser(it.jda).sendPrivateMessage(suggestionUpdateMessage)
+
                 message.fields.removeIf { it.name == reasonTitle }
 
                 message.addField(reasonTitle, reason, false)
@@ -145,6 +149,41 @@ fun suggestionCommands() = commands {
 private fun fetchSuggestionChannel(guild: Guild, config: Configuration) = guild.getTextChannelById(config.messageChannels.suggestionChannel)
 
 private fun inputToStatus(input: String): SuggestionStatus? = SuggestionStatus.values().findLast { it.name.toLowerCase() == input.toLowerCase() }
+
+private fun buildSuggestionUpdateEmbed(suggestion: SuggestionRecord, response: String, newStatus: SuggestionStatus) =
+        embed {
+            title("Suggestion Status Update")
+            description("A suggestion that you submitted has changed status.")
+
+            ifield {
+                name = "ID"
+                value = suggestion.messageID
+            }
+
+            ifield {
+                name = "Old Status"
+                value = suggestion.status.toString()
+            }
+
+            ifield {
+                name = "New Status"
+                value = newStatus.toString()
+            }
+
+            field {
+                name = "Suggestion"
+                value = suggestion.idea
+                inline = false
+            }
+
+            field {
+                name = "Response"
+                value = response
+                inline = false
+            }
+
+            setColor(newStatus.colour)
+        }
 
 private fun buildSuggestionMessage(suggestion: PoolRecord, jda: JDA, status: SuggestionStatus) =
     EmbedBuilder()
