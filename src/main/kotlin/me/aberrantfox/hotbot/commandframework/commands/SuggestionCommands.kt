@@ -7,12 +7,14 @@ import me.aberrantfox.hotbot.dsls.command.commands
 import me.aberrantfox.hotbot.extensions.stdlib.idToName
 import me.aberrantfox.hotbot.services.AddResponse
 import me.aberrantfox.hotbot.services.Configuration
-import me.aberrantfox.hotbot.services.PoolRecord
 import me.aberrantfox.hotbot.services.UserElementPool
 import me.aberrantfox.hotbot.database.*
+import me.aberrantfox.hotbot.dsls.embed.embed
+import me.aberrantfox.hotbot.services.PoolRecord
 import net.dv8tion.jda.core.EmbedBuilder
 import net.dv8tion.jda.core.JDA
 import net.dv8tion.jda.core.entities.Guild
+import sun.java2d.SunGraphicsEnvironment
 import java.awt.Color
 
 
@@ -78,8 +80,9 @@ fun suggestionCommands() = commands {
                 channel.id == it.config.messageChannels.suggestionChannel
             }
 
+
             channel?.sendMessage(buildSuggestionMessage(suggestion, it.jda, SuggestionStatus.Review).build())?.queue {
-                trackSuggestion(suggestion, SuggestionStatus.Review, it.id)
+                trackSuggestion(SuggestionRecord(it.id, SuggestionStatus.Review, suggestion))
 
                 it.addReaction("⬆").queue()
                 it.addReaction("⬇").queue()
@@ -125,7 +128,7 @@ fun suggestionCommands() = commands {
 
             channel.getMessageById(target).queue {
                 val suggestion = obtainSuggestion(target)
-                val message = buildSuggestionMessage(suggestion, it.jda, status)
+                val message = buildSuggestionMessage(suggestion.poolInfo, it.jda, status)
                 val reasonTitle = "Reason for Status"
 
                 message.fields.removeIf { it.name == reasonTitle }
