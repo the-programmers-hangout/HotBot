@@ -1,44 +1,45 @@
-package me.aberrantfox.hotbot.listeners
+package me.aberrantfox.hotbot.commandframework
 
-import me.aberrantfox.hotbot.commandframework.*
-import me.aberrantfox.hotbot.dsls.command.Command
-import me.aberrantfox.hotbot.dsls.command.CommandsContainer
-import me.aberrantfox.hotbot.dsls.command.arg
-import me.aberrantfox.hotbot.services.Configuration
+import me.aberrantfox.hotbot.commandframework.parsing.cleanCommandMessage
 import me.aberrantfox.hotbot.commandframework.commands.macroMap
+import me.aberrantfox.hotbot.commandframework.parsing.convertArguments
+import me.aberrantfox.hotbot.commandframework.parsing.getArgCountError
+import me.aberrantfox.hotbot.dsls.command.Command
 import me.aberrantfox.hotbot.dsls.command.CommandEvent
+import me.aberrantfox.hotbot.dsls.command.CommandsContainer
 import me.aberrantfox.hotbot.extensions.jda.*
 import me.aberrantfox.hotbot.logging.BotLogger
 import me.aberrantfox.hotbot.permissions.PermissionManager
 import me.aberrantfox.hotbot.services.CommandRecommender
+import me.aberrantfox.hotbot.services.Configuration
 import me.aberrantfox.hotbot.services.MService
-import me.aberrantfox.hotbot.services.UserID
 import net.dv8tion.jda.core.JDA
-import net.dv8tion.jda.core.entities.*
+import net.dv8tion.jda.core.entities.Guild
+import net.dv8tion.jda.core.entities.Message
+import net.dv8tion.jda.core.entities.MessageChannel
+import net.dv8tion.jda.core.entities.User
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent
 import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent
 import net.dv8tion.jda.core.hooks.ListenerAdapter
 
-data class CommandListener(val config: Configuration,
-                           val container: CommandsContainer,
-                           val jda: JDA,
-                           val log: BotLogger,
-                           val manager: PermissionManager,
-                           val mService: MService) : ListenerAdapter() {
-    init {
-        CommandRecommender.addAll(container.commands.keys.toList() + macroMap.keys.toList())
-    }
+class CommandExecutor(val config: Configuration,
+                      val container: CommandsContainer,
+                      val jda: JDA,
+                      val log: BotLogger,
+                      val manager: PermissionManager,
+                      val mService: MService) : ListenerAdapter() {
+
 
     override fun onGuildMessageReceived(e: GuildMessageReceivedEvent) = handleInvocation(e.channel, e.message, e.author, true)
 
     override fun onPrivateMessageReceived(e: PrivateMessageReceivedEvent) = handleInvocation(e.channel, e.message, e.author, false)
 
     private fun handleInvocation(channel: MessageChannel, message: Message, author: User, invokedInGuild: Boolean) {
-        if ( !(isUsableEvent(message, channel.id, author)) ) return
+        if (!(isUsableCommand(message, channel.id, author))) return
 
-        val (commandName, actualArgs) = getCommandStruct(message.contentRaw, config)
+        val (commandName, actualArgs) = cleanCommandMessage(message.contentRaw, config)
 
-        if (!(isValidCommand(channel, message, author))) return
+        if (!(canPerformCommand(channel, message, author))) return
 
         val command = container.get(commandName)
 
@@ -68,13 +69,26 @@ data class CommandListener(val config: Configuration,
             return
         }
 
-        if (!(argsMatch(actual, command, channel))) return
+        getArgCountError(actual, command)?.let {
+            channel.sendMessage(it).queue()
+            return
+        }
+
 
         val event = CommandEvent(config, jda, channel, author, message, jda.getGuildById(config.serverInformation.guildid), manager, container, mService, actual)
-        convertAndQueue(actual, command.expectedArgs.toList(), this, event, invokedInGuild, command, config)
+
+        val (convertedArgs, conversionError) = convertArguments(actual, command.expectedArgs.toList(), event, config.serverInformation.prefix)
+        if (conversionError != null || convertedArgs == null) {
+            event.safeRespond(conversionError.toString())
+            return
+        }
+
+        event.args = convertedArgs.requireNoNulls()
+
+        executeCommand(command, event, invokedInGuild)
     }
 
-    fun executeEvent(command: Command, event: CommandEvent, invokedInGuild: Boolean) {
+    private fun executeCommand(command: Command, event: CommandEvent, invokedInGuild: Boolean) {
         if (command.parameterCount == 0) {
             command.execute(event)
             return
@@ -87,7 +101,7 @@ data class CommandListener(val config: Configuration,
         }
     }
 
-    private fun isUsableEvent(message: Message, channel: String, author: User): Boolean {
+    private fun isUsableCommand(message: Message, channel: String, author: User): Boolean {
         if (message.contentRaw.length > 1500) return false
 
         if (config.security.lockDownMode && author.id != config.serverInformation.ownerID) return false
@@ -101,7 +115,7 @@ data class CommandListener(val config: Configuration,
         return true
     }
 
-    private fun isValidCommand(channel: MessageChannel, message: Message, user: User): Boolean {
+    private fun canPerformCommand(channel: MessageChannel, message: Message, user: User): Boolean {
         if (!manager.canPerformAction(user, config.permissionedActions.commandMention) && message.mentionsSomeone()) {
             channel.sendMessage("Your permission level is below the required level to use a command mention.").queue()
             return false
@@ -123,29 +137,7 @@ data class CommandListener(val config: Configuration,
     private fun handleDelete(message: Message, prefix: String) =
         if (!message.contentRaw.startsWith(prefix + prefix)) {
             message.deleteIfExists()
-        } else {
-            Unit
-        }
+        } else Unit
 
-    private fun argsMatch(actual: List<String>, cmd: Command, channel: MessageChannel): Boolean {
-        val optionalCount = cmd.expectedArgs.filter { it.optional }.size
-
-        if (cmd.expectedArgs.contains(arg(ArgumentType.Sentence)) || cmd.expectedArgs.contains(arg(ArgumentType.Splitter))) {
-            if (actual.size < cmd.expectedArgs.size - optionalCount) {
-                channel.sendMessage("You didn't enter the minimum number of required arguments: ${cmd.expectedArgs.size - optionalCount}.").queue()
-                return false
-            }
-        } else {
-            if(!(actual.size >= (cmd.expectedArgs.size - optionalCount)
-                            && (actual.size <= cmd.expectedArgs.size))) {
-                if (!cmd.expectedArgs.contains(arg(ArgumentType.Manual))) {
-                    channel.sendMessage("This command requires at least ${cmd.expectedArgs.size - optionalCount} and a maximum of ${cmd.expectedArgs.size} arguments.").queue()
-                    return false
-                }
-            }
-        }
-
-        return true
-    }
 }
 

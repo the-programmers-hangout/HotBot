@@ -2,8 +2,8 @@ package me.aberrantfox.hotbot.commandframework.commands
 
 import com.github.ricksbrown.cowsay.Cowsay
 import khttp.get as kget
-import me.aberrantfox.hotbot.commandframework.ArgumentType
-import me.aberrantfox.hotbot.commandframework.CommandSet
+import me.aberrantfox.hotbot.commandframework.parsing.ArgumentType
+import me.aberrantfox.hotbot.dsls.command.CommandSet
 import me.aberrantfox.hotbot.dsls.command.commands
 import org.jsoup.Jsoup
 import java.io.File

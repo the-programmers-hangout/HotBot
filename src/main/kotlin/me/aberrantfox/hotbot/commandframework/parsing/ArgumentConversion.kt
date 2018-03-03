@@ -1,14 +1,69 @@
-package me.aberrantfox.hotbot.commandframework
+package me.aberrantfox.hotbot.commandframework.parsing
 
 import me.aberrantfox.hotbot.dsls.command.CommandArgument
 import me.aberrantfox.hotbot.dsls.command.CommandEvent
 import me.aberrantfox.hotbot.extensions.stdlib.*
+import net.dv8tion.jda.core.JDA
+
+const val separatorCharacter = "|"
+
+val multiplePartArgTypes = listOf(ArgumentType.Sentence, ArgumentType.Splitter)
 
 enum class ArgumentType {
     Integer, Double, Word, Choice, Manual, Sentence, User, Splitter, URL
 }
 
-val argsRequiredAtMessageEnd = listOf(ArgumentType.Sentence, ArgumentType.Splitter)
+data class ConversionResult(val args: List<Any?>? = null, val error: String? = null)
+
+fun convertArguments(actual: List<String>, expected: List<CommandArgument>,
+                     event: CommandEvent, prefix: String): ConversionResult {
+    val expectedTypes = expected.map { it.type }
+
+    if (expectedTypes.contains(ArgumentType.Manual)) return ConversionResult(actual)
+
+    val convertedArgs = convertMainArgs(actual, expected)
+            ?: return ConversionResult(null, "Incorrect arguments passed. Try viewing the help documentation via: ${prefix}help <commandName>")
+
+    val usersConverted =
+            if (expectedTypes.contains(ArgumentType.User)) {
+                val (usersConverted, userConversionError) = retrieveUserArguments(expected, convertedArgs, event.jda)
+
+                if (userConversionError != null || usersConverted == null)
+                    return ConversionResult(null, userConversionError)
+
+                usersConverted
+            } else {
+                convertedArgs
+            }
+
+    val filledArgs = convertOptionalArgs(usersConverted, expected, event)
+
+    return ConversionResult(filledArgs)
+}
+
+fun retrieveUserArguments(expected: List<CommandArgument>, filledArgs: List<Any?>, jda: JDA): ConversionResult {
+    val zip = filledArgs.zip(expected)
+
+    val usersConverted =
+            zip.map {
+                val (arg, expectedArg) = it
+
+                if (expectedArg.type != ArgumentType.User || arg == null) return@map arg
+
+                val parsedUser =
+                        try {
+                            jda.retrieveUserById((arg as String).trimToID()).complete()
+                        } catch (e: RuntimeException) {
+                            null
+                        }
+
+                if (parsedUser == null) return ConversionResult(null, "Couldn't retrieve user: $arg")
+
+                return@map parsedUser
+            }
+
+    return ConversionResult(usersConverted)
+}
 
 /**
  * Converts a list of strings to the matching expected argument types
@@ -39,7 +94,7 @@ fun convertMainArgs(actual: List<String>,
 
         converted[nextMatchingIndex] = convertArg(actualArg, expected[nextMatchingIndex].type, index, actual)
 
-        if (expected[nextMatchingIndex].type in argsRequiredAtMessageEnd) break
+        if (expected[nextMatchingIndex].type in multiplePartArgTypes) break
     }
 
     if (converted.filterIndexed { i, arg -> arg == null && !expected[i].optional }.isNotEmpty())
@@ -47,6 +102,7 @@ fun convertMainArgs(actual: List<String>,
 
     return converted.toList()
 }
+
 
 /**
  * Converts any null arguments in a list of converted arguments to their default value
@@ -57,6 +113,7 @@ fun convertMainArgs(actual: List<String>,
  * @return A list of arguments with the optionals filled
  *
  */
+@Suppress("UNCHECKED_CAST")
 fun convertOptionalArgs(args: List<Any?>, expected: List<CommandArgument>, event: CommandEvent) =
         args.mapIndexed { i, arg ->
             arg ?: if (expected[i].defaultValue is Function<*>)
@@ -94,8 +151,8 @@ private fun joinArgs(start: Int, actual: List<String>) = actual.subList(start, a
 private fun splitArg(start: Int, actual: List<String>): List<String> {
     val joined = joinArgs(start, actual)
 
-    if (!(joined.contains(seperatorCharacter))) return listOf(joined)
+    if (!(joined.contains(separatorCharacter))) return listOf(joined)
 
-    return joined.split(seperatorCharacter).toList()
+    return joined.split(separatorCharacter).toList()
 }
 

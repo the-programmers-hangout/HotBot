@@ -1,7 +1,7 @@
 package me.aberrantfox.hotbot.commandframework.commands
 
-import me.aberrantfox.hotbot.commandframework.ArgumentType
-import me.aberrantfox.hotbot.commandframework.CommandSet
+import me.aberrantfox.hotbot.commandframework.parsing.ArgumentType
+import me.aberrantfox.hotbot.dsls.command.CommandSet
 import me.aberrantfox.hotbot.database.*
 import me.aberrantfox.hotbot.dsls.command.commands
 import me.aberrantfox.hotbot.dsls.embed.embed
@@ -14,8 +14,6 @@ import me.aberrantfox.hotbot.extensions.stdlib.randomListItem
 import me.aberrantfox.hotbot.extensions.stdlib.toRole
 import me.aberrantfox.hotbot.services.Configuration
 import me.aberrantfox.hotbot.utility.muteMember
-import net.dv8tion.jda.core.OnlineStatus
-import net.dv8tion.jda.core.entities.Game
 import net.dv8tion.jda.core.entities.Message
 import net.dv8tion.jda.core.entities.MessageChannel
 import net.dv8tion.jda.core.entities.User

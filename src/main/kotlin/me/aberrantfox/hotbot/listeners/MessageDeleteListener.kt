@@ -6,7 +6,6 @@ import me.aberrantfox.hotbot.logging.BotLogger
 import me.aberrantfox.hotbot.permissions.PermissionManager
 import me.aberrantfox.hotbot.services.Configuration
 import me.aberrantfox.hotbot.services.LimitedList
-import me.aberrantfox.hotbot.services.UserID
 import net.dv8tion.jda.core.entities.Message
 import net.dv8tion.jda.core.entities.User
 import net.dv8tion.jda.core.events.message.guild.GuildMessageDeleteEvent

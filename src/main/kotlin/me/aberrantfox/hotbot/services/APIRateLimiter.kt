@@ -4,7 +4,6 @@ import com.google.gson.Gson
 import org.joda.time.DateTime
 import java.io.File
 import kotlin.concurrent.timer
-import me.aberrantfox.hotbot.services.configPath
 
 private data class Datum(var current: Int)
 

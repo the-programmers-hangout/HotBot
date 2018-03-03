@@ -1,6 +1,6 @@
 package me.aberrantfox.hotbot.dsls.command
 
-import me.aberrantfox.hotbot.commandframework.ArgumentType
+import me.aberrantfox.hotbot.commandframework.parsing.ArgumentType
 import me.aberrantfox.hotbot.extensions.stdlib.sanitiseMentions
 import me.aberrantfox.hotbot.logging.BotLogger
 import me.aberrantfox.hotbot.logging.DefaultLogger
@@ -9,6 +9,10 @@ import me.aberrantfox.hotbot.services.Configuration
 import me.aberrantfox.hotbot.services.MService
 import net.dv8tion.jda.core.JDA
 import net.dv8tion.jda.core.entities.*
+import org.reflections.Reflections
+import org.reflections.scanners.MethodAnnotationsScanner
+
+annotation class CommandSet
 
 data class CommandEvent(val config: Configuration, val jda: JDA, val channel: MessageChannel,
                         val author: User, val message: Message, val guild: Guild, val manager: PermissionManager,
@@ -52,9 +56,10 @@ class Command(var log: BotLogger, var expectedArgs: Array<out CommandArgument> =
     override fun history(message: String) = log.history(message)
     override fun history(message: MessageEmbed) = log.history(message)
 
-    val parameterCount = expectedArgs.size
-
     operator fun invoke(args: Command.() -> Unit) {}
+
+    val parameterCount: Int
+        get() = this.expectedArgs.size
 
     fun requiresGuild(requiresGuild: Boolean) {
         this.requiresGuild = requiresGuild
@@ -116,7 +121,7 @@ data class CommandsContainer(var log: BotLogger, var commands: HashMap<String, C
 
     fun has(name: String) = this.commands.containsKey(name)
 
-    fun get(name: String) = this.commands.get(name)
+    operator fun get(name: String) = this.commands.get(name)
 
     fun newLogger(log: BotLogger) {
         this.log = log
@@ -126,6 +131,24 @@ data class CommandsContainer(var log: BotLogger, var commands: HashMap<String, C
     }
 }
 
+fun produceContainer(): CommandsContainer {
+    val pack = "me.aberrantfox.hotbot.commandframework.commands"
+    val cmds = Reflections(pack, MethodAnnotationsScanner()).getMethodsAnnotatedWith(CommandSet::class.java)
+
+    val container = cmds.map { it.invoke(null) }
+            .map { it as CommandsContainer }
+            .reduce { a, b -> a.join(b) }
+
+    val lowMap = HashMap<String, Command>()
+
+    container.commands.keys.forEach {
+        lowMap.put(it.toLowerCase(), container.commands[it]!!)
+    }
+
+    container.commands = lowMap
+
+    return container
+}
 @DslMarker
 annotation class CommandTagMarker
 

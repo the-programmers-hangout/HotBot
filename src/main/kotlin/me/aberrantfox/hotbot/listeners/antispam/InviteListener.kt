@@ -6,12 +6,15 @@ import me.aberrantfox.hotbot.extensions.stdlib.containsInvite
 import me.aberrantfox.hotbot.extensions.stdlib.idToName
 import me.aberrantfox.hotbot.logging.BotLogger
 import me.aberrantfox.hotbot.permissions.PermissionManager
-import me.aberrantfox.hotbot.services.configPath
 import me.aberrantfox.hotbot.services.Configuration
 import me.aberrantfox.hotbot.services.PersistentSet
 import me.aberrantfox.hotbot.services.WeightTracker
+import me.aberrantfox.hotbot.services.configPath
 import net.dv8tion.jda.core.JDA
-import net.dv8tion.jda.core.entities.*
+import net.dv8tion.jda.core.entities.Guild
+import net.dv8tion.jda.core.entities.Member
+import net.dv8tion.jda.core.entities.Message
+import net.dv8tion.jda.core.entities.TextChannel
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent
 import net.dv8tion.jda.core.events.message.guild.GuildMessageUpdateEvent
 import net.dv8tion.jda.core.hooks.ListenerAdapter

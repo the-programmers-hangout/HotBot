@@ -2,10 +2,9 @@ package me.aberrantfox.hotbot.commandframework.commands
 
 import com.google.common.reflect.TypeToken
 import com.google.gson.Gson
-import me.aberrantfox.hotbot.commandframework.ArgumentType
-import me.aberrantfox.hotbot.commandframework.CommandSet
+import me.aberrantfox.hotbot.commandframework.parsing.ArgumentType
+import me.aberrantfox.hotbot.dsls.command.CommandSet
 import me.aberrantfox.hotbot.dsls.command.commands
-import me.aberrantfox.hotbot.commandframework.produceContainer
 import me.aberrantfox.hotbot.services.CommandRecommender
 import me.aberrantfox.hotbot.services.configPath
 import java.io.File
@@ -22,8 +21,10 @@ fun macroCommands() =
                 val key = (it.args[0] as String).toLowerCase()
 
                 when {
-                    produceContainer().commands.containsKey(key) -> it.respond("You dummy. There is a command with that name already...")
+                    it.container.has(key) -> it.respond("You dummy. There is a command with that name already...")
+
                     macroMap.containsKey(key) -> it.respond("Yea... that macro exists...")
+
                     else -> {
                         val value = it.message.contentRaw.substring("addmacro ".length + key.length + it.config.serverInformation.prefix.length + 1)
 
