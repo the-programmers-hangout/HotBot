@@ -6,9 +6,12 @@ import me.aberrantfox.hotbot.dsls.command.commands
 import me.aberrantfox.hotbot.extensions.stdlib.idToName
 import me.aberrantfox.hotbot.services.AddResponse
 import me.aberrantfox.hotbot.services.Configuration
-import me.aberrantfox.hotbot.services.PoolRecord
 import me.aberrantfox.hotbot.services.UserElementPool
 import me.aberrantfox.hotbot.database.*
+import me.aberrantfox.hotbot.dsls.embed.embed
+import me.aberrantfox.hotbot.extensions.jda.sendPrivateMessage
+import me.aberrantfox.hotbot.extensions.stdlib.idToUser
+import me.aberrantfox.hotbot.services.PoolRecord
 import net.dv8tion.jda.core.EmbedBuilder
 import net.dv8tion.jda.core.JDA
 import net.dv8tion.jda.core.entities.Guild
@@ -77,30 +80,9 @@ fun suggestionCommands() = commands {
                 channel.id == it.config.messageChannels.suggestionChannel
             }
 
-            channel?.sendMessage(buildSuggestionMessage(suggestion, it.jda, SuggestionStatus.Review).build())?.queue {
-                trackSuggestion(suggestion, SuggestionStatus.Review, it.id)
-
-                it.addReaction("⬆").queue()
-                it.addReaction("⬇").queue()
-            }
-        }
-    }
-
-    command("poolaccept") {
-        execute {
-            val suggestion = Suggestions.pool.top()
-
-            if (suggestion == null) {
-                it.respond("The suggestion pool is empty... :)")
-                return@execute
-            }
-
-            val channel = it.guild.textChannels.findLast { channel ->
-                channel.id == it.config.messageChannels.suggestionChannel
-            }
 
             channel?.sendMessage(buildSuggestionMessage(suggestion, it.jda, SuggestionStatus.Review).build())?.queue {
-                trackSuggestion(suggestion, SuggestionStatus.Review, it.id)
+                trackSuggestion(SuggestionRecord(it.id, SuggestionStatus.Review, suggestion))
 
                 it.addReaction("⬆").queue()
                 it.addReaction("⬇").queue()
@@ -146,8 +128,11 @@ fun suggestionCommands() = commands {
 
             channel.getMessageById(target).queue {
                 val suggestion = obtainSuggestion(target)
-                val message = buildSuggestionMessage(suggestion, it.jda, status)
+                val message = buildSuggestionMessage(suggestion.poolInfo, it.jda, status)
                 val reasonTitle = "Reason for Status"
+
+                val suggestionUpdateMessage = buildSuggestionUpdateEmbed(suggestion, reason, status)
+                suggestion.member.idToUser(it.jda).sendPrivateMessage(suggestionUpdateMessage)
 
                 message.fields.removeIf { it.name == reasonTitle }
 
@@ -163,6 +148,41 @@ fun suggestionCommands() = commands {
 private fun fetchSuggestionChannel(guild: Guild, config: Configuration) = guild.getTextChannelById(config.messageChannels.suggestionChannel)
 
 private fun inputToStatus(input: String): SuggestionStatus? = SuggestionStatus.values().findLast { it.name.toLowerCase() == input.toLowerCase() }
+
+private fun buildSuggestionUpdateEmbed(suggestion: SuggestionRecord, response: String, newStatus: SuggestionStatus) =
+        embed {
+            title("Suggestion Status Update")
+            description("A suggestion that you submitted has changed status.")
+
+            ifield {
+                name = "ID"
+                value = suggestion.messageID
+            }
+
+            ifield {
+                name = "Old Status"
+                value = suggestion.status.toString()
+            }
+
+            ifield {
+                name = "New Status"
+                value = newStatus.toString()
+            }
+
+            field {
+                name = "Suggestion"
+                value = suggestion.idea
+                inline = false
+            }
+
+            field {
+                name = "Response"
+                value = response
+                inline = false
+            }
+
+            setColor(newStatus.colour)
+        }
 
 private fun buildSuggestionMessage(suggestion: PoolRecord, jda: JDA, status: SuggestionStatus) =
     EmbedBuilder()
