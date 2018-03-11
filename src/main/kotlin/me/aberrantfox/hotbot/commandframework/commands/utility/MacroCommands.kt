@@ -56,7 +56,7 @@ fun macroCommands() =
 
         command("listmacros") {
             execute {
-                val macros = macroMap.keys.toTypedArray().sortedArray()
+                val macros = macroMap.keys.sorted()
                 val macroString =
                         if (macros.isEmpty())
                             "none"
