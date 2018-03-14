@@ -263,7 +263,7 @@ fun moderationCommands() = commands {
             val avatar = user.effectiveAvatarUrl
 
             user.sendPrivateMessage("We have flagged your profile picture as inappropriate. " +
-                "Please change it withing the next 30 minutes or you will be banned.")
+                "Please change it within the next 30 minutes or you will be banned.")
 
             Timer().schedule(1000 * 60 * 30) {
                 if(avatar == it.jda.getUserById(user.id).effectiveAvatarUrl) {
