@@ -1,3 +1,6 @@
+# Note 
+These are out of date. New guide to come.
+
 #### Overview
 Hotbot is a single-server bot. It can operate on multiple servers but it is
 not tested, and definitely not recommended. In the future, it may take into 
