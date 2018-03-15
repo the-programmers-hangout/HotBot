@@ -14,7 +14,8 @@
     "invites": "Commands for dictating how the bot will handle invites",
     "rank": "Commands for granting and removing ranks.",
     "resources": "Commands related to channel resources",
-    "polling": "Commands related to polling questions and answers"
+    "polling": "Commands related to polling questions and answers",
+    "api": "Commands Related to evaluting Javascript code inline, or interfacing with the bot api."
   },
   "commands": [
     {
@@ -807,6 +808,20 @@
       "description": "View commands available to you, based on your permission level.",
       "structure": "",
       "example": ""
+    },
+    {
+      "name": "eval",
+      "category": "api",
+      "description": "Eval code without a response",
+      "structure": "{code}",
+      "example": "event.respond('hi');"
+    },
+    {
+      "name": "evalresponse",
+      "category": "api",
+      "description": "Eval code with a response(useful for inline statements)",
+      "structure": "{code}",
+      "example": "1 + 3 - 5"
     }
   ]
 }
