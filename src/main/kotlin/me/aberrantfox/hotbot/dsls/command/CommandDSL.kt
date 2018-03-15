@@ -104,7 +104,7 @@ data class CommandsContainer(var log: BotLogger, var commands: HashMap<String, C
 
     fun listCommands() = this.commands.keys.toList()
 
-    fun command(name: String, construct: Command.() -> Unit): Command? {
+    fun command(name: String, construct: Command.() -> Unit = {}): Command? {
         val command = Command(log)
         command.construct()
         this.commands.put(name, command)
