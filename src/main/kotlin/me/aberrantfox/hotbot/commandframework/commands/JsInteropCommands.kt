@@ -53,19 +53,22 @@ fun jsCommands() = commands {
         expect(ArgumentType.Sentence)
         execute {
             val script = it.args.component1() as String
-            val result = executeJS(createReturningFunction(script), it)
-
-            it.respond(result)
+            executeJS(createReturningFunction(script), it, true)
         }
     }
 }
 
-private fun executeJS(script: String, event: CommandEvent): String {
-    EngineContainer.engine?.eval(script)
-    EngineContainer.engine?.put("event", event)
-
-    val result = (EngineContainer.engine as Invocable).invokeFunction("evalCommandOperationReturn")
-    return "$result"
+private fun executeJS(script: String, event: CommandEvent, respond: Boolean = false) {
+    try {
+        EngineContainer.engine?.eval(script)
+        EngineContainer.engine?.put("event", event)
+        val result = (EngineContainer.engine as Invocable).invokeFunction("evalCommandOperationReturn")
+        if(respond) {
+            event.respond("$result")
+        }
+    } catch (e: Exception) {
+        event.respond("${e.message} - **cause** - ${e.cause}")
+    }
 }
 
 private fun createVoidFunction(scriptBody: String) =
