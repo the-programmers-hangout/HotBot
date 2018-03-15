@@ -19,3 +19,4 @@ config/invite-whitelist.json
 config/pools/
 config/ratelimit/
 data/
+config/scripts/custom/test.jss

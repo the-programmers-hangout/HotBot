@@ -13,7 +13,6 @@ import javax.script.Invocable
 import javax.script.ScriptEngine
 import javax.script.ScriptEngineManager
 
-
 object EngineContainer {
     var engine: ScriptEngine? = null
 
@@ -25,7 +24,7 @@ object EngineContainer {
         engine.put("config", config)
 
         val setupScripts = File(configPath("scripts${File.separator}jsapi"))
-        val custom =  File(configPath("scripts${File.separator}scripts"))
+        val custom =  File(configPath("scripts${File.separator}custom"))
 
         walkDirectory(setupScripts, engine)
         walkDirectory(custom, engine)
