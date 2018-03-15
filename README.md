@@ -56,6 +56,9 @@ Sample output:
 Bot: test
 ```
 
+###### Where do I put the code?
+In config/scripts/custom. This directory may not exist, create it.
+
 More documentation to come!
 
 ##### Contributing
