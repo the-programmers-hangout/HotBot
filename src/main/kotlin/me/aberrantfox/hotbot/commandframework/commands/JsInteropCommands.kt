@@ -1,7 +1,6 @@
 package me.aberrantfox.hotbot.commandframework.commands
 
 import me.aberrantfox.hotbot.commandframework.parsing.ArgumentType
-import me.aberrantfox.hotbot.dsls.command.CommandEvent
 import me.aberrantfox.hotbot.dsls.command.CommandSet
 import me.aberrantfox.hotbot.dsls.command.CommandsContainer
 import me.aberrantfox.hotbot.dsls.command.commands
@@ -38,48 +37,29 @@ object EngineContainer {
         .forEach { engine.eval(it) }
 }
 
+private const val functionName = "functionScope"
+
 @CommandSet
 fun jsCommands() = commands {
     command("eval") {
         expect(ArgumentType.Sentence)
         execute {
             val script = it.args.component1() as String
-            executeJS(createVoidFunction(script), it)
-        }
-    }
+            val functionContext = createFunctionContext(script)
 
-    command("evalresponse") {
-        expect(ArgumentType.Sentence)
-        execute {
-            val script = it.args.component1() as String
-            executeJS(createReturningFunction(script), it, true)
+            try {
+                EngineContainer.engine?.eval(functionContext)
+                (EngineContainer.engine as Invocable).invokeFunction(functionName, it)
+            } catch (e: Exception) {
+                it.respond("${e.message} - **cause** - ${e.cause}")
+            }
         }
     }
 }
 
-private fun executeJS(script: String, event: CommandEvent, respond: Boolean = false) {
-    try {
-        EngineContainer.engine?.eval(script)
-        EngineContainer.engine?.put("event", event)
-        val result = (EngineContainer.engine as Invocable).invokeFunction("evalCommandOperationReturn")
-        if(respond) {
-            event.respond("$result")
-        }
-    } catch (e: Exception) {
-        event.respond("${e.message} - **cause** - ${e.cause}")
-    }
-}
-
-private fun createVoidFunction(scriptBody: String) =
+private fun createFunctionContext(scriptBody: String) =
     """
-        function evalCommandOperation() {
+        function $functionName(event) {
             $scriptBody
-        };
-    """.trimIndent()
-
-private fun createReturningFunction(scriptBody: String) =
-    """
-        function evalCommandOperationReturn() {
-            return $scriptBody
         };
     """.trimIndent()
