@@ -52,7 +52,10 @@ fun raidCommands() = commands {
                 return@execute
             }
 
-            MutedRaiders.set.forEach { id -> removeMuteRole(it.guild, id.idToUser(it.jda), it.config) }
+            MutedRaiders.set
+                    .mapNotNull { id -> id.idToUser(it.jda) }
+                    .forEach { user -> removeMuteRole(it.guild, user, it.config) }
+
             MutedRaiders.set.clear()
             it.respond("Raiders unmuted, be nice bois!")
         }
@@ -87,6 +90,8 @@ fun raidCommands() = commands {
             MutedRaiders.set
                     .map { id -> id.retrieveIdToUser(it.jda) }
                     .forEach { user -> it.guild.controller.ban(user, delDays).queue() }
+
+            MutedRaiders.set.clear()
 
             it.respond("Performing raid ban.")
         }
