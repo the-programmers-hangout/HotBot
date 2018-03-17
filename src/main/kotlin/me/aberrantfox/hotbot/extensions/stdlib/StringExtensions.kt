@@ -61,8 +61,10 @@ fun String.toBooleanValue(): Boolean =
         }
 
 fun String.idToName(jda: JDA): String = jda.getUserById(this).name
+fun String.idToUser(jda: JDA): User? = jda.getUserById(this.trimToID())
 
-fun String.idToUser(jda: JDA): User = jda.getUserById(this.trimToID())
+fun String.retrieveIdToUser(jda: JDA): User = jda.retrieveUserById(this.trimToID()).complete()
+fun String.retrieveIdToName(jda: JDA): String = jda.retrieveUserById(this.trimToID()).complete().name
 
 fun String.toRole(guild: Guild): Role? = guild.getRoleById(this)
 

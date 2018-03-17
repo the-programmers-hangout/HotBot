@@ -3,7 +3,6 @@ package me.aberrantfox.hotbot.listeners.antispam
 import me.aberrantfox.hotbot.extensions.jda.deleteIfExists
 import me.aberrantfox.hotbot.extensions.jda.fullName
 import me.aberrantfox.hotbot.extensions.stdlib.containsInvite
-import me.aberrantfox.hotbot.extensions.stdlib.idToName
 import me.aberrantfox.hotbot.logging.BotLogger
 import me.aberrantfox.hotbot.permissions.PermissionManager
 import me.aberrantfox.hotbot.services.Configuration
@@ -58,7 +57,8 @@ class InviteListener(val config: Configuration, val logger: BotLogger, val manag
                 guild.controller.ban(author, 0, "You've been automatically banned for linking invitations. Advertising is not allowed, sorry.").queue {
                     logger.alert("Banned user: ${author.fullName()} ($id for advertising automatically.")
                 }
-                logger.alert("Banned: ${id.idToName(jda)} for ${RecentInvites.value(id)} invites.")
+
+                logger.alert("Banned: ${author.fullName()} for ${RecentInvites.value(id)} invites.")
                 RecentInvites.cache.map.remove(id)
             }
 

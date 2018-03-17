@@ -9,8 +9,8 @@ import me.aberrantfox.hotbot.extensions.jda.fullName
 import me.aberrantfox.hotbot.extensions.jda.isCommandInvocation
 import me.aberrantfox.hotbot.extensions.jda.performActionIfIsID
 import me.aberrantfox.hotbot.extensions.jda.sendPrivateMessage
-import me.aberrantfox.hotbot.extensions.stdlib.idToUser
 import me.aberrantfox.hotbot.extensions.stdlib.randomListItem
+import me.aberrantfox.hotbot.extensions.stdlib.retrieveIdToUser
 import me.aberrantfox.hotbot.extensions.stdlib.toRole
 import me.aberrantfox.hotbot.services.Configuration
 import me.aberrantfox.hotbot.utility.muteMember
@@ -212,7 +212,7 @@ fun moderationCommands() = commands {
                     val record = getReason(target)
 
                     if (record != null) {
-                        it.respond("$target was banned by ${record.mod.idToUser(it.jda).fullName()} for reason ${record.reason}")
+                        it.respond("$target was banned by ${record.mod.retrieveIdToUser(it.jda).fullName()} for reason ${record.reason}")
                     } else {
                         it.respond("That user does not have a record logged.")
                     }
@@ -266,7 +266,7 @@ fun moderationCommands() = commands {
                 "Please change it within the next 30 minutes or you will be banned.")
 
             Timer().schedule(1000 * 60 * 30) {
-                if(avatar == it.jda.getUserById(user.id).effectiveAvatarUrl) {
+                if(avatar == user.id.retrieveIdToUser(it.jda).effectiveAvatarUrl) {
                     user.sendPrivateMessage("Hi, since you failed to change your profile picture, you are being banned.")
                     Timer().schedule(1000 * 10) {
                         it.guild.controller.ban(user, 1, "Having a bad profile picture and refusing to change it.").queue()

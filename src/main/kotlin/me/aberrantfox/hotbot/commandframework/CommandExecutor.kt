@@ -64,7 +64,7 @@ class CommandExecutor(val config: Configuration,
     private fun invokeCommand(command: Command, name: String, actual: List<String>, message: Message, author: User, invokedInGuild: Boolean) {
         val channel = message.channel
 
-        if( !(manager.canUseCommand(author.id, name)) ) {
+        if( !(manager.canUseCommand(author, name)) ) {
             channel.sendMessage("Did you really think I would let you do that? :thinking:").queue()
             return
         }
