@@ -10,10 +10,7 @@ import me.aberrantfox.hotbot.dsls.embed.embed
 import me.aberrantfox.hotbot.extensions.jda.fullName
 import me.aberrantfox.hotbot.extensions.jda.getMemberJoinString
 import me.aberrantfox.hotbot.extensions.jda.sendPrivateMessage
-import me.aberrantfox.hotbot.extensions.stdlib.formatJdaDate
-import me.aberrantfox.hotbot.extensions.stdlib.idToName
-import me.aberrantfox.hotbot.extensions.stdlib.idToUser
-import me.aberrantfox.hotbot.extensions.stdlib.limit
+import me.aberrantfox.hotbot.extensions.stdlib.*
 import me.aberrantfox.hotbot.services.Configuration
 import me.aberrantfox.hotbot.services.InfractionAction
 import me.aberrantfox.hotbot.services.UserID
@@ -313,7 +310,7 @@ private fun buildHistoryEmbed(target: User, includeModerator: Boolean, records: 
                     inline = false
 
                     if(includeModerator) {
-                        value += "\nIssued by **${record.moderator.idToName(it.jda)}** on **${record.dateTime.toString(DateTimeFormat.forPattern("dd/MM/yyyy"))}**"
+                        value += "\nIssued by **${record.moderator.retrieveIdToName(it.jda)}** on **${record.dateTime.toString(DateTimeFormat.forPattern("dd/MM/yyyy"))}**"
                     }
                 }
 
@@ -348,7 +345,7 @@ private fun buildHistoryEmbed(target: User, includeModerator: Boolean, records: 
 
             notes.forEach { note ->
                 field {
-                    name = "ID :: __${note.id}__ :: Staff :: __${note.moderator.idToName(it.jda)}__"
+                    name = "ID :: __${note.id}__ :: Staff :: __${note.moderator.retrieveIdToName(it.jda)}__"
                     value = "Noted on **${note.dateTime.toString(DateTimeFormat.forPattern("dd/MM/yyyy"))}**"
                     inline = false
                 }

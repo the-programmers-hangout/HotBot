@@ -5,6 +5,7 @@ import me.aberrantfox.hotbot.dsls.command.CommandSet
 import me.aberrantfox.hotbot.dsls.command.commands
 import me.aberrantfox.hotbot.extensions.jda.fullName
 import me.aberrantfox.hotbot.extensions.stdlib.idToUser
+import me.aberrantfox.hotbot.extensions.stdlib.retrieveIdToUser
 import me.aberrantfox.hotbot.listeners.antispam.MutedRaiders
 import me.aberrantfox.hotbot.utility.removeMuteRole
 import net.dv8tion.jda.core.entities.User
@@ -84,8 +85,8 @@ fun raidCommands() = commands {
             }
 
             MutedRaiders.set
-                .map { id -> id.idToUser(it.jda) }
-                .forEach { user -> it.guild.controller.ban(user, delDays).queue() }
+                    .map { id -> id.retrieveIdToUser(it.jda) }
+                    .forEach { user -> it.guild.controller.ban(user, delDays).queue() }
 
             it.respond("Performing raid ban.")
         }
