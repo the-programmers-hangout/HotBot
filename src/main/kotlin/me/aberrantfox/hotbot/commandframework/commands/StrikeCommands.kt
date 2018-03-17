@@ -193,7 +193,7 @@ fun strikeCommands() =
 
         command("selfhistory") {
             execute {
-                val target = it.author.id.idToUser(it.jda)
+                val target = it.author
 
                 target.sendPrivateMessage(buildHistoryEmbed(target, false, getHistory(target.id),
                         null, it))
