@@ -1,6 +1,10 @@
-var echoListener = new EventListener() {
-    onGuildMessageReceived: function(event) {
-        event.channel.sendMessage("Hi there, you said: " + event.message.contentRaw).queue()
+const echoListener = new EventListener() {
+    onGuildMessageReceived: (event) => {
+        if(event.author.isBot()) {
+            return;
+        }
+
+        event.channel.sendMessage('Hi there, you said: ' + event.message.contentRaw).queue()
     }
 }
 

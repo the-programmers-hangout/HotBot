@@ -10,14 +10,13 @@ import net.dv8tion.jda.core.JDA
 import java.io.File
 import javax.script.Invocable
 import javax.script.ScriptEngine
-import javax.script.ScriptEngineManager
+import jdk.nashorn.api.scripting.NashornScriptEngineFactory
 
 object EngineContainer {
     var engine: ScriptEngine? = null
 
     fun setupScriptEngine(jda: JDA, container: CommandsContainer, config: Configuration): ScriptEngine {
-        val manager = ScriptEngineManager()
-        val engine = manager.getEngineByName("nashorn")
+        val engine = NashornScriptEngineFactory().getScriptEngine("--language=es6")
         engine.put("jda", jda)
         engine.put("container", container)
         engine.put("config", config)
