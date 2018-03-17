@@ -134,7 +134,7 @@ fun permissionCommands() =
             execute {
                 val available = HelpConf.listCategories().map { cat ->
                     val cmds =  HelpConf.listCommandsinCategory(cat)
-                        .filter { cmd -> it.manager.canUseCommand(it.author.id, cmd.name) }
+                        .filter { cmd -> it.manager.canUseCommand(it.author, cmd.name) }
                         .map(CommandDescriptor::name)
                         .joinToString()
 

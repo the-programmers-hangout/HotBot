@@ -4,10 +4,8 @@ import me.aberrantfox.hotbot.database.savePermissions
 import me.aberrantfox.hotbot.extensions.jda.getHighestRole
 import me.aberrantfox.hotbot.extensions.jda.isEqualOrHigherThan
 import me.aberrantfox.hotbot.extensions.jda.toMember
-import me.aberrantfox.hotbot.extensions.stdlib.idToUser
 import me.aberrantfox.hotbot.extensions.stdlib.toRole
 import me.aberrantfox.hotbot.services.Configuration
-import me.aberrantfox.hotbot.services.UserID
 import net.dv8tion.jda.core.JDA
 import net.dv8tion.jda.core.entities.Role
 import net.dv8tion.jda.core.entities.User
@@ -46,10 +44,10 @@ data class PermissionManager(val map: HashMap<RoleID, HashSet<CommandName>> = Ha
         return highestRole?.isEqualOrHigherThan(actionRole) ?: false
     }
 
-    fun canUseCommand(userId: UserID, commandName: CommandName): Boolean {
-        if(userId == config.serverInformation.ownerID) return true
+    fun canUseCommand(user: User, commandName: CommandName): Boolean {
+        if(user.id == config.serverInformation.ownerID) return true
 
-        val highestRole = userId.idToUser(jda).toMember(jda.getGuildById(config.serverInformation.guildid)).getHighestRole()
+        val highestRole = user.toMember(jda.getGuildById(config.serverInformation.guildid)).getHighestRole()
         val roles = getAllRelevantRoleIds(highestRole?.id)
 
         return roles.map { map[it] }
