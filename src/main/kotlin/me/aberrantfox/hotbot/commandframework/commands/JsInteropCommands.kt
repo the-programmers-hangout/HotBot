@@ -16,7 +16,7 @@ object EngineContainer {
     var engine: ScriptEngine? = null
 
     fun setupScriptEngine(jda: JDA, container: CommandsContainer, config: Configuration): ScriptEngine {
-        val engine = NashornScriptEngineFactory().getScriptEngine("--language=es6")
+        val engine = NashornScriptEngineFactory().getScriptEngine("--language=es6", "-scripting")
         engine.put("jda", jda)
         engine.put("container", container)
         engine.put("config", config)
