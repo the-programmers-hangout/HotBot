@@ -114,6 +114,7 @@ fun strikeCommands() =
                 infract(it.copy(args=newArgs))
 
                 StrikeRequests.map.remove(user.id)
+                it.respond("Strike request on ${user.asMention} was accepted.")
             }
         }
 
@@ -125,6 +126,7 @@ fun strikeCommands() =
                 if( !(strikeAgainst(user, it)) ) return@execute
 
                 StrikeRequests.map.remove(user.id)
+                it.respond("Strike request on ${user.asMention} was declined.")
             }
         }
 
