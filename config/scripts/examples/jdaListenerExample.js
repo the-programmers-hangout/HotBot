@@ -4,7 +4,7 @@ const echoListener = new EventListener() {
             return;
         }
 
-        event.channel.sendMessage('Hi there, you said: ' + event.message.contentRaw).queue()
+        event.channel.sendMessage("Hi there, you said: ${event.message.contentRaw}").queue()
     }
 }
 

@@ -1,31 +1,33 @@
 (function(){
-	var fileListener = new EventListener()
+	const fileListener = new EventListener()
 	{
-		onGuildMessageReceived: function (event) {
+		onGuildMessageReceived: (event) => {
+			const msg = event.message;
 
-			var msg = event.message;
-			if (msg.author.isBot()) { return; }
-			if (config.serverInformation.ownerID == msg.member.user.getId()) { return; }
-			if(msg.attachments.length <=0) { return; }
-				var deletedMessage = false;
-				
-				for (var i = 0; i < msg.attachments.length; i++) {
-					var attachment = msg.attachments[i];
-					
-					if (notAllowed(attachment.fileName)) {
-						deletedMessage = true;
-						msg.delete().queue();
-						container.log.warning(msg.author.asMention + " just sent the file " +
-						attachment.getFileName() + "\n" + attachment.getUrl())
-					}
-				}
+			if (msg.author.isBot()) { 
+				return 
+			}
+			
+			if (config.serverInformation.ownerID == msg.member.user.getId()) { 
+				return 
+			}
 
-			if (deletedMessage) {
-				event.channel.sendMessage(
-					"Please don't send that file type here " +
-					msg.author.asMention + " use a service like " +
-					"https://hastebin.com"
-				).queue()
+			if(event.member.isOwner()) {
+				return
+			}
+			
+			if(msg.attachments.isEmpty()) { 
+				return 
+			}
+
+			const containsIllegalAttachment = msg.attachments.stream().anyMatch((attachment) => notAllowed(attachment.fileName))
+			const mention = event.author.asMention
+
+			if(containsIllegalAttachment) {
+				msg.delete().queue()
+				container.log.warning("${mention} attempted to send an illegal file")
+				const userResponse = "Please don't send that file type here ${mention} use a service like https://hastebin.com"
+				event.channel.sendMessage(userResponse).queue()
 			}
 		}
 	};

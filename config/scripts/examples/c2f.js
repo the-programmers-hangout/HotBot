@@ -1,4 +1,4 @@
-const command = createCommand('c2f')
+const command = createCommand("c2f")
 
 command.expect(argType.Integer)
 

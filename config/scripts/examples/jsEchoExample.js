@@ -1,4 +1,4 @@
-const command = createCommand('jsecho')
+const command = createCommand("jsecho")
 
 command.expect(argType.Sentence)
 command.execute((event) => {
