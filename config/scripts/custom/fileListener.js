@@ -2,19 +2,19 @@
 	const fileListener = new EventListener()
 	{
 		onGuildMessageReceived: (event) => {
-			const msg = event.message;
+			const msg = event.message
 
 			if (msg.author.isBot()) { 
 				return 
 			}
 			
-			if (config.serverInformation.ownerID == msg.member.user.getId()) { 
-				return 
-			}
+			// if (config.serverInformation.ownerID == msg.member.user.getId()) { 
+			// 	return 
+			// }
 
-			if(event.member.isOwner()) {
-				return
-			}
+			// if(event.member.isOwner()) {
+			// 	return
+			// }
 			
 			if(msg.attachments.isEmpty()) { 
 				return 
@@ -32,9 +32,10 @@
 		}
 	}
 
-	const regex = /^.*\.(jpg|jpeg|gif|png|mp4|webm)$/i
+	
 
-	function notAllowed(fileName) {	
+	function notAllowed(fileName) {
+		const regex = /^.*\.(jpg|jpeg|gif|png|mp4|webm)$/i
 		return (!regex.test(fileName))
 	}
 
