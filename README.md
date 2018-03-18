@@ -34,17 +34,17 @@ The api exposes a few things:
 
 ###### A basic command
 Read the JavaScript code below (Please note, ES 5.1 syntax for now):
-```js
+```ecmascript 6
 //create a command object. The command will be invoked by typing (prefix)jsecho
-var command = createCommand("jsecho")
+const command = createCommand("jsecho")
 
 //state that in order to use the command, the user must provide some arguments, e.g. ++jsecho Hi there, this is a test!
 command.expect(argType.Sentence)
 
 //Provide a function that is called when the command is executed (It is passed a CommandEvent)
-command.execute( function(event) {
+command.execute((event) => {
     //Get the first argument out of the argument array.
-    var arg1 = event.args[0]
+    const arg1 = event.args[0]
     //respond to the channel that this command was called in with what they said
     event.respond(arg1)
 });
