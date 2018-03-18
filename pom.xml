@@ -10,7 +10,7 @@
 
     <properties>
         <main.class>me.aberrantfox.hotbot.MainAppKt</main.class>
-        <kotlin.version>1.2.21</kotlin.version>
+        <kotlin.version>1.2.30</kotlin.version>
         <junit.version>4.12</junit.version>
         <jupiter.version>5.0.0-M4</jupiter.version>
         <junitPlatformVersion>1.0.0-M4</junitPlatformVersion>
