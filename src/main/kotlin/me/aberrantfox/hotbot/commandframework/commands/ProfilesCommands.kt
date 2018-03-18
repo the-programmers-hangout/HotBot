@@ -3,7 +3,7 @@ package me.aberrantfox.hotbot.commandframework.commands
 import me.aberrantfox.hotbot.commandframework.parsing.ArgumentType
 import me.aberrantfox.hotbot.dsls.command.CommandSet
 import me.aberrantfox.hotbot.dsls.command.commands
-import me.aberrantfox.hotbot.extensions.stdlib.idToName
+import me.aberrantfox.hotbot.extensions.stdlib.retrieveIdToName
 import me.aberrantfox.hotbot.services.AddResponse
 import me.aberrantfox.hotbot.services.UserElementPool
 
@@ -57,7 +57,7 @@ fun profileCommands() = commands {
             target.sendMessage(
                 record.prettyPrint(it.jda, "Profile")
                     .setTitle("")
-                    .setAuthor(record.sender.idToName(it.jda), record.avatarURL, record.avatarURL)
+                    .setAuthor(record.sender.retrieveIdToName(it.jda), record.avatarURL, record.avatarURL)
                     .build())
                 .queue()
         }

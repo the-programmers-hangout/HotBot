@@ -3,14 +3,14 @@ package me.aberrantfox.hotbot.commandframework.commands
 import me.aberrantfox.hotbot.commandframework.parsing.ArgumentType
 import me.aberrantfox.hotbot.dsls.command.CommandSet
 import me.aberrantfox.hotbot.dsls.command.commands
-import me.aberrantfox.hotbot.extensions.stdlib.idToName
 import me.aberrantfox.hotbot.services.AddResponse
 import me.aberrantfox.hotbot.services.Configuration
 import me.aberrantfox.hotbot.services.UserElementPool
 import me.aberrantfox.hotbot.database.*
 import me.aberrantfox.hotbot.dsls.embed.embed
 import me.aberrantfox.hotbot.extensions.jda.sendPrivateMessage
-import me.aberrantfox.hotbot.extensions.stdlib.idToUser
+import me.aberrantfox.hotbot.extensions.stdlib.retrieveIdToName
+import me.aberrantfox.hotbot.extensions.stdlib.retrieveIdToUser
 import me.aberrantfox.hotbot.services.PoolRecord
 import net.dv8tion.jda.core.EmbedBuilder
 import net.dv8tion.jda.core.JDA
@@ -132,7 +132,7 @@ fun suggestionCommands() = commands {
                 val reasonTitle = "Reason for Status"
 
                 val suggestionUpdateMessage = buildSuggestionUpdateEmbed(suggestion, reason, status)
-                suggestion.member.idToUser(it.jda).sendPrivateMessage(suggestionUpdateMessage)
+                suggestion.member.retrieveIdToUser(it.jda).sendPrivateMessage(suggestionUpdateMessage)
 
                 message.fields.removeIf { it.name == reasonTitle }
 
@@ -186,7 +186,7 @@ private fun buildSuggestionUpdateEmbed(suggestion: SuggestionRecord, response: S
 
 private fun buildSuggestionMessage(suggestion: PoolRecord, jda: JDA, status: SuggestionStatus) =
     EmbedBuilder()
-        .setTitle("${suggestion.sender.idToName(jda)}'s Suggestion")
+        .setTitle("${suggestion.sender.retrieveIdToName(jda)}'s Suggestion")
         .setThumbnail(suggestion.avatarURL)
         .setColor(status.colour)
         .setDescription(suggestion.message)
