@@ -31,7 +31,7 @@
 				 
 				msg.delete().queue()
 				container.log.warning("${user} attempted to send the illegal file(s) ${fileNames} in ${channel}")
-				const userResponse = "Please don't send that file type here ${mention} use a service like https://hastebin.com"
+				const userResponse = "Please don't send that file type here ${user} use a service like https://hastebin.com"
 				event.channel.sendMessage(userResponse).queue()
 			}
 		}
