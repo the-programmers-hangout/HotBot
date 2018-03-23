@@ -34,7 +34,7 @@ The api exposes a few things:
 
 ###### A basic command
 Read the JavaScript code below (Please note, ES 5.1 syntax for now):
-```ecmascript 6
+```js
 //create a command object. The command will be invoked by typing (prefix)jsecho
 const command = createCommand("jsecho")
 
