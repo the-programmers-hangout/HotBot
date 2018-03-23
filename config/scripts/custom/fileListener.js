@@ -21,11 +21,16 @@
 			}
 
 			const containsIllegalAttachment = msg.attachments.stream().anyMatch((attachment) => notAllowed(attachment.fileName))
-			const mention = event.author.asMention
-
+			const user = event.author.asMention
 			if(containsIllegalAttachment) {
+				
+				const fileNames = []
+				msg.attachments.stream().forEach(attachment => fileNames.push(attachment.fileName))
+				
+				const channel = event.channel.asMention
+				 
 				msg.delete().queue()
-				container.log.warning("${mention} attempted to send an illegal file")
+				container.log.warning("${user} attempted to send the illegal file(s) ${fileNames} in ${channel}")
 				const userResponse = "Please don't send that file type here ${mention} use a service like https://hastebin.com"
 				event.channel.sendMessage(userResponse).queue()
 			}
