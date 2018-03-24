@@ -1,6 +1,6 @@
 package me.aberrantfox.hotbot.permissions
 
-import me.aberrantfox.hotbot.database.savePermissions
+import me.aberrantfox.hotbot.database.setPermission
 import me.aberrantfox.hotbot.extensions.jda.getHighestRole
 import me.aberrantfox.hotbot.extensions.jda.isEqualOrHigherThan
 import me.aberrantfox.hotbot.extensions.jda.toMember
@@ -18,8 +18,8 @@ data class PermissionManager(val map: HashMap<RoleID, HashSet<CommandName>> = Ha
     fun addPermission(roleID: RoleID, name: CommandName) {
         val lower = name.toLowerCase()
         map.keys.map { map[it]!! }
-            .filter { it.contains(lower) }
-            .forEach { it.remove(lower) }
+                .filter { it.contains(lower) }
+                .forEach { it.remove(lower) }
 
         if(map.containsKey(roleID)) {
             map[roleID]!!.add(lower)
@@ -27,7 +27,7 @@ data class PermissionManager(val map: HashMap<RoleID, HashSet<CommandName>> = Ha
             map[roleID] = hashSetOf(lower)
         }
 
-        savePermissions(this)
+        setPermission(lower, roleID)
     }
 
     fun roleRequired(commandName: CommandName): Role? {
@@ -51,7 +51,7 @@ data class PermissionManager(val map: HashMap<RoleID, HashSet<CommandName>> = Ha
         val roles = getAllRelevantRoleIds(highestRole?.id)
 
         return roles.map { map[it] }
-            .any { it!!.contains(commandName) }
+                .any { it!!.contains(commandName) }
     }
 
     fun listAvailableCommands(roleID: RoleID?): String {
@@ -60,8 +60,8 @@ data class PermissionManager(val map: HashMap<RoleID, HashSet<CommandName>> = Ha
         if(roles.isEmpty()) return "None"
 
         return roles.map { map[it] }
-            .reduceRight { a, b -> a!!.addAll(b!!) ; a }!!
-            .joinToString(", ") { a -> a }
+                .reduceRight { a, b -> a!!.addAll(b!!) ; a }!!
+                .joinToString(", ") { a -> a }
     }
 
     private fun getAllRelevantRoleIds(roleID: RoleID?): List<String> {
@@ -71,9 +71,9 @@ data class PermissionManager(val map: HashMap<RoleID, HashSet<CommandName>> = Ha
 
         val role = guild.roles.first { it.id == roleID }
         val lowerRoles = ArrayList(guild.roles
-            .filter { it.position < role.position }
-            .map { it.id }
-            .toList())
+                .filter { it.position < role.position }
+                .map { it.id }
+                .toList())
 
         lowerRoles.add(roleID)
 

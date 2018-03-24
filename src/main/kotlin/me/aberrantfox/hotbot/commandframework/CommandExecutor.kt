@@ -1,5 +1,7 @@
 package me.aberrantfox.hotbot.commandframework
 
+import kotlinx.coroutines.experimental.CommonPool
+import kotlinx.coroutines.experimental.launch
 import me.aberrantfox.hotbot.commandframework.parsing.cleanCommandMessage
 import me.aberrantfox.hotbot.commandframework.commands.macroMap
 import me.aberrantfox.hotbot.commandframework.parsing.convertArguments
@@ -14,7 +16,6 @@ import me.aberrantfox.hotbot.services.CommandRecommender
 import me.aberrantfox.hotbot.services.Configuration
 import me.aberrantfox.hotbot.services.MService
 import net.dv8tion.jda.core.JDA
-import net.dv8tion.jda.core.entities.Guild
 import net.dv8tion.jda.core.entities.Message
 import net.dv8tion.jda.core.entities.MessageChannel
 import net.dv8tion.jda.core.entities.User
@@ -30,36 +31,41 @@ class CommandExecutor(val config: Configuration,
                       val mService: MService) : ListenerAdapter() {
 
 
-    override fun onGuildMessageReceived(e: GuildMessageReceivedEvent) = handleInvocation(e.channel, e.message, e.author, true)
-
-    override fun onPrivateMessageReceived(e: PrivateMessageReceivedEvent) = handleInvocation(e.channel, e.message, e.author, false)
-
-    private fun handleInvocation(channel: MessageChannel, message: Message, author: User, invokedInGuild: Boolean) {
-        if (!(isUsableCommand(message, channel.id, author))) return
-
-        val (commandName, actualArgs) = cleanCommandMessage(message.contentRaw, config)
-
-        if (!(canPerformCommand(channel, message, author))) return
-
-        val command = container.get(commandName)
-
-        when {
-            command != null -> {
-                invokeCommand(command, commandName, actualArgs, message, author, invokedInGuild)
-                log.cmd("${author.descriptor()} -- invoked $commandName in ${channel.name}")
-            }
-            macroMap.containsKey(commandName) -> {
-                channel.sendMessage(macroMap[commandName]).queue()
-                log.cmd("${author.descriptor()} -- invoked $commandName in ${channel.name}")
-            }
-            else -> {
-                val recommended = CommandRecommender.recommendCommand(commandName)
-                channel.sendMessage("I don't know what ${commandName.replace("@", "")} is, perhaps you meant $recommended?").queue()
-            }
-        }
-
-        if (invokedInGuild) handleDelete(message, config.serverInformation.prefix)
+    override fun onGuildMessageReceived(e: GuildMessageReceivedEvent) {
+        handleInvocation(e.channel, e.message, e.author, true)
     }
+
+    override fun onPrivateMessageReceived(e: PrivateMessageReceivedEvent) {
+        handleInvocation(e.channel, e.message, e.author, false)
+    }
+
+    private fun handleInvocation(channel: MessageChannel, message: Message, author: User, invokedInGuild: Boolean) =
+            launch(CommonPool) {
+                if (!(isUsableCommand(message, channel.id, author))) return@launch
+
+                val (commandName, actualArgs) = cleanCommandMessage(message.contentRaw, config)
+
+                if (!(canPerformCommand(channel, message, author))) return@launch
+
+                val command = container[commandName]
+
+                when {
+                    command != null -> {
+                        invokeCommand(command, commandName, actualArgs, message, author, invokedInGuild)
+                        log.cmd("${author.descriptor()} -- invoked $commandName in ${channel.name}")
+                    }
+                    macroMap.containsKey(commandName) -> {
+                        channel.sendMessage(macroMap[commandName]).queue()
+                        log.cmd("${author.descriptor()} -- invoked $commandName in ${channel.name}")
+                    }
+                    else -> {
+                        val recommended = CommandRecommender.recommendCommand(commandName)
+                        channel.sendMessage("I don't know what ${commandName.replace("@", "")} is, perhaps you meant $recommended?").queue()
+                    }
+                }
+
+                if (invokedInGuild) handleDelete(message, config.serverInformation.prefix)
+            }
 
     private fun invokeCommand(command: Command, name: String, actual: List<String>, message: Message, author: User, invokedInGuild: Boolean) {
         val channel = message.channel
@@ -135,9 +141,9 @@ class CommandExecutor(val config: Configuration,
     }
 
     private fun handleDelete(message: Message, prefix: String) =
-        if (!message.contentRaw.startsWith(prefix + prefix)) {
-            message.deleteIfExists()
-        } else Unit
+            if (!message.contentRaw.startsWith(prefix + prefix)) {
+                message.deleteIfExists()
+            } else Unit
 
 }
 
