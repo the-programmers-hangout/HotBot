@@ -4,7 +4,6 @@
 	command.expect(argType.User)
 
 	command.execute( function(event) {
-		const builder = new EmbedBuilder()
 		const userPfp = event.args[0].effectiveAvatarUrl
 		const reverseUrl = "https://www.google.com/searchbyimage?&image_url="
 		event.respond("<" + reverseUrl + userPfp + ">")
