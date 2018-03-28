@@ -5,25 +5,30 @@ import me.aberrantfox.hotbot.dsls.command.CommandsContainer
 import java.io.File
 
 
-data class HelpFile(val commands: List<CommandDescriptor>, val categoryDescriptions: Map<String, String>)
+data class HelpFile(val commands: ArrayList<CommandDescriptor>, val categoryDescriptions: HashMap<String, String>)
 
-data class CommandDescriptor(val name: String,
-                             val description: String,
-                             val structure: String?,
-                             val example: String?,
-                             val category: String)
+data class CommandDescriptor(val name: String, val description: String, val structure: String?, val example: String?, val category: String)
 
 enum class SelectionArgument { CommandName, CategoryName }
 
 object HelpConf {
     val configuration: HelpFile
 
-    init     {
+    init {
         val data = File(configPath("help.json")).readText()
         val gson = Gson()
 
         configuration = gson.fromJson(data, HelpFile::class.java)
     }
+
+    fun add(name: String, description: String, category: String, structure: String? = null, example: String? = null) =
+            configuration.commands.add(CommandDescriptor(
+                            name.toLowerCase(),
+                            description.toLowerCase(),
+                            structure?.toLowerCase(),
+                            example?.toLowerCase(),
+                            category.toLowerCase())
+            )
 
     fun listCommandsinCategory(name: String) = configuration.commands.filter { it.category == name }
 

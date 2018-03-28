@@ -12,4 +12,6 @@
         const url = "http://chart.apis.google.com/chart?cht=tx&chl=${encodeURIComponent(text)}"
         const image = urlUtilities.sendImageToChannel(url, "latex-processed.png", "Could not process latex", channel)
       }
+
+      help.add("latex", "A command that will parse latex", "fun", "{valid latex}", "\\sum_0^\\infty \\frac{x^n}{n!}")
 }())

@@ -11,6 +11,7 @@ import java.io.File
 import javax.script.Invocable
 import javax.script.ScriptEngine
 import jdk.nashorn.api.scripting.NashornScriptEngineFactory
+import me.aberrantfox.hotbot.services.HelpConf
 
 object EngineContainer {
     var engine: ScriptEngine? = null
@@ -20,6 +21,7 @@ object EngineContainer {
         engine.put("jda", jda)
         engine.put("container", container)
         engine.put("config", config)
+        engine.put("help", HelpConf)
 
         val setupScripts = File(configPath("scripts${File.separator}jsapi"))
         val custom =  File(configPath("scripts${File.separator}custom"))
