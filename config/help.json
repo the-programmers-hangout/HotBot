@@ -204,8 +204,8 @@
       "name": "note",
       "category": "infractions",
       "description": "Add a note to a user's history",
-      "structure": "{noteMessage}",
-      "example": "This is a note"
+      "structure": "{userID} {noteMessage}",
+      "example": "345541952500006911 This is a note"
     },
     {
       "name": "removeNote",
