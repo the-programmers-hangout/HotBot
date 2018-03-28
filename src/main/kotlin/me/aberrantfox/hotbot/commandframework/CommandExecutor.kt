@@ -95,6 +95,10 @@ class CommandExecutor(val config: Configuration,
     }
 
     private fun executeCommand(command: Command, event: CommandEvent, invokedInGuild: Boolean) {
+        if(isDoubleInvocation(event.message, event.config.serverInformation.prefix)) {
+            event.message.addReaction("\uD83D\uDC40").queue()
+        }
+
         if (command.parameterCount == 0) {
             command.execute(event)
             return
@@ -141,9 +145,10 @@ class CommandExecutor(val config: Configuration,
     }
 
     private fun handleDelete(message: Message, prefix: String) =
-            if (!message.contentRaw.startsWith(prefix + prefix)) {
+            if (!isDoubleInvocation(message, prefix)) {
                 message.deleteIfExists()
             } else Unit
 
+    private fun isDoubleInvocation(message: Message, prefix: String) = message.contentRaw.startsWith(prefix + prefix)
 }
 
