@@ -22,7 +22,7 @@ function registerCommand(definition) {
     command.execute = definition.execute
 
     if(definition.help) {
-        help.add(definition.name, definition.description, definition.category, definition.structure, definition.example)
+        help.add(definition.help.name, definition.help.description, definition.help.category, definition.help.structure, definition.help.example)
     }
 }
 
