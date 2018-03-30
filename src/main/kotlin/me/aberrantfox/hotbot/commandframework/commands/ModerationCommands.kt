@@ -14,9 +14,11 @@ import me.aberrantfox.hotbot.extensions.stdlib.retrieveIdToUser
 import me.aberrantfox.hotbot.extensions.stdlib.toRole
 import me.aberrantfox.hotbot.services.Configuration
 import me.aberrantfox.hotbot.utility.muteMember
+import me.aberrantfox.hotbot.utility.muteVoiceChannel
 import net.dv8tion.jda.core.entities.Message
 import net.dv8tion.jda.core.entities.MessageChannel
 import net.dv8tion.jda.core.entities.User
+import net.dv8tion.jda.core.entities.VoiceChannel
 import java.awt.Color
 import java.io.File
 import java.text.SimpleDateFormat
@@ -275,6 +277,17 @@ fun moderationCommands() = commands {
                     user.sendPrivateMessage("Thank you for changing your avatar. You will not be banned.")
                 }
             }
+        }
+    }
+
+    command("mutevoicechannel") {
+        expect(ArgumentType.VoiceChannel)
+
+        execute {
+            val args = it.args
+            val voiceChannel = args[0] as VoiceChannel
+            muteVoiceChannel(it.guild, voiceChannel, it.author, it.config, it
+                    .manager)
         }
     }
 }

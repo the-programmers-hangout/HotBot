@@ -25,9 +25,6 @@ import net.dv8tion.jda.core.JDA
 import net.dv8tion.jda.core.JDABuilder
 import net.dv8tion.jda.core.Permission
 import net.dv8tion.jda.core.entities.Guild
-import java.io.File
-import javax.script.ScriptEngine
-import javax.script.ScriptEngineManager
 
 
 fun main(args: Array<String>) {

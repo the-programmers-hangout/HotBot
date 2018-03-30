@@ -10,59 +10,94 @@ const val separatorCharacter = "|"
 val multiplePartArgTypes = listOf(ArgumentType.Sentence, ArgumentType.Splitter)
 
 enum class ArgumentType {
-    Integer, Double, Word, Choice, Manual, Sentence, User, Splitter, URL
+    Integer, Double, Word, Choice, Manual, Sentence, User, Splitter, URL,
+    VoiceChannel
 }
 
-data class ConversionResult(val args: List<Any?>? = null, val error: String? = null)
+data class ConversionResult(val args: List<Any?>? = null,
+                            val error: String? = null)
 
 fun convertArguments(actual: List<String>, expected: List<CommandArgument>,
                      event: CommandEvent, prefix: String): ConversionResult {
     val expectedTypes = expected.map { it.type }
 
-    if (expectedTypes.contains(ArgumentType.Manual)) return ConversionResult(actual)
+    if (expectedTypes.contains(ArgumentType.Manual)) return ConversionResult(
+            actual)
 
-    val convertedArgs = convertMainArgs(actual, expected)
-            ?: return ConversionResult(null, "Incorrect arguments passed. Try viewing the help documentation via: ${prefix}help <commandName>")
+    val convertedArgs =
+            convertMainArgs(actual, expected) ?: return ConversionResult(null,
+                    "Incorrect arguments passed. Try viewing the help documentation via: ${prefix}help <commandName>")
 
-    val usersConverted =
-            if (expectedTypes.contains(ArgumentType.User)) {
-                val (usersConverted, userConversionError) = retrieveUserArguments(expected, convertedArgs, event.jda)
+    val optionalArgs = if (expectedTypes.contains(ArgumentType.User)) {
+        val (usersConverted, userConversionError) = retrieveUserArguments(
+                expected, convertedArgs, event.jda)
+        if (userConversionError != null || usersConverted == null) return ConversionResult(
+                null, userConversionError)
+        usersConverted
+    } else {
+        if (expectedTypes.contains(ArgumentType.VoiceChannel)) {
+            val (voiceChannelsConverted, voiceChannelConversionError) = retrieveVoiceChannelArguments(
+                    expected, convertedArgs, event.jda)
+            if (voiceChannelConversionError != null || voiceChannelsConverted == null) return ConversionResult(
+                    null, voiceChannelConversionError)
+            voiceChannelsConverted
+        } else {
+            convertedArgs
+        }
+    }
 
-                if (userConversionError != null || usersConverted == null)
-                    return ConversionResult(null, userConversionError)
-
-                usersConverted
-            } else {
-                convertedArgs
-            }
-
-    val filledArgs = convertOptionalArgs(usersConverted, expected, event)
+    val filledArgs = convertOptionalArgs(optionalArgs, expected, event)
 
     return ConversionResult(filledArgs)
 }
 
-fun retrieveUserArguments(expected: List<CommandArgument>, filledArgs: List<Any?>, jda: JDA): ConversionResult {
+fun retrieveUserArguments(expected: List<CommandArgument>,
+                          filledArgs: List<Any?>, jda: JDA): ConversionResult {
     val zip = filledArgs.zip(expected)
 
-    val usersConverted =
-            zip.map {
-                val (arg, expectedArg) = it
+    val usersConverted = zip.map {
+        val (arg, expectedArg) = it
 
-                if (expectedArg.type != ArgumentType.User || arg == null) return@map arg
+        if (expectedArg.type != ArgumentType.User || arg == null) return@map arg
 
-                val parsedUser =
-                        try {
-                            jda.retrieveUserById((arg as String).trimToID()).complete()
-                        } catch (e: RuntimeException) {
-                            null
-                        }
+        val parsedUser = try {
+            jda.retrieveUserById((arg as String).trimToID()).complete()
+        } catch (e: RuntimeException) {
+            null
+        }
 
-                if (parsedUser == null) return ConversionResult(null, "Couldn't retrieve user: $arg")
+        if (parsedUser == null) return ConversionResult(null,
+                "Couldn't retrieve user: $arg")
 
-                return@map parsedUser
-            }
+        return@map parsedUser
+    }
 
     return ConversionResult(usersConverted)
+}
+
+fun retrieveVoiceChannelArguments(expected: List<CommandArgument>,
+                                  filledArgs: List<Any?>,
+                                  jda: JDA): ConversionResult {
+    val zip = filledArgs.zip(expected)
+
+    val voiceChannelsConverted = zip.map {
+        val (arg, expectedArg) = it
+
+        if (expectedArg.type != ArgumentType.VoiceChannel || arg == null) return@map arg
+
+        val parsedVoiceChannel = try {
+            jda.getVoiceChannelById((arg as String).trimToID())
+        } catch (e: RuntimeException) {
+            null
+        }
+
+        if (parsedVoiceChannel == null) return ConversionResult(null,
+                "Couldn't retrieve user: $arg")
+
+        return@map parsedVoiceChannel
+    }
+
+    return ConversionResult(voiceChannelsConverted)
 }
 
 /**
@@ -88,21 +123,22 @@ fun convertMainArgs(actual: List<String>,
         val actualArg = actual[index]
 
         val nextMatchingIndex = expected.withIndex().indexOfFirst {
-            matchesArgType(actualArg, it.value.type) && converted[it.index] == null
+            matchesArgType(actualArg,
+                    it.value.type) && converted[it.index] == null
         }
         if (nextMatchingIndex == -1) return null
 
-        converted[nextMatchingIndex] = convertArg(actualArg, expected[nextMatchingIndex].type, index, actual)
+        converted[nextMatchingIndex] =
+                convertArg(actualArg, expected[nextMatchingIndex].type, index,
+                        actual)
 
         if (expected[nextMatchingIndex].type in multiplePartArgTypes) break
     }
 
-    if (converted.filterIndexed { i, arg -> arg == null && !expected[i].optional }.isNotEmpty())
-        return null
+    if (converted.filterIndexed { i, arg -> arg == null && !expected[i].optional }.isNotEmpty()) return null
 
     return converted.toList()
 }
-
 
 /**
  * Converts any null arguments in a list of converted arguments to their default value
@@ -113,13 +149,14 @@ fun convertMainArgs(actual: List<String>,
  * @return A list of arguments with the optionals filled
  *
  */
-@Suppress("UNCHECKED_CAST")
-fun convertOptionalArgs(args: List<Any?>, expected: List<CommandArgument>, event: CommandEvent) =
+@Suppress("UNCHECKED_CAST") fun convertOptionalArgs(args: List<Any?>,
+                                                    expected: List<CommandArgument>,
+                                                    event: CommandEvent) =
         args.mapIndexed { i, arg ->
-            arg ?: if (expected[i].defaultValue is Function<*>)
-                       (expected[i].defaultValue as (CommandEvent) -> Any).invoke(event)
-                   else
-                       expected[i].defaultValue
+            arg
+                    ?: if (expected[i].defaultValue is Function<*>) (expected[i].defaultValue as (CommandEvent) -> Any).invoke(
+                            event)
+                    else expected[i].defaultValue
         }
 
 
@@ -133,20 +170,22 @@ private fun matchesArgType(arg: String, type: ArgumentType): Boolean {
     }
 }
 
-private fun convertArg(arg: String, type: ArgumentType, index: Int, actual: List<String>): Any {
+private fun convertArg(arg: String, type: ArgumentType, index: Int,
+                       actual: List<String>): Any {
     return when (type) {
         ArgumentType.Integer -> arg.toInt()
         ArgumentType.Double -> arg.toDouble()
         ArgumentType.Choice -> arg.toBooleanValue()
         ArgumentType.User -> arg
+        ArgumentType.VoiceChannel -> arg
         ArgumentType.Sentence -> joinArgs(index, actual)
         ArgumentType.Splitter -> splitArg(index, actual)
         else -> arg
     }
 }
 
-
-private fun joinArgs(start: Int, actual: List<String>) = actual.subList(start, actual.size).reduce { a, b -> "$a $b" }
+private fun joinArgs(start: Int, actual: List<String>) =
+        actual.subList(start, actual.size).reduce { a, b -> "$a $b" }
 
 private fun splitArg(start: Int, actual: List<String>): List<String> {
     val joined = joinArgs(start, actual)

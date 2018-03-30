@@ -1,20 +1,29 @@
 package me.aberrantfox.hotbot.utility
 
+import me.aberrantfox.hotbot.database.CommandPermissions.roleID
 import me.aberrantfox.hotbot.database.deleteMutedMember
 import me.aberrantfox.hotbot.database.insertMutedMember
 import me.aberrantfox.hotbot.dsls.embed.embed
+import me.aberrantfox.hotbot.extensions.jda.getHighestRole
 import me.aberrantfox.hotbot.extensions.stdlib.convertToTimeString
+import me.aberrantfox.hotbot.permissions.PermissionManager
 import me.aberrantfox.hotbot.services.Configuration
 import net.dv8tion.jda.core.entities.Guild
 import net.dv8tion.jda.core.entities.User
+import net.dv8tion.jda.core.entities.VoiceChannel
+import net.dv8tion.jda.core.managers.GuildController
 import java.awt.Color
 import java.util.*
 
 
-data class MuteRecord(val unmuteTime: Long, val reason: String, val moderator: String, val user: String, val guildId: String)
+data class MuteRecord(val unmuteTime: Long, val reason: String,
+                      val moderator: String, val user: String,
+                      val guildId: String)
 
-fun permMuteMember(guild: Guild, user: User, reason: String, config: Configuration, moderator: User) {
-    guild.controller.addRolesToMember(guild.getMemberById(user.id), guild.getRolesByName(config.security.mutedRole, true)).queue()
+fun permMuteMember(guild: Guild, user: User, reason: String,
+                   config: Configuration, moderator: User) {
+    guild.controller.addRolesToMember(guild.getMemberById(user.id),
+            guild.getRolesByName(config.security.mutedRole, true)).queue()
 
     user.openPrivateChannel().queue {
         val muteEmbed = buildMuteEmbed(user.asMention, "Indefinite", reason)
@@ -23,13 +32,16 @@ fun permMuteMember(guild: Guild, user: User, reason: String, config: Configurati
     }
 }
 
-fun muteMember(guild: Guild, user: User, time: Long, reason: String, config: Configuration, moderator: User) {
-    guild.controller.addRolesToMember(guild.getMemberById(user.id), guild.getRolesByName(config.security.mutedRole, true)).queue()
+fun muteMember(guild: Guild, user: User, time: Long, reason: String,
+               config: Configuration, moderator: User) {
+    guild.controller.addRolesToMember(guild.getMemberById(user.id),
+            guild.getRolesByName(config.security.mutedRole, true)).queue()
     val timeString = time.convertToTimeString()
 
     user.openPrivateChannel().queue {
         val timeToUnmute = futureTime(time)
-        val record = MuteRecord(timeToUnmute, reason, moderator.id, user.id, guild.id)
+        val record = MuteRecord(timeToUnmute, reason, moderator.id, user.id,
+                guild.id)
 
         val muteEmbed = buildMuteEmbed(user.asMention, timeString, reason)
         it.sendMessage(muteEmbed).queue()
@@ -39,32 +51,55 @@ fun muteMember(guild: Guild, user: User, time: Long, reason: String, config: Con
     }
 
     moderator.openPrivateChannel().queue {
-        it.sendMessage("User ${user.asMention} has been muted for $timeString, with reason:\n\n$reason").queue()
+        it.sendMessage(
+                "User ${user.asMention} has been muted for $timeString, with reason:\n\n$reason")
+                .queue()
     }
 }
 
-private fun buildMuteEmbed(userMention: String, timeString: String, reason: String) =
-    embed {
-        title("Mute")
-        description("$userMention, you have been muted.\nA muted user cannot speak, post in channels, or react to messages.")
+fun muteVoiceChannel(guild: Guild, voiceChannel: VoiceChannel,
+                     moderator: User, config: Configuration, manager: PermissionManager) {
 
-        field {
-            name = "Length"
-            value = timeString
-            inline = false
+        val guildController = GuildController(guild)
+        val mutedRoles = manager.getLowerRoleIds(guild.getMemberById(moderator.id).getHighestRole()!!.id)
+
+         voiceChannel.members.forEach() {
+            if(mutedRoles.contains(it.getHighestRole()!!.id))
+                guildController.setMute(it, true).queue()
         }
 
-        field {
-            name = "__Reason__"
-            value = reason
-            inline = false
+        moderator.openPrivateChannel().queue {
+            it.sendMessage(
+                    "All non-moderators in voice channel ${voiceChannel.name} have been muted.")
+                    .queue()
         }
+}
 
 
-        setColor(Color.RED)
+private fun buildMuteEmbed(userMention: String, timeString: String,
+                           reason: String) = embed {
+    title("Mute")
+    description(
+            "$userMention, you have been muted.\nA muted user cannot speak, post in channels, or react to messages.")
+
+    field {
+        name = "Length"
+        value = timeString
+        inline = false
     }
 
-fun scheduleUnmute(guild: Guild, user: User, config: Configuration, time: Long, muteRecord: MuteRecord) {
+    field {
+        name = "__Reason__"
+        value = reason
+        inline = false
+    }
+
+
+    setColor(Color.RED)
+}
+
+fun scheduleUnmute(guild: Guild, user: User, config: Configuration, time: Long,
+                   muteRecord: MuteRecord) {
     if (time <= 0) {
         removeMuteRole(guild, user, config, muteRecord)
         return
@@ -77,7 +112,8 @@ fun scheduleUnmute(guild: Guild, user: User, config: Configuration, time: Long, 
     }, time)
 }
 
-fun removeMuteRole(guild: Guild, user: User, config: Configuration, record: MuteRecord) {
+fun removeMuteRole(guild: Guild, user: User, config: Configuration,
+                   record: MuteRecord) {
     if (user.mutualGuilds.isEmpty()) {
         deleteMutedMember(record)
         return
@@ -88,8 +124,13 @@ fun removeMuteRole(guild: Guild, user: User, config: Configuration, record: Mute
 }
 
 fun removeMuteRole(guild: Guild, user: User, config: Configuration) =
-    user.openPrivateChannel().queue {
-        it.sendMessage("${user.name} - you have been unmuted. Please respect our rules to prevent further infractions.").queue {
-            guild.controller.removeRolesFromMember(guild.getMemberById(user.id), guild.getRolesByName(config.security.mutedRole, true)).queue()
+        user.openPrivateChannel().queue {
+            it.sendMessage(
+                    "${user.name} - you have been unmuted. Please respect our rules to prevent further infractions.")
+                    .queue {
+                        guild.controller.removeRolesFromMember(
+                                guild.getMemberById(user.id),
+                                guild.getRolesByName(config.security.mutedRole,
+                                        true)).queue()
+                    }
         }
-    }
