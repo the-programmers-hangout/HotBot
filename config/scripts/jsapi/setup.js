@@ -27,7 +27,7 @@ function registerCommand(definition) {
 
     const command = createCommand(definition.name)
     
-    if(definition.expect && typeof definition.expect === 'object') {
+    if(definition.expect && typeof definition.expect === "object") {
         command.expect(Java.to(definition.expect, ArgumentTypeArray))
     }
     
