@@ -18,6 +18,13 @@
   },
   "commands": [
     {
+      "name": "ban",
+      "category": "moderation",
+      "description": "Bans a member",
+      "structure": "{user} {delete days (Optional)} {reason}",
+      "example": "@Fox#0001 7 For wearing crocs"
+    },
+    {
 	  "name": "cowsay",
 	  "category": "fun",
 	  "description": "Displays a cowsay with a given message",
