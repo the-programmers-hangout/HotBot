@@ -7,13 +7,16 @@ import net.dv8tion.jda.core.JDA
 
 const val separatorCharacter = "|"
 
-val multiplePartArgTypes = listOf(ArgumentType.Sentence, ArgumentType.Splitter)
+val consumingArgTypes = listOf(ArgumentType.Sentence, ArgumentType.Splitter)
+val multiplePartArgTypes = listOf(ArgumentType.Sentence, ArgumentType.Splitter, ArgumentType.TimeString)
 
 enum class ArgumentType {
     Integer, Double, Word, Choice, Manual, Sentence, User, Splitter, URL
 }
 
-data class ConversionResult(val args: List<Any?>? = null, val error: String? = null)
+data class ConversionResult(val results: List<Any?>? = null,
+                            val error: String? = null,
+                            val consumed: List<Any?>? = null) {
 
 fun convertArguments(actual: List<String>, expected: List<CommandArgument>,
                      event: CommandEvent, prefix: String): ConversionResult {
