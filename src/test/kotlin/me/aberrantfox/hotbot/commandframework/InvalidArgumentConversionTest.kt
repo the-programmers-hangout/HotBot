@@ -59,8 +59,8 @@ class InvalidArgumentConversionTest {
 
     private fun mapInvalidTest(argData: List<Pair<List<String>, List<CommandArgument>>>) =
             argData.map { (input, expected) ->
-                DynamicTest.dynamicTest("Input $input against ${expected.map { Pair(it.type, it.optional) }} should cause a null return") {
-                    Assertions.assertNull(convertMainArgs(input, expected))
+                DynamicTest.dynamicTest("Input $input against ${expected.map { Pair(it.type, it.optional) }} should cause null results") {
+                    Assertions.assertNull(convertMainArgs(input, expected).results)
                 }
             }
 
