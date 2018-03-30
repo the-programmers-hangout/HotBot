@@ -11,7 +11,8 @@ val consumingArgTypes = listOf(ArgumentType.Sentence, ArgumentType.Splitter)
 val multiplePartArgTypes = listOf(ArgumentType.Sentence, ArgumentType.Splitter, ArgumentType.TimeString)
 
 enum class ArgumentType {
-    Integer, Double, Word, Choice, Manual, Sentence, User, Splitter, URL
+    Integer, Double, Word, Choice, Manual,
+    Sentence, User, Splitter, URL, TimeString
 }
 
 data class ConversionResult(val results: List<Any?>? = null,
@@ -82,54 +83,41 @@ fun retrieveUserArguments(expected: List<CommandArgument>, filledArgs: List<Any?
     return ConversionResult(usersConverted)
 }
 
-/**
- * Converts a list of strings to the matching expected argument types
- *
- * If the argument isn't converted, it is left as null;
- * e.g. if it's optional and the actual args have already been fully converted
- *
- * Returns null if the actual args cannot fit into the expected ones;
- * e.g. if there is still an arg to convert but no matching place to put it.
- *
- * @return A list of arguments converted to their expected type.
- *
- * null if the actual args do not fit into the expected ones.
- *
- */
-fun convertMainArgs(actual: List<String>,
-                    expected: List<CommandArgument>): List<Any?>? {
+fun convertMainArgs(actual: List<String>, expected: List<CommandArgument>): ConversionResult {
 
     val converted = arrayOfNulls<Any?>(expected.size)
 
-    for (index in 0 until actual.size) {
-        val actualArg = actual[index]
+    val remaining = actual.toMutableList()
+
+    while (remaining.isNotEmpty()) {
+        val actualArg = remaining.first()
 
         val nextMatchingIndex = expected.withIndex().indexOfFirst {
             matchesArgType(actualArg, it.value.type) && converted[it.index] == null
         }
-        if (nextMatchingIndex == -1) return null
+        if (nextMatchingIndex == -1) return ConversionResult(null, "Arguments passed do not match expected ones. Try using the help menu command.")
 
-        converted[nextMatchingIndex] = convertArg(actualArg, expected[nextMatchingIndex].type, index, actual)
+        val result = convertArg(actualArg, expected[nextMatchingIndex].type, remaining)
 
-        if (expected[nextMatchingIndex].type in multiplePartArgTypes) break
+        val convertedValue =
+                if (result is ConversionResult) when {
+                    result.hasError() -> return result
+                    else -> result.results!!.first()
+                } else {
+                    result
+                }
+
+        converted[nextMatchingIndex] = convertedValue
     }
 
-    if (converted.filterIndexed { i, arg -> arg == null && !expected[i].optional }.isNotEmpty())
-        return null
+    val unfilledNonOptionals = converted.filterIndexed { i, arg -> arg == null && !expected[i].optional }
 
-    return converted.toList()
+    if (unfilledNonOptionals.isNotEmpty())
+        return ConversionResult(null, "You did not fill all of the non-optional arguments.")
+
+    return ConversionResult(converted.toList())
 }
 
-
-/**
- * Converts any null arguments in a list of converted arguments to their default value
- *
- * If the default is a function, it is invoked, passing in the CommandEvent.
- * If the value isn't null, it is left unmodified.
- *
- * @return A list of arguments with the optionals filled
- *
- */
 @Suppress("UNCHECKED_CAST")
 fun convertOptionalArgs(args: List<Any?>, expected: List<CommandArgument>, event: CommandEvent) =
         args.mapIndexed { i, arg ->
@@ -150,23 +138,37 @@ private fun matchesArgType(arg: String, type: ArgumentType): Boolean {
     }
 }
 
-private fun convertArg(arg: String, type: ArgumentType, index: Int, actual: List<String>): Any {
-    return when (type) {
-        ArgumentType.Integer -> arg.toInt()
-        ArgumentType.Double -> arg.toDouble()
-        ArgumentType.Choice -> arg.toBooleanValue()
-        ArgumentType.User -> arg
-        ArgumentType.Sentence -> joinArgs(index, actual)
-        ArgumentType.Splitter -> splitArg(index, actual)
-        else -> arg
+private fun convertArg(arg: String, type: ArgumentType, actual: MutableList<String>): Any {
+    val converted =
+            when (type) {
+                ArgumentType.Integer -> arg.toInt()
+                ArgumentType.Double -> arg.toDouble()
+                ArgumentType.Choice -> arg.toBooleanValue()
+                ArgumentType.Sentence -> joinArgs(actual)
+                ArgumentType.Splitter -> splitArg(actual)
+                ArgumentType.TimeString -> convertTimeString(actual)
+                else -> arg
+            }
+
+    if (type !in multiplePartArgTypes) {
+        actual.remove(arg)
+    } else if (type in consumingArgTypes) {
+        actual.clear()
     }
+
+    if (converted is ConversionResult) {
+        converted.consumed?.map {
+            actual.remove(it)
+        }
+    }
+
+    return converted
 }
 
+private fun joinArgs(actual: List<String>) = actual.reduce { a, b -> "$a $b" }
 
-private fun joinArgs(start: Int, actual: List<String>) = actual.subList(start, actual.size).reduce { a, b -> "$a $b" }
-
-private fun splitArg(start: Int, actual: List<String>): List<String> {
-    val joined = joinArgs(start, actual)
+private fun splitArg(actual: List<String>): List<String> {
+    val joined = joinArgs(actual)
 
     if (!(joined.contains(separatorCharacter))) return listOf(joined)
 
