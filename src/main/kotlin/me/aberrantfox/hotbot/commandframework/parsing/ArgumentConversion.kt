@@ -18,18 +18,29 @@ data class ConversionResult(val results: List<Any?>? = null,
                             val error: String? = null,
                             val consumed: List<Any?>? = null) {
 
-fun convertArguments(actual: List<String>, expected: List<CommandArgument>,
-                     event: CommandEvent, prefix: String): ConversionResult {
-    val expectedTypes = expected.map { it.type }
+    fun then(function: (List<Any?>) -> Any): ConversionResult =
+            if (hasError()) {
+                this
+            } else {
+                val nextResult = function.invoke(results!!)
 
-    if (expectedTypes.contains(ArgumentType.Manual)) return ConversionResult(actual)
+                when (nextResult) {
+                    is ConversionResult -> nextResult
+                    is List<*> -> ConversionResult(nextResult)
+                    is Unit -> this
+                    else -> throw IllegalArgumentException("Function must return List, Unit or ConversionResult.")
+                }
+            }
 
-    val convertedArgs = convertMainArgs(actual, expected)
-            ?: return ConversionResult(null, "Incorrect arguments passed. Try viewing the help documentation via: ${prefix}help <commandName>")
+    fun thenIf(condition: Boolean, function: (List<Any?>) -> Any) =
+            if (condition) {
+                then(function)
+            } else {
+                this
+            }
 
-    val usersConverted =
-            if (expectedTypes.contains(ArgumentType.User)) {
-                val (usersConverted, userConversionError) = retrieveUserArguments(expected, convertedArgs, event.jda)
+    fun hasError() = error != null || results == null
+}
 
                 if (userConversionError != null || usersConverted == null)
                     return ConversionResult(null, userConversionError)
