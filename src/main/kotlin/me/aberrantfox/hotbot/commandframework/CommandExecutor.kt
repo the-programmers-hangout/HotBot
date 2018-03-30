@@ -3,7 +3,7 @@ package me.aberrantfox.hotbot.commandframework
 import kotlinx.coroutines.experimental.CommonPool
 import kotlinx.coroutines.experimental.launch
 import me.aberrantfox.hotbot.commandframework.parsing.cleanCommandMessage
-import me.aberrantfox.hotbot.commandframework.commands.macroMap
+import me.aberrantfox.hotbot.commandframework.commands.utility.macroMap
 import me.aberrantfox.hotbot.commandframework.parsing.convertArguments
 import me.aberrantfox.hotbot.commandframework.parsing.getArgCountError
 import me.aberrantfox.hotbot.dsls.command.Command

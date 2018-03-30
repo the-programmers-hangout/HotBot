@@ -1,4 +1,4 @@
-package me.aberrantfox.hotbot.commandframework.commands
+package me.aberrantfox.hotbot.commandframework.commands.utility
 
 import com.google.common.reflect.TypeToken
 import com.google.gson.Gson

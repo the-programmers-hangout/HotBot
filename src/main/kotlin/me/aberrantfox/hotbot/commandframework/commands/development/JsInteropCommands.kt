@@ -1,4 +1,4 @@
-package me.aberrantfox.hotbot.commandframework.commands
+package me.aberrantfox.hotbot.commandframework.commands.development
 
 import me.aberrantfox.hotbot.commandframework.parsing.ArgumentType
 import me.aberrantfox.hotbot.dsls.command.CommandSet
@@ -60,7 +60,7 @@ fun jsCommands() = commands {
 
 private fun createFunctionContext(scriptBody: String) =
     """
-        function $functionName(event) {
+        function ${functionName}(event) {
             $scriptBody
         };
     """.trimIndent()

@@ -9,7 +9,6 @@
     "suggestions": "You can use commands in this section to give suggestions to the server.",
     "embed": "Commands used to build an embed and then send it. You build an embed by using the set/add commands (listed below) - when ready, use sendembed",
     "banqueue": "Commands used for preventing raids and setting up bans. Each moderator has a raid queue in which they can 'pre-load' some bans, with a defined reason.",
-    "profiles": "Commands relating to the profile queue for posting developer profiles or introductions",
     "security": "Commands for modifying security features and thresholds of the bot.",
     "invites": "Commands for dictating how the bot will handle invites",
     "rank": "Commands for granting and removing ranks.",
@@ -472,34 +471,6 @@
       "description": "Echo a message to a channel",
       "structure": "{channelID} {message}",
       "example": "139413981501 Hi there, I am hotbot"
-    },
-    {
-      "name": "submitprofile",
-      "category": "profiles",
-      "description": "Submit a profile to the profile queue, it'll be reviewed by a moderator. YES, you need to match the format! Read the FAQ for formatting!",
-      "structure": "{profile}",
-      "example": "\n **Who are you?** \n  hotbot! \n **What is your experience?** \n everything! \n **What languages are you really, really comfortable with?** \n Kotlin! \n **What other languages have you used/do you know of?** \n Java! \n **Anything else you'd like to say?** \n I like cake!"
-    },
-    {
-      "name": "acceptprofile",
-      "category": "profiles",
-      "description": "Accept a profile and post it to the profiles channel.",
-      "structure": "",
-      "example": ""
-    },
-    {
-      "name": "declineprofile",
-      "category": "profiles",
-      "description": "Decline a profile, removing it from the queue.",
-      "structure": "",
-      "example": ""
-    },
-    {
-      "name": "viewprofile",
-      "category": "profiles",
-      "description": "View the profile at the top of the queue, allowing you to decide whether it should be accepted or rejected.",
-      "structure": "",
-      "example": ""
     },
     {
       "name": "joindate",

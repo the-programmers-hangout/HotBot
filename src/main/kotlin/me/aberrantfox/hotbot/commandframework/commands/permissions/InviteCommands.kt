@@ -1,4 +1,4 @@
-package me.aberrantfox.hotbot.commandframework.commands
+package me.aberrantfox.hotbot.commandframework.commands.permissions
 
 import me.aberrantfox.hotbot.commandframework.parsing.ArgumentType
 import me.aberrantfox.hotbot.dsls.command.CommandSet

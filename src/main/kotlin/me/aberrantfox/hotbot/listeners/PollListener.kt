@@ -1,7 +1,7 @@
 package me.aberrantfox.hotbot.listeners
 
-import me.aberrantfox.hotbot.commandframework.commands.Polls
-import me.aberrantfox.hotbot.commandframework.commands.emoteMap
+import me.aberrantfox.hotbot.commandframework.commands.utility.Polls
+import me.aberrantfox.hotbot.commandframework.commands.utility.emoteMap
 import net.dv8tion.jda.core.events.message.react.MessageReactionAddEvent
 import net.dv8tion.jda.core.hooks.ListenerAdapter
 
