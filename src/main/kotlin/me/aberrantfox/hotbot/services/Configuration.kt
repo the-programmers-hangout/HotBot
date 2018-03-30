@@ -2,6 +2,7 @@ package me.aberrantfox.hotbot.services
 
 import com.github.salomonbrys.kotson.fromJson
 import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import me.aberrantfox.hotbot.logging.ChannelIdHolder
 import java.io.File
 import java.util.*
@@ -53,7 +54,7 @@ enum class InfractionAction {
 
 private val configDir = System.getenv("HOTBOT_CONFIG_DIR") ?: "config"
 private val configLocation = "config.json"
-private val gson = Gson()
+private val gson = GsonBuilder().setPrettyPrinting().create()
 
 fun configPath(fileName: String) = "${configDir}/${fileName}"
 
