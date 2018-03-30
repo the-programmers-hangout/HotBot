@@ -1,13 +1,12 @@
 package me.aberrantfox.hotbot
 
 import me.aberrantfox.hotbot.commandframework.CommandExecutor
-import me.aberrantfox.hotbot.commandframework.commands.EngineContainer
-import me.aberrantfox.hotbot.commandframework.commands.EngineContainer.setupScriptEngine
-import me.aberrantfox.hotbot.commandframework.commands.macroMap
+import me.aberrantfox.hotbot.commandframework.commands.development.EngineContainer
+import me.aberrantfox.hotbot.commandframework.commands.development.EngineContainer.setupScriptEngine
+import me.aberrantfox.hotbot.commandframework.commands.utility.macroMap
 import me.aberrantfox.hotbot.database.getAllMutedMembers
 import me.aberrantfox.hotbot.database.loadUpManager
 import me.aberrantfox.hotbot.database.setupDatabaseSchema
-import me.aberrantfox.hotbot.dsls.command.CommandsContainer
 import me.aberrantfox.hotbot.dsls.command.produceContainer
 import me.aberrantfox.hotbot.extensions.jda.hasRole
 import me.aberrantfox.hotbot.listeners.*
@@ -25,9 +24,6 @@ import net.dv8tion.jda.core.JDA
 import net.dv8tion.jda.core.JDABuilder
 import net.dv8tion.jda.core.Permission
 import net.dv8tion.jda.core.entities.Guild
-import java.io.File
-import javax.script.ScriptEngine
-import javax.script.ScriptEngineManager
 
 
 fun main(args: Array<String>) {

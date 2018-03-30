@@ -1,6 +1,6 @@
 package me.aberrantfox.hotbot.listeners.antispam
 
-import me.aberrantfox.hotbot.commandframework.commands.SecurityLevelState
+import me.aberrantfox.hotbot.commandframework.commands.administration.SecurityLevelState
 import me.aberrantfox.hotbot.extensions.jda.fullName
 import me.aberrantfox.hotbot.extensions.jda.isImagePost
 import me.aberrantfox.hotbot.logging.BotLogger

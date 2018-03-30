@@ -1,4 +1,4 @@
-package me.aberrantfox.hotbot.commandframework.commands
+package me.aberrantfox.hotbot.commandframework.commands.administration
 
 import me.aberrantfox.hotbot.commandframework.parsing.ArgumentType
 import me.aberrantfox.hotbot.dsls.command.CommandSet
@@ -111,7 +111,7 @@ fun strikeCommands() =
 
                 val request = StrikeRequests.map[user.id]!!
                 val newArgs = listOf(request.user, request.amount, request.reason)
-                infract(it.copy(args=newArgs))
+                infract(it.copy(args = newArgs))
 
                 StrikeRequests.map.remove(user.id)
                 it.respond("Strike request on ${user.asMention} was accepted.")

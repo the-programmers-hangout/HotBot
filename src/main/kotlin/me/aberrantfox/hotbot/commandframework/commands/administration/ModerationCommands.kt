@@ -1,8 +1,9 @@
-package me.aberrantfox.hotbot.commandframework.commands
+package me.aberrantfox.hotbot.commandframework.commands.administration
 
 import me.aberrantfox.hotbot.commandframework.parsing.ArgumentType
 import me.aberrantfox.hotbot.dsls.command.CommandSet
 import me.aberrantfox.hotbot.database.*
+import me.aberrantfox.hotbot.dsls.command.arg
 import me.aberrantfox.hotbot.dsls.command.commands
 import me.aberrantfox.hotbot.dsls.embed.embed
 import me.aberrantfox.hotbot.extensions.jda.fullName
@@ -27,6 +28,24 @@ class ModerationCommands
 
 @CommandSet
 fun moderationCommands() = commands {
+    command("ban") {
+        expect(arg(ArgumentType.User), arg(ArgumentType.Integer, true, 1), arg(ArgumentType.Sentence))
+        execute {
+            val target = it.args.component1() as User
+            val deleteMessageDays = it.args.component2() as Int
+            val reason = it.args.component3() as String
+
+            if( !(it.guild.members.map { it.user.id }.contains(target.id)) ) {
+                it.respond("Use not found in this server.")
+                return@execute
+            }
+
+            it.guild.controller.ban(target, deleteMessageDays, reason).queue { _ ->
+                it.respond("${target.fullName()} was banned.")
+            }
+        }
+    }
+
     command("nuke") {
         expect(ArgumentType.Integer)
         execute {

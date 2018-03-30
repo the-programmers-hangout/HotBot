@@ -1,4 +1,4 @@
-package me.aberrantfox.hotbot.commandframework.commands
+package me.aberrantfox.hotbot.commandframework.commands.permissions
 
 import com.google.gson.Gson
 import me.aberrantfox.hotbot.commandframework.parsing.ArgumentType
@@ -30,16 +30,16 @@ object RankContainer {
     }
 
 
-    fun canUse(role: String) = this.config.acceptableRanks.contains(role.toLowerCase())
+    fun canUse(role: String) = config.acceptableRanks.contains(role.toLowerCase())
 
     fun add(role: String) {
-        this.config.acceptableRanks.add(role.toLowerCase())
-        this.save()
+        config.acceptableRanks.add(role.toLowerCase())
+        save()
     }
 
     fun remove(role: String) {
-        this.config.acceptableRanks.remove(role.toLowerCase())
-        this.save()
+        config.acceptableRanks.remove(role.toLowerCase())
+        save()
     }
 
     fun stringList() =

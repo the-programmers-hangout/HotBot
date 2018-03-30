@@ -1,4 +1,4 @@
-package me.aberrantfox.hotbot.commandframework.commands
+package me.aberrantfox.hotbot.commandframework.commands.utility
 
 import com.github.ricksbrown.cowsay.Cowsay
 import khttp.get as kget
