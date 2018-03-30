@@ -42,17 +42,20 @@ data class ConversionResult(val results: List<Any?>? = null,
     fun hasError() = error != null || results == null
 }
 
-                if (userConversionError != null || usersConverted == null)
-                    return ConversionResult(null, userConversionError)
+fun convertArguments(actual: List<String>, expected: List<CommandArgument>, event: CommandEvent): ConversionResult {
 
-                usersConverted
-            } else {
-                convertedArgs
+    val expectedTypes = expected.map { it.type }
+
+    if (expectedTypes.contains(ArgumentType.Manual)) {
+        return ConversionResult(actual)
+    }
+
+    return convertMainArgs(actual, expected)
+            .thenIf(expectedTypes.contains(ArgumentType.User)) {
+                retrieveUserArguments(expected, it, event.jda)
+            }.then {
+                convertOptionalArgs(it, expected, event)
             }
-
-    val filledArgs = convertOptionalArgs(usersConverted, expected, event)
-
-    return ConversionResult(filledArgs)
 }
 
 fun retrieveUserArguments(expected: List<CommandArgument>, filledArgs: List<Any?>, jda: JDA): ConversionResult {
