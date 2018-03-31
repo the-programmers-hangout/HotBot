@@ -8,8 +8,8 @@ private typealias Quantifier = String
 
 fun convertTimeString(actual: List<String>): ConversionResult {
 
-    val timeStringEnd = actual.indexOfLast { toTimeElement(it) != null }
-    val original = actual.subList(0, timeStringEnd + 1).toList()
+    val timeStringEnd = actual.indexOfFirst { toTimeElement(it) == null }
+    val original = actual.subList(0, timeStringEnd).toList()
 
     val timeElements = original
             .map(String::toLowerCase)
