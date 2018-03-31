@@ -1,6 +1,5 @@
 package me.aberrantfox.hotbot.utility
 
-import me.aberrantfox.hotbot.database.CommandPermissions.roleID
 import me.aberrantfox.hotbot.database.deleteMutedMember
 import me.aberrantfox.hotbot.database.insertMutedMember
 import me.aberrantfox.hotbot.dsls.embed.embed
@@ -11,7 +10,6 @@ import me.aberrantfox.hotbot.services.Configuration
 import net.dv8tion.jda.core.entities.Guild
 import net.dv8tion.jda.core.entities.User
 import net.dv8tion.jda.core.entities.VoiceChannel
-import net.dv8tion.jda.core.managers.GuildController
 import java.awt.Color
 import java.util.*
 
@@ -58,23 +56,35 @@ fun muteMember(guild: Guild, user: User, time: Long, reason: String,
 }
 
 fun muteVoiceChannel(guild: Guild, voiceChannel: VoiceChannel,
-                     moderator: User, config: Configuration, manager: PermissionManager) {
+                      moderator: User, config: Configuration, manager: PermissionManager) {
 
-        val guildController = GuildController(guild)
-        val mutedRoles = manager.getLowerRoleIds(guild.getMemberById(moderator.id).getHighestRole()!!.id)
+    val mutedRoles = manager.getLowerRoleIds(config.permissionedActions
+            .voiceChannelMuteThreshold)
 
-         voiceChannel.members.forEach() {
-            if(mutedRoles.contains(it.getHighestRole()!!.id))
-                guildController.setMute(it, true).queue()
+    voiceChannel.members.forEach() {
+        if(mutedRoles.contains(it.getHighestRole()!!.id)) {
+            guild.controller.setMute(it, true).queue()
         }
+    }
 
-        moderator.openPrivateChannel().queue {
-            it.sendMessage(
-                    "All non-moderators in voice channel ${voiceChannel.name} have been muted.")
-                    .queue()
-        }
+    moderator.openPrivateChannel().queue {
+        it.sendMessage(
+                "All non-moderators in voice channel **${voiceChannel.name}** have been muted.").queue()
+    }
 }
 
+fun unmuteVoiceChannel(guild: Guild, voiceChannel: VoiceChannel,
+                     moderator: User, config: Configuration, manager: PermissionManager) {
+
+    voiceChannel.members.forEach() {
+            guild.controller.setMute(it, false).queue()
+    }
+
+    moderator.openPrivateChannel().queue {
+        it.sendMessage(
+                "All non-moderators in voice channel **${voiceChannel.name}** have been un-muted.").queue()
+    }
+}
 
 private fun buildMuteEmbed(userMention: String, timeString: String,
                            reason: String) = embed {

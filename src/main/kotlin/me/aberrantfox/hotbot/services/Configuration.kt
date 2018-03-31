@@ -38,7 +38,8 @@ data class ApiConfiguration(val cleverbotAPIKey: String = "insert-api-key",
 data class PermissionedActions(var sendInvite: String = "insert-role-id",
                                var sendURL: String = "insert-role-id",
                                var commandMention: String = "insert-role-id",
-                               val ignoreLogging: String = "insert-rold-id")
+                               val ignoreLogging: String = "insert-rold-id",
+                               var voiceChannelMuteThreshold: String = "insert-role-id")
 
 data class DatabaseCredentials(val username: String = "root",
                                val password: String = "",
