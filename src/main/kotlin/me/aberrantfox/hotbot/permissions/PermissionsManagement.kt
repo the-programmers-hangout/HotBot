@@ -67,16 +67,20 @@ data class PermissionManager(val map: HashMap<RoleID, HashSet<CommandName>> = Ha
     private fun getAllRelevantRoleIds(roleID: RoleID?): List<String> {
         if(roleID == null) return ArrayList()
 
-        val guild = jda.getGuildById(config.serverInformation.guildid)
-
-        val role = guild.roles.first { it.id == roleID }
-        val lowerRoles = ArrayList(guild.roles
-                .filter { it.position < role.position }
-                .map { it.id }
-                .toList())
+        val lowerRoles = getLowerRoleIds(roleID)
 
         lowerRoles.add(roleID)
 
         return lowerRoles.filter { map.containsKey(it) }
+    }
+
+    fun getLowerRoleIds(roleID: RoleID): ArrayList<String> {
+        val guild = jda.getGuildById(config.serverInformation.guildid)
+        val role = guild.roles.first { it.id == roleID }
+
+        return ArrayList(guild.roles
+                .filter { it.position < role.position }
+                .map { it.id }
+                .toList())
     }
 }

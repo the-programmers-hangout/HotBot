@@ -57,7 +57,7 @@ class DuplicateMessageListener (val config: Configuration, val log: BotLogger, v
     }
 
     private fun punish(event: GuildMessageReceivedEvent, reason: String, id: String) {
-        permMuteMember(event.guild, event.author, reason, config, event.jda.selfUser)
+        permMuteMember(event.guild, event.author, reason, config)
 
         tracker.list(id)?.forEach { it.message.delete().queue() }
 
