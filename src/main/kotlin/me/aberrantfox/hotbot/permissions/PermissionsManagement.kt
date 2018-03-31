@@ -79,4 +79,16 @@ data class PermissionManager(val map: HashMap<RoleID, HashSet<CommandName>> = Ha
 
         return lowerRoles.filter { map.containsKey(it) }
     }
+
+    fun getLowerRoleIds(roleID: RoleID?): List<String> {
+
+        if(roleID == null) return ArrayList()
+        val guild = jda.getGuildById(config.serverInformation.guildid)
+        val role = guild.roles.first { it.id == roleID }
+
+        return ArrayList(guild.roles
+                .filter { it.position < role.position }
+                .map { it.id }
+                .toList())
+    }
 }

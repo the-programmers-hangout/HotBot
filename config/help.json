@@ -793,6 +793,20 @@
       "description": "Eval code without a response",
       "structure": "{code}",
       "example": "event.respond('hi');"
+    },
+    {
+      "name": "mutevoicechannel",
+      "category": "moderation",
+      "description": "Mute all non-moderators in a voice channel.",
+      "structure": "{targetChannelId}",
+      "example": "134932042994309234"
+    },
+    {
+      "name": "unmutevoicechannel",
+      "category": "moderation",
+      "description": "Unmute all users in a voice channel.",
+      "structure": "{targetChannelId}",
+      "example": "134932042994309234"
     }
   ]
 }
