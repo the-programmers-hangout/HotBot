@@ -3,6 +3,7 @@ package me.aberrantfox.hotbot.commandframework.commands.administration
 import me.aberrantfox.hotbot.commandframework.parsing.ArgumentType
 import me.aberrantfox.hotbot.dsls.command.CommandSet
 import me.aberrantfox.hotbot.database.*
+import me.aberrantfox.hotbot.database.ChannelResources.channel
 import me.aberrantfox.hotbot.dsls.command.arg
 import me.aberrantfox.hotbot.dsls.command.commands
 import me.aberrantfox.hotbot.dsls.embed.embed
@@ -17,6 +18,7 @@ import me.aberrantfox.hotbot.services.Configuration
 import me.aberrantfox.hotbot.utility.muteMember
 import net.dv8tion.jda.core.entities.Message
 import net.dv8tion.jda.core.entities.MessageChannel
+import net.dv8tion.jda.core.entities.TextChannel
 import net.dv8tion.jda.core.entities.User
 import java.awt.Color
 import java.io.File
@@ -131,13 +133,11 @@ fun moderationCommands() = commands {
     }
 
     command("move") {
-        expect(ArgumentType.Word, ArgumentType.Integer, ArgumentType.Word)
+        expect(ArgumentType.Word, ArgumentType.Integer, ArgumentType.TextChannel)
         execute {
-            val args = it.args
-
-            val targets = getTargets((args[0] as String))
-            val searchSpace = args[1] as Int
-            val chan = args[2] as String
+            val targets = getTargets((it.args.component1() as String))
+            val searchSpace = it.args.component2() as Int
+            val channel = it.args.component3() as TextChannel
 
             if (searchSpace < 0) {
                 it.respond("... move what")
@@ -146,13 +146,6 @@ fun moderationCommands() = commands {
 
             if (searchSpace > 99) {
                 it.respond("Yea buddy, I'm not moving the entire channel into another, 99 messages or less")
-                return@execute
-            }
-
-            val channel = it.guild.textChannels.firstOrNull { it.id == chan }
-
-            if (channel == null) {
-                it.respond("... to where?")
                 return@execute
             }
 
@@ -205,40 +198,26 @@ fun moderationCommands() = commands {
     }
 
     command("setbanreason") {
-        expect(ArgumentType.Word, ArgumentType.Sentence)
+        expect(ArgumentType.User, ArgumentType.Sentence)
         execute {
-            val target = (it.args[0] as String)
-            val reason = it.args[1] as String
+            val target = it.args.component1() as User
+            val reason = it.args.component2() as String
 
-            try {
-                it.jda.performActionIfIsID(target) { user ->
-                    updateOrSetReason(target, reason, it.author.id)
-                    it.respond("The ban reason for $target has been logged")
-                }
-            } catch (e: IllegalArgumentException) {
-                it.respond("$target is not a valid ID")
-            }
+            updateOrSetReason(target.id, reason, it.author.id)
+            it.respond("The ban reason for ${target.fullName()} has been logged")
         }
     }
 
     command("getbanreason") {
-        expect(ArgumentType.Word)
+        expect(ArgumentType.User)
         execute {
-            val target = it.args[0] as String
+            val target = it.args.component1() as User
+            val record = getReason(target.id)
 
-            try {
-                it.jda.performActionIfIsID(target) { user ->
-                    val record = getReason(target)
-
-                    if (record != null) {
-                        it.respond("$target was banned by ${record.mod.retrieveIdToUser(it.jda).fullName()} for reason ${record.reason}")
-                    } else {
-                        it.respond("That user does not have a record logged.")
-                    }
-
-                }
-            } catch (e: IllegalArgumentException) {
-                it.respond("$target is not a valid ID")
+            if (record != null) {
+                it.respond("${target.fullName()} was banned by ${record.mod.retrieveIdToUser(it.jda).fullName()} for reason ${record.reason}")
+            } else {
+                it.respond("That user does not have a record logged.")
             }
         }
     }

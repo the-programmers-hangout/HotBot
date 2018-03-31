@@ -11,6 +11,7 @@ import me.aberrantfox.hotbot.dsls.embed.embed
 import me.aberrantfox.hotbot.extensions.jda.fullName
 import me.aberrantfox.hotbot.services.Configuration
 import net.dv8tion.jda.core.OnlineStatus
+import net.dv8tion.jda.core.entities.TextChannel
 import net.dv8tion.jda.core.entities.User
 import java.awt.Color
 import java.util.*
@@ -119,12 +120,12 @@ fun utilCommands() = commands {
     }
 
     command("echo") {
-        expect(ArgumentType.Word, ArgumentType.Sentence)
+        expect(ArgumentType.TextChannel, ArgumentType.Sentence)
         execute {
-            val target = it.args[0] as String
+            val target = it.args[0] as TextChannel
             val message = it.args[1] as String
 
-            it.jda.getTextChannelById(target).sendMessage(message).queue()
+            target.sendMessage(message).queue()
         }
     }
 

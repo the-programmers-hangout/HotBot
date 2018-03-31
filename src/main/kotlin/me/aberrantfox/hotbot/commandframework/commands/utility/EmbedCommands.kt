@@ -72,41 +72,19 @@ fun embedCommands() =
         }
 
         command("copyembed") {
-            expect(arg(ArgumentType.Word),
-                   arg(ArgumentType.Word, optional = true, default = { it.channel.id }))
+            expect(arg(ArgumentType.Message),
+                   arg(ArgumentType.TextChannel, optional = true, default = { it.channel }))
             execute {
-                val messageId = it.args.component1() as String
-                val channelId = it.args.component2() as String
+                val message = it.args.component1() as Message
 
-                // exception if channelId can't be converted to Long in getTextChannelById
-                if (!channelId.isLong()) {
-                    it.respond("Not a valid channel id")
+                val embed = message.embeds.firstOrNull()
+                if (embed == null) {
+                    it.respond("Message doesn't contain any embeds")
                     return@execute
                 }
 
-                val channel = it.jda.getTextChannelById(channelId)
-                if (channel == null) {
-                    it.respond("Channel not found with the given id")
-                    return@execute
-                }
-
-                channel.getMessageById(messageId).queue(
-                        { msg ->
-                            // Success
-                            val embed = msg?.embeds?.firstOrNull()
-                            if (embed == null) {
-                                it.respond("Message doesn't contain any embeds")
-                                return@queue
-                            }
-
-                            EHolder.embed = EmbedBuilder(embed)
-                            EHolder.message = msg
-                        },
-                        { error ->
-                            // Failure
-                            it.respond("Message retrieval failed. A message with that id may not exist in this channel.")
-                        }
-                )
+                EHolder.embed = EmbedBuilder(embed)
+                EHolder.message = message
             }
         }
 

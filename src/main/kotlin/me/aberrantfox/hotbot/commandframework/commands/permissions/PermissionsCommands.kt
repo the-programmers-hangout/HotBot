@@ -10,21 +10,17 @@ import me.aberrantfox.hotbot.extensions.jda.toMember
 import me.aberrantfox.hotbot.extensions.stdlib.sanitiseMentions
 import me.aberrantfox.hotbot.services.CommandDescriptor
 import me.aberrantfox.hotbot.services.HelpConf
+import net.dv8tion.jda.core.entities.Role
 import java.awt.Color
 
 @CommandSet
 fun permissionCommands() =
     commands {
         command("setPermission") {
-            expect(ArgumentType.Word, ArgumentType.Word)
+            expect(ArgumentType.Word, ArgumentType.Role)
             execute {
-                val commandName = it.args[0] as String
-                val role = it.guild.getRoleByIdOrName(it.args[1] as String)
-
-                if (role == null) {
-                    it.respond("Unknown role.")
-                    return@execute
-                }
+                val commandName = it.args.component1() as String
+                val role = it.args.component2() as Role
 
                 if (!(it.container.has(commandName))) {
                     it.safeRespond("Dunno what the command: $commandName is - run the help command?")
@@ -64,14 +60,9 @@ fun permissionCommands() =
         }
 
         command("setallPermissions") {
-            expect(ArgumentType.Word)
+            expect(ArgumentType.Role)
             execute {
-                val role = it.guild.getRoleByIdOrName(it.args.component1() as String)
-
-                if (role == null) {
-                    it.respond("Unknown role")
-                    return@execute
-                }
+                val role = it.args.component1() as Role
 
                 if (it.config.serverInformation.ownerID != it.author.id) {
                     it.respond("Sorry, this command can only be run by the owner marked in the configuration file.")
@@ -83,15 +74,10 @@ fun permissionCommands() =
         }
 
         command("setPermissions") {
-            expect(ArgumentType.Word, ArgumentType.Word)
+            expect(ArgumentType.Word, ArgumentType.Role)
             execute {
                 val target = it.args.component1() as String
-                val role = it.guild.getRoleByIdOrName(it.args.component2() as String)
-
-                if (role == null) {
-                    it.safeRespond("Unknown role")
-                    return@execute
-                }
+                val role = it.args.component2() as Role
 
                 val commands = HelpConf.listCommandsinCategory(target).map { it.name }
 

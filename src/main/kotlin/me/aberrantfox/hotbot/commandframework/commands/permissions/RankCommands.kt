@@ -8,6 +8,7 @@ import me.aberrantfox.hotbot.dsls.command.commands
 import me.aberrantfox.hotbot.extensions.jda.fullName
 import me.aberrantfox.hotbot.extensions.jda.isRole
 import me.aberrantfox.hotbot.services.configPath
+import net.dv8tion.jda.core.entities.Role
 import net.dv8tion.jda.core.entities.User
 import java.io.File
 
@@ -55,50 +56,47 @@ object RankContainer {
 @CommandSet
 fun rankCommands() = commands {
     command("grant") {
-        expect(ArgumentType.Word, ArgumentType.User)
+        expect(ArgumentType.Role, ArgumentType.User)
         execute {
             handleGrant(it, true)
         }
     }
 
     command("revoke") {
-        expect(ArgumentType.Word, ArgumentType.User)
+        expect(ArgumentType.Role, ArgumentType.User)
         execute {
             handleGrant(it, false)
         }
     }
 
     command("makerolegrantable") {
-        expect(ArgumentType.Word)
+        expect(ArgumentType.Role)
         execute {
-            val role = it.args[0] as String
+            val role = it.args.component1() as Role
+            val roleName = role.name
 
-            if (!(it.jda.isRole(role))) {
-                it.respond("Error, that is not a role, or there are more than one roles by that name.")
-                return@execute
-            }
-
-            if (RankContainer.canUse(role)) {
+            if (RankContainer.canUse(roleName)) {
                 it.respond("A role with that name is already grantable.")
                 return@execute
             }
 
-            RankContainer.add(role)
-            it.respond("The role: $role has been added to the role whitelist, and can now be assigned via the grant command.")
+            RankContainer.add(role.name)
+            it.respond("The role: $roleName has been added to the role whitelist, and can now be assigned via the grant command.")
         }
     }
 
     command("makeroleungrantable") {
-        expect(ArgumentType.Word)
+        expect(ArgumentType.Role)
         execute {
-            val role = it.args[0] as String
+            val role = it.args.component1() as Role
+            val roleName = role.name
 
-            if (!(RankContainer.canUse(role))) {
+            if (!(RankContainer.canUse(roleName))) {
                 it.respond("Error: a role with that name hasn't been made grantable or doesn't exist")
                 return@execute
             }
 
-            RankContainer.remove(role)
+            RankContainer.remove(roleName)
             it.respond("The role: $role has been un-whitelisted, meaning it can no longer be granted. ")
         }
     }
@@ -111,21 +109,10 @@ fun rankCommands() = commands {
 }
 
 private fun handleGrant(event: CommandEvent, grant: Boolean) {
-    val roleName = event.args[0] as String
-    val target = event.args[1] as User
+    val role = event.args.component1() as Role
+    val target = event.args.component2() as User
     val member = event.guild.getMember(target)
-
-    if (!(event.jda.isRole(roleName))) {
-        event.respond("That is not a known role")
-        return
-    }
-
-    val role = event.guild.getRolesByName(roleName, true)
-
-    if (!(RankContainer.canUse(roleName))) {
-        event.respond("That is not a grantable role")
-        return
-    }
+    val roleName = role.name
 
     if (grant) {
         event.guild.controller.addRolesToMember(member, role).queue()
