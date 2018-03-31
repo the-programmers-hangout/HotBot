@@ -95,7 +95,7 @@ class ValidArgumentConversionTest {
             argData.map { (input, expected) ->
                 DynamicTest.dynamicTest(
                         "Input $input should parse to ${expected.second}") {
-                    Assertions.assertEquals(expected.second, convertMainArgs(input, expected.first))
+                    Assertions.assertEquals(expected.second, convertMainArgs(input, expected.first).results)
                 }
             }
 

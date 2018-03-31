@@ -80,10 +80,9 @@ class CommandExecutor(val config: Configuration,
             return
         }
 
-
         val event = CommandEvent(config, jda, channel, author, message, jda.getGuildById(config.serverInformation.guildid), manager, container, mService, actual)
 
-        val (convertedArgs, conversionError) = convertArguments(actual, command.expectedArgs.toList(), event, config.serverInformation.prefix)
+        val (convertedArgs, conversionError) = convertArguments(actual, command.expectedArgs.toList(), event)
         if (conversionError != null || convertedArgs == null) {
             event.safeRespond(conversionError.toString())
             return
