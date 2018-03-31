@@ -11,14 +11,18 @@ fun convertTimeString(actual: List<String>): ConversionResult {
     val timeStringEnd = actual.indexOfFirst { toTimeElement(it) == null }
     val original = actual.subList(0, timeStringEnd).toList()
 
-    val timeElements = original
+    val possibleElements = original
             .map(String::toLowerCase)
             .map(::toTimeElement)
 
-    if (timeElements.isEmpty() || timeElements.contains(null)) {
+
+    val timeElements = possibleElements.dropLastWhile { it is Quantity } // assume trailing numbers are part of next arg (ID, Integer, etc.)
+
+    if (timeElements.isEmpty()) {
         return ConversionResult(null, "Invalid time element passed.")
     }
 
+    val consumed = original.subList(0, timeElements.size)
 
     val quantityCount = timeElements.count { it is Quantity }
     val quantifierCount = timeElements.count { it is Quantifier }
@@ -52,7 +56,7 @@ fun convertTimeString(actual: List<String>): ConversionResult {
             .reduce { a, b -> a + b }
 
 
-    return ConversionResult(results=listOf(timeInSeconds), consumed=original)
+    return ConversionResult(results=listOf(timeInSeconds), consumed=consumed)
 }
 
 private fun toTimeElement(element: String): Any? {
