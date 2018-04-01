@@ -16,7 +16,7 @@ fun funCommands() =
     commands {
         command("cat") {
             execute {
-                val json = kget("http://random.cat/meow").jsonObject
+                val json = kget("http://aws.random.cat/meow").jsonObject
                 it.respond(json.getString("file"))
             }
         }
