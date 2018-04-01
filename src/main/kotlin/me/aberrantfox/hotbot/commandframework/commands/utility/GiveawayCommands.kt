@@ -42,11 +42,22 @@ fun giveawayCommands() = commands {
     command("giveawayend"){
         expect(ArgumentType.Word)
         execute{
+            val giveawayID = it.args.component1() as String
+
+            if((Giveaways.map.containsKey(giveawayID))){
+                Giveaways.map.remove(giveawayID)
+                info("Ended the giveaway: $giveawayID")
+            }else{
+                findWinner(it.channel, giveawayID)
+            }
         }
     }
     command("giveawayreroll"){
         expect(ArgumentType.Word)
         execute {
+            val giveawayID = it.args.component1() as String
+
+            findWinner(it.channel, giveawayID)
         }
     }
 }
