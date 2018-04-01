@@ -64,15 +64,22 @@ fun giveawayCommands() = commands {
 
 private fun findWinner(channel: MessageChannel, id: String){
     val giveaway = channel.getMessageById(id)
-
+    val prize = Giveaways.map[id]!!.prize
     giveaway.queue{
         val reaction = it.reactions.first{ it.reactionEmote.name == "\uD83C\uDF89" }
 
         reaction.users.queue { users ->
             val user = users.dropLast(1)
-            val winner = user[randomInt(0, user.size-1)]
-
-            giveaway.complete().editMessage(buildWinnerEmbed(winner)).queue()
+            if(user.isEmpty()){
+                giveaway.complete().editMessage(embed {
+                    title("Giveaway event ended")
+                    description("Nobody won __**$prize**__ because nobody reacted!")
+                    setColor(Color.RED)
+                }).queue()
+            }else{
+                val winner = user[randomInt(0, user.size-1)]
+                giveaway.complete().editMessage(buildWinnerEmbed(winner, prize)).queue()
+            }
         }
     }
 }
@@ -119,10 +126,10 @@ private fun buildGiveawayEmbed(timeMilliSecs: Long, prize: String) =
             }
         }
 
-private fun buildWinnerEmbed(winner: User) =
+private fun buildWinnerEmbed(winner: User, prize: String) =
         embed {
             title("Giveaway event ended")
-            description("${winner.asMention} has won the giveaway! \uD83C\uDF89")
+            description("${winner.asMention} has won __**$prize**__ \uD83C\uDF89")
             setColor(Color.BLACK)
             field {
                 name = ""
