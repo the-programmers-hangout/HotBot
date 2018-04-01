@@ -25,7 +25,7 @@ val delay = 5000L
 
 @CommandSet
 fun giveawayCommands() = commands {
-    command("giveaway"){
+    command("giveawaystart"){
         expect(ArgumentType.TimeString, ArgumentType.Sentence)
         execute {
             val timeMilliSecs = (it.args.component1() as Double).roundToLong() * 1000
