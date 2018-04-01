@@ -46,10 +46,8 @@ fun giveawayCommands() = commands {
 
             if((Giveaways.map.containsKey(giveawayID))){
                 Giveaways.map.remove(giveawayID)
-                info("Ended the giveaway: $giveawayID")
-            }else{
-                findWinner(it.channel, giveawayID)
             }
+            findWinner(it.channel, giveawayID)
         }
     }
     command("giveawayreroll"){
@@ -64,7 +62,6 @@ fun giveawayCommands() = commands {
 
 private fun findWinner(channel: MessageChannel, id: String){
     val giveaway = channel.getMessageById(id)
-    val prize = Giveaways.map[id]!!.prize
     giveaway.queue{
         val reaction = it.reactions.first{ it.reactionEmote.name == "\uD83C\uDF89" }
 
@@ -73,12 +70,12 @@ private fun findWinner(channel: MessageChannel, id: String){
             if(user.isEmpty()){
                 giveaway.complete().editMessage(embed {
                     title("Giveaway event ended")
-                    description("Nobody won __**$prize**__ because nobody reacted!")
+                    description("Nobody won because nobody reacted!")
                     setColor(Color.RED)
                 }).queue()
             }else{
                 val winner = user[randomInt(0, user.size-1)]
-                giveaway.complete().editMessage(buildWinnerEmbed(winner, prize)).queue()
+                giveaway.complete().editMessage(buildWinnerEmbed(winner)).queue()
             }
         }
     }
@@ -91,8 +88,10 @@ private fun runGiveaway(id: String, timeLeft: Long) {
     Timer().schedule(delay) {
         when{
             timeLeft < delay -> {
-                Giveaways.map.remove(id)
-                findWinner(giveaway.channel, msg.id)
+                if(Giveaways.map.containsKey(id)){
+                    Giveaways.map.remove(id)
+                    findWinner(giveaway.channel, msg.id)
+                }
             }
 
             Giveaways.map.containsKey(id) -> {
@@ -102,9 +101,6 @@ private fun runGiveaway(id: String, timeLeft: Long) {
                     msg.editMessage(buildGiveawayEmbed(timeLeft-delay, giveaway.prize)).queue()
                     runGiveaway(id, timeLeft-delay)
                 }
-            }
-            else -> {
-                findWinner(giveaway.channel, msg.id)
             }
         }
     }
@@ -126,10 +122,10 @@ private fun buildGiveawayEmbed(timeMilliSecs: Long, prize: String) =
             }
         }
 
-private fun buildWinnerEmbed(winner: User, prize: String) =
+private fun buildWinnerEmbed(winner: User) =
         embed {
             title("Giveaway event ended")
-            description("${winner.asMention} has won __**$prize**__ \uD83C\uDF89")
+            description("${winner.asMention} has won! \uD83C\uDF89")
             setColor(Color.BLACK)
             field {
                 name = ""
