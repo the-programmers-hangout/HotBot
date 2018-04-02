@@ -14,7 +14,8 @@
     "rank": "Commands for granting and removing ranks.",
     "resources": "Commands related to channel resources",
     "polling": "Commands related to polling questions and answers",
-    "api": "Commands Related to evaluting Javascript code inline, or interfacing with the bot api."
+    "api": "Commands related to evaluting Javascript code inline, or interfacing with the bot api.",
+    "giveaways": "Commands related to giveaways"
   },
   "commands": [
     {
@@ -807,6 +808,27 @@
       "description": "Unmute all users in a voice channel.",
       "structure": "{targetChannelId}",
       "example": "134932042994309234"
+    },
+    {
+      "name": "giveawaystart",
+      "category": "giveaway",
+      "description": "Starts a giveaway in the channel it is invoked in.",
+      "structure": "{timeString} {prize}",
+      "example": "1d an ice cold can of coke"
+    },
+    {
+      "name": "giveawayend",
+      "category": "giveaway",
+      "description": "Force end a giveaway",
+      "structure": "{messageID}",
+      "example": "429853770063806466"
+    },
+    {
+      "name": "giveawayreroll",
+      "category": "giveaway",
+      "description": "Reroll an ended giveaway to get a new winner",
+      "structure": "{messageID}",
+      "example": "429853770063806466"
     }
   ]
 }
