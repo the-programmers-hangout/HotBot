@@ -13,27 +13,25 @@ import java.awt.Color
 class ChannelDeleteListener(val log: BotLogger) : ListenerAdapter() {
     override fun onTextChannelDelete(event: TextChannelDeleteEvent) {
         val resources = fetchChannelResources(event.channel.id, true)
-        if(resources.isEmpty()){
+        if (resources.isEmpty()) {
             return
         }
+
         removeAllChannelResources(event.channel.id)
         log.warning(buildDeleteResourcesEmbed(event.channel, resources))
     }
 }
+
 private fun buildDeleteResourcesEmbed(channel: MessageChannel, resources: Map<String, ResourceSection>) =
         embed {
             setColor(Color.RED)
             title("Deleted ${channel.name}'s resources")
             description("Deleted channel resources:")
 
-            resources.forEach { _, rs ->
-                val sb = StringBuilder()
-
-                rs.items.forEach { info -> sb.append("$info\n") }
-
+            resources.forEach { _, section ->
                 field {
-                    name = rs.section
-                    value = sb.toString()
+                    name = section.section
+                    value = section.items.joinToString("\n")
                     inline = false
                 }
             }
