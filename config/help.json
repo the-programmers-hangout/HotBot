@@ -829,6 +829,27 @@
       "description": "Reroll an ended giveaway to get a new winner",
       "structure": "{messageID}",
       "example": "429853770063806466"
+    },
+    {
+      "name": "xkcd",
+      "category": "fun",
+      "description": "Returns the XKCD comic number specified, or a random comic if you don't supply a number.",
+      "structure": "{comicNumber}",
+      "example": "371"
+    },
+    {
+      "name": "xkcd-search",
+      "category": "fun",
+      "description": "Returns a XKCD comic that most closely matches your query.",
+      "structure": "{searchQuery}",
+      "example": "Exploits of a mom"
+    },
+    {
+      "name": "xkcd-latest",
+      "category": "fun",
+      "description": "Grabs the latest XKCD comic.",
+      "structure": "",
+      "example": ""
     }
   ]
 }
