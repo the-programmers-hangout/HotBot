@@ -67,6 +67,7 @@ fun main(args: Array<String>) {
             InviteListener(config, logger, manager),
             VoiceChannelListener(logger),
             NewChannelListener(mutedRole),
+            ChannelDeleteListener(logger),
             DuplicateMessageListener(config, logger, tracker),
             RoleListener(config),
             PollListener(),
