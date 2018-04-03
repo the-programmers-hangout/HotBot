@@ -8,20 +8,20 @@ import me.aberrantfox.hotbot.dsls.command.commands
 import me.aberrantfox.hotbot.utility.randomInt
 import java.net.URLEncoder
 
-@CommandSet fun xkcdCommands() = commands {
+@CommandSet
+fun xkcdCommands() = commands {
     command("xkcd") {
-        expect(arg(ArgumentType.Integer, true, -1))
+        expect(arg(ArgumentType.Integer, true, { randomInt(1, getAmount()) }))
         execute {
             val target = it.args.component1() as Int
-            val link = if (target == -1) {
-                produceURL(randomInt(1, getAmount()))
-            } else {
-                if (target <= getAmount() && target > 0) {
-                    produceURL(target)
-                } else {
-                    "Please enter a valid comic number between 1 and ${getAmount()}"
-                }
-            }
+
+            val link =
+                    if (target <= getAmount() && target > 0) {
+                        produceURL(target)
+                    } else {
+                        "Please enter a valid comic number between 1 and ${getAmount()}"
+                    }
+
             it.respond(link)
         }
     }
