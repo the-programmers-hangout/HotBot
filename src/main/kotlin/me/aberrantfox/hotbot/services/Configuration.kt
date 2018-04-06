@@ -4,6 +4,7 @@ import com.github.salomonbrys.kotson.fromJson
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import me.aberrantfox.hotbot.logging.ChannelIdHolder
+import me.aberrantfox.hotbot.permissions.PermissionLevel
 import java.io.File
 import java.util.*
 
@@ -36,11 +37,11 @@ data class ApiConfiguration(val cleverbotAPIKey: String = "insert-api-key",
                             val cleverBotApiCallLimit: Int = 10000,
                             val enableCleverBot: Boolean = false)
 
-data class PermissionedActions(var sendInvite: String = "insert-role-id",
-                               var sendURL: String = "insert-role-id",
-                               var commandMention: String = "insert-role-id",
-                               val ignoreLogging: String = "insert-role-id",
-                               var voiceChannelMuteThreshold: String = "insert-role-id")
+data class PermissionedActions(var sendInvite: PermissionLevel = PermissionLevel.Moderator,
+                               var sendURL: PermissionLevel = PermissionLevel.Moderator,
+                               var commandMention: PermissionLevel = PermissionLevel.Moderator,
+                               val ignoreLogging: PermissionLevel = PermissionLevel.Moderator,
+                               var voiceChannelMuteThreshold: PermissionLevel = PermissionLevel.Moderator)
 
 data class DatabaseCredentials(val username: String = "root",
                                val password: String = "",

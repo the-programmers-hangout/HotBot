@@ -3,7 +3,6 @@ package me.aberrantfox.hotbot.commandframework.commands.utility
 import com.google.gson.Gson
 import me.aberrantfox.hotbot.commandframework.parsing.ArgumentType
 import me.aberrantfox.hotbot.dsls.command.CommandSet
-import me.aberrantfox.hotbot.database.savePermissions
 import me.aberrantfox.hotbot.dsls.command.CommandEvent
 import me.aberrantfox.hotbot.services.saveConfig
 import me.aberrantfox.hotbot.dsls.command.commands
@@ -87,7 +86,7 @@ fun utilCommands() = commands {
             it.respond("Exiting")
             saveConfig(it.config)
             info("saved configurations")
-            savePermissions(it.manager)
+            it.manager.save()
             info("saved permissions to database prior to shut down.")
             System.exit(0)
         }

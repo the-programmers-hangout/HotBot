@@ -5,6 +5,7 @@ import me.aberrantfox.hotbot.database.insertMutedMember
 import me.aberrantfox.hotbot.dsls.embed.embed
 import me.aberrantfox.hotbot.extensions.jda.getHighestRole
 import me.aberrantfox.hotbot.extensions.stdlib.convertToTimeString
+import me.aberrantfox.hotbot.permissions.PermissionLevel
 import me.aberrantfox.hotbot.permissions.PermissionManager
 import me.aberrantfox.hotbot.services.Configuration
 import net.dv8tion.jda.core.entities.Guild
@@ -57,18 +58,12 @@ fun muteMember(guild: Guild, user: User, time: Long, reason: String,
 
 fun muteVoiceChannel(guild: Guild, voiceChannel: VoiceChannel,
                      moderator: User, config: Configuration, manager: PermissionManager) {
-
-    val mutedRoles = manager.getLowerRoleIds(config.permissionedActions.voiceChannelMuteThreshold)
-
-    voiceChannel.members.forEach {
-        if (mutedRoles.contains(it.getHighestRole()!!.id)) {
-            guild.controller.setMute(it, true).queue()
-        }
-    }
+    voiceChannel.members
+            .filter { !(manager.canPerformAction(it.user, config.permissionedActions.voiceChannelMuteThreshold)) }
+            .forEach { guild.controller.setMute(it, true).queue() }
 
     moderator.openPrivateChannel().queue {
-        it.sendMessage(
-                "All non-moderators in voice channel **${voiceChannel.name}** have been muted.").queue()
+        it.sendMessage("All non-moderators in voice channel **${voiceChannel.name}** have been muted.").queue()
     }
 }
 
@@ -79,8 +74,7 @@ fun unmuteVoiceChannel(guild: Guild, voiceChannel: VoiceChannel, moderator: User
     }
 
     moderator.openPrivateChannel().queue {
-        it.sendMessage(
-                "All members in voice channel **${voiceChannel.name}** have been un-muted.").queue()
+        it.sendMessage("All members in voice channel **${voiceChannel.name}** have been un-muted.").queue()
     }
 }
 

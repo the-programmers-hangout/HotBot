@@ -5,7 +5,6 @@ import me.aberrantfox.hotbot.commandframework.commands.development.EngineContain
 import me.aberrantfox.hotbot.commandframework.commands.development.EngineContainer.setupScriptEngine
 import me.aberrantfox.hotbot.commandframework.commands.utility.macroMap
 import me.aberrantfox.hotbot.database.getAllMutedMembers
-import me.aberrantfox.hotbot.database.loadUpManager
 import me.aberrantfox.hotbot.database.setupDatabaseSchema
 import me.aberrantfox.hotbot.dsls.command.produceContainer
 import me.aberrantfox.hotbot.extensions.jda.hasRole
@@ -53,11 +52,9 @@ fun main(args: Array<String>) {
     logger.info("connected")
     val mutedRole = jda.getRolesByName(config.security.mutedRole, true).first()
     val tracker = MessageTracker(1)
-
-    val manager = PermissionManager(HashMap(), jda, config)
+    val guild = jda.getGuildById(config.serverInformation.guildid)
+    val manager = PermissionManager(jda, guild, container, config)
     val messageService = MService()
-
-    loadUpManager(manager)
 
     container.newLogger(logger)
 

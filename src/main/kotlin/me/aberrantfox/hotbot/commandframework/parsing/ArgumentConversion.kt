@@ -2,8 +2,11 @@ package me.aberrantfox.hotbot.commandframework.parsing
 
 import me.aberrantfox.hotbot.dsls.command.CommandArgument
 import me.aberrantfox.hotbot.dsls.command.CommandEvent
+import me.aberrantfox.hotbot.dsls.command.CommandsContainer
 import me.aberrantfox.hotbot.extensions.jda.getRoleByIdOrName
 import me.aberrantfox.hotbot.extensions.stdlib.*
+import me.aberrantfox.hotbot.permissions.PermissionLevel
+import me.aberrantfox.hotbot.services.HelpConf
 import net.dv8tion.jda.core.entities.Guild
 import net.dv8tion.jda.core.entities.ISnowflake
 import net.dv8tion.jda.core.entities.TextChannel
@@ -24,7 +27,8 @@ val multiplePartArgTypes = listOf(ArgumentType.Sentence, ArgumentType.Splitter, 
 enum class ArgumentType {
     Integer, Double, Word, Choice, Manual,
     Sentence, User, Splitter, URL, TimeString,
-    TextChannel, VoiceChannel, Message, Role
+    TextChannel, VoiceChannel, Message, Role,
+    PermissionLevel, Command, Category
 }
 
 data class ConversionResult(val results: List<Any?>? = null,
@@ -63,7 +67,7 @@ fun convertArguments(actual: List<String>, expected: List<CommandArgument>, even
         return ConversionResult(actual)
     }
 
-    return convertMainArgs(actual, expected)
+    return convertMainArgs(actual, expected, event.container)
             .thenIf(expectedTypes.any(snowflakeArgTypes::contains)) {
                 retrieveSnowflakes(it, expected, event.guild)
             }.then {
@@ -73,7 +77,7 @@ fun convertArguments(actual: List<String>, expected: List<CommandArgument>, even
             } // final and separate message conversion because dependent on text channel arg being converted already
 }
 
-fun convertMainArgs(actual: List<String>, expected: List<CommandArgument>): ConversionResult {
+fun convertMainArgs(actual: List<String>, expected: List<CommandArgument>, container: CommandsContainer): ConversionResult {
 
     val converted = arrayOfNulls<Any?>(expected.size)
 
@@ -83,11 +87,11 @@ fun convertMainArgs(actual: List<String>, expected: List<CommandArgument>): Conv
         val actualArg = remaining.first()
 
         val nextMatchingIndex = expected.withIndex().indexOfFirst {
-            matchesArgType(actualArg, it.value.type) && converted[it.index] == null
+            matchesArgType(actualArg, it.value.type, container) && converted[it.index] == null
         }
         if (nextMatchingIndex == -1) return ConversionResult(null, "Arguments passed do not match expected ones. Try using the help menu command.")
 
-        val result = convertArg(actualArg, expected[nextMatchingIndex].type, remaining)
+        val result = convertArg(actualArg, expected[nextMatchingIndex].type, remaining, container)
 
         val convertedValue =
                 if (result is ConversionResult) when {
@@ -162,22 +166,27 @@ fun convertOptionalArgs(args: List<Any?>, expected: List<CommandArgument>, event
         }
 
 
-private fun matchesArgType(arg: String, type: ArgumentType): Boolean {
+private fun matchesArgType(arg: String, type: ArgumentType, container: CommandsContainer): Boolean {
     return when (type) {
         ArgumentType.Integer -> arg.isInteger()
         ArgumentType.Double -> arg.isDouble()
         ArgumentType.Choice -> arg.isBooleanValue()
         ArgumentType.URL -> arg.containsURl()
+        ArgumentType.PermissionLevel -> arg.isPermission()
+        ArgumentType.Command -> container.has(arg.toLowerCase())
+        ArgumentType.Category -> HelpConf.listCategories().contains(arg.toLowerCase())
         else -> true
     }
 }
 
-private fun convertArg(arg: String, type: ArgumentType, actual: MutableList<String>): Any {
+private fun convertArg(arg: String, type: ArgumentType, actual: MutableList<String>, container: CommandsContainer): Any {
     val converted =
             when (type) {
                 ArgumentType.Integer -> arg.toInt()
                 ArgumentType.Double -> arg.toDouble()
                 ArgumentType.Choice -> arg.toBooleanValue()
+                ArgumentType.PermissionLevel -> PermissionLevel.convertToPermission(arg)
+                ArgumentType.Command -> container[arg.toLowerCase()]!!
                 ArgumentType.Sentence -> joinArgs(actual)
                 ArgumentType.Splitter -> splitArg(actual)
                 ArgumentType.TimeString -> convertTimeString(actual)

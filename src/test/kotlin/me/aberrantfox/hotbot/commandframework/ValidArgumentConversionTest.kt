@@ -5,6 +5,7 @@ import me.aberrantfox.hotbot.commandframework.parsing.ArgumentType.Double
 import me.aberrantfox.hotbot.commandframework.parsing.convertMainArgs
 import me.aberrantfox.hotbot.dsls.command.CommandArgument
 import me.aberrantfox.hotbot.dsls.command.arg
+import me.aberrantfox.hotbot.dsls.command.produceContainer
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.DynamicTest
 import org.junit.jupiter.api.TestFactory
@@ -82,6 +83,8 @@ class ValidArgumentConversionTest {
                     listOf(true, null, listOf("is no?", "yes", "no", "maybe", "off")))
     )
 
+    private val container = produceContainer()
+
     @TestFactory
     fun testValidSingleTypeArgs() = mapValidTests(validSingleTypeArgs)
 
@@ -95,7 +98,7 @@ class ValidArgumentConversionTest {
             argData.map { (input, expected) ->
                 DynamicTest.dynamicTest(
                         "Input $input should parse to ${expected.second}") {
-                    Assertions.assertEquals(expected.second, convertMainArgs(input, expected.first).results)
+                    Assertions.assertEquals(expected.second, convertMainArgs(input, expected.first, container).results)
                 }
             }
 

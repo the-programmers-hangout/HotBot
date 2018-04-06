@@ -14,6 +14,7 @@ import me.aberrantfox.hotbot.extensions.jda.sendPrivateMessage
 import me.aberrantfox.hotbot.extensions.stdlib.randomListItem
 import me.aberrantfox.hotbot.extensions.stdlib.retrieveIdToUser
 import me.aberrantfox.hotbot.extensions.stdlib.toRole
+import me.aberrantfox.hotbot.permissions.PermissionLevel
 import me.aberrantfox.hotbot.services.Configuration
 import me.aberrantfox.hotbot.utility.muteMember
 import me.aberrantfox.hotbot.utility.muteVoiceChannel
@@ -122,16 +123,11 @@ fun moderationCommands() = commands {
     }
 
     command("setfilter") {
-        expect(ArgumentType.Word)
+        expect(ArgumentType.PermissionLevel)
         execute {
-            val desiredLevel = (it.args[0] as String).toRole(it.guild)
-
-            if (desiredLevel == null) {
-                it.respond("Don't know that permission level boss... ")
-            } else {
-                it.config.permissionedActions.commandMention = desiredLevel.id
-                it.respond("Permission level now set to: ${desiredLevel.name} ; be sure to save configurations.")
-            }
+            val level = it.args.component1() as PermissionLevel
+            it.config.permissionedActions.commandMention = level
+            it.respond("Permission level now set to: ${level.name} ; be sure to save configurations.")
         }
     }
 
