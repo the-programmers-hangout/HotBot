@@ -19,6 +19,20 @@
   },
   "commands": [
     {
+      "name": "viewroleassignments",
+      "category": "permissions",
+      "description": "View the assigned permission levels of any role which has an assigned permission level",
+      "structure": "",
+      "example": ""
+    },
+    {
+      "name": "setrolelevel",
+      "category": "permissions",
+      "description": "Set the PermissionLevel of a particular role.",
+      "structure": "{role} {level}",
+      "example": "moderatorRole Moderator"
+    },
+    {
       "name": "ban",
       "category": "moderation",
       "description": "Bans a member",
