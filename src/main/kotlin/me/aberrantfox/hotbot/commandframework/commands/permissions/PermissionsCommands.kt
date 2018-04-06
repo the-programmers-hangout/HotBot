@@ -143,4 +143,30 @@ fun permissionCommands() =
                 it.respond("${role.name} is now assigned the permission level ${level.name}")
             }
         }
+
+        command("viewRoleAssignments") {
+            execute {
+                it.respond(embed {
+                    title("Role Assignments")
+                    description("Below you can see what roles have been assigned what permission levels")
+
+                    val assignments = it.manager.roleAssignemts()
+
+                    val assignmentsText = if(assignments.isEmpty()) {
+                        "None"
+                    } else {
+                        assignments.joinToString("\n") { pair ->
+                            val roleName = it.guild.getRoleById(pair.key).name
+                            "$roleName :: PermissionLevel.${pair.value}"
+                        }
+                    }
+
+                    field {
+                        this.name = "Assignments"
+                        this.value = assignmentsText
+                        inline = false
+                    }
+                })
+            }
+        }
     }

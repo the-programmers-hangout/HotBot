@@ -69,6 +69,8 @@ data class PermissionManager(val jda: JDA, val guild: Guild, val container: Comm
         launch(CommonPool) { save() }
     }
 
+    fun roleAssignemts() = permissionsConfig.roleMappings.entries
+
     private fun getPermissionLevel(user: User): PermissionLevel {
         if (botConfig.serverInformation.ownerID == user.id) return PermissionLevel.Owner
 
