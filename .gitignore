@@ -17,5 +17,6 @@ config/raiders.json
 config/macros.json
 config/invite-whitelist.json
 config/pools/
+config/permissions.json
 config/ratelimit/
 data/
