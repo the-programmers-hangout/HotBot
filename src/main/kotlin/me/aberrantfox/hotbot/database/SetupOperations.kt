@@ -41,7 +41,7 @@ object Strikes : Table() {
     val date = date("date")
 }
 
-object HistoryCount: Table(){
+object HistoryCount: Table() {
     val member = varchar("member", 18).primaryKey()
     val historyCount = integer("historyCount")
 }

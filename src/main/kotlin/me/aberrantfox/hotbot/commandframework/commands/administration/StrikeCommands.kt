@@ -166,6 +166,7 @@ fun strikeCommands() =
             expect(ArgumentType.User)
             execute {
                 val target = it.args[0] as User
+                incrementOrSetHistoryCount(target.id)
                 it.respond(buildHistoryEmbed(target, true, getHistory(target.id),
                         getNotesByUser(target.id), it))
             }
