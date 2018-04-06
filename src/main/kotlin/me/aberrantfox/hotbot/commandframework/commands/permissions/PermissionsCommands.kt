@@ -131,4 +131,16 @@ fun permissionCommands() =
                 })
             }
         }
+
+        command("setRoleLevel") {
+            expect(ArgumentType.Role, ArgumentType.PermissionLevel)
+            execute {
+                val role = it.args.component1() as Role
+                val level = it.args.component2() as PermissionLevel
+
+                it.manager.assignRoleLevel(role, level)
+
+                it.respond("${role.name} is now assigned the permission level ${level.name}")
+            }
+        }
     }

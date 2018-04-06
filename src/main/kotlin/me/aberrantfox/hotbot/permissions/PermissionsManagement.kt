@@ -7,6 +7,7 @@ import me.aberrantfox.hotbot.dsls.command.CommandsContainer
 import me.aberrantfox.hotbot.services.Configuration
 import net.dv8tion.jda.core.JDA
 import net.dv8tion.jda.core.entities.Guild
+import net.dv8tion.jda.core.entities.Role
 import net.dv8tion.jda.core.entities.User
 import java.io.File
 
@@ -62,6 +63,11 @@ data class PermissionManager(val jda: JDA, val guild: Guild, val container: Comm
             .filter { it.value <= getPermissionLevel(user) }
             .map { it.key }
             .joinToString()
+
+    fun assignRoleLevel(role: Role, level: PermissionLevel) {
+        permissionsConfig.roleMappings[role.id] = level
+        launch(CommonPool) { save() }
+    }
 
     private fun getPermissionLevel(user: User): PermissionLevel {
         if (botConfig.serverInformation.ownerID == user.id) return PermissionLevel.Owner
