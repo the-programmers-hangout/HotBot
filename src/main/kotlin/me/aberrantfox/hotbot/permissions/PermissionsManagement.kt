@@ -1,86 +1,81 @@
 package me.aberrantfox.hotbot.permissions
 
-import me.aberrantfox.hotbot.database.setPermission
-import me.aberrantfox.hotbot.extensions.jda.getHighestRole
-import me.aberrantfox.hotbot.extensions.jda.isEqualOrHigherThan
-import me.aberrantfox.hotbot.extensions.jda.toMember
-import me.aberrantfox.hotbot.extensions.stdlib.toRole
+import com.google.gson.GsonBuilder
+import kotlinx.coroutines.experimental.CommonPool
+import kotlinx.coroutines.experimental.launch
+import me.aberrantfox.hotbot.dsls.command.CommandsContainer
 import me.aberrantfox.hotbot.services.Configuration
 import net.dv8tion.jda.core.JDA
-import net.dv8tion.jda.core.entities.Role
+import net.dv8tion.jda.core.entities.Guild
 import net.dv8tion.jda.core.entities.User
+import java.io.File
 
-typealias RoleID = String
-typealias CommandName = String
+private const val permissionsConfigurationLocation = "config/permissions.json"
 
-data class PermissionManager(val map: HashMap<RoleID, HashSet<CommandName>> = HashMap(), val jda: JDA, val config: Configuration) {
+enum class PermissionLevel {
+    Everyone, Member, JrMod, Moderator, Administrator, Owner;
+    companion object {
+        fun isLevel(name: String) = PermissionLevel.values()
+                .map { it.name.toLowerCase() }
+                .any { it == name.toLowerCase() }
 
-    fun addPermission(roleID: RoleID, name: CommandName) {
-        val lower = name.toLowerCase()
-        map.keys.map { map[it]!! }
-                .filter { it.contains(lower) }
-                .forEach { it.remove(lower) }
+        fun convertToPermission(level: String) = PermissionLevel.values()
+                .first { it.name.toLowerCase() == level.toLowerCase() }
+    }
+}
 
-        if(map.containsKey(roleID)) {
-            map[roleID]!!.add(lower)
+data class PermissionsConfiguration(val permissions: HashMap<String, PermissionLevel> = HashMap(),
+                                    val roleMappings: HashMap<String, PermissionLevel> = HashMap())
+
+data class PermissionManager(val jda: JDA, val guild: Guild, val container: CommandsContainer, val botConfig: Configuration) {
+    private val gson = GsonBuilder().setPrettyPrinting().create()
+    private val permissionsFile = File(permissionsConfigurationLocation)
+    private val permissionsConfig: PermissionsConfiguration
+
+    init {
+        permissionsConfig = if (permissionsFile.exists()) {
+            gson.fromJson(permissionsFile.readText(), PermissionsConfiguration::class.java)
         } else {
-            map[roleID] = hashSetOf(lower)
+            PermissionsConfiguration()
         }
 
-        setPermission(lower, roleID)
+        container.commands
+                .map { it.key.toLowerCase() }
+                .filter { !(permissionsConfig.permissions.containsKey(it)) }
+                .forEach { permissionsConfig.permissions[it] = PermissionLevel.Administrator }
     }
 
-    fun roleRequired(commandName: CommandName): Role? {
-        val containingMap = map.entries.firstOrNull { it.value.contains(commandName.toLowerCase()) }
-        return containingMap?.key?.toRole(jda.getGuildById(config.serverInformation.guildid))
+    fun save() = permissionsFile.writeText(gson.toJson(permissionsConfig))
+
+    fun setPermission(command: String, level: PermissionLevel) {
+        permissionsConfig.permissions[command.toLowerCase()] = level
+        launch(CommonPool) { save() }
     }
 
-    fun canPerformAction(user: User, actionRoleID: RoleID): Boolean {
-        if(user.id == config.serverInformation.ownerID) return true
+    fun roleRequired(name: String) = permissionsConfig.permissions[name.toLowerCase()]
 
-        val highestRole = user.toMember(jda.getGuildById(config.serverInformation.guildid)).getHighestRole()
-        val actionRole = actionRoleID.toRole(jda.getGuildById(config.serverInformation.guildid))
+    fun canPerformAction(user: User, actionLevel: PermissionLevel) = getPermissionLevel(user) >= actionLevel
 
-        return highestRole?.isEqualOrHigherThan(actionRole) ?: false
-    }
+    fun canUseCommand(user: User, command: String) = getPermissionLevel(user) >= permissionsConfig.permissions[command]!!
 
-    fun canUseCommand(user: User, commandName: CommandName): Boolean {
-        if(user.id == config.serverInformation.ownerID) return true
+    fun listAvailableCommands(user: User) = permissionsConfig.permissions
+            .filter { it.value <= getPermissionLevel(user) }
+            .map { it.key }
+            .joinToString()
 
-        val highestRole = user.toMember(jda.getGuildById(config.serverInformation.guildid)).getHighestRole()
-        val roles = getAllRelevantRoleIds(highestRole?.id)
+    private fun getPermissionLevel(user: User): PermissionLevel {
+        if (botConfig.serverInformation.ownerID == user.id) return PermissionLevel.Owner
 
-        return roles.map { map[it] }
-                .any { it!!.contains(commandName) }
-    }
+        val member = guild.getMember(user)
 
-    fun listAvailableCommands(roleID: RoleID?): String {
-        val roles = getAllRelevantRoleIds(roleID)
+        if (member.roles.isEmpty()) return PermissionLevel.Everyone
 
-        if(roles.isEmpty()) return "None"
+        if (member.roles.none { permissionsConfig.roleMappings.containsKey(it.id) }) return PermissionLevel.Everyone
 
-        return roles.map { map[it] }
-                .reduceRight { a, b -> a!!.addAll(b!!) ; a }!!
-                .joinToString(", ") { a -> a }
-    }
-
-    private fun getAllRelevantRoleIds(roleID: RoleID?): List<String> {
-        if(roleID == null) return ArrayList()
-
-        val lowerRoles = getLowerRoleIds(roleID)
-
-        lowerRoles.add(roleID)
-
-        return lowerRoles.filter { map.containsKey(it) }
-    }
-
-    fun getLowerRoleIds(roleID: RoleID): ArrayList<String> {
-        val guild = jda.getGuildById(config.serverInformation.guildid)
-        val role = guild.roles.first { it.id == roleID }
-
-        return ArrayList(guild.roles
-                .filter { it.position < role.position }
+        val highestRole = member.roles
                 .map { it.id }
-                .toList())
+                .maxBy { permissionsConfig.roleMappings[it]!! }
+
+        return permissionsConfig.roleMappings[highestRole]!!
     }
 }
