@@ -293,10 +293,12 @@ private fun buildHistoryEmbed(target: User, includeModerator: Boolean, records: 
                 value = "${target.fullName()} has **${records.size}** infractions(s).\nOf these infractions, " +
                         "**${records.filter { it.isExpired }.size}** are expired and **${records.filter { !it.isExpired }.size}** are still in effect." +
                         "\nCurrent strike value of **${getMaxStrikes(target.id)}/${it.config.security.strikeCeil}**" +
-                        "\nHistory has been invoked **$historyCount** times."
                         "\nJoin date: **${it.guild.getMemberJoinString(target)}**" +
                         "\nCreation date: **${target.creationTime.toString().formatJdaDate()}**"
                 inline = false
+                if(includeModerator){
+                    value +="\nHistory has been invoked **$historyCount** times."
+                }
             }
 
             field {
