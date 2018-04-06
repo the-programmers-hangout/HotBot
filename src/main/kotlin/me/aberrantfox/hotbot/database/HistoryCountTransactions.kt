@@ -3,9 +3,6 @@ package me.aberrantfox.hotbot.database
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 
-data class HistoryCountTransactions(val member: String,
-                                    val historyCount: String)
-
 
 fun incrementOrSetHistoryCount(member: String): Boolean =
     transaction {
@@ -23,6 +20,20 @@ fun incrementOrSetHistoryCount(member: String): Boolean =
         }
         true
     }
+
+fun getHistoryCount(member: String): Int {
+    var historyCount = 0
+
+    transaction {
+        val select = HistoryCount.select {
+            Op.build { HistoryCount.member eq member }
+        }.first()
+
+        historyCount = select[HistoryCount.historyCount]
+    }
+
+    return historyCount
+}
 
 fun hasHistoryCount(member: String) =
         transaction {

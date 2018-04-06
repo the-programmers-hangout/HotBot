@@ -168,7 +168,7 @@ fun strikeCommands() =
                 val target = it.args[0] as User
                 incrementOrSetHistoryCount(target.id)
                 it.respond(buildHistoryEmbed(target, true, getHistory(target.id),
-                        getNotesByUser(target.id), it))
+                        getHistoryCount(target.id),getNotesByUser(target.id), it))
             }
         }
 
@@ -197,7 +197,7 @@ fun strikeCommands() =
                 val target = it.author
 
                 target.sendPrivateMessage(buildHistoryEmbed(target, false, getHistory(target.id),
-                        null, it))
+                        getHistoryCount(target.id), null, it))
             }
         }
     }
@@ -276,7 +276,7 @@ private fun administerPunishment(config: Configuration, user: User, strikeQuanti
 }
 
 private fun buildHistoryEmbed(target: User, includeModerator: Boolean, records: List<StrikeRecord>,
-                              notes: List<NoteRecord>?, it: CommandEvent) =
+                              historyCount: Int, notes: List<NoteRecord>?, it: CommandEvent) =
         embed {
             title("${target.fullName()}'s Record")
             setColor(Color.MAGENTA)
@@ -293,6 +293,7 @@ private fun buildHistoryEmbed(target: User, includeModerator: Boolean, records: 
                 value = "${target.fullName()} has **${records.size}** infractions(s).\nOf these infractions, " +
                         "**${records.filter { it.isExpired }.size}** are expired and **${records.filter { !it.isExpired }.size}** are still in effect." +
                         "\nCurrent strike value of **${getMaxStrikes(target.id)}/${it.config.security.strikeCeil}**" +
+                        "\nHistory has been invoked **$historyCount** times."
                         "\nJoin date: **${it.guild.getMemberJoinString(target)}**" +
                         "\nCreation date: **${target.creationTime.toString().formatJdaDate()}**"
                 inline = false
