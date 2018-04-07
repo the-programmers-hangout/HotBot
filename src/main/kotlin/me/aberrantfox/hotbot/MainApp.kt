@@ -53,7 +53,7 @@ fun main(args: Array<String>) {
     val mutedRole = jda.getRolesByName(config.security.mutedRole, true).first()
     val tracker = MessageTracker(1)
     val guild = jda.getGuildById(config.serverInformation.guildid)
-    val manager = PermissionManager(jda, guild, container, config)
+    val manager = PermissionManager(guild, container, config)
     val messageService = MService()
 
     container.newLogger(logger)
