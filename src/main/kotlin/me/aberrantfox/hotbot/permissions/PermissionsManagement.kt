@@ -52,7 +52,15 @@ open class PermissionManager(val guild: Guild, val container: CommandsContainer,
         launch(CommonPool) { save() }
     }
 
-    fun roleRequired(name: String) = permissionsConfig.permissions[name.toLowerCase()]
+    fun roleRequired(name: String): PermissionLevel {
+        val lowerName = name.toLowerCase()
+
+        if(permissionsConfig.permissions.containsKey(lowerName)) {
+            return permissionsConfig.permissions[lowerName]!!
+        }
+
+        return PermissionLevel.Owner
+    }
 
     fun canPerformAction(user: User, actionLevel: PermissionLevel) = getPermissionLevel(user) >= actionLevel
 
