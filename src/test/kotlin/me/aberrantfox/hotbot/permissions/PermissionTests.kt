@@ -27,6 +27,10 @@ class PermissionTests {
     @Test
     fun permissionStoredIsNotEqualToOtherPermissions() = assert(manager.roleRequired(commandName) != PermissionLevel.Moderator)
 
+    @Test
+    fun unknownCommandIsOfLevelOwner() = assert(manager.roleRequired("unknown-cmd-test") == PermissionLevel.Owner)
+
+
 }
 
 private fun produceManager(): PermissionManager {
