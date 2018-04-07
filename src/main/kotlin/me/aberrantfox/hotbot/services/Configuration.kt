@@ -8,7 +8,7 @@ import me.aberrantfox.hotbot.permissions.PermissionLevel
 import java.io.File
 import java.util.*
 
-data class Configuration(val serverInformation: ServerInformation = ServerInformation(),
+open class Configuration(open val serverInformation: ServerInformation = ServerInformation(),
                          val security: Security = Security(),
                          val messageChannels: MessageChannels = MessageChannels(),
                          val apiConfiguration: ApiConfiguration = ApiConfiguration(),
@@ -17,8 +17,8 @@ data class Configuration(val serverInformation: ServerInformation = ServerInform
                          val permissionedActions: PermissionedActions = PermissionedActions(),
                          val botInformation: BotInformation = BotInformation())
 
-data class ServerInformation(val token: String = "insert-token",
-                             val ownerID: String = "insert-id",
+open class ServerInformation(val token: String = "insert-token",
+                             open val ownerID: String = "insert-id",
                              var prefix: String = "insert-prefix",
                              val guildid: String = "insert-guild-id",
                              val suggestionPoolLimit: Int = 20)

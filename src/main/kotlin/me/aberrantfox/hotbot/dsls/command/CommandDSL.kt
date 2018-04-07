@@ -33,7 +33,7 @@ data class CommandEvent(val config: Configuration, val jda: JDA, val channel: Me
 }
 
 @CommandTagMarker
-class Command(var log: BotLogger, val name: String,  var expectedArgs: Array<out CommandArgument> = arrayOf(),
+open class Command(var log: BotLogger, open val name: String,  var expectedArgs: Array<out CommandArgument> = arrayOf(),
               var execute: (CommandEvent) -> Unit = {}, var requiresGuild: Boolean = false) : BotLogger {
     override fun info(message: String) = log.info(message)
     override fun info(message: MessageEmbed) = log.info(message)
@@ -99,7 +99,7 @@ data class CommandArgument(val type: ArgumentType, val optional: Boolean = false
 }
 
 @CommandTagMarker
-data class CommandsContainer(var log: BotLogger, var commands: HashMap<String, Command> = HashMap()) {
+open class CommandsContainer(var log: BotLogger, open var commands: HashMap<String, Command> = HashMap()) {
     operator fun invoke(args: CommandsContainer.() -> Unit) {}
 
     fun listCommands() = this.commands.keys.toList()

@@ -5,13 +5,10 @@ import kotlinx.coroutines.experimental.CommonPool
 import kotlinx.coroutines.experimental.launch
 import me.aberrantfox.hotbot.dsls.command.CommandsContainer
 import me.aberrantfox.hotbot.services.Configuration
-import net.dv8tion.jda.core.JDA
 import net.dv8tion.jda.core.entities.Guild
 import net.dv8tion.jda.core.entities.Role
 import net.dv8tion.jda.core.entities.User
 import java.io.File
-
-private const val permissionsConfigurationLocation = "config/permissions.json"
 
 enum class PermissionLevel {
     Everyone, Member, JrMod, Moderator, Administrator, Owner;
@@ -28,7 +25,9 @@ enum class PermissionLevel {
 data class PermissionsConfiguration(val permissions: HashMap<String, PermissionLevel> = HashMap(),
                                     val roleMappings: HashMap<String, PermissionLevel> = HashMap())
 
-data class PermissionManager(val jda: JDA, val guild: Guild, val container: CommandsContainer, val botConfig: Configuration) {
+open class PermissionManager(val guild: Guild, val container: CommandsContainer, val botConfig: Configuration,
+                             private val permissionsConfigurationLocation: String = "config/permissions.json") {
+
     private val gson = GsonBuilder().setPrettyPrinting().create()
     private val permissionsFile = File(permissionsConfigurationLocation)
     private val permissionsConfig: PermissionsConfiguration
