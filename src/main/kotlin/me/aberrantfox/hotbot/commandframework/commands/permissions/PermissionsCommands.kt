@@ -33,7 +33,7 @@ fun permissionCommands() =
             expect(ArgumentType.Command)
             execute {
                 val name = (it.args.component1() as Command).name
-                it.respond("The required role is: ${it.manager.roleRequired(name)?.name ?: "Only the owner can invoke this."}")
+                it.respond("The required role is: ${it.manager.roleRequired(name).name}")
             }
         }
 
@@ -92,7 +92,7 @@ fun permissionCommands() =
                     HelpConf.listCategories()
                         .map { cat ->
                             val commandsInCategory = HelpConf.listCommandsinCategory(cat)
-                            val text = commandsInCategory.joinToString("\n") { cmd -> "${cmd.name} -- ${it.manager.roleRequired(cmd.name)?.name ?: "Owner"}" }
+                            val text = commandsInCategory.joinToString("\n") { cmd -> "${cmd.name} -- ${it.manager.roleRequired(cmd.name)}" }
                             Pair(cat, text)
                         }
                         .forEach {
