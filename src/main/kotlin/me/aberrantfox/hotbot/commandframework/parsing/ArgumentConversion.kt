@@ -90,6 +90,8 @@ fun convertMainArgs(actual: List<String>, expected: List<CommandArgument>): Conv
                     else -> result
                 }
 
+        consumeArgs(actualArg, expectedType, result, remaining)
+
         converted[nextMatchingIndex] = convertedValue
     }
 
@@ -165,31 +167,29 @@ private fun matchesArgType(arg: String, type: ArgumentType): Boolean {
     }
 }
 
-private fun convertArg(arg: String, type: ArgumentType, actual: MutableList<String>): Any {
-    val converted =
-            when (type) {
-                ArgumentType.Integer -> arg.toInt()
-                ArgumentType.Double -> arg.toDouble()
-                ArgumentType.Choice -> arg.toBooleanValue()
-                ArgumentType.Sentence -> joinArgs(actual)
-                ArgumentType.Splitter -> splitArg(actual)
-                ArgumentType.TimeString -> convertTimeString(actual)
-                else -> arg
-            }
+private fun convertArg(arg: String, type: ArgumentType, remaining: MutableList<String>) =
+        when (type) {
+            ArgumentType.Integer -> arg.toInt()
+            ArgumentType.Double -> arg.toDouble()
+            ArgumentType.Choice -> arg.toBooleanValue()
+            ArgumentType.Sentence -> joinArgs(remaining)
+            ArgumentType.Splitter -> splitArg(remaining)
+            ArgumentType.TimeString -> convertTimeString(remaining)
+            else -> arg
+        }
 
+private fun consumeArgs(actualArg: String, type: ArgumentType, result: Any, remaining: MutableList<String>) {
     if (type !in multiplePartArgTypes) {
-        actual.remove(arg)
+        remaining.remove(actualArg)
     } else if (type in consumingArgTypes) {
-        actual.clear()
+        remaining.clear()
     }
 
-    if (converted is ConversionResult) {
-        converted.consumed?.map {
-            actual.remove(it)
+    if (result is Results) {
+        result.consumed?.map {
+            remaining.remove(it)
         }
     }
-
-    return converted
 }
 
 private fun joinArgs(actual: List<String>) = actual.reduce { a, b -> "$a $b" }
