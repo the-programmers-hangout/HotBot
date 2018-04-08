@@ -3,11 +3,13 @@ package me.aberrantfox.hotbot.commandframework
 import me.aberrantfox.hotbot.commandframework.parsing.ArgumentType.*
 import me.aberrantfox.hotbot.commandframework.parsing.ArgumentType.Double
 import me.aberrantfox.hotbot.commandframework.parsing.convertMainArgs
+import me.aberrantfox.hotbot.commandframework.parsing.ConversionResult.*
 import me.aberrantfox.hotbot.dsls.command.CommandArgument
 import me.aberrantfox.hotbot.dsls.command.arg
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.DynamicTest
 import org.junit.jupiter.api.TestFactory
+
 
 class InvalidArgumentConversionTest {
 
@@ -59,8 +61,8 @@ class InvalidArgumentConversionTest {
 
     private fun mapInvalidTest(argData: List<Pair<List<String>, List<CommandArgument>>>) =
             argData.map { (input, expected) ->
-                DynamicTest.dynamicTest("Input $input against ${expected.map { Pair(it.type, it.optional) }} should cause null results") {
-                    Assertions.assertNull(convertMainArgs(input, expected).results)
+                DynamicTest.dynamicTest("Input $input against ${expected.map { Pair(it.type, it.optional) }} should produce an error") {
+                    Assertions.assertTrue(convertMainArgs(input, expected) is Error)
                 }
             }
 

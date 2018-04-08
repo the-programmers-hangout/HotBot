@@ -2,6 +2,7 @@ package me.aberrantfox.hotbot.commandframework
 
 import me.aberrantfox.hotbot.commandframework.parsing.ArgumentType.*
 import me.aberrantfox.hotbot.commandframework.parsing.ArgumentType.Double
+import me.aberrantfox.hotbot.commandframework.parsing.ConversionResult.*
 import me.aberrantfox.hotbot.commandframework.parsing.convertMainArgs
 import me.aberrantfox.hotbot.dsls.command.CommandArgument
 import me.aberrantfox.hotbot.dsls.command.arg
@@ -95,7 +96,7 @@ class ValidArgumentConversionTest {
             argData.map { (input, expected) ->
                 DynamicTest.dynamicTest(
                         "Input $input should parse to ${expected.second}") {
-                    Assertions.assertEquals(expected.second, convertMainArgs(input, expected.first).results)
+                    Assertions.assertEquals(expected.second, (convertMainArgs(input, expected.first) as? Results)?.results)
                 }
             }
 
