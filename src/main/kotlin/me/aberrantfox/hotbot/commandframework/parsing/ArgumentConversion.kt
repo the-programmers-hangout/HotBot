@@ -7,6 +7,7 @@ import me.aberrantfox.hotbot.extensions.stdlib.*
 import net.dv8tion.jda.core.entities.Guild
 import net.dv8tion.jda.core.entities.ISnowflake
 import net.dv8tion.jda.core.entities.TextChannel
+import me.aberrantfox.hotbot.commandframework.parsing.ConversionResult.*
 
 const val separatorCharacter = "|"
 
@@ -27,32 +28,22 @@ enum class ArgumentType {
     TextChannel, VoiceChannel, Message, Role
 }
 
-data class ConversionResult(val results: List<Any?>? = null,
-                            val error: String? = null,
-                            val consumed: List<String>? = null) {
-
-    fun then(function: (List<Any?>) -> Any): ConversionResult =
-            if (hasError()) {
-                this
-            } else {
-                val nextResult = function.invoke(results!!)
-
-                when (nextResult) {
-                    is ConversionResult -> nextResult
-                    is List<*> -> ConversionResult(nextResult)
-                    is Unit -> this
-                    else -> throw IllegalArgumentException("Function must return List, Unit or ConversionResult.")
-                }
+sealed class ConversionResult {
+    fun then(function: (List<Any?>) -> ConversionResult): ConversionResult =
+            when (this) {
+                is Results -> function(results)
+                is Error -> this
             }
 
-    fun thenIf(condition: Boolean, function: (List<Any?>) -> Any) =
+    fun thenIf(condition: Boolean, function: (List<Any?>) -> ConversionResult) =
             if (condition) {
                 then(function)
             } else {
                 this
             }
 
-    fun hasError() = error != null || results == null
+    data class Results(val results: List<Any?>, val consumed: List<String>? = null) : ConversionResult()
+    data class Error(val error: String) : ConversionResult()
 }
 
 fun convertArguments(actual: List<String>, expected: List<CommandArgument>, event: CommandEvent): ConversionResult {
@@ -60,7 +51,7 @@ fun convertArguments(actual: List<String>, expected: List<CommandArgument>, even
     val expectedTypes = expected.map { it.type }
 
     if (expectedTypes.contains(ArgumentType.Manual)) {
-        return ConversionResult(actual)
+        return Results(actual)
     }
 
     return convertMainArgs(actual, expected)
@@ -85,16 +76,18 @@ fun convertMainArgs(actual: List<String>, expected: List<CommandArgument>): Conv
         val nextMatchingIndex = expected.withIndex().indexOfFirst {
             matchesArgType(actualArg, it.value.type) && converted[it.index] == null
         }
-        if (nextMatchingIndex == -1) return ConversionResult(null, "Arguments passed do not match expected ones. Try using the help menu command.")
+        if (nextMatchingIndex == -1) return Error("Couldn't match '$actualArg' with the expected arguments. Try using the `help` command.")
 
-        val result = convertArg(actualArg, expected[nextMatchingIndex].type, remaining)
+        val expectedType = expected[nextMatchingIndex].type
+
+        val result = convertArg(actualArg, expectedType, remaining)
+
+        if (result is Error) return result
 
         val convertedValue =
-                if (result is ConversionResult) when {
-                    result.hasError() -> return result
-                    else -> result.results!!.first()
-                } else {
-                    result
+                when (result) {
+                    is Results -> result.results.first()
+                    else -> result
                 }
 
         converted[nextMatchingIndex] = convertedValue
@@ -103,9 +96,9 @@ fun convertMainArgs(actual: List<String>, expected: List<CommandArgument>): Conv
     val unfilledNonOptionals = converted.filterIndexed { i, arg -> arg == null && !expected[i].optional }
 
     if (unfilledNonOptionals.isNotEmpty())
-        return ConversionResult(null, "You did not fill all of the non-optional arguments.")
+        return Error("You did not fill all of the non-optional arguments.")
 
-    return ConversionResult(converted.toList())
+    return Results(converted.toList())
 }
 
 fun retrieveSnowflakes(args: List<Any?>, expected: List<CommandArgument>, guild: Guild): ConversionResult {
@@ -122,12 +115,12 @@ fun retrieveSnowflakes(args: List<Any?>, expected: List<CommandArgument>, guild:
                             conversionFun(guild, (arg as String).trimToID())
                         } catch (e: RuntimeException) {
                             null
-                        } ?: return ConversionResult(null, "Couldn't retrieve ${expectedArg.type}: $arg.")
+                        } ?: return Error("Couldn't retrieve ${expectedArg.type}: $arg.")
 
                 return@map retrieved
             }
 
-    return ConversionResult(converted)
+    return Results(converted)
 }
 
 fun retrieveMessageArgs(args: List<Any?>, expected: List<CommandArgument>): ConversionResult {
@@ -144,22 +137,22 @@ fun retrieveMessageArgs(args: List<Any?>, expected: List<CommandArgument>): Conv
                     channel.getMessageById(arg as String).complete()
                 } catch (e: RuntimeException) {
                     null
-                } ?: return ConversionResult(null, "Couldn't retrieve message from given channel.")
+                } ?: return Error("Couldn't retrieve message from given channel.")
 
         return@map message
     }
 
-    return ConversionResult(converted)
+    return Results(converted)
 }
 
-@Suppress("UNCHECKED_CAST")
 fun convertOptionalArgs(args: List<Any?>, expected: List<CommandArgument>, event: CommandEvent) =
-        args.zip(expected).map { (arg, expectedArg) ->
-            arg ?: if (expectedArg.defaultValue is Function<*>)
-                       (expectedArg.defaultValue as (CommandEvent) -> Any).invoke(event)
-                   else
-                       expectedArg.defaultValue
-        }
+        args.zip(expected)
+            .map { (arg, expectedArg) ->
+                arg ?: if (expectedArg.defaultValue is Function<*>)
+                           (expectedArg.defaultValue as (CommandEvent) -> Any).invoke(event)
+                       else
+                           expectedArg.defaultValue
+            }.let { Results(it) }
 
 
 private fun matchesArgType(arg: String, type: ArgumentType): Boolean {

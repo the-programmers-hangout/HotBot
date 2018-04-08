@@ -2,10 +2,8 @@ package me.aberrantfox.hotbot.commandframework
 
 import kotlinx.coroutines.experimental.CommonPool
 import kotlinx.coroutines.experimental.launch
-import me.aberrantfox.hotbot.commandframework.parsing.cleanCommandMessage
 import me.aberrantfox.hotbot.commandframework.commands.utility.macroMap
-import me.aberrantfox.hotbot.commandframework.parsing.convertArguments
-import me.aberrantfox.hotbot.commandframework.parsing.getArgCountError
+import me.aberrantfox.hotbot.commandframework.parsing.*
 import me.aberrantfox.hotbot.dsls.command.Command
 import me.aberrantfox.hotbot.dsls.command.CommandEvent
 import me.aberrantfox.hotbot.dsls.command.CommandsContainer
@@ -22,6 +20,7 @@ import net.dv8tion.jda.core.entities.User
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent
 import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent
 import net.dv8tion.jda.core.hooks.ListenerAdapter
+import me.aberrantfox.hotbot.commandframework.parsing.ConversionResult.*
 
 class CommandExecutor(val config: Configuration,
                       val container: CommandsContainer,
@@ -82,13 +81,15 @@ class CommandExecutor(val config: Configuration,
 
         val event = CommandEvent(config, jda, channel, author, message, jda.getGuildById(config.serverInformation.guildid), manager, container, mService, actual)
 
-        val (convertedArgs, conversionError) = convertArguments(actual, command.expectedArgs.toList(), event)
-        if (conversionError != null || convertedArgs == null) {
-            event.safeRespond(conversionError.toString())
-            return
-        }
+        val conversionResult = convertArguments(actual, command.expectedArgs.toList(), event)
 
-        event.args = convertedArgs.requireNoNulls()
+        when(conversionResult) {
+            is Results -> event.args = conversionResult.results.requireNoNulls()
+            is Error -> {
+                event.safeRespond(conversionResult.error)
+                return
+            }
+        }
 
         executeCommand(command, event, invokedInGuild)
     }
