@@ -192,7 +192,7 @@ private fun consumeArgs(actualArg: String, type: ArgumentType, result: Any, rema
     }
 }
 
-private fun joinArgs(actual: List<String>) = actual.reduce { a, b -> "$a $b" }
+private fun joinArgs(actual: List<String>) = actual.joinToString(" ")
 
 private fun splitArg(actual: List<String>): List<String> {
     val joined = joinArgs(actual)
