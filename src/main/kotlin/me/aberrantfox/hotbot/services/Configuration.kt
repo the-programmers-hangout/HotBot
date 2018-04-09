@@ -20,7 +20,7 @@ open class Configuration(open val serverInformation: ServerInformation = ServerI
 open class ServerInformation(val token: String = "insert-token",
                              open val ownerID: String = "insert-id",
                              var prefix: String = "insert-prefix",
-                             val guildid: String = "insert-guild-id",
+                             open val guildid: String = "insert-guild-id",
                              val suggestionPoolLimit: Int = 20)
 
 data class Security(val ignoredIDs: MutableSet<String> = mutableSetOf(),

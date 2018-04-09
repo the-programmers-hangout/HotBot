@@ -7,6 +7,7 @@ import me.aberrantfox.hotbot.dsls.command.Command
 import me.aberrantfox.hotbot.dsls.command.CommandsContainer
 import me.aberrantfox.hotbot.services.Configuration
 import me.aberrantfox.hotbot.services.ServerInformation
+import net.dv8tion.jda.core.JDA
 import net.dv8tion.jda.core.entities.Guild
 import net.dv8tion.jda.core.entities.Member
 import net.dv8tion.jda.core.entities.Role
@@ -67,13 +68,18 @@ private fun produceManager(): PermissionManager {
 
     val serverInformationMock = mock<ServerInformation> {
         on { ownerID } doReturn ""
+        on { guildid } doReturn "guildid"
     }
 
     val config = mock<Configuration> {
         on { serverInformation } doReturn serverInformationMock
     }
 
-    val manager = PermissionManager(guildMock, containerMock, config, permsFilePath)
+    val jdaMock = mock<JDA> {
+        on { getGuildById(config.serverInformation.guildid) } doReturn guildMock
+    }
+
+    val manager = PermissionManager(jdaMock, containerMock, config, permsFilePath)
     runBlocking { manager.setPermission(commandName, PermissionLevel.JrMod).join() }
 
     return manager

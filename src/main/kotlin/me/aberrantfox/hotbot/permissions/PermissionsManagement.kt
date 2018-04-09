@@ -6,6 +6,7 @@ import kotlinx.coroutines.experimental.Job
 import kotlinx.coroutines.experimental.launch
 import me.aberrantfox.hotbot.dsls.command.CommandsContainer
 import me.aberrantfox.hotbot.services.Configuration
+import net.dv8tion.jda.core.JDA
 import net.dv8tion.jda.core.entities.Guild
 import net.dv8tion.jda.core.entities.Role
 import net.dv8tion.jda.core.entities.User
@@ -26,7 +27,7 @@ enum class PermissionLevel {
 data class PermissionsConfiguration(val permissions: HashMap<String, PermissionLevel> = HashMap(),
                                     val roleMappings: HashMap<String, PermissionLevel> = HashMap())
 
-open class PermissionManager(val guild: Guild, val container: CommandsContainer, val botConfig: Configuration,
+open class PermissionManager(val jda: JDA, val container: CommandsContainer, val botConfig: Configuration,
                              private val permissionsConfigurationLocation: String = "config/permissions.json") {
 
     private val gson = GsonBuilder().setPrettyPrinting().create()
@@ -82,7 +83,7 @@ open class PermissionManager(val guild: Guild, val container: CommandsContainer,
     private fun getPermissionLevel(user: User): PermissionLevel {
         if (botConfig.serverInformation.ownerID == user.id) return PermissionLevel.Owner
 
-        val member = guild.getMember(user)
+        val member = jda.getGuildById(botConfig.serverInformation.guildid).getMember(user)
 
         if (member.roles.isEmpty()) return PermissionLevel.Everyone
 
