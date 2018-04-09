@@ -2,6 +2,7 @@ package me.aberrantfox.hotbot.permissions
 
 import com.google.gson.GsonBuilder
 import kotlinx.coroutines.experimental.CommonPool
+import kotlinx.coroutines.experimental.Job
 import kotlinx.coroutines.experimental.launch
 import me.aberrantfox.hotbot.dsls.command.CommandsContainer
 import me.aberrantfox.hotbot.services.Configuration
@@ -47,9 +48,9 @@ open class PermissionManager(val guild: Guild, val container: CommandsContainer,
 
     fun save() = permissionsFile.writeText(gson.toJson(permissionsConfig))
 
-    fun setPermission(command: String, level: PermissionLevel) {
+    fun setPermission(command: String, level: PermissionLevel): Job {
         permissionsConfig.permissions[command.toLowerCase()] = level
-        launch(CommonPool) { save() }
+        return launch(CommonPool) { save() }
     }
 
     fun roleRequired(name: String): PermissionLevel {
@@ -71,9 +72,9 @@ open class PermissionManager(val guild: Guild, val container: CommandsContainer,
             .map { it.key }
             .joinToString()
 
-    fun assignRoleLevel(role: Role, level: PermissionLevel) {
+    fun assignRoleLevel(role: Role, level: PermissionLevel): Job {
         permissionsConfig.roleMappings[role.id] = level
-        launch(CommonPool) { save() }
+        return launch(CommonPool) { save() }
     }
 
     fun roleAssignemts() = permissionsConfig.roleMappings.entries
