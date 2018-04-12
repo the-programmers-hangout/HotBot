@@ -2,21 +2,35 @@ package me.aberrantfox.hotbot.permissions
 
 import com.nhaarman.mockito_kotlin.doReturn
 import com.nhaarman.mockito_kotlin.mock
+import kotlinx.coroutines.experimental.runBlocking
 import me.aberrantfox.hotbot.dsls.command.Command
 import me.aberrantfox.hotbot.dsls.command.CommandsContainer
 import me.aberrantfox.hotbot.services.Configuration
 import me.aberrantfox.hotbot.services.ServerInformation
+import net.dv8tion.jda.core.JDA
 import net.dv8tion.jda.core.entities.Guild
 import net.dv8tion.jda.core.entities.Member
 import net.dv8tion.jda.core.entities.Role
 import net.dv8tion.jda.core.entities.User
-import org.junit.Before
-import org.junit.Test
+import org.junit.*
+import java.io.File
+import java.nio.file.Files
 
 private const val commandName = "test-command"
+private const val permsFilePath = "fake-path"
 
 class PermissionTests {
-    private var manager = produceManager()
+    companion object {
+        @BeforeClass
+        @JvmStatic
+        fun beforeAll() = cleanupFiles()
+
+        @AfterClass
+        @JvmStatic
+        fun afterAll() = cleanupFiles()
+    }
+
+    private lateinit var manager: PermissionManager
 
     @Before
     fun beforeEach() { manager = produceManager() }
@@ -54,15 +68,25 @@ private fun produceManager(): PermissionManager {
 
     val serverInformationMock = mock<ServerInformation> {
         on { ownerID } doReturn ""
+        on { guildid } doReturn "guildid"
     }
 
     val config = mock<Configuration> {
         on { serverInformation } doReturn serverInformationMock
     }
 
-    val manager = PermissionManager(guildMock, containerMock, config, "fake-path")
-    manager.setPermission(commandName, PermissionLevel.JrMod)
+    val jdaMock = mock<JDA> {
+        on { getGuildById(config.serverInformation.guildid) } doReturn guildMock
+    }
+
+    val manager = PermissionManager(jdaMock, containerMock, config, permsFilePath)
+    runBlocking { manager.setPermission(commandName, PermissionLevel.JrMod).join() }
 
     return manager
 }
 
+private fun cleanupFiles() {
+    val permsFile = File(permsFilePath)
+
+    Files.deleteIfExists(permsFile.toPath())
+}
