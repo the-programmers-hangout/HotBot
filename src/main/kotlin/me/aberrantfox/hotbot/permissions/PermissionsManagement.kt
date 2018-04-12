@@ -26,7 +26,7 @@ data class PermissionsConfiguration(val permissions: HashMap<String, PermissionL
                                     val roleMappings: HashMap<String, PermissionLevel> = HashMap())
 
 open class PermissionManager(val guild: Guild, val container: CommandsContainer, val botConfig: Configuration,
-                             private val permissionsConfigurationLocation: String = "config/permissions.json") {
+                             permissionsConfigurationLocation: String = "config/permissions.json") {
 
     private val gson = GsonBuilder().setPrettyPrinting().create()
     private val permissionsFile = File(permissionsConfigurationLocation)
@@ -43,6 +43,8 @@ open class PermissionManager(val guild: Guild, val container: CommandsContainer,
                 .map { it.key.toLowerCase() }
                 .filter { !(permissionsConfig.permissions.containsKey(it)) }
                 .forEach { permissionsConfig.permissions[it] = PermissionLevel.Administrator }
+
+        launch(CommonPool) { save() }
     }
 
     fun save() = permissionsFile.writeText(gson.toJson(permissionsConfig))
@@ -52,19 +54,11 @@ open class PermissionManager(val guild: Guild, val container: CommandsContainer,
         launch(CommonPool) { save() }
     }
 
-    fun roleRequired(name: String): PermissionLevel {
-        val lowerName = name.toLowerCase()
-
-        if(permissionsConfig.permissions.containsKey(lowerName)) {
-            return permissionsConfig.permissions[lowerName]!!
-        }
-
-        return PermissionLevel.Owner
-    }
+    fun roleRequired(name: String) =  permissionsConfig.permissions[name.toLowerCase()] ?: PermissionLevel.Owner
 
     fun canPerformAction(user: User, actionLevel: PermissionLevel) = getPermissionLevel(user) >= actionLevel
 
-    fun canUseCommand(user: User, command: String) = getPermissionLevel(user) >= permissionsConfig.permissions[command]!!
+    fun canUseCommand(user: User, command: String) = getPermissionLevel(user) >= permissionsConfig.permissions[command] ?: PermissionLevel.Owner
 
     fun listAvailableCommands(user: User) = permissionsConfig.permissions
             .filter { it.value <= getPermissionLevel(user) }
