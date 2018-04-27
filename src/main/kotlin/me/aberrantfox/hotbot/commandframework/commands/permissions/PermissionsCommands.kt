@@ -22,7 +22,7 @@ fun permissionCommands() =
                 val level = it.args.component2() as PermissionLevel
 
                 it.manager.setPermission(command.name, level)
-                it.respond("${command.name} is now accessible to ${level.name} and higher")
+                it.safeRespond("${command.name} is now accessible to ${level.name} and higher")
             }
         }
 
@@ -30,7 +30,7 @@ fun permissionCommands() =
             expect(ArgumentType.Command)
             execute {
                 val name = (it.args.component1() as Command).name
-                it.respond("The required role is: ${it.manager.roleRequired(name).name}")
+                it.safeRespond("The required role is: ${it.manager.roleRequired(name).name}")
             }
         }
 
