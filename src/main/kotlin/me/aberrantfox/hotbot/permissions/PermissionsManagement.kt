@@ -7,7 +7,6 @@ import kotlinx.coroutines.experimental.launch
 import me.aberrantfox.hotbot.dsls.command.CommandsContainer
 import me.aberrantfox.hotbot.services.Configuration
 import net.dv8tion.jda.core.JDA
-import net.dv8tion.jda.core.entities.Guild
 import net.dv8tion.jda.core.entities.Role
 import net.dv8tion.jda.core.entities.User
 import java.io.File
@@ -28,7 +27,7 @@ data class PermissionsConfiguration(val permissions: HashMap<String, PermissionL
                                     val roleMappings: HashMap<String, PermissionLevel> = HashMap())
 
 open class PermissionManager(val jda: JDA, val container: CommandsContainer, val botConfig: Configuration,
-                             private val permissionsConfigurationLocation: String = "config/permissions.json") {
+                             permissionsConfigurationLocation: String = "config/permissions.json") {
 
     private val gson = GsonBuilder().setPrettyPrinting().create()
     private val permissionsFile = File(permissionsConfigurationLocation)

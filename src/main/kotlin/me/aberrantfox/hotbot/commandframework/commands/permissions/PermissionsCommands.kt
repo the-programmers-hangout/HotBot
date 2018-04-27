@@ -1,13 +1,10 @@
 package me.aberrantfox.hotbot.commandframework.commands.permissions
 
-import kotlinx.coroutines.experimental.launch
 import me.aberrantfox.hotbot.commandframework.parsing.ArgumentType
 import me.aberrantfox.hotbot.dsls.command.Command
 import me.aberrantfox.hotbot.dsls.command.CommandSet
 import me.aberrantfox.hotbot.dsls.command.commands
 import me.aberrantfox.hotbot.dsls.embed.embed
-import me.aberrantfox.hotbot.extensions.jda.getHighestRole
-import me.aberrantfox.hotbot.extensions.jda.toMember
 import me.aberrantfox.hotbot.extensions.stdlib.sanitiseMentions
 import me.aberrantfox.hotbot.permissions.PermissionLevel
 import me.aberrantfox.hotbot.services.CommandDescriptor
