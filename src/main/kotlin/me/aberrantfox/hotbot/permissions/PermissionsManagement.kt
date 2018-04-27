@@ -59,7 +59,7 @@ open class PermissionManager(val jda: JDA, val container: CommandsContainer, val
 
     fun canPerformAction(user: User, actionLevel: PermissionLevel) = getPermissionLevel(user) >= actionLevel
 
-    fun canUseCommand(user: User, command: String) = getPermissionLevel(user) >= permissionsConfig.permissions[command] ?: PermissionLevel.Owner
+    fun canUseCommand(user: User, command: String) = getPermissionLevel(user) >= permissionsConfig.permissions[command.toLowerCase()] ?: PermissionLevel.Owner
 
     fun listAvailableCommands(user: User) = permissionsConfig.permissions
             .filter { it.value <= getPermissionLevel(user) }
