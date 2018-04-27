@@ -1,6 +1,6 @@
 .idea/**
 target/**
-Aegeus.iml
+**.iml
 config.json
 macros.json
 ..gitignore.un~
