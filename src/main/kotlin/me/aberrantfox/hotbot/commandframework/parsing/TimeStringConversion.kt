@@ -2,6 +2,7 @@ package me.aberrantfox.hotbot.commandframework.parsing
 
 import me.aberrantfox.hotbot.extensions.stdlib.isDigitOrPeriod
 import me.aberrantfox.hotbot.extensions.stdlib.isDouble
+import me.aberrantfox.hotbot.commandframework.parsing.ConversionResult.*
 
 private typealias Quantity = Double
 private typealias Quantifier = String
@@ -27,7 +28,7 @@ fun convertTimeString(actual: List<String>): ConversionResult {
     val timeElements = possibleElements.dropLastWhile { it is Quantity } // assume trailing numbers are part of next arg (ID, Integer, etc.)
 
     if (timeElements.isEmpty()) {
-        return ConversionResult(null, "Invalid time element passed.")
+        return Error("Invalid time element passed.")
     }
 
     val consumed = original.subList(0, timeElements.size)
@@ -36,7 +37,7 @@ fun convertTimeString(actual: List<String>): ConversionResult {
     val quantifierCount = timeElements.count { it is Quantifier }
 
     if (quantityCount != quantifierCount) {
-        return ConversionResult(null, "The number of quantities doesn't match the number of quantifiers.")
+        return Error("The number of quantities doesn't match the number of quantifiers.")
     }
 
 
@@ -47,7 +48,7 @@ fun convertTimeString(actual: List<String>): ConversionResult {
     }
 
     if (hasMissingQuantifier) {
-        return ConversionResult(null, "At least one quantity is missing a quantifier.")
+        return Error("At least one quantity is missing a quantifier.")
     }
 
 
@@ -64,7 +65,7 @@ fun convertTimeString(actual: List<String>): ConversionResult {
             .reduce { a, b -> a + b }
 
 
-    return ConversionResult(results=listOf(timeInSeconds), consumed=consumed)
+    return Results(results=listOf(timeInSeconds), consumed=consumed)
 }
 
 private fun toTimeElement(element: String): Any? {
