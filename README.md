@@ -1,6 +1,6 @@
 
 
-#### Hotbot version 6.0.1
+#### Hotbot version 6.0.2
 
 #### What is hotbot? 
 At a glance, Hotbot is a discord bot built specifically for a programming server. It has many features, including fun, administration, channel management, an internal permissions system as well as some forms of anti-spam. 
