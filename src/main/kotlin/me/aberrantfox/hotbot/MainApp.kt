@@ -23,9 +23,11 @@ import net.dv8tion.jda.core.JDA
 import net.dv8tion.jda.core.JDABuilder
 import net.dv8tion.jda.core.Permission
 import net.dv8tion.jda.core.entities.Guild
+import org.apache.log4j.*
 
 
 fun main(args: Array<String>) {
+    setupLogger()
     println("Starting to load hotbot.")
     val container = produceContainer()
     val config = loadConfig() ?: return
@@ -82,6 +84,26 @@ fun main(args: Array<String>) {
     handleLTSMutes(config, jda)
     EngineContainer.engine = setupScriptEngine(jda, container, config)
     logger.info("Fully setup, now ready for use.")
+}
+
+private fun setupLogger() {
+    val console = ConsoleAppender()
+    val pattern = "%d [%p|%c|%C{1}] %m%n"
+    console.layout = PatternLayout(pattern)
+    console.threshold = Level.INFO
+    console.activateOptions()
+
+    Logger.getRootLogger().addAppender(console)
+
+    val fa = FileAppender()
+    fa.name = "FileLogger"
+    fa.file = "hotbot.log"
+    fa.layout = PatternLayout("%d %-5p [%c{1}] %m%n")
+    fa.threshold = Level.DEBUG
+    fa.append = true
+    fa.activateOptions()
+
+    Logger.getRootLogger().addAppender(fa)
 }
 
 private fun setupMutedRole(guild: Guild, roleName: String) {
