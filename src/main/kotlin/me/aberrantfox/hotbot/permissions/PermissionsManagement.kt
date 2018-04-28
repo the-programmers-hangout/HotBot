@@ -84,7 +84,7 @@ open class PermissionManager(val jda: JDA, val container: CommandsContainer, val
 
         val highestRole = member.roles
                 .map { it.id }
-                .maxBy { permissionsConfig.roleMappings[it]!! }
+                .maxBy { permissionsConfig.roleMappings.getOrDefault(it, PermissionLevel.Everyone) }
 
         return permissionsConfig.roleMappings[highestRole]!!
     }
