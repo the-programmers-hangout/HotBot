@@ -22,6 +22,8 @@ fun incrementOrSetHistoryCount(member: String): Boolean =
     }
 
 fun getHistoryCount(member: String): Int {
+    if(!hasHistoryCount(member)) return 0
+
     var historyCount = 0
 
     transaction {
