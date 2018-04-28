@@ -14,7 +14,8 @@ fun setupDatabaseSchema(config: Configuration) {
             "useJDBCCompliantTimezoneShift=true",
             "useLegacyDatetimeCode=true",
             "serverTimezone=UTC",
-            "nullNamePatternMatchesAll=true"
+            "nullNamePatternMatchesAll=true",
+            "useSSL=false"
     )
 
     val url = "jdbc:mysql://${config.databaseCredentials.hostname}/${config.databaseCredentials.database}?${dbParams.joinToString("&")}"
