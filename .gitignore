@@ -1,6 +1,7 @@
 .idea/**
 target/**
 **.iml
+hotbot.log
 config.json
 macros.json
 ..gitignore.un~
