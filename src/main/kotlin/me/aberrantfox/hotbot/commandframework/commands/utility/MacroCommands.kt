@@ -149,26 +149,24 @@ fun macroCommands() =
 
         command("listmacros") {
             execute {
-                val macros = macroMap.keys.sorted()
-                val macroString =
-                        if (macros.isEmpty())
-                            "none"
-                        else
-                            macros.joinToString(", ")
+                val grouped = macros.groupBy { it.category }
 
-                it.respond("Currently available macros: $macroString.")
+                val macroEmbed = buildMacrosEmbed(grouped)
+
+                it.respond(macroEmbed)
             }
         }
-
     }
 
 private fun buildMacrosEmbed(groupedMacros: Map<String, List<Macro>>) =
         embed {
             title("Currently Available Macros")
 
-            groupedMacros.toList().sortedByDescending { it.second.size }.forEach { (macroName, macros) ->
+            setColor(Color.GREEN)
+
+            groupedMacros.toList().sortedByDescending { it.second.size }.forEach { (categoryName, macros) ->
                 field {
-                    name = macroName
+                    name = categoryName.capitalize()
                     value = macros.map { it.name }.sorted().joinToString(", ")
                     inline = false
                 }
@@ -184,7 +182,7 @@ private fun loadMacroMap(): MutableList<Macro> {
     }
 
     val macros = gson.fromJson<MutableList<Macro>>(file.readText())
-    
+
     return macros
 }
 
