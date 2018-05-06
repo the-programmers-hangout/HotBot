@@ -37,7 +37,7 @@
 		}
 	}
 
-	const regex = /^.*\.(jpg|jpeg|gif|png|mp4|webm)$/i
+	const regex = /^.*\.(jpg|jpeg|gif|png|mp4|webm|mov)$/i
 
 	function notAllowed(fileName) {	
 		return (!regex.test(fileName))
