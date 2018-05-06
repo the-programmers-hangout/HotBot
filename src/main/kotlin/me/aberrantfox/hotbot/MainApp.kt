@@ -3,7 +3,7 @@ package me.aberrantfox.hotbot
 import me.aberrantfox.hotbot.commandframework.CommandExecutor
 import me.aberrantfox.hotbot.commandframework.commands.development.EngineContainer
 import me.aberrantfox.hotbot.commandframework.commands.development.EngineContainer.setupScriptEngine
-import me.aberrantfox.hotbot.commandframework.commands.utility.macroMap
+import me.aberrantfox.hotbot.commandframework.commands.utility.macros
 import me.aberrantfox.hotbot.database.getAllMutedMembers
 import me.aberrantfox.hotbot.database.setupDatabaseSchema
 import me.aberrantfox.hotbot.dsls.command.produceContainer
@@ -74,7 +74,7 @@ fun main(args: Array<String>) {
             MessageDeleteListener(logger, manager, config),
             NewJoinListener())
 
-    CommandRecommender.addAll(container.commands.keys.toList() + macroMap.keys.toList())
+    CommandRecommender.addAll(container.commands.keys.toList() + macros.map { it.name })
 
     if(config.apiConfiguration.enableCleverBot) {
         println("Enabling cleverbot integration.")

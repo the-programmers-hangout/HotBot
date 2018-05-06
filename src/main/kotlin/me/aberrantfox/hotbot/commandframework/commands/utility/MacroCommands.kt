@@ -1,16 +1,22 @@
 package me.aberrantfox.hotbot.commandframework.commands.utility
 
-import com.google.common.reflect.TypeToken
+import com.github.salomonbrys.kotson.fromJson
 import com.google.gson.Gson
+import com.google.gson.annotations.SerializedName
 import me.aberrantfox.hotbot.commandframework.parsing.ArgumentType
 import me.aberrantfox.hotbot.dsls.command.CommandSet
 import me.aberrantfox.hotbot.dsls.command.commands
+import me.aberrantfox.hotbot.dsls.embed.embed
 import me.aberrantfox.hotbot.services.CommandRecommender
 import me.aberrantfox.hotbot.services.configPath
 import java.io.File
 
+data class Macro(@SerializedName("name") val name: String,
+                 @SerializedName("message") val message: String,
+                 @SerializedName("category") val category: String)
+
 private val mapLocation = configPath("macros.json")
-val macroMap = loadMacroMap()
+val macros = loadMacroMap()
 
 @CommandSet
 fun macroCommands() =
@@ -69,23 +75,35 @@ fun macroCommands() =
 
     }
 
-private fun loadMacroMap(): HashMap<String, String> {
+private fun buildMacrosEmbed(groupedMacros: Map<String, List<Macro>>) =
+        embed {
+            title("Currently Available Macros")
+
+            groupedMacros.toList().sortedByDescending { it.second.size }.forEach { (macroName, macros) ->
+                field {
+                    name = macroName
+                    value = macros.map { it.name }.sorted().joinToString(", ")
+                    inline = false
+                }
+            }
+        }
+
+private fun loadMacroMap(): MutableList<Macro> {
     val file = File(mapLocation)
     val gson = Gson()
 
-    if( !(file.exists()) ) {
-        return HashMap()
+    if (!(file.exists())) {
+        return mutableListOf()
     }
 
-    val type = object : TypeToken<HashMap<String, String>>() {}.type
-    val map = gson.fromJson<HashMap<String, String>>(file.readText(), type)
-
-    return map
+    val macros = gson.fromJson<MutableList<Macro>>(file.readText())
+    
+    return macros
 }
 
-private fun saveMacroMap(map: HashMap<String, String>) {
+private fun saveMacroMap(macros: List<Macro>) {
     val gson = Gson()
-    val json = gson.toJson(map)
+    val json = gson.toJson(macros)
     val file = File(mapLocation)
 
     file.delete()

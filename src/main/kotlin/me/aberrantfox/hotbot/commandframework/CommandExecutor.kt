@@ -2,7 +2,7 @@ package me.aberrantfox.hotbot.commandframework
 
 import kotlinx.coroutines.experimental.CommonPool
 import kotlinx.coroutines.experimental.launch
-import me.aberrantfox.hotbot.commandframework.commands.utility.macroMap
+import me.aberrantfox.hotbot.commandframework.commands.utility.macros
 import me.aberrantfox.hotbot.commandframework.parsing.*
 import me.aberrantfox.hotbot.dsls.command.Command
 import me.aberrantfox.hotbot.dsls.command.CommandEvent
@@ -47,14 +47,15 @@ class CommandExecutor(val config: Configuration,
                 if (!(canPerformCommand(channel, message, author))) return@launch
 
                 val command = container[commandName]
+                val macro = macros.firstOrNull { it.name == commandName }
 
                 when {
                     command != null -> {
                         invokeCommand(command, commandName, actualArgs, message, author, invokedInGuild)
                         log.cmd("${author.descriptor()} -- invoked $commandName in ${channel.name}")
                     }
-                    macroMap.containsKey(commandName) -> {
-                        channel.sendMessage(macroMap[commandName]).queue()
+                    macro != null -> {
+                        channel.sendMessage(macro.message).queue()
                         log.cmd("${author.descriptor()} -- invoked $commandName in ${channel.name}")
                     }
                     else -> {
