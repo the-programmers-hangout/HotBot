@@ -61,7 +61,7 @@ class DuplicateMessageListener (val config: Configuration, val log: BotLogger, v
 
         tracker.list(id)?.forEach { it.message.delete().queue() }
 
-        log.warning("${event.author.fullName()} was muted for $reason")
+        log.warning("${event.author.asMention} (${event.author.fullName()}) was muted for $reason")
         tracker.removeUser(id)
     }
 }
