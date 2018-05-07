@@ -149,7 +149,7 @@ fun macroCommands() =
 
         command("listmacros") {
             execute {
-                val grouped = macros.groupBy { it.category }
+                val grouped = macros.groupBy { it.category.toLowerCase() }
 
                 val macroEmbed = buildMacrosEmbed(grouped)
 
