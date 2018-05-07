@@ -4,7 +4,6 @@ import com.github.salomonbrys.kotson.fromJson
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 import me.aberrantfox.hotbot.commandframework.parsing.ArgumentType
-import me.aberrantfox.hotbot.dsls.command.Command
 import me.aberrantfox.hotbot.dsls.command.CommandSet
 import me.aberrantfox.hotbot.dsls.command.commands
 import me.aberrantfox.hotbot.dsls.embed.embed
@@ -18,7 +17,7 @@ data class Macro(@SerializedName("name") val name: String,
                  @SerializedName("category") val category: String)
 
 private val mapLocation = configPath("macros.json")
-val macros = loadMacroMap()
+val macros = loadMacroList()
 
 @CommandSet
 fun macroCommands() =
@@ -41,7 +40,7 @@ fun macroCommands() =
                 }
 
                 macros.add(Macro(name, message, category))
-                saveMacroMap(macros)
+                saveMacroList(macros)
 
                 CommandRecommender.addPossibility(name)
 
@@ -51,54 +50,50 @@ fun macroCommands() =
         }
 
         command("editmacro") {
-            expect(ArgumentType.Word, ArgumentType.Sentence)
+            expect(ArgumentType.Macro, ArgumentType.Sentence)
             execute {
-                val name = (it.args.component1() as String).toLowerCase()
+                val macro = it.args.component1() as Macro
+                val name = macro.name
                 val message = it.args.component2() as String
-
-                val macro = macros.firstOrNull { it.name.toLowerCase() == name }
-                    ?: return@execute it.safeRespond("$name isn't a macro.")
 
                 macros.remove(macro)
                 macros.add(macro.copy(message=message))
 
-                saveMacroMap(macros)
+                saveMacroList(macros)
 
                 it.safeRespond("**$name** (category: **${macro.category}**) will now respond with: **$message**")
             }
         }
 
         command("setmacrocategory") {
-            expect(ArgumentType.Word, ArgumentType.Word)
+            expect(ArgumentType.Macro, ArgumentType.Word)
             execute {
-                val name = (it.args.component1() as String).toLowerCase()
-                val category = (it.args.component2() as String).toLowerCase()
+                val macro = it.args.component1() as Macro
+                val name = macro.name
 
-                val macro = macros.firstOrNull { it.name.toLowerCase() == name }
-                    ?: return@execute it.safeRespond("$name isn't a macro.")
+                val category = (it.args.component2() as String).toLowerCase()
 
                 macros.remove(macro)
                 macros.add(macro.copy(category=category))
 
-                saveMacroMap(macros)
+                saveMacroList(macros)
 
                 it.safeRespond("**$name** category changed from **${macro.category}** to **$category**")
             }
         }
 
         command("renamemacro") {
-            expect(ArgumentType.Word, ArgumentType.Word)
+            expect(ArgumentType.Macro, ArgumentType.Word)
             execute {
-                val oldName = (it.args.component1() as String).toLowerCase()
+                val oldMacro = it.args.component1() as Macro
                 val newName = (it.args.component2() as String).toLowerCase()
 
-                val macro = macros.firstOrNull { it.name.toLowerCase() == oldName }
-                        ?: return@execute it.safeRespond("$oldName isn't a macro.")
+                macros.remove(oldMacro)
+                macros.add(oldMacro.copy(name=newName))
 
-                macros.remove(macro)
-                macros.add(macro.copy(name=newName))
+                saveMacroList(macros)
 
-                saveMacroMap(macros)
+                val oldName = oldMacro.name
 
                 CommandRecommender.removePossibility(oldName)
                 CommandRecommender.addPossibility(newName)
@@ -108,19 +103,16 @@ fun macroCommands() =
         }
 
         command("removemacro") {
-            expect(ArgumentType.Word)
+            expect(ArgumentType.Macro)
             execute {
-                val name = (it.args.component1() as String).toLowerCase()
-
-                val macro = macros.firstOrNull { it.name.toLowerCase() == name }
-                        ?: return@execute it.safeRespond("$name isn't a macro.")
+                val macro = it.args.component1() as Macro
 
                 macros.remove(macro)
-                saveMacroMap(macros)
+                saveMacroList(macros)
 
-                CommandRecommender.removePossibility(name)
+                CommandRecommender.removePossibility(macro.name)
 
-                it.safeRespond("$name - this macro is now gone.")
+                it.safeRespond("${macro.name} - this macro is now gone.")
             }
         }
 
@@ -141,7 +133,7 @@ fun macroCommands() =
                     CommandRecommender.removePossibility(it.name)
                 }
 
-                saveMacroMap(macros)
+                saveMacroList(macros)
 
                 it.safeRespond("${toRemove.size} macros removed.")
             }
@@ -173,7 +165,7 @@ private fun buildMacrosEmbed(groupedMacros: Map<String, List<Macro>>) =
             }
         }
 
-private fun loadMacroMap(): MutableList<Macro> {
+private fun loadMacroList(): MutableList<Macro> {
     val file = File(mapLocation)
     val gson = Gson()
 
@@ -186,7 +178,7 @@ private fun loadMacroMap(): MutableList<Macro> {
     return macros
 }
 
-private fun saveMacroMap(macros: List<Macro>) {
+private fun saveMacroList(macros: List<Macro>) {
     val gson = Gson()
     val json = gson.toJson(macros)
     val file = File(mapLocation)
