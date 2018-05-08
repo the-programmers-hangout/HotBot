@@ -77,9 +77,30 @@
     {
       "name": "addmacro",
       "category": "macro",
-      "description": "Adds a macro which will respond with the given message when invoked by the given name.",
+      "description": "Add a macro which will respond with the given message when invoked by the given name.",
+      "structure": "{macroName} {categoryName} [macroMessage]",
+      "example": "greet fun Hello, World!"
+    },
+    {
+      "name": "editmacro",
+      "category": "macro",
+      "description": "Change a macro's response message",
       "structure": "{macroName} [macroMessage]",
-      "example": "greet Hello, World!"
+      "example": "test New test message."
+    },
+    {
+      "name": "renamemacro",
+      "category": "macro",
+      "description": "Change a macro's name, keeping the original response",
+      "structure": "{oldName} {newName}",
+      "example": "greet helloworld"
+    },
+    {
+      "name": "setmacrocategories",
+      "category": "macro",
+      "description": "Move one or many macros to a category.",
+      "structure": "macroName1 macroName2 macroName3 ... | categoryName",
+      "example": "ask sask wrapcode | help"
     },
     {
       "name": "removemacro",
@@ -87,6 +108,13 @@
       "description": "Removes a macro with the given name",
       "structure": "{macroname}",
       "example": "greet"
+    },
+    {
+      "name": "removemacros",
+      "category": "macro",
+      "description": "Removes a whole category of macros",
+      "structure": "{categoryName}",
+      "example": "fun"
     },
     {
       "name": "listmacros",

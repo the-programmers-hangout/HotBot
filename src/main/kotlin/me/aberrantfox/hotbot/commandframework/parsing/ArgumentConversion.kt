@@ -1,5 +1,6 @@
 package me.aberrantfox.hotbot.commandframework.parsing
 
+import me.aberrantfox.hotbot.commandframework.commands.utility.macros
 import me.aberrantfox.hotbot.dsls.command.CommandArgument
 import me.aberrantfox.hotbot.dsls.command.CommandEvent
 import me.aberrantfox.hotbot.dsls.command.CommandsContainer
@@ -29,7 +30,7 @@ enum class ArgumentType {
     Integer, Double, Word, Choice, Manual,
     Sentence, User, Splitter, URL, TimeString,
     TextChannel, VoiceChannel, Message, Role,
-    PermissionLevel, Command, Category
+    PermissionLevel, Command, Category, Macro
 }
 
 sealed class ConversionResult {
@@ -170,6 +171,7 @@ private fun matchesArgType(arg: String, type: ArgumentType, container: CommandsC
         ArgumentType.PermissionLevel -> arg.isPermission()
         ArgumentType.Command -> container.has(arg.toLowerCase())
         ArgumentType.Category -> HelpConf.listCategories().contains(arg.toLowerCase())
+        ArgumentType.Macro -> macros.any { it.name.toLowerCase() == arg.toLowerCase() }
         else -> true
     }
 }
@@ -181,10 +183,11 @@ private fun convertArg(arg: String, type: ArgumentType, actual: MutableList<Stri
         ArgumentType.Double -> arg.toDouble()
         ArgumentType.Choice -> arg.toBooleanValue()
         ArgumentType.PermissionLevel -> PermissionLevel.convertToPermission(arg)
-        ArgumentType.Command -> container[arg.toLowerCase()]!!
+        ArgumentType.Command -> container[arg.toLowerCase()] ?: throw IllegalStateException("Command argument should have been already verified as valid.")
         ArgumentType.Sentence -> joinArgs(actual)
         ArgumentType.Splitter -> splitArg(actual)
         ArgumentType.TimeString -> convertTimeString(actual)
+        ArgumentType.Macro -> macros.firstOrNull { it.name.toLowerCase() == arg.toLowerCase() } ?: throw IllegalStateException("Macro argument should have already been verified as valid.")
         else -> arg
     }
 
