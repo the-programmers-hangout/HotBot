@@ -309,7 +309,7 @@ private fun buildHistoryEmbed(target: User, includeModerator: Boolean, records: 
 
             records.forEach { record ->
                 field {
-                    name = "ID :: ${record.id} :: Weight :: ${record.strikes}"
+                    name = "ID :: __${record.id}__ :: Weight :: __${record.strikes}__"
                     value = "This infraction is **${expired(record.isExpired)}**."
                     inline = false
 
@@ -350,7 +350,7 @@ private fun buildHistoryEmbed(target: User, includeModerator: Boolean, records: 
             notes.forEach { note ->
                 field {
                     name = "ID :: __${note.id}__ :: Staff :: __${note.moderator.retrieveIdToName(it.jda)}__"
-                    value = "Noted on **${note.dateTime.toString(DateTimeFormat.forPattern("dd/MM/yyyy"))}**"
+                    value = "Noted by **${note.moderator.retrieveIdToName(it.jda)}** on **${note.dateTime.toString(DateTimeFormat.forPattern("dd/MM/yyyy"))}**"
                     inline = false
                 }
 
