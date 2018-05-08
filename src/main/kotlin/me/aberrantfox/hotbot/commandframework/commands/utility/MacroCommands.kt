@@ -5,6 +5,7 @@ import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 import me.aberrantfox.hotbot.commandframework.parsing.ArgumentType
 import me.aberrantfox.hotbot.dsls.command.CommandSet
+import me.aberrantfox.hotbot.dsls.command.arg
 import me.aberrantfox.hotbot.dsls.command.commands
 import me.aberrantfox.hotbot.dsls.embed.embed
 import me.aberrantfox.hotbot.services.CommandRecommender
@@ -98,7 +99,14 @@ fun macroCommands() =
             expect(ArgumentType.Macro, ArgumentType.Word)
             execute {
                 val oldMacro = it.args.component1() as Macro
+
                 val newName = (it.args.component2() as String).toLowerCase()
+
+                if (it.container.has(newName))
+                    return@execute it.safeRespond("A command already exists with the name $newName")
+
+                if (macros.any { it.name.toLowerCase() == newName })
+                    return@execute it.safeRespond("The macro $newName already exists.")
 
                 macros.remove(oldMacro)
                 macros.add(oldMacro.copy(name=newName))
