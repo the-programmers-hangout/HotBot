@@ -96,11 +96,11 @@
       "example": "greet helloworld"
     },
     {
-      "name": "setmacrocategory",
+      "name": "setmacrocategories",
       "category": "macro",
-      "description": "Change a macro's category.",
-      "structure": "{macroName} {categoryName}",
-      "example": "ask help"
+      "description": "Move one or many macros to a category.",
+      "structure": "macroName1 macroName2 macroName3 ... | categoryName",
+      "example": "ask sask wrapcode | help"
     },
     {
       "name": "removemacro",

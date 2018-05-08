@@ -65,20 +65,32 @@ fun macroCommands() =
             }
         }
 
-        command("setmacrocategory") {
-            expect(ArgumentType.Macro, ArgumentType.Word)
+        command("setmacrocategories") {
+            expect(ArgumentType.Splitter)
             execute {
-                val macro = it.args.component1() as Macro
-                val name = macro.name
+                val splitArgs = it.args.component1() as List<String>
 
-                val category = (it.args.component2() as String).toLowerCase()
+                if (splitArgs.size > 2) {
+                    return@execute it.respond("Too many arguments passed. Pass macros and a category only.")
+                }
 
-                macros.remove(macro)
-                macros.add(macro.copy(category=category))
+                val macroArgs = splitArgs.firstOrNull()?.trim()?.split(' ')
+                        ?: return@execute it.respond("Must pass at least one macro")
+
+                val newCategory = splitArgs.getOrNull(1)?.toLowerCase()?.trim()
+                        ?: return@execute it.respond("Must pass a category.")
+
+                macroArgs.forEach { arg ->
+                    val macro = macros.find { it.name.toLowerCase() == arg.toLowerCase() }
+                            ?: return@execute it.safeRespond("Couldn't find macro: $arg")
+
+                    macros.remove(macro)
+                    macros.add(macro.copy(category=newCategory))
+                }
 
                 saveMacroList(macros)
 
-                it.safeRespond("**$name** category changed from **${macro.category}** to **$category**")
+                it.safeRespond("${macroArgs.joinToString(", ")} moved to $newCategory")
             }
         }
 
