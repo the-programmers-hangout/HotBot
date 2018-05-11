@@ -28,9 +28,6 @@ private const val prizeFieldTitle = "Prize"
 
 @CommandSet
 fun giveawayCommands() = commands {
-
-    val log = this.log
-
     command("giveawaystart") {
         expect(ArgumentType.TimeString, ArgumentType.Sentence)
         execute {
@@ -63,7 +60,7 @@ fun giveawayCommands() = commands {
             announceWinner(message, prize)
             Giveaways.giveaways.remove(messageID)
 
-            log.info("Ended giveaway for $prize (Message ID: $messageID)")
+            info("Ended giveaway for $prize (Message ID: $messageID)")
         }
     }
 

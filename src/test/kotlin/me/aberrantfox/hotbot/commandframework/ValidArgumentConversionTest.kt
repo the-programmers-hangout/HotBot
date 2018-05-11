@@ -7,7 +7,6 @@ import me.aberrantfox.hotbot.commandframework.parsing.convertMainArgs
 import me.aberrantfox.hotbot.dsls.command.CommandArgument
 import me.aberrantfox.hotbot.dsls.command.arg
 import me.aberrantfox.hotbot.dsls.command.produceContainer
-import me.aberrantfox.hotbot.logging.DefaultLogger
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.DynamicTest
 import org.junit.jupiter.api.TestFactory
@@ -85,7 +84,7 @@ class ValidArgumentConversionTest {
                     listOf(true, null, listOf("is no?", "yes", "no", "maybe", "off")))
     )
 
-    private val container = produceContainer(DefaultLogger())
+    private val container = produceContainer()
 
     @TestFactory
     fun testValidSingleTypeArgs() = mapValidTests(validSingleTypeArgs)

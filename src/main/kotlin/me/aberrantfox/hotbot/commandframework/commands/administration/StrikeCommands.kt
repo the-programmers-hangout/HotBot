@@ -30,9 +30,6 @@ object StrikeRequests {
 @CommandSet
 fun strikeCommands() =
     commands {
-
-        val log = this.log
-
         command("warn") {
             expect(ArgumentType.User, ArgumentType.Sentence)
             execute {
@@ -68,7 +65,7 @@ fun strikeCommands() =
 
                 StrikeRequests.map.put(target.id, request)
                 it.respond("This has been logged and will be accepted or declined, thank you.")
-                log.info("${it.author.fullName()} has a new strike request. Use viewRequest ${target.asMention} to see it.")
+                info("${it.author.fullName()} has a new strike request. Use viewRequest ${target.asMention} to see it.")
             }
         }
 

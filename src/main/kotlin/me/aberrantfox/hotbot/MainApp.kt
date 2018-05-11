@@ -29,13 +29,8 @@ import org.apache.log4j.*
 fun main(args: Array<String>) {
     setupLogger()
     println("Starting to load hotbot.")
-
+    val container = produceContainer()
     val config = loadConfig() ?: return
-
-    val jda = JDABuilder(AccountType.BOT).setToken(config.serverInformation.token).buildBlocking()
-    val logger = convertChannels(config.logChannels, jda)
-
-    val container = produceContainer(logger)
 
     saveConfig(config)
 
@@ -51,6 +46,9 @@ fun main(args: Array<String>) {
 
     setupDatabaseSchema(config)
 
+    val jda = JDABuilder(AccountType.BOT).setToken(config.serverInformation.token).buildBlocking()
+    val logger = convertChannels(config.logChannels, jda)
+
     jda.guilds.forEach { setupMutedRole(it, config.security.mutedRole) }
 
     logger.info("connected")
@@ -58,6 +56,8 @@ fun main(args: Array<String>) {
     val tracker = MessageTracker(1)
     val manager = PermissionManager(jda, container, config)
     val messageService = MService()
+
+    container.newLogger(logger)
 
     jda.addEventListener(
             CommandExecutor(config, container, jda, logger, manager, messageService),

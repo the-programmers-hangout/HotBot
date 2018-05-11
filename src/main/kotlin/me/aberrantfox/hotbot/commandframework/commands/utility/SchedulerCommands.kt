@@ -12,9 +12,6 @@ import kotlin.math.roundToLong
 
 @CommandSet
 fun schedulerCommands() = commands {
-
-    val log = this.log
-
     command("remindme") {
         expect(ArgumentType.TimeString, ArgumentType.Sentence)
         execute {
@@ -24,7 +21,7 @@ fun schedulerCommands() = commands {
             it.respond("Got it, I'll remind you about that in ${timeMilliSecs.convertToTimeString()}")
 
             Timer().schedule(timeMilliSecs) {
-                log.info("${it.author.fullName()} reminded themselves about: $title")
+                info("${it.author.fullName()} reminded themselves about: $title")
                 it.author.sendPrivateMessage("Hi, you asked me to remind you about: $title")
             }
         }
