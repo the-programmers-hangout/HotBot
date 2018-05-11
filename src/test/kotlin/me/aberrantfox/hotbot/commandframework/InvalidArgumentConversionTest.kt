@@ -7,6 +7,7 @@ import me.aberrantfox.hotbot.commandframework.parsing.ConversionResult.*
 import me.aberrantfox.hotbot.dsls.command.CommandArgument
 import me.aberrantfox.hotbot.dsls.command.arg
 import me.aberrantfox.hotbot.dsls.command.produceContainer
+import me.aberrantfox.hotbot.logging.DefaultLogger
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.DynamicTest
 import org.junit.jupiter.api.TestFactory
@@ -51,7 +52,7 @@ class InvalidArgumentConversionTest {
             test(listOf("4", "akdasd", "2"), listOf(arg(Integer, true, 24), arg(Double), arg(Splitter)))
     )
 
-    private val container = produceContainer()
+    private val container = produceContainer(DefaultLogger())
 
     @TestFactory
     fun testInvalidSingleTypeArgs() = mapInvalidTest(invalidSingleTypeArgs)

@@ -33,28 +33,8 @@ data class CommandEvent(val config: Configuration, val jda: JDA, val channel: Me
 }
 
 @CommandTagMarker
-open class Command(var log: BotLogger, open val name: String,  var expectedArgs: Array<out CommandArgument> = arrayOf(),
-              var execute: (CommandEvent) -> Unit = {}, var requiresGuild: Boolean = false) : BotLogger {
-    override fun info(message: String) = log.info(message)
-    override fun info(message: MessageEmbed) = log.info(message)
-
-    override fun cmd(message: String) = log.cmd(message)
-    override fun cmd(message: MessageEmbed) = log.cmd(message)
-
-    override fun error(message: String) = log.error(message)
-    override fun error(message: MessageEmbed) = log.error(message)
-
-    override fun alert(message: String) = log.alert(message)
-    override fun alert(message: MessageEmbed) = log.alert(message)
-
-    override fun warning(message: String) = log.warning(message)
-    override fun warning(message: MessageEmbed) = log.warning(message)
-
-    override fun voice(message: String) = log.voice(message)
-    override fun voice(message: MessageEmbed) = log.voice(message)
-
-    override fun history(message: String) = log.history(message)
-    override fun history(message: MessageEmbed) = log.history(message)
+open class Command(open val name: String,  var expectedArgs: Array<out CommandArgument> = arrayOf(),
+              var execute: (CommandEvent) -> Unit = {}, var requiresGuild: Boolean = false) {
 
     operator fun invoke(args: Command.() -> Unit) {}
 
@@ -105,7 +85,7 @@ open class CommandsContainer(var log: BotLogger, open var commands: HashMap<Stri
     fun listCommands() = this.commands.keys.toList()
 
     fun command(name: String, construct: Command.() -> Unit = {}): Command? {
-        val command = Command(log, name)
+        val command = Command(name)
         command.construct()
         this.commands.put(name, command)
         return command
@@ -125,13 +105,10 @@ open class CommandsContainer(var log: BotLogger, open var commands: HashMap<Stri
 
     fun newLogger(log: BotLogger) {
         this.log = log
-        this.commands.values.forEach {
-            it.log = log
-        }
     }
 }
 
-fun produceContainer(): CommandsContainer {
+fun produceContainer(logger: BotLogger): CommandsContainer {
     val pack = "me.aberrantfox.hotbot.commandframework.commands"
     val cmds = Reflections(pack, MethodAnnotationsScanner()).getMethodsAnnotatedWith(CommandSet::class.java)
 
@@ -146,6 +123,8 @@ fun produceContainer(): CommandsContainer {
     }
 
     container.commands = lowMap
+
+    container.log = logger
 
     return container
 }

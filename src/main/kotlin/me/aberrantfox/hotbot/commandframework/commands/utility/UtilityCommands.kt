@@ -31,6 +31,9 @@ val startTime = Date()
 
 @CommandSet
 fun utilCommands() = commands {
+
+    val log = this.log
+
     command("ping") {
         execute {
             it.respond("Pong!")
@@ -84,10 +87,13 @@ fun utilCommands() = commands {
     command("exit") {
         execute {
             it.respond("Exiting")
+
             saveConfig(it.config)
-            info("saved configurations")
+            log.info("saved configurations")
+
             it.manager.save()
-            info("saved permissions to database prior to shut down.")
+            log.info("saved permissions to database prior to shut down.")
+
             System.exit(0)
         }
     }
