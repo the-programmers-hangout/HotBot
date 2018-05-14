@@ -30,7 +30,7 @@ fun funCommands() =
 
         command("flip") {
             execute {
-                val message = if (Random().nextBoolean()) "Heads" else "tails"
+                val message = if (Random().nextBoolean()) "Heads" else "Tails"
                 it.respond(message)
             }
         }

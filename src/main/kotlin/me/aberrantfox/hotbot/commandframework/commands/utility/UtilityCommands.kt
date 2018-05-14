@@ -14,6 +14,7 @@ import net.dv8tion.jda.core.entities.TextChannel
 import net.dv8tion.jda.core.entities.User
 import java.awt.Color
 import java.util.*
+import khttp.post
 
 data class Properties(val version: String, val author: String)
 
@@ -133,6 +134,18 @@ fun utilCommands() = commands {
         execute {
             val target = it.args.component1() as User
             it.respond("${target.fullName()}'s account was made on ${target.creationTime}")
+        }
+    }
+
+    command("uploadtext") {
+        expect(ArgumentType.Sentence)
+        execute {
+            it.message.delete().queue()
+
+            val text = it.args.component1() as String
+            val response = post("https://hastebin.com/documents", data = text).jsonObject
+
+            it.respond("${it.author.fullName()}'s paste: https://hastebin.com/" + response.getString("key"))
         }
     }
 }
