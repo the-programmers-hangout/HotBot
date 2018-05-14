@@ -148,8 +148,8 @@
       "name": "mute",
       "category": "moderation",
       "description": "Mute a member for a specified number of minutes.",
-      "structure": "{userID} {timeInMinutes} [Reason]",
-      "example": "12340234239 10 Being a silly billy."
+      "structure": "{userID} {timeString} [Reason]",
+      "example": "12340234239 1 day 10m Being a silly billy."
     },
     {
       "name": "lockdown",
