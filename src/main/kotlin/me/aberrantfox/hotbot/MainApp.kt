@@ -5,6 +5,7 @@ import me.aberrantfox.hotbot.commandframework.commands.development.EngineContain
 import me.aberrantfox.hotbot.commandframework.commands.development.EngineContainer.setupScriptEngine
 import me.aberrantfox.hotbot.commandframework.commands.utility.macros
 import me.aberrantfox.hotbot.database.getAllMutedMembers
+import me.aberrantfox.hotbot.database.forEachIgnoredID
 import me.aberrantfox.hotbot.database.setupDatabaseSchema
 import me.aberrantfox.hotbot.dsls.command.produceContainer
 import me.aberrantfox.hotbot.extensions.jda.hasRole
@@ -56,6 +57,8 @@ fun main(args: Array<String>) {
     val tracker = MessageTracker(1)
     val manager = PermissionManager(jda, container, config)
     val messageService = MService()
+
+    forEachIgnoredID { config.security.ignoredIDs.add(it) }
 
     container.newLogger(logger)
 

@@ -28,7 +28,8 @@ fun setupDatabaseSchema(config: Configuration) {
     )
 
     transaction {
-        SchemaUtils.create(Strikes, HistoryCount, Suggestions, BanRecords, CommandPermissions, ChannelResources, Notes, MutedMember)
+        SchemaUtils.create(Strikes, HistoryCount, Suggestions, BanRecords, CommandPermissions,
+                ChannelResources, Notes, MutedMember, IgnoredIDs)
         logger.addLogger(StdOutSqlLogger)
     }
 }
@@ -90,4 +91,8 @@ object MutedMember : Table() {
     val reason = text("reason")
     val moderator = varchar("moderator", 18)
     val guildId = varchar("guildId", 18)
+}
+
+object IgnoredIDs : Table() {
+    val id = varchar("id", 18).primaryKey()
 }
