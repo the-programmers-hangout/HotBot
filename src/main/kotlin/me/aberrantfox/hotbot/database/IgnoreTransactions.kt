@@ -3,8 +3,6 @@ package me.aberrantfox.hotbot.database
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 
-data class IgnoreRecord(val id: String)
-
 fun forEachIgnoredID(action: (String) -> Unit) =
         transaction {
             IgnoredIDs.selectAll()
