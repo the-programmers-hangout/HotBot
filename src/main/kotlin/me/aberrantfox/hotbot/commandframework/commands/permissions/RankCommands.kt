@@ -114,6 +114,11 @@ private fun handleGrant(event: CommandEvent, grant: Boolean) {
     val member = event.guild.getMember(target)
     val roleName = role.name
 
+    if (!RankContainer.canUse(role.name)) {
+        event.safeRespond("That role cannot be granted or revoked.")
+        return
+    }
+
     if (grant) {
         event.guild.controller.addRolesToMember(member, role).queue()
         event.respond("$roleName assigned to ${target.fullName()}")
