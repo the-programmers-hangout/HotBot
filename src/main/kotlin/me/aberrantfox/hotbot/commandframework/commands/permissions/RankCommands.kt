@@ -80,8 +80,8 @@ fun rankCommands() = commands {
                 return@execute
             }
 
-            RankContainer.add(role.name)
-            it.respond("The role: $roleName has been added to the role whitelist, and can now be assigned via the grant command.")
+            RankContainer.add(roleName)
+            it.safeRespond("The role: $roleName has been added to the role whitelist, and can now be assigned via the grant command.")
         }
     }
 
@@ -97,13 +97,13 @@ fun rankCommands() = commands {
             }
 
             RankContainer.remove(roleName)
-            it.respond("The role: $role has been un-whitelisted, meaning it can no longer be granted. ")
+            it.safeRespond("The role: $roleName has been un-whitelisted, meaning it can no longer be granted. ")
         }
     }
 
     command("listgrantableroles") {
         execute {
-            it.respond("Currently whitelisted roles: ${RankContainer.stringList()}")
+            it.safeRespond("Currently whitelisted roles: ${RankContainer.stringList()}")
         }
     }
 }
@@ -114,16 +114,16 @@ private fun handleGrant(event: CommandEvent, grant: Boolean) {
     val member = event.guild.getMember(target)
     val roleName = role.name
 
-    if (!RankContainer.canUse(role.name)) {
+    if (!RankContainer.canUse(roleName)) {
         event.safeRespond("That role cannot be granted or revoked.")
         return
     }
 
     if (grant) {
         event.guild.controller.addRolesToMember(member, role).queue()
-        event.respond("$roleName assigned to ${target.fullName()}")
+        event.safeRespond("$roleName assigned to ${target.fullName()}")
     } else {
         event.guild.controller.removeRolesFromMember(member, role).queue()
-        event.respond("$roleName removed from ${target.fullName()}")
+        event.safeRespond("$roleName removed from ${target.fullName()}")
     }
 }
