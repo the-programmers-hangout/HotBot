@@ -29,6 +29,7 @@ import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.concurrent.schedule
+import kotlin.math.roundToLong
 
 class ModerationCommands
 
@@ -92,12 +93,12 @@ fun moderationCommands() = commands {
     }
 
     command("mute") {
-        expect(ArgumentType.User, ArgumentType.Integer, ArgumentType.Sentence)
+        expect(ArgumentType.User, ArgumentType.TimeString, ArgumentType.Sentence)
         execute {
             val args = it.args
 
             val user = args[0] as User
-            val time = (args[1] as Int).toLong() * 1000 * 60
+            val time = (args[1] as Double).roundToLong() * 1000
             val reason = args[2] as String
 
             muteMember(it.guild, user, time, reason, it.config, it.author)
