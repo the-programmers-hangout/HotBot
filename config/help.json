@@ -892,6 +892,13 @@
       "description": "Grabs the latest XKCD comic.",
       "structure": "",
       "example": ""
+    },
+    {
+      "name": "uploadtext",
+      "category": "utility",
+      "description": "Uploads the given block of text/code to hastebin and removes the invocation",
+      "structure": "{text}",
+      "example": "print('Hello, World!')"
     }
   ]
 }
