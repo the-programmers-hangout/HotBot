@@ -14,7 +14,7 @@
         <junit.version>4.12</junit.version>
         <jupiter.version>5.0.0-M4</jupiter.version>
         <junitPlatformVersion>1.0.0-M4</junitPlatformVersion>
-        <jda.version>3.5.1_342</jda.version>
+        <jda.version>3.6.0_367</jda.version>
         <project.author>Fox#0001</project.author>
     </properties>
 
