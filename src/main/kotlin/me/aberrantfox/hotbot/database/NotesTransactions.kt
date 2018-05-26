@@ -30,9 +30,7 @@ fun replaceNote(id: Int, note: String, moderator: String) =
                 it[Notes.moderator] = moderator
                 it[Notes.note] = note
                 it[Notes.date] = DateTime.now()
-
             }
-
         }
 
 
