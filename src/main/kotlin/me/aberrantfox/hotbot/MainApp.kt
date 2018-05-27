@@ -4,7 +4,10 @@ import me.aberrantfox.hotbot.commandframework.CommandExecutor
 import me.aberrantfox.hotbot.commandframework.commands.development.EngineContainer
 import me.aberrantfox.hotbot.commandframework.commands.development.EngineContainer.setupScriptEngine
 import me.aberrantfox.hotbot.commandframework.commands.utility.macros
+import me.aberrantfox.hotbot.commandframework.commands.utility.scheduleReminder
 import me.aberrantfox.hotbot.database.getAllMutedMembers
+import me.aberrantfox.hotbot.database.forEachIgnoredID
+import me.aberrantfox.hotbot.database.forEachReminder
 import me.aberrantfox.hotbot.database.setupDatabaseSchema
 import me.aberrantfox.hotbot.dsls.command.produceContainer
 import me.aberrantfox.hotbot.extensions.jda.hasRole
@@ -13,6 +16,7 @@ import me.aberrantfox.hotbot.listeners.antispam.DuplicateMessageListener
 import me.aberrantfox.hotbot.listeners.antispam.InviteListener
 import me.aberrantfox.hotbot.listeners.antispam.NewJoinListener
 import me.aberrantfox.hotbot.listeners.antispam.TooManyMentionsListener
+import me.aberrantfox.hotbot.logging.BotLogger
 import me.aberrantfox.hotbot.logging.convertChannels
 import me.aberrantfox.hotbot.permissions.PermissionManager
 import me.aberrantfox.hotbot.services.*
@@ -57,6 +61,8 @@ fun main(args: Array<String>) {
     val manager = PermissionManager(jda, container, config)
     val messageService = MService()
 
+    forEachIgnoredID { config.security.ignoredIDs.add(it) }
+
     container.newLogger(logger)
 
     jda.addEventListener(
@@ -82,6 +88,7 @@ fun main(args: Array<String>) {
     }
 
     handleLTSMutes(config, jda)
+    loadReminders(jda, logger)
     EngineContainer.engine = setupScriptEngine(jda, container, config)
     logger.info("Fully setup, now ready for use.")
 }
@@ -133,5 +140,14 @@ private fun handleLTSMutes(config: Configuration, jda: JDA) {
         if(user != null) {
             scheduleUnmute(guild, user.user, config, difference, it)
         }
+    }
+}
+
+private fun loadReminders(jda: JDA, log: BotLogger) {
+    forEachReminder {
+        val difference = timeToDifference(it.remindTime)
+        val user = jda.getUserById(it.member)
+
+        scheduleReminder(user, it.message, difference, log)
     }
 }

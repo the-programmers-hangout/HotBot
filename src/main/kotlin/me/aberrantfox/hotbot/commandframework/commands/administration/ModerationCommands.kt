@@ -76,9 +76,11 @@ fun moderationCommands() = commands {
 
             if (config.security.ignoredIDs.contains(target)) {
                 config.security.ignoredIDs.remove(target)
+                deleteIgnoredID(target)
                 it.respond("Unignored $target")
             } else {
                 config.security.ignoredIDs.add(target)
+                insertIgnoredID(target)
                 it.respond("$target? Who? What? Don't know what that is. ;)")
             }
         }
