@@ -3,9 +3,8 @@ package me.aberrantfox.hotbot
 import me.aberrantfox.hotbot.commands.development.EngineContainer
 import me.aberrantfox.hotbot.commands.development.EngineContainer.setupScriptEngine
 import me.aberrantfox.hotbot.commands.utility.scheduleReminder
-import me.aberrantfox.hotbot.database.getAllMutedMembers
-import me.aberrantfox.hotbot.database.forEachIgnoredID
 import me.aberrantfox.hotbot.database.forEachReminder
+import me.aberrantfox.hotbot.database.getAllMutedMembers
 import me.aberrantfox.hotbot.database.setupDatabaseSchema
 import me.aberrantfox.hotbot.listeners.*
 import me.aberrantfox.hotbot.listeners.antispam.DuplicateMessageListener
@@ -16,6 +15,9 @@ import me.aberrantfox.hotbot.permissions.PermissionManager
 import me.aberrantfox.hotbot.services.*
 import me.aberrantfox.hotbot.utility.scheduleUnmute
 import me.aberrantfox.hotbot.utility.timeToDifference
+import me.aberrantfox.kjdautils.api.Fail
+import me.aberrantfox.kjdautils.api.Pass
+import me.aberrantfox.kjdautils.api.PreconditionResult
 import me.aberrantfox.kjdautils.api.startBot
 import me.aberrantfox.kjdautils.extensions.jda.containsInvite
 import me.aberrantfox.kjdautils.extensions.jda.containsURL
@@ -38,6 +40,7 @@ fun main(args: Array<String>) {
         println("Starting to load hotbot.")
 
 
+
         setupLogger()
         setupDatabaseSchema(config)
 
@@ -49,17 +52,20 @@ fun main(args: Array<String>) {
         registerInjectionObject(messageService, config, logger, manager)
 
 
+
         val container = registerCommands(commandPath, config.serverInformation.prefix)
 
         manager.setDefaultPermissions(container)
 
+        val failsBecause: (String?, Boolean) -> PreconditionResult = { reason, condition -> if (condition) Pass else Fail(reason) }
+
         registerCommandPreconditions(
-                { !config.security.lockDownMode || it.author.id == config.serverInformation.ownerID },
-                { !config.security.ignoredIDs.contains(it.channel.id) && !config.security.ignoredIDs.contains(it.author.id) },
-                { manager.canPerformAction(it.author, config.permissionedActions.commandMention) || !it.message.mentionsSomeone() },
-                { manager.canPerformAction(it.author, config.permissionedActions.sendInvite) || !it.message.containsInvite() },
-                { manager.canPerformAction(it.author, config.permissionedActions.sendURL) || !it.message.containsURL() },
-                { manager.canUseCommand(it.author, it.command.name) }
+                { failsBecause("Only the owner can invoke commands in lockdown mode", !config.security.lockDownMode || it.author.id == config.serverInformation.ownerID) },
+                { failsBecause(null, !config.security.ignoredIDs.contains(it.channel.id) && !config.security.ignoredIDs.contains(it.author.id)) },
+                { failsBecause("You do not have the required permissions to use a command mention", manager.canPerformAction(it.author, config.permissionedActions.commandMention) || !it.message.mentionsSomeone()) },
+                { failsBecause("You do not have the required permissions to send an invite.", manager.canPerformAction(it.author, config.permissionedActions.sendInvite) || !it.message.containsInvite()) },
+                { failsBecause("You do not have the required permissions to send URLs", manager.canPerformAction(it.author, config.permissionedActions.sendURL) || !it.message.containsURL()) },
+                { failsBecause("Did you really think I would let you do that? :thinking:", manager.canUseCommand(it.author, it.command.name)) }
         )
 
 
