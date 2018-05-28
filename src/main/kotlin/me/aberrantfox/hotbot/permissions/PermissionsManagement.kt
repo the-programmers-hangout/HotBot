@@ -4,8 +4,8 @@ import com.google.gson.GsonBuilder
 import kotlinx.coroutines.experimental.CommonPool
 import kotlinx.coroutines.experimental.Job
 import kotlinx.coroutines.experimental.launch
-import me.aberrantfox.hotbot.dsls.command.CommandsContainer
 import me.aberrantfox.hotbot.services.Configuration
+import me.aberrantfox.kjdautils.api.dsl.CommandsContainer
 import net.dv8tion.jda.core.JDA
 import net.dv8tion.jda.core.entities.Role
 import net.dv8tion.jda.core.entities.User
@@ -26,7 +26,7 @@ enum class PermissionLevel {
 data class PermissionsConfiguration(val permissions: HashMap<String, PermissionLevel> = HashMap(),
                                     val roleMappings: HashMap<String, PermissionLevel> = HashMap())
 
-open class PermissionManager(val jda: JDA, val container: CommandsContainer, val botConfig: Configuration,
+open class PermissionManager(val jda: JDA, val botConfig: Configuration,
                              permissionsConfigurationLocation: String = "config/permissions.json") {
 
     private val gson = GsonBuilder().setPrettyPrinting().create()
@@ -40,12 +40,16 @@ open class PermissionManager(val jda: JDA, val container: CommandsContainer, val
             PermissionsConfiguration()
         }
 
+        launch(CommonPool) { save() }
+    }
+
+    fun setDefaultPermissions(container: CommandsContainer): Job {
         container.commands
                 .map { it.key.toLowerCase() }
                 .filter { !(permissionsConfig.permissions.containsKey(it)) }
                 .forEach { permissionsConfig.permissions[it] = PermissionLevel.Administrator }
 
-        launch(CommonPool) { save() }
+        return launch(CommonPool) { save() }
     }
 
     fun save() = permissionsFile.writeText(gson.toJson(permissionsConfig))
