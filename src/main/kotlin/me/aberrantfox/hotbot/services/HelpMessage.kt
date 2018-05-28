@@ -1,7 +1,7 @@
 package me.aberrantfox.hotbot.services
 
 import com.google.gson.Gson
-import me.aberrantfox.hotbot.dsls.command.CommandsContainer
+import me.aberrantfox.kjdautils.api.dsl.CommandsContainer
 import java.io.File
 
 
