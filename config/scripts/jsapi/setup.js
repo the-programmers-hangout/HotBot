@@ -1,8 +1,7 @@
-const argType = Java.type("me.aberrantfox.hotbot.commandframework.parsing.ArgumentType")
 const listener = Java.type("net.dv8tion.jda.core.hooks.ListenerAdapter")
 const EventListener = Java.extend(listener)
 const urlUtilities = Java.type("me.aberrantfox.hotbot.javautilities.UrlUtilities")
-const ArgumentTypeArray = Java.type("me.aberrantfox.hotbot.commandframework.parsing.ArgumentType[]")
+const ArgumentTypeArray = Java.type("me.aberrantfox.kjdautils.internal.command.ArgumentType[]")
 
 function createCommand(name) {
     return container.command(name, function(){})
@@ -37,5 +36,3 @@ function registerCommand(definition) {
         help.add(definition.help.name, definition.help.description, definition.help.category, definition.help.structure, definition.help.example)
     }
 }
-
-const log = container.log

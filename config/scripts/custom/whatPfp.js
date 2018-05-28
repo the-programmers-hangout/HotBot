@@ -1,6 +1,6 @@
 registerCommand({
     name: "whatpfp",
-    expect: [argType.User],
+    expect: [UserArg],
     execute: (event) => {
         const userPfp = event.args[0].effectiveAvatarUrl
         const reverseUrl = "https://www.google.com/searchbyimage?&image_url="

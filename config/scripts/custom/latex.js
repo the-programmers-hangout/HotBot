@@ -1,6 +1,6 @@
 registerCommand({
     name: "latex",
-    expect: [argType.Sentence],
+    expect: [SentenceArg],
     execute: (event) => {
         const text = event.args[0]
         processLatex(text, event.channel)
