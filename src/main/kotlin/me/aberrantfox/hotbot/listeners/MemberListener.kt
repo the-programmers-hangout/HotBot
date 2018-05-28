@@ -1,23 +1,23 @@
 package me.aberrantfox.hotbot.listeners
 
-import me.aberrantfox.hotbot.extensions.jda.fullName
-import me.aberrantfox.hotbot.extensions.stdlib.formatJdaDate
-import me.aberrantfox.hotbot.extensions.stdlib.randomListItem
-import me.aberrantfox.hotbot.logging.BotLogger
+import com.google.common.eventbus.Subscribe
 import me.aberrantfox.hotbot.services.Configuration
 import me.aberrantfox.hotbot.services.MService
+import me.aberrantfox.kjdautils.extensions.jda.fullName
+import me.aberrantfox.kjdautils.extensions.stdlib.randomListItem
+import me.aberrantfox.kjdautils.internal.logging.BotLogger
 import net.dv8tion.jda.core.EmbedBuilder
 import net.dv8tion.jda.core.events.guild.member.GuildMemberJoinEvent
 import net.dv8tion.jda.core.events.guild.member.GuildMemberLeaveEvent
-import net.dv8tion.jda.core.hooks.ListenerAdapter
 import java.awt.Color
 import java.util.*
 import kotlin.concurrent.schedule
 
 
-class MemberListener(val configuration: Configuration, val logger: BotLogger, val mService: MService) : ListenerAdapter() {
+class MemberListener(val configuration: Configuration, val logger: BotLogger, val mService: MService) {
 
-    override fun onGuildMemberJoin(event: GuildMemberJoinEvent) {
+    @Subscribe
+    fun onGuildMemberJoin(event: GuildMemberJoinEvent) {
         val target = event.guild.textChannels.findLast { it.id == configuration.messageChannels.welcomeChannel }
         val response = mService.messages.onJoin.randomListItem().replace("%name%", "${event.user.asMention}(${event.user.fullName()})")
         val userImage = event.user.effectiveAvatarUrl
@@ -33,7 +33,8 @@ class MemberListener(val configuration: Configuration, val logger: BotLogger, va
         }
     }
 
-    override fun onGuildMemberLeave(e: GuildMemberLeaveEvent) = logger.info("${e.user.fullName()} :: ${e.user.asMention} left the server")
+    @Subscribe
+    fun onGuildMemberLeave(e: GuildMemberLeaveEvent) = logger.info("${e.user.fullName()} :: ${e.user.asMention} left the server")
 
     private fun buildJoinMessage(response: String, image: String) =
         EmbedBuilder()

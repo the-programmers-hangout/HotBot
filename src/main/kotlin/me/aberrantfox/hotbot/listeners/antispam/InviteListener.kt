@@ -1,14 +1,15 @@
 package me.aberrantfox.hotbot.listeners.antispam
 
-import me.aberrantfox.hotbot.extensions.jda.deleteIfExists
-import me.aberrantfox.hotbot.extensions.jda.fullName
-import me.aberrantfox.hotbot.extensions.stdlib.containsInvite
-import me.aberrantfox.hotbot.logging.BotLogger
+import com.google.common.eventbus.Subscribe
 import me.aberrantfox.hotbot.permissions.PermissionManager
 import me.aberrantfox.hotbot.services.Configuration
 import me.aberrantfox.hotbot.services.PersistentSet
 import me.aberrantfox.hotbot.services.WeightTracker
 import me.aberrantfox.hotbot.services.configPath
+import me.aberrantfox.kjdautils.extensions.jda.deleteIfExists
+import me.aberrantfox.kjdautils.extensions.jda.fullName
+import me.aberrantfox.kjdautils.extensions.stdlib.containsInvite
+import me.aberrantfox.kjdautils.internal.logging.BotLogger
 import net.dv8tion.jda.core.JDA
 import net.dv8tion.jda.core.entities.Guild
 import net.dv8tion.jda.core.entities.Member
@@ -16,7 +17,6 @@ import net.dv8tion.jda.core.entities.Message
 import net.dv8tion.jda.core.entities.TextChannel
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent
 import net.dv8tion.jda.core.events.message.guild.GuildMessageUpdateEvent
-import net.dv8tion.jda.core.hooks.ListenerAdapter
 
 object RecentInvites {
     val cache = WeightTracker(6)
@@ -32,11 +32,14 @@ object RecentInvites {
     }
 }
 
-class InviteListener(val config: Configuration, val logger: BotLogger, val manager: PermissionManager) : ListenerAdapter() {
-    override fun onGuildMessageUpdate(event: GuildMessageUpdateEvent) =
+class InviteListener(val config: Configuration, val logger: BotLogger, val manager: PermissionManager) {
+
+    @Subscribe
+    fun onGuildMessageUpdate(event: GuildMessageUpdateEvent) =
             handlePossibleInviteMessage(event.member, event.message, event.guild, event.channel, event.author.isBot, event.jda)
 
-    override fun onGuildMessageReceived(event: GuildMessageReceivedEvent) =
+    @Subscribe
+    fun onGuildMessageReceived(event: GuildMessageReceivedEvent) =
             handlePossibleInviteMessage(event.member, event.message, event.guild, event.channel, event.author.isBot, event.jda)
 
     private fun handlePossibleInviteMessage(author: Member?, message: Message, guild: Guild, channel: TextChannel,

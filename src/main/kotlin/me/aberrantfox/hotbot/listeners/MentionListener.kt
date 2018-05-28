@@ -1,16 +1,17 @@
 package me.aberrantfox.hotbot.listeners
 
+import com.google.common.eventbus.Subscribe
 import com.michaelwflaherty.cleverbotapi.CleverBotQuery
 import me.aberrantfox.hotbot.services.APIRateLimiter
 import me.aberrantfox.hotbot.services.Configuration
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent
-import net.dv8tion.jda.core.hooks.ListenerAdapter
 
 
-class MentionListener(val config: Configuration, val selfName: String) : ListenerAdapter() {
+class MentionListener(val config: Configuration, val selfName: String) {
     private val rateLimiter = APIRateLimiter(config.apiConfiguration.cleverBotApiCallLimit, 0, "CleverBot")
 
-    override fun onGuildMessageReceived(event: GuildMessageReceivedEvent) {
+    @Subscribe
+    fun onGuildMessageReceived(event: GuildMessageReceivedEvent) {
         if( !(rateLimiter.canCall()) ) return
 
         if(event.author.isBot) return
