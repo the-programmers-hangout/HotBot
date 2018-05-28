@@ -56,9 +56,9 @@
     {
       "name": "flip",
       "category": "fun",
-      "description": "Flips a coin.",
-      "structure": "",
-      "example": ""
+      "description": "Flips a coin. Optionally, print one of the choices given.",
+      "structure": "[{choice} | {choice} ...]",
+      "example": "Get work done | Browse #meme-bin | Take a power nap"
     },
     {
       "name": "dog",

@@ -23,7 +23,7 @@ open class ServerInformation(val token: String = "insert-token",
                              open val guildid: String = "insert-guild-id",
                              val suggestionPoolLimit: Int = 20)
 
-data class Security(val ignoredIDs: MutableSet<String> = mutableSetOf(),
+data class Security(@Transient val ignoredIDs: MutableSet<String> = mutableSetOf(),
                     var lockDownMode: Boolean = false,
                     val infractionActionMap: HashMap<Int, InfractionAction> = HashMap(),
                     val mutedRole: String = "Muted",

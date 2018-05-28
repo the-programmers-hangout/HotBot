@@ -1,6 +1,7 @@
 package me.aberrantfox.hotbot.listeners
 
 import me.aberrantfox.hotbot.extensions.jda.fullName
+import me.aberrantfox.hotbot.extensions.stdlib.formatJdaDate
 import me.aberrantfox.hotbot.extensions.stdlib.randomListItem
 import me.aberrantfox.hotbot.logging.BotLogger
 import me.aberrantfox.hotbot.services.Configuration
@@ -21,6 +22,7 @@ class MemberListener(val configuration: Configuration, val logger: BotLogger, va
         val response = mService.messages.onJoin.randomListItem().replace("%name%", "${event.user.asMention}(${event.user.fullName()})")
         val userImage = event.user.effectiveAvatarUrl
 
+        logger.info("${event.user.fullName()} :: ${event.user.asMention} created on ${event.user.creationTime.toString().formatJdaDate()} -- joined the server")
         target?.sendMessage(buildJoinMessage(response, userImage))?.queue { msg->
             msg.addReaction("\uD83D\uDC4B").queue {
                 WelcomeMessages.map.put(event.user.id, msg.id)
@@ -31,7 +33,7 @@ class MemberListener(val configuration: Configuration, val logger: BotLogger, va
         }
     }
 
-    override fun onGuildMemberLeave(e: GuildMemberLeaveEvent) = logger.info("${e.user.asMention} left the server")
+    override fun onGuildMemberLeave(e: GuildMemberLeaveEvent) = logger.info("${e.user.fullName()} :: ${e.user.asMention} left the server")
 
     private fun buildJoinMessage(response: String, image: String) =
         EmbedBuilder()
