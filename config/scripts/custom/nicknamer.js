@@ -1,10 +1,11 @@
 registerCommand({
     name: "nick",
-    expect: [argType.User, argType.Sentence],
+    expect: [UserArg, SentenceArg],
     execute: (event) => {
-        const target = event.guild.getMember(event.args[0])
+        const guild = jda.getGuildById(config.serverInformation.guildid)
+        const target = guild.getMember(event.args[0])
         const nick = event.args[1]
-        const guildController = event.guild.getController()
+        const guildController = guild.getController()
         guildController.setNickname(target, nick).queue()
     },
     help: {
