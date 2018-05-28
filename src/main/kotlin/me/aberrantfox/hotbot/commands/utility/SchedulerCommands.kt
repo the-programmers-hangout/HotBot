@@ -2,12 +2,6 @@ package me.aberrantfox.hotbot.commands.utility
 
 import me.aberrantfox.hotbot.database.deleteReminder
 import me.aberrantfox.hotbot.database.insertReminder
-import me.aberrantfox.hotbot.dsls.command.CommandSet
-import me.aberrantfox.hotbot.dsls.command.commands
-import me.aberrantfox.hotbot.extensions.jda.fullName
-import me.aberrantfox.hotbot.extensions.jda.sendPrivateMessage
-import me.aberrantfox.hotbot.extensions.stdlib.convertToTimeString
-import me.aberrantfox.hotbot.logging.BotLogger
 import me.aberrantfox.hotbot.utility.futureTime
 import me.aberrantfox.kjdautils.api.dsl.CommandSet
 import me.aberrantfox.kjdautils.api.dsl.commands
@@ -23,7 +17,7 @@ import kotlin.concurrent.schedule
 import kotlin.math.roundToLong
 
 @CommandSet
-fun schedulerCommands() = commands {
+fun schedulerCommands(log: BotLogger) = commands {
     command("remindme") {
         expect(TimeStringArg, SentenceArg)
         execute {
@@ -39,7 +33,7 @@ fun schedulerCommands() = commands {
 }
 
 fun scheduleReminder(user: User, message: String, timeMilli: Long, log: BotLogger) {
-    fun remindTask () {
+    fun remindTask() {
         deleteReminder(user.id, message)
         log.info("${user.fullName()} reminded themselves about: $message")
         user.sendPrivateMessage("Hi, you asked me to remind you about: $message")

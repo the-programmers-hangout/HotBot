@@ -1,15 +1,16 @@
 package me.aberrantfox.hotbot.commands.utility
 
 import com.github.ricksbrown.cowsay.Cowsay
-import khttp.get as kget
 import me.aberrantfox.kjdautils.api.dsl.CommandSet
 import me.aberrantfox.kjdautils.api.dsl.arg
 import me.aberrantfox.kjdautils.api.dsl.commands
 import me.aberrantfox.kjdautils.internal.command.arguments.SentenceArg
+import me.aberrantfox.kjdautils.internal.command.arguments.SplitterArg
 import org.jsoup.Jsoup
 import java.io.File
 import java.net.URLEncoder
 import java.util.*
+import khttp.get as kget
 
 @CommandSet
 fun funCommands() =
