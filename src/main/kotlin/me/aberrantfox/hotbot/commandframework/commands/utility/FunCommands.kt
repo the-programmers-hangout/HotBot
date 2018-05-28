@@ -4,6 +4,7 @@ import com.github.ricksbrown.cowsay.Cowsay
 import khttp.get as kget
 import me.aberrantfox.hotbot.commandframework.parsing.ArgumentType
 import me.aberrantfox.hotbot.dsls.command.CommandSet
+import me.aberrantfox.hotbot.dsls.command.arg
 import me.aberrantfox.hotbot.dsls.command.commands
 import org.jsoup.Jsoup
 import java.io.File
@@ -29,9 +30,13 @@ fun funCommands() =
         }
 
         command("flip") {
+            expect(arg(ArgumentType.Splitter, true, listOf("Heads", "Tails")))
             execute {
-                val message = if (Random().nextBoolean()) "Heads" else "Tails"
-                it.respond(message)
+                val options = it.args[0] as List<String>
+                var choice = options[Random().nextInt(options.size)]
+                if (options.size == 1)
+                    choice += "\n... were you expecting something else ? :thinking: Did you forget the `|` separator ?"
+                it.respond(choice)
             }
         }
 
