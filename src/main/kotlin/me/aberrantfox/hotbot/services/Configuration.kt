@@ -1,10 +1,9 @@
 package me.aberrantfox.hotbot.services
 
 import com.github.salomonbrys.kotson.fromJson
-import com.google.gson.Gson
 import com.google.gson.GsonBuilder
-import me.aberrantfox.hotbot.logging.ChannelIdHolder
 import me.aberrantfox.hotbot.permissions.PermissionLevel
+import me.aberrantfox.kjdautils.internal.logging.ChannelIdHolder
 import java.io.File
 import java.util.*
 
@@ -17,11 +16,11 @@ open class Configuration(open val serverInformation: ServerInformation = ServerI
                          val permissionedActions: PermissionedActions = PermissionedActions(),
                          val botInformation: BotInformation = BotInformation())
 
-open class ServerInformation(val token: String = "insert-token",
-                             open val ownerID: String = "insert-id",
-                             var prefix: String = "insert-prefix",
-                             open val guildid: String = "insert-guild-id",
-                             val suggestionPoolLimit: Int = 20)
+class ServerInformation(val token: String = "insert-token",
+                        val ownerID: String = "insert-id",
+                        var prefix: String = "insert-prefix",
+                        val guildid: String = "insert-guild-id",
+                        val suggestionPoolLimit: Int = 20)
 
 data class Security(@Transient val ignoredIDs: MutableSet<String> = mutableSetOf(),
                     var lockDownMode: Boolean = false,
