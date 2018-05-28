@@ -36,7 +36,7 @@ fun funCommands() =
                 var choice = options[Random().nextInt(options.size)]
                 if (options.size == 1)
                     choice += "\n... were you expecting something else ? :thinking: Did you forget the `|` separator ?"
-                it.respond(choice)
+                it.safeRespond(choice)
             }
         }
 
