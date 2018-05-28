@@ -256,6 +256,17 @@ fun moderationCommands() = commands {
         }
     }
 
+    command("editnote") {
+        expect(ArgumentType.Integer, ArgumentType.Sentence)
+        execute {
+            //get user id that note is placed on, use that in insertNote part. If possible, try to replace note at ID with a different note, rather than a different ID.
+            val noteId = it.args.component1() as Int
+            val note = it.args.component2() as String
+            replaceNote(noteId, note, it.author.id)
+            it.respond("Note $noteId has been updated.")
+        }
+    }
+
     command("badpfp") {
         expect(ArgumentType.User)
         execute {

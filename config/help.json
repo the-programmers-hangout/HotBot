@@ -271,6 +271,13 @@
       "example": ""
     },
     {
+      "name": "editNote",
+      "category": "infractions",
+      "description": "Edits a note by ID (listed in history)",
+      "structure": "{noteId} {edited note}",
+      "example": "17 This is the edited note"
+    },
+    {
       "name": "ping",
       "category": "utility",
       "description": "Pong!",
