@@ -3,10 +3,11 @@ package me.aberrantfox.hotbot.permissions
 import com.nhaarman.mockito_kotlin.doReturn
 import com.nhaarman.mockito_kotlin.mock
 import kotlinx.coroutines.experimental.runBlocking
-import me.aberrantfox.hotbot.dsls.command.Command
-import me.aberrantfox.hotbot.dsls.command.CommandsContainer
 import me.aberrantfox.hotbot.services.Configuration
 import me.aberrantfox.hotbot.services.ServerInformation
+import me.aberrantfox.kjdautils.api.dsl.Command
+import me.aberrantfox.kjdautils.api.dsl.CommandsContainer
+import me.aberrantfox.kjdautils.internal.logging.DefaultLogger
 import net.dv8tion.jda.core.JDA
 import net.dv8tion.jda.core.entities.Guild
 import net.dv8tion.jda.core.entities.Member
@@ -46,6 +47,16 @@ class PermissionTests {
 }
 
 private fun produceManager(): PermissionManager {
+
+    val command = Command(commandName)
+
+    val container = CommandsContainer(hashMapOf(commandName to command))
+
+    val serverInfo = ServerInformation(
+            ownerID = "",
+            guildid = "guildid"
+    )
+
     val userMock = mock<User> {
         on { id } doReturn "non-blank"
     }
@@ -58,28 +69,16 @@ private fun produceManager(): PermissionManager {
         on { getMember(userMock) } doReturn memberMock
     }
 
-    val commandMock = mock<Command> {
-        on { name } doReturn commandName
-    }
-
-    val containerMock = mock<CommandsContainer> {
-        on { commands } doReturn hashMapOf(commandName to commandMock)
-    }
-
-    val serverInformationMock = mock<ServerInformation> {
-        on { ownerID } doReturn ""
-        on { guildid } doReturn "guildid"
-    }
-
     val config = mock<Configuration> {
-        on { serverInformation } doReturn serverInformationMock
+        on { serverInformation } doReturn serverInfo
     }
 
     val jdaMock = mock<JDA> {
         on { getGuildById(config.serverInformation.guildid) } doReturn guildMock
     }
 
-    val manager = PermissionManager(jdaMock, containerMock, config, permsFilePath)
+    val manager = PermissionManager(jdaMock, config, permsFilePath)
+    manager.setDefaultPermissions(container)
     runBlocking { manager.setPermission(commandName, PermissionLevel.JrMod).join() }
 
     return manager
