@@ -54,6 +54,13 @@
       "example": ""
     },
     {
+      "name": "fox",
+      "category": "fun",
+      "description": "Displays a picture of a fox.",
+      "structure": "",
+      "example": ""
+    },
+    {
       "name": "flip",
       "category": "fun",
       "description": "Flips a coin. Optionally, print one of the choices given.",

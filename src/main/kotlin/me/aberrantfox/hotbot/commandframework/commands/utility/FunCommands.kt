@@ -29,6 +29,13 @@ fun funCommands() =
             }
         }
 
+        command("fox") {
+            execute{
+                val json = kget("https://randomfox.ca/floof/").jsonObject
+                it.respond(json.getString("image"))
+            }
+        }
+
         command("flip") {
             expect(arg(ArgumentType.Splitter, true, listOf("Heads", "Tails")))
             execute {
