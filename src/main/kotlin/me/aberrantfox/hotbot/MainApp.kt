@@ -16,13 +16,13 @@ import me.aberrantfox.hotbot.permissions.PermissionManager
 import me.aberrantfox.hotbot.services.*
 import me.aberrantfox.hotbot.utility.scheduleUnmute
 import me.aberrantfox.hotbot.utility.timeToDifference
-import me.aberrantfox.kjdautils.api.Fail
-import me.aberrantfox.kjdautils.api.Pass
-import me.aberrantfox.kjdautils.api.PreconditionResult
 import me.aberrantfox.kjdautils.api.startBot
 import me.aberrantfox.kjdautils.extensions.jda.containsInvite
 import me.aberrantfox.kjdautils.extensions.jda.containsURL
 import me.aberrantfox.kjdautils.extensions.jda.mentionsSomeone
+import me.aberrantfox.kjdautils.internal.command.Fail
+import me.aberrantfox.kjdautils.internal.command.Pass
+import me.aberrantfox.kjdautils.internal.command.PreconditionResult
 import me.aberrantfox.kjdautils.internal.logging.BotLogger
 import me.aberrantfox.kjdautils.internal.logging.convertChannels
 import net.dv8tion.jda.core.JDA

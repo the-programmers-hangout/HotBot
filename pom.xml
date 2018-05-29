@@ -157,7 +157,7 @@
         <dependency>
             <groupId>com.github.joshthewall</groupId>
             <artifactId>KUtils</artifactId>
-            <version>af04111d0b</version>
+            <version>96d5c25741</version>
         </dependency>
         <!--<dependency>
             <groupId>com.github.aberrantfox</groupId>
