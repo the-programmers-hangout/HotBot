@@ -117,6 +117,8 @@ fun main(args: Array<String>) {
             jda.addEventListener(MentionListener(config, jda.selfUser.name))
         }
 
+        loadReminders(jda, logger)
+
         EngineContainer.engine = setupScriptEngine(jda, container, config, logger)
 
         logger.info("Fully setup, now ready for use.")
