@@ -65,7 +65,7 @@ fun strikeCommands() =
 
                 StrikeRequests.map.put(target.id, request)
                 it.respond("This has been logged and will be accepted or declined, thank you.")
-                info("${it.author.fullName()} has a new strike request. Use viewRequest ${target.asMention} to see it.")
+                alert("${it.author.fullName()} has a new strike request. Use ++viewRequest ${target.asMention} to see it.")
             }
         }
 
