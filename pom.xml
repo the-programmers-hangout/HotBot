@@ -154,6 +154,16 @@
             <artifactId>jsoup</artifactId>
             <version>1.11.1</version>
         </dependency>
+        <dependency>
+            <groupId>com.github.joshthewall</groupId>
+            <artifactId>KUtils</artifactId>
+            <version>af04111d0b</version>
+        </dependency>
+        <!--<dependency>
+            <groupId>com.github.aberrantfox</groupId>
+            <artifactId>Kutils</artifactId>
+            <version>0.5.0</version>
+        </dependency>-->
     </dependencies>
     <repositories>
         <repository>
@@ -168,6 +178,10 @@
             <id>bintray-kotlin-exposed</id>
             <name>bintray</name>
             <url>http://dl.bintray.com/kotlin/exposed</url>
+        </repository>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
         </repository>
     </repositories>
 
