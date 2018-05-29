@@ -3,6 +3,7 @@ package me.aberrantfox.hotbot
 import me.aberrantfox.hotbot.commands.development.EngineContainer
 import me.aberrantfox.hotbot.commands.development.EngineContainer.setupScriptEngine
 import me.aberrantfox.hotbot.commands.utility.scheduleReminder
+import me.aberrantfox.hotbot.database.forEachIgnoredID
 import me.aberrantfox.hotbot.database.forEachReminder
 import me.aberrantfox.hotbot.database.getAllMutedMembers
 import me.aberrantfox.hotbot.database.setupDatabaseSchema
@@ -91,6 +92,7 @@ fun main(args: Array<String>) {
 
         handleLTSMutes(config, jda)
 
+        forEachIgnoredID { config.security.ignoredIDs.add(it) }
 
 
         val tracker = MessageTracker(1)
