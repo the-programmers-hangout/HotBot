@@ -35,7 +35,16 @@ class MemberListener(val configuration: Configuration, val logger: BotLogger, va
     }
 
     @Subscribe
-    fun onGuildMemberLeave(e: GuildMemberLeaveEvent) = logger.info("${e.user.fullName()} :: ${e.user.asMention} left the server")
+    fun onGuildMemberLeave(e: GuildMemberLeaveEvent) {
+        logger.info("${e.user.fullName()} :: ${e.user.asMention} left the server")
+
+        if(configuration.serverInformation.deleteWelcomeOnLeave && WelcomeMessages.map.containsKey(e.user.id)) {
+            val messageID = WelcomeMessages.map[e.user.id]
+            e.jda.getTextChannelById(configuration.messageChannels.welcomeChannel).getMessageById(messageID).queue {
+                it.delete().queue()
+            }
+        }
+    }
 
     private fun buildJoinMessage(response: String, image: String) =
         EmbedBuilder()
