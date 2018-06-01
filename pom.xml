@@ -155,15 +155,10 @@
             <version>1.11.1</version>
         </dependency>
         <dependency>
-            <groupId>com.github.joshthewall</groupId>
-            <artifactId>KUtils</artifactId>
-            <version>96d5c25741</version>
-        </dependency>
-        <!--<dependency>
             <groupId>com.github.aberrantfox</groupId>
-            <artifactId>Kutils</artifactId>
-            <version>0.5.0</version>
-        </dependency>-->
+            <artifactId>KUtils</artifactId>
+            <version>0.6.0</version>
+        </dependency>
     </dependencies>
     <repositories>
         <repository>
