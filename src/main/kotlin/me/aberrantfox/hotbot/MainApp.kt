@@ -1,13 +1,14 @@
 package me.aberrantfox.hotbot
 
 import me.aberrantfox.hotbot.commandframework.CommandExecutor
-import me.aberrantfox.hotbot.commandframework.commands.EngineContainer
-import me.aberrantfox.hotbot.commandframework.commands.EngineContainer.setupScriptEngine
-import me.aberrantfox.hotbot.commandframework.commands.macroMap
+import me.aberrantfox.hotbot.commandframework.commands.development.EngineContainer
+import me.aberrantfox.hotbot.commandframework.commands.development.EngineContainer.setupScriptEngine
+import me.aberrantfox.hotbot.commandframework.commands.utility.macros
+import me.aberrantfox.hotbot.commandframework.commands.utility.scheduleReminder
 import me.aberrantfox.hotbot.database.getAllMutedMembers
-import me.aberrantfox.hotbot.database.loadUpManager
+import me.aberrantfox.hotbot.database.forEachIgnoredID
+import me.aberrantfox.hotbot.database.forEachReminder
 import me.aberrantfox.hotbot.database.setupDatabaseSchema
-import me.aberrantfox.hotbot.dsls.command.CommandsContainer
 import me.aberrantfox.hotbot.dsls.command.produceContainer
 import me.aberrantfox.hotbot.extensions.jda.hasRole
 import me.aberrantfox.hotbot.listeners.*
@@ -15,6 +16,7 @@ import me.aberrantfox.hotbot.listeners.antispam.DuplicateMessageListener
 import me.aberrantfox.hotbot.listeners.antispam.InviteListener
 import me.aberrantfox.hotbot.listeners.antispam.NewJoinListener
 import me.aberrantfox.hotbot.listeners.antispam.TooManyMentionsListener
+import me.aberrantfox.hotbot.logging.BotLogger
 import me.aberrantfox.hotbot.logging.convertChannels
 import me.aberrantfox.hotbot.permissions.PermissionManager
 import me.aberrantfox.hotbot.services.*
@@ -25,12 +27,11 @@ import net.dv8tion.jda.core.JDA
 import net.dv8tion.jda.core.JDABuilder
 import net.dv8tion.jda.core.Permission
 import net.dv8tion.jda.core.entities.Guild
-import java.io.File
-import javax.script.ScriptEngine
-import javax.script.ScriptEngineManager
+import org.apache.log4j.*
 
 
 fun main(args: Array<String>) {
+    setupLogger()
     println("Starting to load hotbot.")
     val container = produceContainer()
     val config = loadConfig() ?: return
@@ -57,11 +58,10 @@ fun main(args: Array<String>) {
     logger.info("connected")
     val mutedRole = jda.getRolesByName(config.security.mutedRole, true).first()
     val tracker = MessageTracker(1)
-
-    val manager = PermissionManager(HashMap(), jda, config)
+    val manager = PermissionManager(jda, container, config)
     val messageService = MService()
 
-    loadUpManager(manager)
+    forEachIgnoredID { config.security.ignoredIDs.add(it) }
 
     container.newLogger(logger)
 
@@ -71,6 +71,7 @@ fun main(args: Array<String>) {
             InviteListener(config, logger, manager),
             VoiceChannelListener(logger),
             NewChannelListener(mutedRole),
+            ChannelDeleteListener(logger),
             DuplicateMessageListener(config, logger, tracker),
             RoleListener(config),
             PollListener(),
@@ -79,7 +80,7 @@ fun main(args: Array<String>) {
             MessageDeleteListener(logger, manager, config),
             NewJoinListener())
 
-    CommandRecommender.addAll(container.commands.keys.toList() + macroMap.keys.toList())
+    CommandRecommender.addAll(container.commands.keys.toList() + macros.map { it.name })
 
     if(config.apiConfiguration.enableCleverBot) {
         println("Enabling cleverbot integration.")
@@ -87,8 +88,29 @@ fun main(args: Array<String>) {
     }
 
     handleLTSMutes(config, jda)
+    loadReminders(jda, logger)
     EngineContainer.engine = setupScriptEngine(jda, container, config)
     logger.info("Fully setup, now ready for use.")
+}
+
+private fun setupLogger() {
+    val console = ConsoleAppender()
+    val pattern = "%d [%p|%c|%C{1}] %m%n"
+    console.layout = PatternLayout(pattern)
+    console.threshold = Level.INFO
+    console.activateOptions()
+
+    Logger.getRootLogger().addAppender(console)
+
+    val fa = FileAppender()
+    fa.name = "FileLogger"
+    fa.file = "hotbot.log"
+    fa.layout = PatternLayout("%d %-5p [%c{1}] %m%n")
+    fa.threshold = Level.DEBUG
+    fa.append = true
+    fa.activateOptions()
+
+    Logger.getRootLogger().addAppender(fa)
 }
 
 private fun setupMutedRole(guild: Guild, roleName: String) {
@@ -118,5 +140,14 @@ private fun handleLTSMutes(config: Configuration, jda: JDA) {
         if(user != null) {
             scheduleUnmute(guild, user.user, config, difference, it)
         }
+    }
+}
+
+private fun loadReminders(jda: JDA, log: BotLogger) {
+    forEachReminder {
+        val difference = timeToDifference(it.remindTime)
+        val user = jda.getUserById(it.member)
+
+        scheduleReminder(user, it.message, difference, log)
     }
 }

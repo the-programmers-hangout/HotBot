@@ -1,59 +1,42 @@
-package me.aberrantfox.hotbot.commandframework.commands
+package me.aberrantfox.hotbot.commandframework.commands.permissions
 
 import me.aberrantfox.hotbot.commandframework.parsing.ArgumentType
+import me.aberrantfox.hotbot.dsls.command.Command
 import me.aberrantfox.hotbot.dsls.command.CommandSet
 import me.aberrantfox.hotbot.dsls.command.commands
 import me.aberrantfox.hotbot.dsls.embed.embed
-import me.aberrantfox.hotbot.extensions.jda.getHighestRole
-import me.aberrantfox.hotbot.extensions.jda.getRoleByIdOrName
-import me.aberrantfox.hotbot.extensions.jda.toMember
 import me.aberrantfox.hotbot.extensions.stdlib.sanitiseMentions
+import me.aberrantfox.hotbot.permissions.PermissionLevel
 import me.aberrantfox.hotbot.services.CommandDescriptor
 import me.aberrantfox.hotbot.services.HelpConf
+import net.dv8tion.jda.core.entities.Role
 import java.awt.Color
 
 @CommandSet
 fun permissionCommands() =
     commands {
         command("setPermission") {
-            expect(ArgumentType.Word, ArgumentType.Word)
+            expect(ArgumentType.Command, ArgumentType.PermissionLevel)
             execute {
-                val commandName = it.args[0] as String
-                val role = it.guild.getRoleByIdOrName(it.args[1] as String)
+                val command = it.args.component1() as Command
+                val level = it.args.component2() as PermissionLevel
 
-                if (role == null) {
-                    it.respond("Unknown role.")
-                    return@execute
-                }
-
-                if (!(it.container.has(commandName))) {
-                    it.safeRespond("Dunno what the command: $commandName is - run the help command?")
-                    return@execute
-                }
-
-                it.manager.addPermission(role.id, commandName)
-                it.safeRespond("$commandName can now be invoked by ${role.name}")
+                it.manager.setPermission(command.name, level)
+                it.safeRespond("${command.name} is now accessible to ${level.name} and higher")
             }
         }
 
         command("getPermission") {
-            expect(ArgumentType.Word)
+            expect(ArgumentType.Command)
             execute {
-                val name = it.args[0] as String
-
-                if (!(it.container.has(name))) {
-                    it.safeRespond("I do not know what $name is")
-                    return@execute
-                }
-
-                it.safeRespond("The required role is: ${it.manager.roleRequired(name)?.name
-                    ?: "Only the owner can invoke this."}")
+                val name = (it.args.component1() as Command).name
+                it.safeRespond("The required role is: ${it.manager.roleRequired(name).name}")
             }
         }
 
         command("listcommandperms") {
             execute {
-                it.safeRespond(it.manager.listAvailableCommands(it.author.toMember(it.guild).getHighestRole()?.id))
+                it.respond(it.manager.listAvailableCommands(it.author))
             }
         }
 
@@ -64,44 +47,34 @@ fun permissionCommands() =
         }
 
         command("setallPermissions") {
-            expect(ArgumentType.Word)
+            expect(ArgumentType.PermissionLevel)
             execute {
-                val role = it.guild.getRoleByIdOrName(it.args.component1() as String)
-
-                if (role == null) {
-                    it.respond("Unknown role")
-                    return@execute
-                }
+                val level = it.args.component1() as PermissionLevel
 
                 if (it.config.serverInformation.ownerID != it.author.id) {
                     it.respond("Sorry, this command can only be run by the owner marked in the configuration file.")
                     return@execute
                 }
 
-                it.container.listCommands().forEach { command -> it.manager.addPermission(role.id, command) }
+                it.container.listCommands().forEach { command -> it.manager.setPermission(command, level) }
             }
         }
 
         command("setPermissions") {
-            expect(ArgumentType.Word, ArgumentType.Word)
+            expect(ArgumentType.Category, ArgumentType.PermissionLevel)
             execute {
-                val target = it.args.component1() as String
-                val role = it.guild.getRoleByIdOrName(it.args.component2() as String)
+                val category = it.args.component1() as String
+                val level = it.args.component2() as PermissionLevel
 
-                if (role == null) {
-                    it.safeRespond("Unknown role")
-                    return@execute
-                }
-
-                val commands = HelpConf.listCommandsinCategory(target).map { it.name }
+                val commands = HelpConf.listCommandsinCategory(category).map { it.name }
 
                 if (commands.isEmpty()) {
-                    it.respond("Either this category ($target) contains 0 commands, or it is not a real category :thinking:")
+                    it.respond("Either this category ($category) contains 0 commands, or it is not a real category :thinking:")
                     return@execute
                 }
 
-                commands.forEach { command -> it.manager.addPermission(role.id, command) }
-                it.safeRespond("${role.name} now has access to: ${commands.joinToString(prefix = "`", postfix = "`")}")
+                commands.forEach { command -> it.manager.setPermission(command, level) }
+                it.safeRespond("${level.name} now has access to: ${commands.joinToString(prefix = "`", postfix = "`")}")
             }
         }
 
@@ -116,7 +89,7 @@ fun permissionCommands() =
                     HelpConf.listCategories()
                         .map { cat ->
                             val commandsInCategory = HelpConf.listCommandsinCategory(cat)
-                            val text = commandsInCategory.joinToString("\n") { cmd -> "${cmd.name} -- ${it.manager.roleRequired(cmd.name)?.name ?: "Owner"}" }
+                            val text = commandsInCategory.joinToString("\n") { cmd -> "${cmd.name} -- ${it.manager.roleRequired(cmd.name)}" }
                             Pair(cat, text)
                         }
                         .forEach {
@@ -151,6 +124,44 @@ fun permissionCommands() =
                             value = it.second
                             inline = false
                         }
+                    }
+                })
+            }
+        }
+
+        command("setRoleLevel") {
+            expect(ArgumentType.Role, ArgumentType.PermissionLevel)
+            execute {
+                val role = it.args.component1() as Role
+                val level = it.args.component2() as PermissionLevel
+
+                it.manager.assignRoleLevel(role, level)
+
+                it.respond("${role.name} is now assigned the permission level ${level.name}")
+            }
+        }
+
+        command("viewRoleAssignments") {
+            execute {
+                it.respond(embed {
+                    title("Role Assignments")
+                    description("Below you can see what roles have been assigned what permission levels")
+
+                    val assignments = it.manager.roleAssignemts()
+
+                    val assignmentsText = if(assignments.isEmpty()) {
+                        "None"
+                    } else {
+                        assignments.joinToString("\n") { pair ->
+                            val roleName = it.guild.getRoleById(pair.key).name
+                            "$roleName :: PermissionLevel.${pair.value}"
+                        }
+                    }
+
+                    field {
+                        this.name = "Assignments"
+                        this.value = assignmentsText
+                        inline = false
                     }
                 })
             }

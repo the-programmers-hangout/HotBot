@@ -1,9 +1,8 @@
-package me.aberrantfox.hotbot.commandframework.commands
+package me.aberrantfox.hotbot.commandframework.commands.utility
 
 import com.google.gson.Gson
 import me.aberrantfox.hotbot.commandframework.parsing.ArgumentType
 import me.aberrantfox.hotbot.dsls.command.CommandSet
-import me.aberrantfox.hotbot.database.savePermissions
 import me.aberrantfox.hotbot.dsls.command.CommandEvent
 import me.aberrantfox.hotbot.services.saveConfig
 import me.aberrantfox.hotbot.dsls.command.commands
@@ -11,9 +10,11 @@ import me.aberrantfox.hotbot.dsls.embed.embed
 import me.aberrantfox.hotbot.extensions.jda.fullName
 import me.aberrantfox.hotbot.services.Configuration
 import net.dv8tion.jda.core.OnlineStatus
+import net.dv8tion.jda.core.entities.TextChannel
 import net.dv8tion.jda.core.entities.User
 import java.awt.Color
 import java.util.*
+import khttp.post
 
 data class Properties(val version: String, val author: String)
 
@@ -86,7 +87,7 @@ fun utilCommands() = commands {
             it.respond("Exiting")
             saveConfig(it.config)
             info("saved configurations")
-            savePermissions(it.manager)
+            it.manager.save()
             info("saved permissions to database prior to shut down.")
             System.exit(0)
         }
@@ -119,12 +120,12 @@ fun utilCommands() = commands {
     }
 
     command("echo") {
-        expect(ArgumentType.Word, ArgumentType.Sentence)
+        expect(ArgumentType.TextChannel, ArgumentType.Sentence)
         execute {
-            val target = it.args[0] as String
+            val target = it.args[0] as TextChannel
             val message = it.args[1] as String
 
-            it.jda.getTextChannelById(target).sendMessage(message).queue()
+            target.sendMessage(message).queue()
         }
     }
 
@@ -133,6 +134,18 @@ fun utilCommands() = commands {
         execute {
             val target = it.args.component1() as User
             it.respond("${target.fullName()}'s account was made on ${target.creationTime}")
+        }
+    }
+
+    command("uploadtext") {
+        expect(ArgumentType.Sentence)
+        execute {
+            it.message.delete().queue()
+
+            val text = it.args.component1() as String
+            val response = post("https://hastebin.com/documents", data = text).jsonObject
+
+            it.respond("${it.author.fullName()}'s paste: https://hastebin.com/" + response.getString("key"))
         }
     }
 }

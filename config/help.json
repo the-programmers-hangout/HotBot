@@ -9,15 +9,36 @@
     "suggestions": "You can use commands in this section to give suggestions to the server.",
     "embed": "Commands used to build an embed and then send it. You build an embed by using the set/add commands (listed below) - when ready, use sendembed",
     "banqueue": "Commands used for preventing raids and setting up bans. Each moderator has a raid queue in which they can 'pre-load' some bans, with a defined reason.",
-    "profiles": "Commands relating to the profile queue for posting developer profiles or introductions",
     "security": "Commands for modifying security features and thresholds of the bot.",
     "invites": "Commands for dictating how the bot will handle invites",
     "rank": "Commands for granting and removing ranks.",
     "resources": "Commands related to channel resources",
     "polling": "Commands related to polling questions and answers",
-    "api": "Commands Related to evaluting Javascript code inline, or interfacing with the bot api."
+    "api": "Commands related to evaluting Javascript code inline, or interfacing with the bot api.",
+    "giveaways": "Commands related to giveaways"
   },
   "commands": [
+    {
+      "name": "viewroleassignments",
+      "category": "permissions",
+      "description": "View the assigned permission levels of any role which has an assigned permission level",
+      "structure": "",
+      "example": ""
+    },
+    {
+      "name": "setrolelevel",
+      "category": "permissions",
+      "description": "Set the PermissionLevel of a particular role.",
+      "structure": "{role} {level}",
+      "example": "moderatorRole Moderator"
+    },
+    {
+      "name": "ban",
+      "category": "moderation",
+      "description": "Bans a member",
+      "structure": "{user} {delete days (Optional)} {reason}",
+      "example": "@Fox#0001 7 For wearing crocs"
+    },
     {
 	  "name": "cowsay",
 	  "category": "fun",
@@ -33,11 +54,18 @@
       "example": ""
     },
     {
-      "name": "flip",
+      "name": "fox",
       "category": "fun",
-      "description": "Flips a coin.",
+      "description": "Displays a picture of a fox.",
       "structure": "",
       "example": ""
+    },
+    {
+      "name": "flip",
+      "category": "fun",
+      "description": "Flips a coin. Optionally, print one of the choices given.",
+      "structure": "[{choice} | {choice} ...]",
+      "example": "Get work done | Browse #meme-bin | Take a power nap"
     },
     {
       "name": "dog",
@@ -56,9 +84,30 @@
     {
       "name": "addmacro",
       "category": "macro",
-      "description": "Adds a macro which will respond with the given message when invoked by the given name.",
+      "description": "Add a macro which will respond with the given message when invoked by the given name.",
+      "structure": "{macroName} {categoryName} [macroMessage]",
+      "example": "greet fun Hello, World!"
+    },
+    {
+      "name": "editmacro",
+      "category": "macro",
+      "description": "Change a macro's response message",
       "structure": "{macroName} [macroMessage]",
-      "example": "greet Hello, World!"
+      "example": "test New test message."
+    },
+    {
+      "name": "renamemacro",
+      "category": "macro",
+      "description": "Change a macro's name, keeping the original response",
+      "structure": "{oldName} {newName}",
+      "example": "greet helloworld"
+    },
+    {
+      "name": "setmacrocategories",
+      "category": "macro",
+      "description": "Move one or many macros to a category.",
+      "structure": "macroName1 macroName2 macroName3 ... | categoryName",
+      "example": "ask sask wrapcode | help"
     },
     {
       "name": "removemacro",
@@ -66,6 +115,13 @@
       "description": "Removes a macro with the given name",
       "structure": "{macroname}",
       "example": "greet"
+    },
+    {
+      "name": "removemacros",
+      "category": "macro",
+      "description": "Removes a whole category of macros",
+      "structure": "{categoryName}",
+      "example": "fun"
     },
     {
       "name": "listmacros",
@@ -99,8 +155,8 @@
       "name": "mute",
       "category": "moderation",
       "description": "Mute a member for a specified number of minutes.",
-      "structure": "{userID} {timeInMinutes} [Reason]",
-      "example": "12340234239 10 Being a silly billy."
+      "structure": "{userID} {timeString} [Reason]",
+      "example": "12340234239 1 day 10m Being a silly billy."
     },
     {
       "name": "lockdown",
@@ -220,6 +276,13 @@
       "description": "Wipes all notes from a user (permanently deleted).",
       "structure": "",
       "example": ""
+    },
+    {
+      "name": "editNote",
+      "category": "infractions",
+      "description": "Edits a note by ID (listed in history)",
+      "structure": "{noteId} {edited note}",
+      "example": "17 This is the edited note"
     },
     {
       "name": "ping",
@@ -472,34 +535,6 @@
       "description": "Echo a message to a channel",
       "structure": "{channelID} {message}",
       "example": "139413981501 Hi there, I am hotbot"
-    },
-    {
-      "name": "submitprofile",
-      "category": "profiles",
-      "description": "Submit a profile to the profile queue, it'll be reviewed by a moderator. YES, you need to match the format! Read the FAQ for formatting!",
-      "structure": "{profile}",
-      "example": "\n **Who are you?** \n  hotbot! \n **What is your experience?** \n everything! \n **What languages are you really, really comfortable with?** \n Kotlin! \n **What other languages have you used/do you know of?** \n Java! \n **Anything else you'd like to say?** \n I like cake!"
-    },
-    {
-      "name": "acceptprofile",
-      "category": "profiles",
-      "description": "Accept a profile and post it to the profiles channel.",
-      "structure": "",
-      "example": ""
-    },
-    {
-      "name": "declineprofile",
-      "category": "profiles",
-      "description": "Decline a profile, removing it from the queue.",
-      "structure": "",
-      "example": ""
-    },
-    {
-      "name": "viewprofile",
-      "category": "profiles",
-      "description": "View the profile at the top of the queue, allowing you to decide whether it should be accepted or rejected.",
-      "structure": "",
-      "example": ""
     },
     {
       "name": "joindate",
@@ -815,6 +850,69 @@
       "description": "Eval code without a response",
       "structure": "{code}",
       "example": "event.respond('hi');"
+    },
+    {
+      "name": "mutevoicechannel",
+      "category": "moderation",
+      "description": "Mute all non-moderators in a voice channel.",
+      "structure": "{targetChannelId}",
+      "example": "134932042994309234"
+    },
+    {
+      "name": "unmutevoicechannel",
+      "category": "moderation",
+      "description": "Unmute all users in a voice channel.",
+      "structure": "{targetChannelId}",
+      "example": "134932042994309234"
+    },
+    {
+      "name": "giveawaystart",
+      "category": "giveaway",
+      "description": "Starts a giveaway in the channel it is invoked in.",
+      "structure": "{timeString} {prize}",
+      "example": "1d an ice cold can of coke"
+    },
+    {
+      "name": "giveawayend",
+      "category": "giveaway",
+      "description": "Force end a giveaway",
+      "structure": "{messageID}",
+      "example": "429853770063806466"
+    },
+    {
+      "name": "giveawayreroll",
+      "category": "giveaway",
+      "description": "Reroll an ended giveaway to get a new winner",
+      "structure": "{messageID}",
+      "example": "429853770063806466"
+    },
+    {
+      "name": "xkcd",
+      "category": "fun",
+      "description": "Returns the XKCD comic number specified, or a random comic if you don't supply a number.",
+      "structure": "{comicNumber}",
+      "example": "371"
+    },
+    {
+      "name": "xkcd-search",
+      "category": "fun",
+      "description": "Returns a XKCD comic that most closely matches your query.",
+      "structure": "{searchQuery}",
+      "example": "Exploits of a mom"
+    },
+    {
+      "name": "xkcd-latest",
+      "category": "fun",
+      "description": "Grabs the latest XKCD comic.",
+      "structure": "",
+      "example": ""
+    },
+    {
+      "name": "uploadtext",
+      "category": "utility",
+      "description": "Uploads the given block of text/code to hastebin and removes the invocation",
+      "structure": "{text}",
+      "example": "print('Hello, World!')"
     }
   ]
 }

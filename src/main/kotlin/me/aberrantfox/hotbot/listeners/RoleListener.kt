@@ -1,6 +1,6 @@
 package me.aberrantfox.hotbot.listeners
 
-import me.aberrantfox.hotbot.commandframework.commands.RankContainer
+import me.aberrantfox.hotbot.commandframework.commands.permissions.RankContainer
 import me.aberrantfox.hotbot.services.Configuration
 import net.dv8tion.jda.core.events.role.update.RoleUpdateNameEvent
 import net.dv8tion.jda.core.hooks.ListenerAdapter

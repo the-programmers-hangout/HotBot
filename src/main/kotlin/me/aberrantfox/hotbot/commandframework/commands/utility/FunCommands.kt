@@ -1,9 +1,10 @@
-package me.aberrantfox.hotbot.commandframework.commands
+package me.aberrantfox.hotbot.commandframework.commands.utility
 
 import com.github.ricksbrown.cowsay.Cowsay
 import khttp.get as kget
 import me.aberrantfox.hotbot.commandframework.parsing.ArgumentType
 import me.aberrantfox.hotbot.dsls.command.CommandSet
+import me.aberrantfox.hotbot.dsls.command.arg
 import me.aberrantfox.hotbot.dsls.command.commands
 import org.jsoup.Jsoup
 import java.io.File
@@ -16,7 +17,7 @@ fun funCommands() =
     commands {
         command("cat") {
             execute {
-                val json = kget("http://random.cat/meow").jsonObject
+                val json = kget("http://aws.random.cat/meow").jsonObject
                 it.respond(json.getString("file"))
             }
         }
@@ -28,10 +29,21 @@ fun funCommands() =
             }
         }
 
+        command("fox") {
+            execute{
+                val json = kget("https://randomfox.ca/floof/").jsonObject
+                it.respond(json.getString("image"))
+            }
+        }
+
         command("flip") {
+            expect(arg(ArgumentType.Splitter, true, listOf("Heads", "Tails")))
             execute {
-                val message = if (Random().nextBoolean()) "Heads" else "tails"
-                it.respond(message)
+                val options = it.args[0] as List<String>
+                var choice = options[Random().nextInt(options.size)]
+                if (options.size == 1)
+                    choice += "\n... were you expecting something else ? :thinking: Did you forget the `|` separator ?"
+                it.safeRespond(choice)
             }
         }
 

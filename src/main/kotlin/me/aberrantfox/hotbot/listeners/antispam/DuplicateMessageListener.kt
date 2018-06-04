@@ -1,6 +1,7 @@
 package me.aberrantfox.hotbot.listeners.antispam
 
-import me.aberrantfox.hotbot.commandframework.commands.SecurityLevelState
+import me.aberrantfox.hotbot.commandframework.commands.administration.SecurityLevelState
+import me.aberrantfox.hotbot.extensions.jda.descriptor
 import me.aberrantfox.hotbot.extensions.jda.fullName
 import me.aberrantfox.hotbot.extensions.jda.isImagePost
 import me.aberrantfox.hotbot.logging.BotLogger
@@ -57,11 +58,11 @@ class DuplicateMessageListener (val config: Configuration, val log: BotLogger, v
     }
 
     private fun punish(event: GuildMessageReceivedEvent, reason: String, id: String) {
-        permMuteMember(event.guild, event.author, reason, config, event.jda.selfUser)
+        permMuteMember(event.guild, event.author, reason, config)
 
         tracker.list(id)?.forEach { it.message.delete().queue() }
 
-        log.warning("${event.author.fullName()} was muted for $reason")
+        log.warning("${event.author.descriptor()} was muted for $reason")
         tracker.removeUser(id)
     }
 }

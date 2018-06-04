@@ -27,6 +27,8 @@ class MessageDeleteListener(val logger: BotLogger,
 
         val found = list.find { it == event.message }
 
+        if(event.message.contentRaw.startsWith(config.serverInformation.prefix)) return
+
         if(found != null) {
             logger.history(embed {
                 title("Message Edit")

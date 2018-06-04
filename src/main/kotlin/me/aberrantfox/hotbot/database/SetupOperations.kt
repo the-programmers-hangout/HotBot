@@ -1,6 +1,6 @@
 package me.aberrantfox.hotbot.database
 
-import me.aberrantfox.hotbot.commandframework.commands.SuggestionStatus
+import me.aberrantfox.hotbot.commandframework.commands.utility.SuggestionStatus
 import me.aberrantfox.hotbot.services.Configuration
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
@@ -14,7 +14,8 @@ fun setupDatabaseSchema(config: Configuration) {
             "useJDBCCompliantTimezoneShift=true",
             "useLegacyDatetimeCode=true",
             "serverTimezone=UTC",
-            "nullNamePatternMatchesAll=true"
+            "nullNamePatternMatchesAll=true",
+            "useSSL=false"
     )
 
     val url = "jdbc:mysql://${config.databaseCredentials.hostname}/${config.databaseCredentials.database}?${dbParams.joinToString("&")}"
@@ -27,7 +28,8 @@ fun setupDatabaseSchema(config: Configuration) {
     )
 
     transaction {
-        SchemaUtils.create(Strikes, Suggestions, BanRecords, CommandPermissions, ChannelResources, Notes, MutedMember)
+        SchemaUtils.create(Strikes, HistoryCount, Suggestions, BanRecords, CommandPermissions,
+                ChannelResources, Notes, MutedMember, IgnoredIDs, Reminder)
         logger.addLogger(StdOutSqlLogger)
     }
 }
@@ -39,6 +41,11 @@ object Strikes : Table() {
     val strikes = integer("strikes")
     val reason = text("reason")
     val date = date("date")
+}
+
+object HistoryCount: Table() {
+    val member = varchar("member", 18).primaryKey()
+    val historyCount = integer("historyCount")
 }
 
 object Notes: Table() {
@@ -84,4 +91,15 @@ object MutedMember : Table() {
     val reason = text("reason")
     val moderator = varchar("moderator", 18)
     val guildId = varchar("guildId", 18)
+}
+
+object IgnoredIDs : Table() {
+    val id = varchar("id", 18).primaryKey()
+}
+
+object Reminder : Table() {
+    val id = integer("id").autoIncrement().primaryKey()
+    val member = varchar("member", 18)
+    val message = text("message")
+    val remindTime = long("remindTime")
 }

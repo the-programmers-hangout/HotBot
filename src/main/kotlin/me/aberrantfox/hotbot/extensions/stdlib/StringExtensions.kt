@@ -1,5 +1,6 @@
 package me.aberrantfox.hotbot.extensions.stdlib
 
+import me.aberrantfox.hotbot.permissions.PermissionLevel
 import net.dv8tion.jda.core.JDA
 import net.dv8tion.jda.core.entities.Guild
 import net.dv8tion.jda.core.entities.Role
@@ -80,3 +81,5 @@ fun String.trimToID(): String =
         } else {
             this
         }
+
+fun String.isPermission() = PermissionLevel.isLevel(this)

@@ -1,4 +1,4 @@
-package me.aberrantfox.hotbot.commandframework.commands
+package me.aberrantfox.hotbot.commandframework.commands.administration
 
 import me.aberrantfox.hotbot.commandframework.parsing.ArgumentType
 import me.aberrantfox.hotbot.dsls.command.CommandSet
@@ -65,7 +65,7 @@ fun strikeCommands() =
 
                 StrikeRequests.map.put(target.id, request)
                 it.respond("This has been logged and will be accepted or declined, thank you.")
-                info("${it.author.fullName()} has a new strike request. Use viewRequest ${target.asMention} to see it.")
+                alert("${it.author.fullName()} has a new strike request. Use ++viewRequest ${target.asMention} to see it.")
             }
         }
 
@@ -111,7 +111,7 @@ fun strikeCommands() =
 
                 val request = StrikeRequests.map[user.id]!!
                 val newArgs = listOf(request.user, request.amount, request.reason)
-                infract(it.copy(args=newArgs))
+                infract(it.copy(args = newArgs))
 
                 StrikeRequests.map.remove(user.id)
                 it.respond("Strike request on ${user.asMention} was accepted.")
@@ -166,8 +166,9 @@ fun strikeCommands() =
             expect(ArgumentType.User)
             execute {
                 val target = it.args[0] as User
+                incrementOrSetHistoryCount(target.id)
                 it.respond(buildHistoryEmbed(target, true, getHistory(target.id),
-                        getNotesByUser(target.id), it))
+                        getHistoryCount(target.id),getNotesByUser(target.id), it))
             }
         }
 
@@ -196,7 +197,7 @@ fun strikeCommands() =
                 val target = it.author
 
                 target.sendPrivateMessage(buildHistoryEmbed(target, false, getHistory(target.id),
-                        null, it))
+                        getHistoryCount(target.id), null, it))
             }
         }
     }
@@ -275,7 +276,7 @@ private fun administerPunishment(config: Configuration, user: User, strikeQuanti
 }
 
 private fun buildHistoryEmbed(target: User, includeModerator: Boolean, records: List<StrikeRecord>,
-                              notes: List<NoteRecord>?, it: CommandEvent) =
+                              historyCount: Int, notes: List<NoteRecord>?, it: CommandEvent) =
         embed {
             title("${target.fullName()}'s Record")
             setColor(Color.MAGENTA)
@@ -295,6 +296,9 @@ private fun buildHistoryEmbed(target: User, includeModerator: Boolean, records: 
                         "\nJoin date: **${it.guild.getMemberJoinString(target)}**" +
                         "\nCreation date: **${target.creationTime.toString().formatJdaDate()}**"
                 inline = false
+                if(includeModerator){
+                    value +="\nHistory has been invoked **$historyCount** times."
+                }
             }
 
             field {
@@ -305,7 +309,7 @@ private fun buildHistoryEmbed(target: User, includeModerator: Boolean, records: 
 
             records.forEach { record ->
                 field {
-                    name = "ID :: ${record.id} :: Weight :: ${record.strikes}"
+                    name = "ID :: __${record.id}__ :: Weight :: __${record.strikes}__"
                     value = "This infraction is **${expired(record.isExpired)}**."
                     inline = false
 
@@ -346,7 +350,7 @@ private fun buildHistoryEmbed(target: User, includeModerator: Boolean, records: 
             notes.forEach { note ->
                 field {
                     name = "ID :: __${note.id}__ :: Staff :: __${note.moderator.retrieveIdToName(it.jda)}__"
-                    value = "Noted on **${note.dateTime.toString(DateTimeFormat.forPattern("dd/MM/yyyy"))}**"
+                    value = "Noted by **${note.moderator.retrieveIdToName(it.jda)}** on **${note.dateTime.toString(DateTimeFormat.forPattern("dd/MM/yyyy"))}**"
                     inline = false
                 }
 

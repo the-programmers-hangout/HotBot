@@ -2,11 +2,13 @@ package me.aberrantfox.hotbot.services
 
 import com.github.salomonbrys.kotson.fromJson
 import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import me.aberrantfox.hotbot.logging.ChannelIdHolder
+import me.aberrantfox.hotbot.permissions.PermissionLevel
 import java.io.File
 import java.util.*
 
-data class Configuration(val serverInformation: ServerInformation = ServerInformation(),
+open class Configuration(open val serverInformation: ServerInformation = ServerInformation(),
                          val security: Security = Security(),
                          val messageChannels: MessageChannels = MessageChannels(),
                          val apiConfiguration: ApiConfiguration = ApiConfiguration(),
@@ -15,13 +17,13 @@ data class Configuration(val serverInformation: ServerInformation = ServerInform
                          val permissionedActions: PermissionedActions = PermissionedActions(),
                          val botInformation: BotInformation = BotInformation())
 
-data class ServerInformation(val token: String = "insert-token",
-                             val ownerID: String = "insert-id",
+open class ServerInformation(val token: String = "insert-token",
+                             open val ownerID: String = "insert-id",
                              var prefix: String = "insert-prefix",
-                             val guildid: String = "insert-guild-id",
+                             open val guildid: String = "insert-guild-id",
                              val suggestionPoolLimit: Int = 20)
 
-data class Security(val ignoredIDs: MutableSet<String> = mutableSetOf(),
+data class Security(@Transient val ignoredIDs: MutableSet<String> = mutableSetOf(),
                     var lockDownMode: Boolean = false,
                     val infractionActionMap: HashMap<Int, InfractionAction> = HashMap(),
                     val mutedRole: String = "Muted",
@@ -35,10 +37,11 @@ data class ApiConfiguration(val cleverbotAPIKey: String = "insert-api-key",
                             val cleverBotApiCallLimit: Int = 10000,
                             val enableCleverBot: Boolean = false)
 
-data class PermissionedActions(var sendInvite: String = "insert-role-id",
-                               var sendURL: String = "insert-role-id",
-                               var commandMention: String = "insert-role-id",
-                               val ignoreLogging: String = "insert-rold-id")
+data class PermissionedActions(var sendInvite: PermissionLevel = PermissionLevel.Moderator,
+                               var sendURL: PermissionLevel = PermissionLevel.Moderator,
+                               var commandMention: PermissionLevel = PermissionLevel.Moderator,
+                               val ignoreLogging: PermissionLevel = PermissionLevel.Moderator,
+                               var voiceChannelMuteThreshold: PermissionLevel = PermissionLevel.Moderator)
 
 data class DatabaseCredentials(val username: String = "root",
                                val password: String = "",
@@ -53,7 +56,7 @@ enum class InfractionAction {
 
 private val configDir = System.getenv("HOTBOT_CONFIG_DIR") ?: "config"
 private val configLocation = "config.json"
-private val gson = Gson()
+private val gson = GsonBuilder().setPrettyPrinting().create()
 
 fun configPath(fileName: String) = "${configDir}/${fileName}"
 
