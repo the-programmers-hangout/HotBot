@@ -33,15 +33,10 @@ import org.apache.log4j.*
 const val commandPath = "me.aberrantfox.hotbot.commands"
 
 fun main(args: Array<String>) {
-
     val config = loadConfig() ?: return
     saveConfig(config)
 
     startBot(config.serverInformation.token) {
-        println("Starting to load hotbot.")
-
-
-
         setupLogger()
         setupDatabaseSchema(config)
 
@@ -51,9 +46,6 @@ fun main(args: Array<String>) {
         val manager = PermissionManager(jda, config)
 
         registerInjectionObject(messageService, config, logger, manager)
-
-
-
         val container = registerCommands(commandPath, config.serverInformation.prefix)
 
         manager.setDefaultPermissions(container)
@@ -69,8 +61,6 @@ fun main(args: Array<String>) {
                 { failsBecause("Did you really think I would let you do that? :thinking:", manager.canUseCommand(it.author, it.command.name)) }
         )
 
-
-
         val helpErrors = HelpConf.getDocumentationErrors(container)
 
         if (helpErrors.isNotEmpty()) {
@@ -82,19 +72,11 @@ fun main(args: Array<String>) {
             }
         }
 
-
-        logger.info("connected")
-
-
         jda.guilds.forEach { setupMutedRole(it, config.security.mutedRole) }
-
         val mutedRole = jda.getRolesByName(config.security.mutedRole, true).first()
 
         handleLTSMutes(config, jda)
-
         forEachIgnoredID { config.security.ignoredIDs.add(it) }
-
-
         val tracker = MessageTracker(1)
 
         registerListeners(
@@ -118,7 +100,6 @@ fun main(args: Array<String>) {
         }
 
         loadReminders(jda, logger)
-
         EngineContainer.engine = setupScriptEngine(jda, container, config, logger)
 
         logger.info("Fully setup, now ready for use.")
