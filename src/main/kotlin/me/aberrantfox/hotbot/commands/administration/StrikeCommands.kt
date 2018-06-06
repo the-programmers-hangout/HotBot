@@ -194,6 +194,7 @@ fun strikeCommands(config: Configuration, log: BotLogger) =
                 val user = it.args[0] as User
                 val amount = removeAllInfractions(user.id)
 
+                resetHistoryCount(user.id)
                 it.respond("Infractions for ${user.asMention} have been wiped. Total removed: $amount")
             }
         }
