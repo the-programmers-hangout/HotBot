@@ -66,7 +66,6 @@ fun main(args: Array<String>) {
         if (helpErrors.isNotEmpty()) {
             println("The help documentation needs to be updated:")
             helpErrors.forEach(::println)
-
             if (!config.botInformation.developmentMode) {
                 return@startBot
             }
@@ -91,7 +90,8 @@ fun main(args: Array<String>) {
                 BanListener(config),
                 TooManyMentionsListener(logger, mutedRole),
                 MessageDeleteListener(logger, manager, config),
-                NewJoinListener()
+                NewJoinListener(),
+                EveryoneTagListener(logger)
         )
 
         if (config.apiConfiguration.enableCleverBot) {
