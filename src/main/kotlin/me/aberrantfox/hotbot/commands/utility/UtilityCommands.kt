@@ -10,7 +10,6 @@ import me.aberrantfox.kjdautils.api.dsl.CommandSet
 import me.aberrantfox.kjdautils.api.dsl.commands
 import me.aberrantfox.kjdautils.api.dsl.embed
 import me.aberrantfox.kjdautils.extensions.jda.fullName
-import me.aberrantfox.kjdautils.internal.command.ArgumentType
 import me.aberrantfox.kjdautils.internal.command.arguments.SentenceArg
 import me.aberrantfox.kjdautils.internal.command.arguments.TextChannelArg
 import me.aberrantfox.kjdautils.internal.command.arguments.UserArg
@@ -81,11 +80,22 @@ fun utilCommands(mService: MService, manager: PermissionManager, config: Configu
 
     command("uptime") {
         execute {
-            val uptime = Date().time - startTime.time
-            val minutes = uptime / 1000 / 60
-            val currentDate = startTime.toString()
+            val milliseconds = Date().time - startTime.time
+            val seconds = (milliseconds / 1000) % 60
+            val minutes = (milliseconds / (1000 * 60)) % 60
+            val hours = (milliseconds / (1000 * 60 * 60)) % 24
+            val days = (milliseconds / (1000 * 60 * 60 * 24))
 
-            it.respond("I've been awake since ${currentDate}, so like... ${minutes} minutes")
+            it.respond(embed {
+                setColor(Color.WHITE)
+                setTitle("I have been running since")
+                setDescription(startTime.toString())
+
+                field {
+                    name = "That's been"
+                    value = "$days day(s), $hours hour(s), $minutes minute(s) and $seconds second(s)"
+                }
+            })
         }
     }
 
