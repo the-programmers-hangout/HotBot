@@ -36,3 +36,22 @@ object CategoryArg : ArgumentType {
     override fun isValid(arg: String, event: CommandEvent) = HelpConf.listCategories().contains(arg.toLowerCase())
     override fun convert(arg: String, args: List<String>, event: CommandEvent) = ArgumentResult.Single(arg)
 }
+
+object HexColourArg : ArgumentType {
+    override val consumptionType = ConsumptionType.Single
+    override fun isValid(arg: String, event: CommandEvent) = convertMap(arg, { true }, { false })
+
+    override fun convert(arg: String, args: List<String>, event: CommandEvent) =
+            convertMap(arg, { ArgumentResult.Single(it) }, { ArgumentResult.Error ("Invalid color argument") })
+
+    private fun <T: Any> convertMap(arg: String, success: (Int) -> T, fail: () -> T): T {
+        if (arg.length != 7 && arg.length != 6) return fail.invoke()
+
+        val hex = if (arg.length == 7) arg.substring(1) else arg
+        try {
+            return success.invoke(hex.toInt(16))
+        } catch (e: NumberFormatException) {
+            return fail.invoke()
+        }
+    }
+}

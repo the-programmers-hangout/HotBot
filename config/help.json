@@ -441,9 +441,9 @@
     {
       "name": "setColour",
       "category": "embed",
-      "description": "Set the colour of the embed using RGB -- values must be between 0 and 1",
-      "structure": "{red} {green} {blue}",
-      "example": "0.333 0.666 0"
+      "description": "Set the colour of the embed using a hex colour code.",
+      "structure": "{[#]color}",
+      "example": "#ee0000"
     },
     {
       "name": "setSelfAuthor",
@@ -906,6 +906,13 @@
       "description": "Uploads the given block of text/code to hastebin and removes the invocation",
       "structure": "{text}",
       "example": "print('Hello, World!')"
+    },
+    {
+      "name": "colour",
+      "category": "utility",
+      "description": "Shows an embed with the given hex colour code",
+      "structure": "{[#]colour}",
+      "example": "00CAFF"
     }
   ]
 }
