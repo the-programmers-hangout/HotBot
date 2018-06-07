@@ -96,7 +96,7 @@ fun main(args: Array<String>) {
 
         if (config.apiConfiguration.enableCleverBot) {
             println("Enabling cleverbot integration.")
-            jda.addEventListener(MentionListener(config, jda.selfUser.name))
+            registerListeners(MentionListener(config, jda.selfUser.name))
         }
 
         loadReminders(jda, logger)
