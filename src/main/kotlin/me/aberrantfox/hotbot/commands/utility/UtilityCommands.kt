@@ -164,8 +164,9 @@ fun utilCommands(mService: MService, manager: PermissionManager, config: Configu
             val hex = colour.toString(16).padStart(6, '0')
             val response = embed {
                 setColor(colour)
-                setDescription("Colour: #${hex}")
-                setThumbnail("http://via.placeholder.com/32/${hex}?text=%20&")
+                setTitle("Colour")
+                setDescription("#${hex}")
+                setThumbnail("http://via.placeholder.com/40/${hex}?text=%20&")
             }
             it.respond(response)
         }

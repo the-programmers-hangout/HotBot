@@ -39,19 +39,16 @@ object CategoryArg : ArgumentType {
 
 object HexColourArg : ArgumentType {
     override val consumptionType = ConsumptionType.Single
-    override fun isValid(arg: String, event: CommandEvent) = convertMap(arg, { true }, { false })
+    override fun isValid(arg: String, event: CommandEvent) = arg.length == 6 || arg.length == 7 && arg[0] == '#'
 
-    override fun convert(arg: String, args: List<String>, event: CommandEvent) =
-            convertMap(arg, { ArgumentResult.Single(it) }, { ArgumentResult.Error ("Invalid color argument") })
-
-    private fun <T: Any> convertMap(arg: String, success: (Int) -> T, fail: () -> T): T {
-        if (arg.length != 7 && arg.length != 6) return fail.invoke()
+    override fun convert(arg: String, args: List<String>, event: CommandEvent): ArgumentResult {
+        if (arg.length != 7 && arg.length != 6) return ArgumentResult.Error ("Invalid colour argument.")
 
         val hex = if (arg.length == 7) arg.substring(1) else arg
-        try {
-            return success.invoke(hex.toInt(16))
+        return try {
+            ArgumentResult.Single(hex.toInt(16))
         } catch (e: NumberFormatException) {
-            return fail.invoke()
+            ArgumentResult.Error ("Invalid colour argument.")
         }
     }
 }
