@@ -9,11 +9,7 @@ import me.aberrantfox.hotbot.database.forEachIgnoredID
 import me.aberrantfox.hotbot.database.forEachReminder
 import me.aberrantfox.hotbot.database.getAllMutedMembers
 import me.aberrantfox.hotbot.database.setupDatabaseSchema
-import me.aberrantfox.hotbot.listeners.*
-import me.aberrantfox.hotbot.listeners.antispam.DuplicateMessageListener
-import me.aberrantfox.hotbot.listeners.antispam.InviteListener
-import me.aberrantfox.hotbot.listeners.antispam.NewJoinListener
-import me.aberrantfox.hotbot.listeners.antispam.TooManyMentionsListener
+import me.aberrantfox.hotbot.optionallisteners.MentionListener
 import me.aberrantfox.hotbot.permissions.PermissionManager
 import me.aberrantfox.hotbot.services.*
 import me.aberrantfox.hotbot.utility.scheduleUnmute
@@ -39,6 +35,7 @@ const val commandPath = "me.aberrantfox.hotbot.commands"
 fun main(args: Array<String>) {
     val config = loadConfig() ?: return
     saveConfig(config)
+    start(config)
 }
 
 private fun start(config: Configuration) = startBot(config.serverInformation.token) {
@@ -85,22 +82,8 @@ private fun start(config: Configuration) = startBot(config.serverInformation.tok
     handleLTSMutes(config, jda)
     forEachIgnoredID { config.security.ignoredIDs.add(it) }
     val tracker = MessageTracker(1)
-
-    registerListeners(
-            MemberListener(config, logger, messageService),
-            InviteListener(config, logger, manager),
-            VoiceChannelListener(logger),
-            NewChannelListener(mutedRole),
-            ChannelDeleteListener(logger),
-            DuplicateMessageListener(config, logger, tracker),
-            RoleListener(config),
-            PollListener(),
-            BanListener(config),
-            TooManyMentionsListener(logger, mutedRole),
-            MessageDeleteListener(logger, manager, config),
-            NewJoinListener(),
-            EveryoneTagListener(logger)
-    )
+    registerInjectionObject(tracker, mutedRole)
+    registerListenersByPath("me.aberrantfox.hotbot.listeners")
 
     if (config.apiConfiguration.enableCleverBot) {
         println("Enabling cleverbot integration.")
