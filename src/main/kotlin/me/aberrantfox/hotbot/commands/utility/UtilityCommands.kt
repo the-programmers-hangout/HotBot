@@ -2,6 +2,7 @@ package me.aberrantfox.hotbot.commands.utility
 
 import com.google.gson.Gson
 import khttp.post
+import me.aberrantfox.hotbot.commands.HexColourArg
 import me.aberrantfox.hotbot.permissions.PermissionManager
 import me.aberrantfox.hotbot.services.Configuration
 import me.aberrantfox.hotbot.services.MService
@@ -153,6 +154,21 @@ fun utilCommands(mService: MService, manager: PermissionManager, config: Configu
             it.message.delete().queue()
 
             it.respond("${it.author.fullName()}'s paste: https://hastebin.com/" + response.getString("key"))
+        }
+    }
+
+    command("colour") {
+        expect(HexColourArg)
+        execute {
+            val colour = it.args.component1() as Int
+            val hex = colour.toString(16).padStart(6, '0')
+            val response = embed {
+                setColor(colour)
+                setTitle("Colour")
+                setDescription("#${hex}")
+                setThumbnail("http://via.placeholder.com/40/${hex}?text=%20&")
+            }
+            it.respond(response)
         }
     }
 }

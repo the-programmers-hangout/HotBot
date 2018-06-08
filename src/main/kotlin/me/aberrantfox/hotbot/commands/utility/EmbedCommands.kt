@@ -1,5 +1,6 @@
 package me.aberrantfox.hotbot.commands.utility
 
+import me.aberrantfox.hotbot.commands.HexColourArg
 import me.aberrantfox.kjdautils.api.dsl.CommandSet
 import me.aberrantfox.kjdautils.api.dsl.arg
 import me.aberrantfox.kjdautils.api.dsl.commands
@@ -11,7 +12,6 @@ import net.dv8tion.jda.core.EmbedBuilder
 import net.dv8tion.jda.core.entities.Message
 import net.dv8tion.jda.core.entities.MessageEmbed
 import net.dv8tion.jda.core.entities.User
-import java.awt.Color
 import java.time.Instant
 
 private object EHolder {
@@ -152,19 +152,9 @@ fun embedCommands() =
         }
 
         command("setcolour") {
-            expect(DoubleArg, DoubleArg, DoubleArg)
+            expect(HexColourArg)
             execute {
-                val r = it.args[0] as Double
-                val g = it.args[1] as Double
-                val b = it.args[2] as Double
-
-                if (r > 1 || r < 0 ||
-                    g > 1 || g < 0 ||
-                    b > 1 || b < 0) {
-                    it.respond("R/G/B values must be between 0 and 1")
-                } else {
-                    EHolder.embed.setColor(Color(r.toFloat(), g.toFloat(), b.toFloat()))
-                }
+                EHolder.embed.setColor(it.args.component1() as Int)
             }
         }
 
