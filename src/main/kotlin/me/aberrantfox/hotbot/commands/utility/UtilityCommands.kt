@@ -40,7 +40,7 @@ val startTime = Date()
 fun utilCommands(mService: MService, manager: PermissionManager, config: Configuration, log: BotLogger) = commands {
     command("ping") {
         execute {
-            it.respond("Pong!")
+            it.respond("Responded in ${it.jda.ping}ms")
         }
     }
 
