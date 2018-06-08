@@ -1,6 +1,6 @@
 registerCommand({
     name: "nick",
-    expect: [UserArg, SentenceArg],
+    expect: [LowerUserArg, SentenceArg],
     execute: (event) => {
         const guild = jda.getGuildById(config.serverInformation.guildid)
         const target = guild.getMember(event.args[0])

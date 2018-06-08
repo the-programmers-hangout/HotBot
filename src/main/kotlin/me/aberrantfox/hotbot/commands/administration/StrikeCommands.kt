@@ -1,5 +1,6 @@
 package me.aberrantfox.hotbot.commands.administration
 
+import me.aberrantfox.hotbot.commands.LowerUserArg
 import me.aberrantfox.hotbot.database.*
 import me.aberrantfox.hotbot.services.Configuration
 import me.aberrantfox.hotbot.services.InfractionAction
@@ -31,7 +32,7 @@ object StrikeRequests {
 fun strikeCommands(config: Configuration, log: BotLogger) =
     commands {
         command("warn") {
-            expect(UserArg, SentenceArg)
+            expect(LowerUserArg, SentenceArg)
             execute {
                 val newArgs = listOf(it.args[0], 0, it.args[1])
                 val e = it.copy(args=newArgs)
@@ -42,7 +43,7 @@ fun strikeCommands(config: Configuration, log: BotLogger) =
         }
 
         command("strike") {
-            expect(arg(UserArg),
+            expect(arg(LowerUserArg),
                    arg(IntegerArg, optional = true, default = 1),
                    arg(SentenceArg))
             execute {
@@ -52,7 +53,7 @@ fun strikeCommands(config: Configuration, log: BotLogger) =
         }
 
         command("strikerequest") {
-            expect(UserArg, IntegerArg, SentenceArg)
+            expect(LowerUserArg, IntegerArg, SentenceArg)
             execute {
                 val target = it.args.component1() as User
                 val amount = it.args.component2() as Int
@@ -72,7 +73,7 @@ fun strikeCommands(config: Configuration, log: BotLogger) =
         }
 
         command("viewRequest") {
-            expect(UserArg)
+            expect(LowerUserArg)
             execute {
                 val user = it.args.component1() as User
 
@@ -105,7 +106,7 @@ fun strikeCommands(config: Configuration, log: BotLogger) =
         }
 
         command("acceptrequest") {
-            expect(UserArg)
+            expect(LowerUserArg)
             execute {
                 val user = it.args.component1() as User
 
@@ -122,7 +123,7 @@ fun strikeCommands(config: Configuration, log: BotLogger) =
         }
 
         command("declinerequest") {
-            expect(UserArg)
+            expect(LowerUserArg)
             execute {
                 val user = it.args.component1() as User
 
@@ -134,7 +135,7 @@ fun strikeCommands(config: Configuration, log: BotLogger) =
         }
 
         command("deleteRequest") {
-            expect(UserArg)
+            expect(LowerUserArg)
             execute {
                 val user = it.args.component1() as User
 
@@ -189,7 +190,7 @@ fun strikeCommands(config: Configuration, log: BotLogger) =
         }
 
         command("cleanse") {
-            expect(UserArg)
+            expect(LowerUserArg)
             execute {
                 val user = it.args[0] as User
                 val amount = removeAllInfractions(user.id)

@@ -1,5 +1,6 @@
 package me.aberrantfox.hotbot
 
+import me.aberrantfox.hotbot.commands.LowerUserArg
 import me.aberrantfox.hotbot.commands.development.EngineContainer
 import me.aberrantfox.hotbot.commands.development.EngineContainer.setupScriptEngine
 import me.aberrantfox.hotbot.commands.utility.scheduleReminder
@@ -47,6 +48,7 @@ fun main(args: Array<String>) {
 
         registerInjectionObject(messageService, config, logger, manager)
         val container = registerCommands(commandPath, config.serverInformation.prefix)
+        LowerUserArg.manager = manager
 
         manager.setDefaultPermissions(container)
 
