@@ -6,6 +6,7 @@ import com.google.gson.annotations.SerializedName
 import me.aberrantfox.hotbot.commands.MacroArg
 import me.aberrantfox.hotbot.services.configPath
 import me.aberrantfox.kjdautils.api.dsl.CommandSet
+import me.aberrantfox.kjdautils.api.dsl.CommandsContainer
 import me.aberrantfox.kjdautils.api.dsl.commands
 import me.aberrantfox.kjdautils.api.dsl.embed
 import me.aberrantfox.kjdautils.internal.command.CommandRecommender
@@ -32,18 +33,20 @@ fun macroCommands() =
                 val category = (it.args.component2() as String).toLowerCase()
                 val message = it.args.component3() as String
 
-                if (it.container.has(name)) {
-                    it.respond("You dummy. There is a command with that name already...")
-                    return@execute
-                }
-
                 if (macros.any { it.name.toLowerCase() == name }) {
                     it.respond("Yea... that macro exists...")
                     return@execute
                 }
 
+                if (it.container.has(name)) {
+                    it.respond("You dummy. There is a command with that name already...")
+                    return@execute
+                }
+
                 macros.add(Macro(name, message, category))
                 saveMacroList(macros)
+
+                it.container.command(name, { execute { it.respond(message) } })
 
                 CommandRecommender.addPossibility(name)
 
@@ -56,11 +59,14 @@ fun macroCommands() =
             expect(MacroArg, SentenceArg)
             execute {
                 val macro = it.args.component1() as Macro
-                val name = macro.name
+                val name = macro.name.toLowerCase()
                 val message = it.args.component2() as String
 
                 macros.remove(macro)
+                it.container.commands.remove(name)
+
                 macros.add(macro.copy(message=message))
+                it.container.command(name, { execute { it.respond(message) } })
 
                 saveMacroList(macros)
 
@@ -111,7 +117,10 @@ fun macroCommands() =
                     return@execute it.safeRespond("The macro $newName already exists.")
 
                 macros.remove(oldMacro)
+                it.container.commands.remove(oldMacro.name)
+
                 macros.add(oldMacro.copy(name=newName))
+                it.container.command(newName, { execute { it.respond(oldMacro.message) } })
 
                 saveMacroList(macros)
 
@@ -132,6 +141,8 @@ fun macroCommands() =
                 macros.remove(macro)
                 saveMacroList(macros)
 
+                it.container.commands.remove(macro.name)
+
                 CommandRecommender.removePossibility(macro.name)
 
                 it.safeRespond("${macro.name} - this macro is now gone.")
@@ -150,9 +161,11 @@ fun macroCommands() =
                     return@execute
                 }
 
-                toRemove.forEach {
-                    macros.remove(it)
-                    CommandRecommender.removePossibility(it.name)
+                toRemove.forEach { macro ->
+                    macros.remove(macro)
+                    it.container.commands.remove(macro.name)
+
+                    CommandRecommender.removePossibility(macro.name)
                 }
 
                 saveMacroList(macros)
