@@ -134,15 +134,19 @@ fun suggestionCommands(config: Configuration) = commands {
                 val reasonTitle = "Reason for Status"
 
                 val suggestionUpdateMessage = buildSuggestionUpdateEmbed(suggestion, reason, status)
-                it.jda.retrieveUserById(suggestion.member).complete()
-                        .sendPrivateMessage(suggestionUpdateMessage)
 
-                message.fields.removeIf { it.name == reasonTitle }
+                try {
+                    it.jda.retrieveUserById(suggestion.member).complete()
+                            .sendPrivateMessage(suggestionUpdateMessage)
+                }
+                finally {
+                    message.fields.removeIf { it.name == reasonTitle }
 
-                message.addField(reasonTitle, reason, false)
-                updateSuggestion(target, status)
+                    message.addField(reasonTitle, reason, false)
+                    updateSuggestion(target, status)
 
-                it.editMessage(message.build()).queue()
+                    it.editMessage(message.build()).queue()
+                }
             }
         }
     }
