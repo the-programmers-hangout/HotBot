@@ -17,8 +17,9 @@ class EveryoneTagListener(val log: BotLogger) {
             handleEveryoneTag(event.member, event.message, event.channel)
 
     private fun handleEveryoneTag(member: Member?, message: Message, channel: TextChannel) {
-        // ignore people with roles
         if (member?.roles?.isNotEmpty() != false) return
+
+        if (member.user.isBot) return
 
         // mentionsEveryone only works if the message actually pings, so search for the tag manually
         if (listOf("@here", "@everyone").any { message.contentRaw.contains(it) }) {
