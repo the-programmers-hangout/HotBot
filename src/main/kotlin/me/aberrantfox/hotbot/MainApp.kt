@@ -2,6 +2,7 @@ package me.aberrantfox.hotbot
 
 import me.aberrantfox.hotbot.commands.development.EngineContainer
 import me.aberrantfox.hotbot.commands.development.EngineContainer.setupScriptEngine
+import me.aberrantfox.hotbot.commands.utility.macros
 import me.aberrantfox.hotbot.commands.utility.scheduleReminder
 import me.aberrantfox.hotbot.database.forEachIgnoredID
 import me.aberrantfox.hotbot.database.forEachReminder
@@ -16,10 +17,13 @@ import me.aberrantfox.hotbot.permissions.PermissionManager
 import me.aberrantfox.hotbot.services.*
 import me.aberrantfox.hotbot.utility.scheduleUnmute
 import me.aberrantfox.hotbot.utility.timeToDifference
+import me.aberrantfox.kjdautils.api.dsl.Command
+import me.aberrantfox.kjdautils.api.dsl.CommandsContainer
 import me.aberrantfox.kjdautils.api.startBot
 import me.aberrantfox.kjdautils.extensions.jda.containsInvite
 import me.aberrantfox.kjdautils.extensions.jda.containsURL
 import me.aberrantfox.kjdautils.extensions.jda.mentionsSomeone
+import me.aberrantfox.kjdautils.internal.command.CommandRecommender
 import me.aberrantfox.kjdautils.internal.command.Fail
 import me.aberrantfox.kjdautils.internal.command.Pass
 import me.aberrantfox.kjdautils.internal.command.PreconditionResult
@@ -47,6 +51,8 @@ fun main(args: Array<String>) {
 
         registerInjectionObject(messageService, config, logger, manager)
         val container = registerCommands(commandPath, config.serverInformation.prefix)
+
+        setupMacros(container)
 
         manager.setDefaultPermissions(container)
 
@@ -105,6 +111,12 @@ fun main(args: Array<String>) {
         logger.info("Fully setup, now ready for use.")
     }
 }
+
+private fun setupMacros(container: CommandsContainer) =
+        macros.forEach { macro ->
+            container.command(macro.name, { execute { it.respond(macro.message) } })
+            CommandRecommender.addPossibility(macro.name)
+        }
 
 private fun setupLogger() {
     val console = ConsoleAppender()
