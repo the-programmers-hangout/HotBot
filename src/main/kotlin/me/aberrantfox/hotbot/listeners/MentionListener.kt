@@ -9,6 +9,7 @@ import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent
 
 class MentionListener(val config: Configuration, val selfName: String) {
     private val rateLimiter = APIRateLimiter(config.apiConfiguration.cleverBotApiCallLimit, 0, "CleverBot")
+    private val pattern = Regex("(\\s|^)${selfName}(\\s|$)")
 
     @Subscribe
     fun onGuildMessageReceived(event: GuildMessageReceivedEvent) {
@@ -20,7 +21,7 @@ class MentionListener(val config: Configuration, val selfName: String) {
 
         if(config.security.ignoredIDs.contains(event.author.id)) return
 
-        if(event.message.contentRaw.toLowerCase().contains(event.jda.selfUser.name.toLowerCase())
+        if(event.message.contentRaw.toLowerCase().contains(pattern)
             || event.message.isMentioned(event.jda.selfUser)) {
 
             rateLimiter.increment()
