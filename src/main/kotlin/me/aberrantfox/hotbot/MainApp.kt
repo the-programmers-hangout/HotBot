@@ -18,7 +18,6 @@ import me.aberrantfox.hotbot.permissions.PermissionManager
 import me.aberrantfox.hotbot.services.*
 import me.aberrantfox.hotbot.utility.scheduleUnmute
 import me.aberrantfox.hotbot.utility.timeToDifference
-import me.aberrantfox.kjdautils.api.dsl.Command
 import me.aberrantfox.kjdautils.api.dsl.CommandsContainer
 import me.aberrantfox.kjdautils.api.startBot
 import me.aberrantfox.kjdautils.extensions.jda.containsInvite
@@ -40,78 +39,78 @@ const val commandPath = "me.aberrantfox.hotbot.commands"
 fun main(args: Array<String>) {
     val config = loadConfig() ?: return
     saveConfig(config)
+}
 
-    startBot(config.serverInformation.token) {
-        setupLogger()
-        setupDatabaseSchema(config)
+private fun start(config: Configuration) = startBot(config.serverInformation.token) {
+    setupLogger()
+    setupDatabaseSchema(config)
 
-        logger = convertChannels(config.logChannels, jda)
+    logger = convertChannels(config.logChannels, jda)
 
-        val messageService = MService()
-        val manager = PermissionManager(jda, config)
+    val messageService = MService()
+    val manager = PermissionManager(jda, config)
 
-        registerInjectionObject(messageService, config, logger, manager)
-        val container = registerCommands(commandPath, config.serverInformation.prefix)
-        LowerUserArg.manager = manager
+    registerInjectionObject(messageService, config, logger, manager)
+    val container = registerCommands(commandPath, config.serverInformation.prefix)
+    LowerUserArg.manager = manager
 
-        setupMacros(container)
+    setupMacros(container)
 
-        manager.setDefaultPermissions(container)
+    manager.setDefaultPermissions(container)
 
-        val failsBecause: (String?, Boolean) -> PreconditionResult = { reason, condition -> if (condition) Pass else Fail(reason) }
+    val failsBecause: (String?, Boolean) -> PreconditionResult = { reason, condition -> if (condition) Pass else Fail(reason) }
 
-        registerCommandPreconditions(
-                { failsBecause("Only the owner can invoke commands in lockdown mode", !config.security.lockDownMode || it.author.id == config.serverInformation.ownerID) },
-                { failsBecause(null, !config.security.ignoredIDs.contains(it.channel.id) && !config.security.ignoredIDs.contains(it.author.id)) },
-                { failsBecause("You do not have the required permissions to use a command mention", manager.canPerformAction(it.author, config.permissionedActions.commandMention) || !it.message.mentionsSomeone()) },
-                { failsBecause("You do not have the required permissions to send an invite.", manager.canPerformAction(it.author, config.permissionedActions.sendInvite) || !it.message.containsInvite()) },
-                { failsBecause("You do not have the required permissions to send URLs", manager.canPerformAction(it.author, config.permissionedActions.sendURL) || !it.message.containsURL()) },
-                { failsBecause("Did you really think I would let you do that? :thinking:", manager.canUseCommand(it.author, it.command.name)) }
-        )
+    registerCommandPreconditions(
+            { failsBecause("Only the owner can invoke commands in lockdown mode", !config.security.lockDownMode || it.author.id == config.serverInformation.ownerID) },
+            { failsBecause(null, !config.security.ignoredIDs.contains(it.channel.id) && !config.security.ignoredIDs.contains(it.author.id)) },
+            { failsBecause("You do not have the required permissions to use a command mention", manager.canPerformAction(it.author, config.permissionedActions.commandMention) || !it.message.mentionsSomeone()) },
+            { failsBecause("You do not have the required permissions to send an invite.", manager.canPerformAction(it.author, config.permissionedActions.sendInvite) || !it.message.containsInvite()) },
+            { failsBecause("You do not have the required permissions to send URLs", manager.canPerformAction(it.author, config.permissionedActions.sendURL) || !it.message.containsURL()) },
+            { failsBecause("Did you really think I would let you do that? :thinking:", manager.canUseCommand(it.author, it.command.name)) }
+    )
 
-        val helpErrors = HelpConf.getDocumentationErrors(container)
+    val helpErrors = HelpConf.getDocumentationErrors(container)
 
-        if (helpErrors.isNotEmpty()) {
-            println("The help documentation needs to be updated:")
-            helpErrors.forEach(::println)
-            if (!config.botInformation.developmentMode) {
-                return@startBot
-            }
+    if (helpErrors.isNotEmpty()) {
+        println("The help documentation needs to be updated:")
+        helpErrors.forEach(::println)
+        if (!config.botInformation.developmentMode) {
+            return@startBot
         }
-
-        jda.guilds.forEach { setupMutedRole(it, config.security.mutedRole) }
-        val mutedRole = jda.getRolesByName(config.security.mutedRole, true).first()
-
-        handleLTSMutes(config, jda)
-        forEachIgnoredID { config.security.ignoredIDs.add(it) }
-        val tracker = MessageTracker(1)
-
-        registerListeners(
-                MemberListener(config, logger, messageService),
-                InviteListener(config, logger, manager),
-                VoiceChannelListener(logger),
-                NewChannelListener(mutedRole),
-                ChannelDeleteListener(logger),
-                DuplicateMessageListener(config, logger, tracker),
-                RoleListener(config),
-                PollListener(),
-                BanListener(config),
-                TooManyMentionsListener(logger, mutedRole),
-                MessageDeleteListener(logger, manager, config),
-                NewJoinListener(),
-                EveryoneTagListener(logger)
-        )
-
-        if (config.apiConfiguration.enableCleverBot) {
-            println("Enabling cleverbot integration.")
-            registerListeners(MentionListener(config, jda.selfUser.name))
-        }
-
-        loadReminders(jda, logger)
-        EngineContainer.engine = setupScriptEngine(jda, container, config, logger)
-
-        logger.info("Fully setup, now ready for use.")
     }
+
+    jda.guilds.forEach { setupMutedRole(it, config.security.mutedRole) }
+    val mutedRole = jda.getRolesByName(config.security.mutedRole, true).first()
+
+    handleLTSMutes(config, jda)
+    forEachIgnoredID { config.security.ignoredIDs.add(it) }
+    val tracker = MessageTracker(1)
+
+    registerListeners(
+            MemberListener(config, logger, messageService),
+            InviteListener(config, logger, manager),
+            VoiceChannelListener(logger),
+            NewChannelListener(mutedRole),
+            ChannelDeleteListener(logger),
+            DuplicateMessageListener(config, logger, tracker),
+            RoleListener(config),
+            PollListener(),
+            BanListener(config),
+            TooManyMentionsListener(logger, mutedRole),
+            MessageDeleteListener(logger, manager, config),
+            NewJoinListener(),
+            EveryoneTagListener(logger)
+    )
+
+    if (config.apiConfiguration.enableCleverBot) {
+        println("Enabling cleverbot integration.")
+        registerListeners(MentionListener(config, jda.selfUser.name))
+    }
+
+    loadReminders(jda, logger)
+    EngineContainer.engine = setupScriptEngine(jda, container, config, logger)
+
+    logger.info("Fully setup, now ready for use.")
 }
 
 private fun setupMacros(container: CommandsContainer) =
