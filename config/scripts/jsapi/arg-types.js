@@ -17,4 +17,5 @@ const WordArg = Java.type("me.aberrantfox.kjdautils.internal.command.arguments.W
 const PermissionLevelArg = Java.type("me.aberrantfox.hotbot.commands.PermissionLevelArg").INSTANCE
 const MacroArg = Java.type("me.aberrantfox.hotbot.commands.MacroArg").INSTANCE
 const CategoryArg = Java.type("me.aberrantfox.hotbot.commands.CategoryArg").INSTANCE
+const LowerUserArg = Java.type("me.aberrantfox.hotbot.commands.LowerUserArg").INSTANCE
 

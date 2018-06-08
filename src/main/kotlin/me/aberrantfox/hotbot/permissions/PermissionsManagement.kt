@@ -77,6 +77,8 @@ open class PermissionManager(val jda: JDA, val botConfig: Configuration,
 
     fun roleAssignments() = permissionsConfig.roleMappings.entries
 
+    fun compareUsers(userA: User, userB: User) = getPermissionLevel(userA).compareTo(getPermissionLevel(userB))
+
     private fun getPermissionLevel(user: User): PermissionLevel {
         if (botConfig.serverInformation.ownerID == user.id) return PermissionLevel.Owner
 

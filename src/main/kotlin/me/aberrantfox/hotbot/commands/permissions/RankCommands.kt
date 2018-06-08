@@ -1,6 +1,7 @@
 package me.aberrantfox.hotbot.commands.permissions
 
 import com.google.gson.Gson
+import me.aberrantfox.hotbot.commands.LowerUserArg
 import me.aberrantfox.hotbot.services.Configuration
 import me.aberrantfox.hotbot.services.configPath
 import me.aberrantfox.kjdautils.api.dsl.CommandEvent
@@ -58,7 +59,7 @@ object RankContainer {
 @CommandSet
 fun rankCommands(config: Configuration) = commands {
     command("grant") {
-        expect(RoleArg, UserArg)
+        expect(RoleArg, LowerUserArg)
         execute {
             val guild = it.jda.getGuildById(config.serverInformation.guildid)
 
@@ -67,7 +68,7 @@ fun rankCommands(config: Configuration) = commands {
     }
 
     command("revoke") {
-        expect(RoleArg, UserArg)
+        expect(RoleArg, LowerUserArg)
         execute {
             val guild = it.jda.getGuildById(config.serverInformation.guildid)
 

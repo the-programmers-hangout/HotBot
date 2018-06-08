@@ -1,5 +1,6 @@
 package me.aberrantfox.hotbot.commands.administration
 
+import me.aberrantfox.hotbot.commands.LowerUserArg
 import me.aberrantfox.hotbot.commands.PermissionLevelArg
 import me.aberrantfox.hotbot.database.*
 import me.aberrantfox.hotbot.permissions.PermissionManager
@@ -27,7 +28,7 @@ class ModerationCommands
 @CommandSet
 fun moderationCommands(config: Configuration, mService: MService, manager: PermissionManager) = commands {
     command("ban") {
-        expect(arg(UserArg), arg(IntegerArg, true, 1), arg(SentenceArg))
+        expect(arg(LowerUserArg), arg(IntegerArg, true, 1), arg(SentenceArg))
         execute {
             val target = it.args.component1() as User
             val deleteMessageDays = it.args.component2() as Int
@@ -77,7 +78,7 @@ fun moderationCommands(config: Configuration, mService: MService, manager: Permi
     }
 
     command("gag") {
-        expect(UserArg)
+        expect(LowerUserArg)
         execute {
             val user = it.args.component1() as User
             val guild = it.jda.getGuildById(config.serverInformation.guildid)
@@ -87,7 +88,7 @@ fun moderationCommands(config: Configuration, mService: MService, manager: Permi
     }
 
     command("mute") {
-        expect(UserArg, TimeStringArg, SentenceArg)
+        expect(LowerUserArg, TimeStringArg, SentenceArg)
         execute {
             val user = it.args.component1() as User
             val time = (it.args.component2() as Double).roundToLong() * 1000
@@ -151,7 +152,7 @@ fun moderationCommands(config: Configuration, mService: MService, manager: Permi
     }
 
     command("badname") {
-        expect(UserArg, SentenceArg)
+        expect(LowerUserArg, SentenceArg)
         execute {
             val target = it.args[0] as User
             val reason = it.args[1] as String
@@ -221,7 +222,7 @@ fun moderationCommands(config: Configuration, mService: MService, manager: Permi
     }
 
     command("note") {
-        expect(UserArg, SentenceArg)
+        expect(LowerUserArg, SentenceArg)
         execute {
             val target = it.args.component1() as User
             val note = it.args.component2() as String
@@ -243,7 +244,7 @@ fun moderationCommands(config: Configuration, mService: MService, manager: Permi
     }
 
     command("cleansenotes") {
-        expect(UserArg)
+        expect(LowerUserArg)
         execute {
             val target = it.args.component1() as User
             val amount = removeAllNotesByUser(target.id)
@@ -264,7 +265,7 @@ fun moderationCommands(config: Configuration, mService: MService, manager: Permi
     }
 
     command("badpfp") {
-        expect(UserArg)
+        expect(LowerUserArg)
         execute {
             val user = it.args.component1() as User
             val avatar = user.effectiveAvatarUrl
