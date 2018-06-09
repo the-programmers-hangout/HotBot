@@ -60,6 +60,7 @@ private fun start(config: Configuration) = startBot(config.serverInformation.tok
     registerCommandPreconditions(
             { failsBecause("Only the owner can invoke commands in lockdown mode", !config.security.lockDownMode || it.author.id == config.serverInformation.ownerID) },
             { failsBecause(null, !config.security.ignoredIDs.contains(it.channel.id) && !config.security.ignoredIDs.contains(it.author.id)) },
+            { failsBecause(null, manager.isChannelCommandIgnored(it.author, it.channel.id)) },
             { failsBecause("You do not have the required permissions to use a command mention", manager.canPerformAction(it.author, config.permissionedActions.commandMention) || !it.message.mentionsSomeone()) },
             { failsBecause("You do not have the required permissions to send an invite.", manager.canPerformAction(it.author, config.permissionedActions.sendInvite) || !it.message.containsInvite()) },
             { failsBecause("You do not have the required permissions to send URLs", manager.canPerformAction(it.author, config.permissionedActions.sendURL) || !it.message.containsURL()) },
@@ -87,7 +88,7 @@ private fun start(config: Configuration) = startBot(config.serverInformation.tok
 
     if (config.apiConfiguration.enableCleverBot) {
         println("Enabling cleverbot integration.")
-        registerListeners(MentionListener(config, jda.selfUser.name))
+        registerListeners(MentionListener(config, jda.selfUser.name, manager))
     }
 
     loadReminders(jda, logger)

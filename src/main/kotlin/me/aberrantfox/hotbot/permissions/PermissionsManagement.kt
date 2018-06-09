@@ -23,8 +23,12 @@ enum class PermissionLevel {
     }
 }
 
+data class ChannelPermission (val command: PermissionLevel,
+                              val mention: PermissionLevel)
+
 data class PermissionsConfiguration(val permissions: HashMap<String, PermissionLevel> = HashMap(),
-                                    val roleMappings: HashMap<String, PermissionLevel> = HashMap())
+                                    val roleMappings: HashMap<String, PermissionLevel> = HashMap(),
+                                    var channelIgnoreLevels: HashMap<String, ChannelPermission> = HashMap())
 
 open class PermissionManager(val jda: JDA, val botConfig: Configuration,
                              permissionsConfigurationLocation: String = "config/permissions.json") {
@@ -64,6 +68,10 @@ open class PermissionManager(val jda: JDA, val botConfig: Configuration,
     fun canPerformAction(user: User, actionLevel: PermissionLevel) = getPermissionLevel(user) >= actionLevel
 
     fun canUseCommand(user: User, command: String) = getPermissionLevel(user) >= permissionsConfig.permissions[command.toLowerCase()] ?: PermissionLevel.Owner
+
+    fun isChannelCommandIgnored(user: User, channelId: String) = getPermissionLevel(user) >= permissionsConfig.channelIgnoreLevels[channelId]?.command ?: PermissionLevel.Everyone
+
+    fun isChannelMentionIgnored(user: User, channelId: String) = getPermissionLevel(user) >= permissionsConfig.channelIgnoreLevels[channelId]?.mention ?: PermissionLevel.Everyone
 
     fun listAvailableCommands(user: User) = permissionsConfig.permissions
             .filter { it.value <= getPermissionLevel(user) }

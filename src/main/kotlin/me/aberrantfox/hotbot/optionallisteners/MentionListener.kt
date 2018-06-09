@@ -2,12 +2,13 @@ package me.aberrantfox.hotbot.optionallisteners
 
 import com.google.common.eventbus.Subscribe
 import com.michaelwflaherty.cleverbotapi.CleverBotQuery
+import me.aberrantfox.hotbot.permissions.PermissionManager
 import me.aberrantfox.hotbot.services.APIRateLimiter
 import me.aberrantfox.hotbot.services.Configuration
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent
 
 
-class MentionListener(val config: Configuration, val selfName: String) {
+class MentionListener(val config: Configuration, val selfName: String, val manager: PermissionManager) {
     private val rateLimiter = APIRateLimiter(config.apiConfiguration.cleverBotApiCallLimit, 0, "CleverBot")
     private val pattern = Regex("(\\s|^)${selfName}(\\s|$)")
 
@@ -20,6 +21,8 @@ class MentionListener(val config: Configuration, val selfName: String) {
         if(config.security.ignoredIDs.contains(event.channel.id)) return
 
         if(config.security.ignoredIDs.contains(event.author.id)) return
+
+        if(manager.isChannelMentionIgnored(event.author, event.channel.id)) return
 
         if(event.message.contentRaw.toLowerCase().contains(pattern)
             || event.message.isMentioned(event.jda.selfUser)) {
