@@ -73,7 +73,7 @@ fun funCommands() =
                     arg0.isBlank() -> "```${Cowsay.say(arrayOf(arg0))}```"
                     arg1.isBlank() -> "Message argument required"
                     CowsayData.validCows.contains(arg0) -> "```${Cowsay.say(arrayOf("-f $arg0", arg1))}```"
-                    else -> "Invalid cow."
+                    else -> "```${Cowsay.say(arrayOf("$arg0 $arg1"))}```"
                 })
             }
         }
