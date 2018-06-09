@@ -6,7 +6,9 @@ import com.google.gson.annotations.SerializedName
 import me.aberrantfox.hotbot.commands.MacroArg
 import me.aberrantfox.hotbot.permissions.PermissionLevel
 import me.aberrantfox.hotbot.permissions.PermissionManager
+import me.aberrantfox.hotbot.services.Configuration
 import me.aberrantfox.hotbot.services.configPath
+import me.aberrantfox.hotbot.utility.timeToDifference
 import me.aberrantfox.kjdautils.api.dsl.CommandSet
 import me.aberrantfox.kjdautils.api.dsl.CommandsContainer
 import me.aberrantfox.kjdautils.api.dsl.commands
@@ -15,6 +17,9 @@ import me.aberrantfox.kjdautils.internal.command.CommandRecommender
 import me.aberrantfox.kjdautils.internal.command.arguments.SentenceArg
 import me.aberrantfox.kjdautils.internal.command.arguments.SplitterArg
 import me.aberrantfox.kjdautils.internal.command.arguments.WordArg
+import net.dv8tion.jda.core.entities.Guild
+import net.dv8tion.jda.core.entities.MessageChannel
+import org.joda.time.DateTime
 import java.awt.Color
 import java.io.File
 
@@ -24,6 +29,9 @@ data class Macro(@SerializedName("name") val name: String,
 
 private val mapLocation = configPath("macros.json")
 val macros = loadMacroList()
+
+// ChannelId -> (Macro -> Timestamp)
+var macroPreviousTime = hashMapOf<String, HashMap<String, Long>>()
 
 @CommandSet
 fun macroCommands(permManager: PermissionManager) =
@@ -162,12 +170,14 @@ fun macroCommands(permManager: PermissionManager) =
         }
     }
 
-fun setupMacroCommands(container: CommandsContainer, manager: PermissionManager) =
-        macros.forEach { macro ->
-            container.command(macro.name, { execute { it.respond(macro.message) } })
-            CommandRecommender.addPossibility(macro.name)
-            manager.setPermission(macro.name, PermissionLevel.Everyone)
-        }
+fun setupMacroCommands(container: CommandsContainer, manager: PermissionManager, config: Configuration, guilds: List<Guild>) {
+    macros.forEach { macro ->
+        container.command(macro.name, { execute { if (checkMacroDelay(macro, it.channel, config)) it.respond(macro.message) } })
+        CommandRecommender.addPossibility(macro.name)
+        manager.setPermission(macro.name, PermissionLevel.Everyone)
+    }
+    macroPreviousTime.putAll(guilds.map{ it.textChannels }.flatten().associate { it.id to hashMapOf<String, Long>() } )
+}
 
 fun addMacro(macro: Macro, container: CommandsContainer, manager: PermissionManager) {
     macros.add(macro)
@@ -217,4 +227,22 @@ private fun saveMacroList(macros: List<Macro>) {
 
     file.delete()
     file.printWriter().use { out -> out.println(json) }
+}
+
+fun checkMacroDelay(macro: Macro, channel: MessageChannel, config: Configuration): Boolean {
+    val delay = config.serverInformation.macroDelay * 1000
+    if (delay <= 0)
+        return true
+
+    val channelMap = macroPreviousTime[channel.id]
+    val previousTime = channelMap?.get(macro.name)
+
+    if (previousTime?.let { timeToDifference(it) < -delay} != false) {
+        val now = DateTime.now().millis
+        channelMap?.set(macro.name, now)
+
+        return true
+    }
+
+    return false
 }

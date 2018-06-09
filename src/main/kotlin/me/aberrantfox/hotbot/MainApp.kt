@@ -3,6 +3,9 @@ package me.aberrantfox.hotbot
 import me.aberrantfox.hotbot.commands.LowerUserArg
 import me.aberrantfox.hotbot.commands.development.EngineContainer
 import me.aberrantfox.hotbot.commands.development.EngineContainer.setupScriptEngine
+import me.aberrantfox.hotbot.commands.utility.checkMacroDelay
+import me.aberrantfox.hotbot.commands.utility.macroPreviousTime
+import me.aberrantfox.hotbot.commands.utility.macros
 import me.aberrantfox.hotbot.commands.utility.scheduleReminder
 import me.aberrantfox.hotbot.commands.utility.setupMacroCommands
 import me.aberrantfox.hotbot.database.forEachIgnoredID
@@ -49,9 +52,9 @@ private fun start(config: Configuration) = startBot(config.serverInformation.tok
     val container = registerCommands(commandPath, config.serverInformation.prefix)
     LowerUserArg.manager = manager
 
-    manager.setDefaultPermissions(container)
+    setupMacroCommands(container, manager, config, jda.guilds)
 
-    setupMacroCommands(container, manager)
+    manager.setDefaultPermissions(container)
 
     val failsBecause: (String?, Boolean) -> PreconditionResult = { reason, condition -> if (condition) Pass else Fail(reason) }
 
@@ -94,6 +97,7 @@ private fun start(config: Configuration) = startBot(config.serverInformation.tok
 
     logger.info("Fully setup, now ready for use.")
 }
+
 
 private fun setupLogger() {
     val console = ConsoleAppender()
