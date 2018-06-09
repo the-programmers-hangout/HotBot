@@ -4,6 +4,8 @@ import com.github.salomonbrys.kotson.fromJson
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 import me.aberrantfox.hotbot.commands.MacroArg
+import me.aberrantfox.hotbot.permissions.PermissionLevel
+import me.aberrantfox.hotbot.permissions.PermissionManager
 import me.aberrantfox.hotbot.services.configPath
 import me.aberrantfox.kjdautils.api.dsl.CommandSet
 import me.aberrantfox.kjdautils.api.dsl.CommandsContainer
@@ -24,7 +26,7 @@ private val mapLocation = configPath("macros.json")
 val macros = loadMacroList()
 
 @CommandSet
-fun macroCommands() =
+fun macroCommands(permManager: PermissionManager) =
     commands {
         command("addmacro") {
             expect(WordArg, WordArg, SentenceArg)
@@ -43,12 +45,8 @@ fun macroCommands() =
                     return@execute
                 }
 
-                macros.add(Macro(name, message, category))
+                addMacro(Macro(name, message, category), it.container, permManager)
                 saveMacroList(macros)
-
-                it.container.command(name, { execute { it.respond(message) } })
-
-                CommandRecommender.addPossibility(name)
 
                 it.safeRespond("**$name** (category: **$category**) will now respond with: **$message**")
             }
@@ -62,11 +60,8 @@ fun macroCommands() =
                 val name = macro.name.toLowerCase()
                 val message = it.args.component2() as String
 
-                macros.remove(macro)
-                it.container.commands.remove(name)
-
-                macros.add(macro.copy(message=message))
-                it.container.command(name, { execute { it.respond(message) } })
+                removeMacro(macro, it.container, permManager)
+                addMacro(macro.copy(message=message), it.container, permManager)
 
                 saveMacroList(macros)
 
@@ -93,8 +88,8 @@ fun macroCommands() =
                     val macro = macros.find { it.name.toLowerCase() == arg.toLowerCase() }
                             ?: return@execute it.safeRespond("Couldn't find macro: $arg")
 
-                    macros.remove(macro)
-                    macros.add(macro.copy(category=newCategory))
+                    removeMacro(macro, it.container, permManager)
+                    addMacro(macro.copy(category=newCategory), it.container, permManager)
                 }
 
                 saveMacroList(macros)
@@ -116,20 +111,12 @@ fun macroCommands() =
                 if (macros.any { it.name.toLowerCase() == newName })
                     return@execute it.safeRespond("The macro $newName already exists.")
 
-                macros.remove(oldMacro)
-                it.container.commands.remove(oldMacro.name)
-
-                macros.add(oldMacro.copy(name=newName))
-                it.container.command(newName, { execute { it.respond(oldMacro.message) } })
+                removeMacro(oldMacro, it.container, permManager)
+                addMacro(oldMacro.copy(name=newName), it.container, permManager)
 
                 saveMacroList(macros)
 
-                val oldName = oldMacro.name
-
-                CommandRecommender.removePossibility(oldName)
-                CommandRecommender.addPossibility(newName)
-
-                it.safeRespond("**$oldName** renamed to **$newName**")
+                it.safeRespond("**${oldMacro.name}** renamed to **$newName**")
             }
         }
 
@@ -138,12 +125,7 @@ fun macroCommands() =
             execute {
                 val macro = it.args.component1() as Macro
 
-                macros.remove(macro)
-                saveMacroList(macros)
-
-                it.container.commands.remove(macro.name)
-
-                CommandRecommender.removePossibility(macro.name)
+                removeMacro(macro, it.container, permManager)
 
                 it.safeRespond("${macro.name} - this macro is now gone.")
             }
@@ -161,12 +143,7 @@ fun macroCommands() =
                     return@execute
                 }
 
-                toRemove.forEach { macro ->
-                    macros.remove(macro)
-                    it.container.commands.remove(macro.name)
-
-                    CommandRecommender.removePossibility(macro.name)
-                }
+                toRemove.forEach { macro -> removeMacro(macro, it.container, permManager) }
 
                 saveMacroList(macros)
 
@@ -184,6 +161,26 @@ fun macroCommands() =
             }
         }
     }
+
+fun setupMacroCommands(container: CommandsContainer, manager: PermissionManager) =
+        macros.forEach { macro ->
+            container.command(macro.name, { execute { it.respond(macro.message) } })
+            CommandRecommender.addPossibility(macro.name)
+            manager.setPermission(macro.name, PermissionLevel.Everyone)
+        }
+
+fun addMacro(macro: Macro, container: CommandsContainer, manager: PermissionManager) {
+    macros.add(macro)
+    container.command(macro.name, { execute { it.respond(macro.message) } })
+    CommandRecommender.addPossibility(macro.name)
+    manager.setPermission(macro.name, PermissionLevel.Everyone)
+}
+
+fun removeMacro(macro: Macro, container: CommandsContainer, manager: PermissionManager) {
+    macros.remove(macro)
+    container.commands.remove(macro.name)
+    CommandRecommender.removePossibility(macro.name)
+}
 
 private fun buildMacrosEmbed(groupedMacros: Map<String, List<Macro>>) =
         embed {

@@ -3,8 +3,8 @@ package me.aberrantfox.hotbot
 import me.aberrantfox.hotbot.commands.LowerUserArg
 import me.aberrantfox.hotbot.commands.development.EngineContainer
 import me.aberrantfox.hotbot.commands.development.EngineContainer.setupScriptEngine
-import me.aberrantfox.hotbot.commands.utility.macros
 import me.aberrantfox.hotbot.commands.utility.scheduleReminder
+import me.aberrantfox.hotbot.commands.utility.setupMacroCommands
 import me.aberrantfox.hotbot.database.forEachIgnoredID
 import me.aberrantfox.hotbot.database.forEachReminder
 import me.aberrantfox.hotbot.database.getAllMutedMembers
@@ -14,12 +14,10 @@ import me.aberrantfox.hotbot.permissions.PermissionManager
 import me.aberrantfox.hotbot.services.*
 import me.aberrantfox.hotbot.utility.scheduleUnmute
 import me.aberrantfox.hotbot.utility.timeToDifference
-import me.aberrantfox.kjdautils.api.dsl.CommandsContainer
 import me.aberrantfox.kjdautils.api.startBot
 import me.aberrantfox.kjdautils.extensions.jda.containsInvite
 import me.aberrantfox.kjdautils.extensions.jda.containsURL
 import me.aberrantfox.kjdautils.extensions.jda.mentionsSomeone
-import me.aberrantfox.kjdautils.internal.command.CommandRecommender
 import me.aberrantfox.kjdautils.internal.command.Fail
 import me.aberrantfox.kjdautils.internal.command.Pass
 import me.aberrantfox.kjdautils.internal.command.PreconditionResult
@@ -51,9 +49,9 @@ private fun start(config: Configuration) = startBot(config.serverInformation.tok
     val container = registerCommands(commandPath, config.serverInformation.prefix)
     LowerUserArg.manager = manager
 
-    setupMacros(container)
-
     manager.setDefaultPermissions(container)
+
+    setupMacroCommands(container, manager)
 
     val failsBecause: (String?, Boolean) -> PreconditionResult = { reason, condition -> if (condition) Pass else Fail(reason) }
 
@@ -96,12 +94,6 @@ private fun start(config: Configuration) = startBot(config.serverInformation.tok
 
     logger.info("Fully setup, now ready for use.")
 }
-
-private fun setupMacros(container: CommandsContainer) =
-        macros.forEach { macro ->
-            container.command(macro.name, { execute { it.respond(macro.message) } })
-            CommandRecommender.addPossibility(macro.name)
-        }
 
 private fun setupLogger() {
     val console = ConsoleAppender()
