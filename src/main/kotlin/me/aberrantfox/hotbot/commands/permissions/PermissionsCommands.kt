@@ -14,7 +14,10 @@ import me.aberrantfox.kjdautils.api.dsl.embed
 import me.aberrantfox.kjdautils.extensions.stdlib.sanitiseMentions
 import me.aberrantfox.kjdautils.internal.command.arguments.CommandArg
 import me.aberrantfox.kjdautils.internal.command.arguments.RoleArg
+import me.aberrantfox.kjdautils.internal.command.arguments.TextChannelArg
+import me.aberrantfox.kjdautils.internal.command.tryRetrieveSnowflake
 import net.dv8tion.jda.core.entities.Role
+import net.dv8tion.jda.core.entities.TextChannel
 import java.awt.Color
 
 @CommandSet
@@ -170,6 +173,53 @@ fun permissionCommands(manager: PermissionManager, config: Configuration) =
                             this.name = "Assignments"
                             this.value = assignmentsText
                             inline = false
+                        }
+                    })
+                }
+            }
+
+            command("setChannelCommandIgnore") {
+                expect(TextChannelArg, PermissionLevelArg)
+                execute {
+                    val channel = it.args.component1() as TextChannel
+                    val level = it.args.component2() as PermissionLevel
+                    manager.setChannelCommandIgnore(channel.id, level)
+
+                    it.respond("Commands in ${channel.name} now require a minimum role of $level")
+                }
+            }
+
+            command("setChannelMentionIgnore") {
+                expect(TextChannelArg, PermissionLevelArg)
+                execute {
+                    val channel = it.args.component1() as TextChannel
+                    val level = it.args.component2() as PermissionLevel
+                    manager.setChannelMentionIgnore(channel.id, level)
+
+                    it.respond("Mentions in ${channel.name} now require a minimum role of $level")
+                }
+            }
+
+            command("viewChannelIgnoreLevels") {
+                execute { event ->
+                    val map = manager.allChannelIgnoreLevels()
+
+                    event.respond(embed {
+                        setTitle("Channel Ignore Levels")
+                        setColor(Color.BLUE)
+                        map.forEach {
+                            ifield {
+                                name = "Channel"
+                                value = "<#${it.key}>"
+                            }
+                            ifield {
+                                name = "Command"
+                                value = it.value.command.toString()
+                            }
+                            ifield {
+                                name = "Mention"
+                                value = it.value.mention.toString()
+                            }
                         }
                     })
                 }
