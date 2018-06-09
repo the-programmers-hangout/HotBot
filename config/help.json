@@ -42,9 +42,9 @@
     {
 	  "name": "cowsay",
 	  "category": "fun",
-	  "description": "Displays a cowsay with a given message",
-	  "structure": "{message}",
-	  "example": "moo, i am a cow!"
+	  "description": "Displays a cowsay with a given message. Run with no arguments to get a list of valid cows.",
+	  "structure": "[[cow] message]",
+	  "example": "tux I'd like to interject for a moment"
 	},
     {
       "name": "cat",

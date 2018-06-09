@@ -6,6 +6,7 @@ import me.aberrantfox.kjdautils.api.dsl.arg
 import me.aberrantfox.kjdautils.api.dsl.commands
 import me.aberrantfox.kjdautils.internal.command.arguments.SentenceArg
 import me.aberrantfox.kjdautils.internal.command.arguments.SplitterArg
+import me.aberrantfox.kjdautils.internal.command.arguments.WordArg
 import org.jsoup.Jsoup
 import java.io.File
 import java.net.URLEncoder
@@ -62,65 +63,25 @@ fun funCommands() =
         }
 
         command("cowsay") {
-            expect(SentenceArg)
+            expect(arg(WordArg, true, {""}), arg(SentenceArg, true, {""}))
             execute {
-                val sentence = it.args[0] as String
+                val arg0 = it.args[0] as String
+                val arg1 = it.args[1] as String
 
-                val response = parseCowsayArgs(sentence.split(" "))
-                if(!response.isBlank()){
-                    it.safeRespond(response)
-                    return@execute
-                }
-
-                val specialChars = Regex("(`+|@|<@[0-9]+>)")
-                val args = sentence
-                        .replace("\n", " ")
-                        .replace(specialChars, "")
-                        .split(" ")
-                        .toTypedArray()
-
-                val result = Cowsay.say(args)
-
-                if(!result.isBlank()){
-                    val response = Cowsay.say(args)
-                    if (response.length > 1994){
-                        it.safeRespond("that message was too long, moo!")
-                        return@execute
-                    }
-
-                    it.safeRespond("```" + Cowsay.say(args) + "```")
-                }
+                it.safeRespond(when {
+                    arg0.isBlank() && arg1.isBlank() -> CowsayData.validCows.joinToString (", ")
+                    arg0.isBlank() -> "```${Cowsay.say(arrayOf(arg0))}```"
+                    arg1.isBlank() -> "Message argument required"
+                    CowsayData.validCows.contains(arg0) -> "```${Cowsay.say(arrayOf("-f $arg0", arg1))}```"
+                    else -> "```${Cowsay.say(arrayOf("$arg0 $arg1"))}```"
+                })
             }
         }
 
     }
 
 
-private fun parseCowsayArgs(arguments: List<String>): String {
-    val flagsWithArgs = Regex("-T|-W|-f|-e|--alt|--lang")
-    val flagsWithNoArgs = Regex("-b|-d|-g|-l|-n|-p|-s|-t|-w|-y")
-
-    if(!arguments.mapIndexedNotNull{index, s -> if (flagsWithArgs.matches(s)) index + 1 else null }
-            .all { it < arguments.size && !arguments[it].startsWith("-") && !arguments[it].contains(Regex("/|\\\\")) }){
-        return "one of your flags is missing an argument, or the supplied argument is invalid"
-    }
-
-    var skipNextArg = false
-    arguments.forEach{
-        if (!skipNextArg) {
-            if(flagsWithArgs.matches(it)){
-                skipNextArg = true
-            }
-            if(it == "-h"){
-                return "```" + Scanner(File("cowsayhelp.txt")).useDelimiter("\\Z").next() + "```"
-            }
-            if(!flagsWithArgs.matches(it) && !flagsWithNoArgs.matches(it)){
-                return ""
-            }
-        }
-        else {
-            skipNextArg = false
-        }
-    }
-    return ""
+object CowsayData {
+    val validCows = Cowsay.say(arrayOf("-l")).split("\n").filterNot { listOf("sodomized", "head-in", "telebears").contains(it) }
 }
+
