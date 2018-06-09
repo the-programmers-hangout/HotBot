@@ -201,6 +201,27 @@
       "example": ""
     },
     {
+      "name": "setChannelCommandIgnore",
+      "category": "permissions",
+      "desciprtion": "Set the minimum role required to invoke a command in the given channel",
+      "structure": "{channel} {permissionLevel}",
+      "example": "415478703091351574 Moderator"
+    },
+    {
+      "name": "setChannelMentionIgnore",
+      "category": "permissions",
+      "desciprtion": "Set the minimum role required for the bot to reply to a mention, if mentions are enabled",
+      "structure": "{channel} {permissionLevel}",
+      "example": "415478703091351574 Member"
+    },
+    {
+      "name": "viewChannelIgnoreLevels",
+      "category": "permissions",
+      "description": "Display the required roles to invoke/mention in the overridden channels",
+      "structure": "",
+      "example": ""
+    },
+    {
       "name": "warn",
       "category": "infractions",
       "description": "Warn a member, giving them a 0 strike infraction with the given reason.",
