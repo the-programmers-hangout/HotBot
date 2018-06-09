@@ -50,7 +50,7 @@ object LowerUserArg : ArgumentType {
 
         return when {
             retrieved == null -> ArgumentResult.Error("Couldn't retrieve user: $arg")
-            manager.compareUsers(retrieved as User, event.author) > 0 -> ArgumentResult.Error("You don't have the permission to use this command on the target user.")
+            manager.compareUsers(retrieved as User, event.author) >= 0 -> ArgumentResult.Error("You don't have the permission to use this command on the target user.")
             else -> ArgumentResult.Single(retrieved)
         }
     }
