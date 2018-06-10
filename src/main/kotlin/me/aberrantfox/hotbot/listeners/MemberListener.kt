@@ -1,6 +1,7 @@
 package me.aberrantfox.hotbot.listeners
 
 import com.google.common.eventbus.Subscribe
+import me.aberrantfox.hotbot.database.insertLeave
 import me.aberrantfox.hotbot.services.Configuration
 import me.aberrantfox.hotbot.services.MService
 import me.aberrantfox.kjdautils.extensions.jda.fullName
@@ -10,6 +11,7 @@ import me.aberrantfox.kjdautils.internal.logging.BotLogger
 import net.dv8tion.jda.core.EmbedBuilder
 import net.dv8tion.jda.core.events.guild.member.GuildMemberJoinEvent
 import net.dv8tion.jda.core.events.guild.member.GuildMemberLeaveEvent
+import org.joda.time.DateTime
 import java.awt.Color
 import java.util.*
 import kotlin.concurrent.schedule
@@ -44,6 +46,8 @@ class MemberListener(val configuration: Configuration, val logger: BotLogger, va
                 it.delete().queue()
             }
         }
+
+        insertLeave(e.user.id, DateTime(e.member.joinDate.toEpochSecond() * 1000), e.guild.id, !e.guild.isMember(e.user))
     }
 
     private fun buildJoinMessage(response: String, image: String) =
