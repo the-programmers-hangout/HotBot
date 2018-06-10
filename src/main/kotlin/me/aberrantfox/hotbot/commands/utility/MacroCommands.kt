@@ -9,14 +9,12 @@ import me.aberrantfox.hotbot.permissions.PermissionManager
 import me.aberrantfox.hotbot.services.Configuration
 import me.aberrantfox.hotbot.services.configPath
 import me.aberrantfox.hotbot.utility.timeToDifference
-import me.aberrantfox.kjdautils.api.dsl.CommandSet
-import me.aberrantfox.kjdautils.api.dsl.CommandsContainer
-import me.aberrantfox.kjdautils.api.dsl.commands
-import me.aberrantfox.kjdautils.api.dsl.embed
+import me.aberrantfox.kjdautils.api.dsl.*
 import me.aberrantfox.kjdautils.internal.command.CommandRecommender
 import me.aberrantfox.kjdautils.internal.command.arguments.SentenceArg
 import me.aberrantfox.kjdautils.internal.command.arguments.SplitterArg
 import me.aberrantfox.kjdautils.internal.command.arguments.WordArg
+import me.aberrantfox.kjdautils.internal.command.convertOptionalArgs
 import net.dv8tion.jda.core.entities.Guild
 import net.dv8tion.jda.core.entities.MessageChannel
 import org.joda.time.DateTime
@@ -34,7 +32,7 @@ val macros = loadMacroList()
 val macroPreviousTime = hashMapOf<String, HashMap<String, Long>>()
 
 @CommandSet
-fun macroCommands(permManager: PermissionManager, config: Configuration) =
+fun macroCommands(permManager: PermissionManager) =
     commands {
         command("addmacro") {
             expect(WordArg, WordArg, SentenceArg)
@@ -53,7 +51,7 @@ fun macroCommands(permManager: PermissionManager, config: Configuration) =
                     return@execute
                 }
 
-                addMacro(Macro(name, message, category), it.container, permManager, config)
+                addMacro(Macro(name, message, category), it.container, permManager)
                 saveMacroList(macros)
 
                 it.safeRespond("**$name** (category: **$category**) will now respond with: **$message**")
@@ -69,7 +67,7 @@ fun macroCommands(permManager: PermissionManager, config: Configuration) =
                 val message = it.args.component2() as String
 
                 removeMacro(macro, it.container, permManager)
-                addMacro(macro.copy(message=message), it.container, permManager, config)
+                addMacro(macro.copy(message=message), it.container, permManager)
 
                 saveMacroList(macros)
 
@@ -97,7 +95,7 @@ fun macroCommands(permManager: PermissionManager, config: Configuration) =
                             ?: return@execute it.safeRespond("Couldn't find macro: $arg")
 
                     removeMacro(macro, it.container, permManager)
-                    addMacro(macro.copy(category=newCategory), it.container, permManager, config)
+                    addMacro(macro.copy(category=newCategory), it.container, permManager)
                 }
 
                 saveMacroList(macros)
@@ -120,7 +118,7 @@ fun macroCommands(permManager: PermissionManager, config: Configuration) =
                     return@execute it.safeRespond("The macro $newName already exists.")
 
                 removeMacro(oldMacro, it.container, permManager)
-                addMacro(oldMacro.copy(name=newName), it.container, permManager, config)
+                addMacro(oldMacro.copy(name=newName), it.container, permManager)
 
                 saveMacroList(macros)
 
@@ -170,18 +168,21 @@ fun macroCommands(permManager: PermissionManager, config: Configuration) =
         }
     }
 
-fun setupMacroCommands(container: CommandsContainer, manager: PermissionManager, config: Configuration, guilds: List<Guild>) {
-    macros.forEach { setupMacro(it, container, manager, config) }
+fun setupMacroCommands(container: CommandsContainer, manager: PermissionManager, guilds: List<Guild>) {
+    macros.forEach { setupMacro(it, container, manager) }
     macroPreviousTime.putAll(guilds.map{ it.textChannels }.flatten().associate { it.id to hashMapOf<String, Long>() } )
 }
 
-fun addMacro(macro: Macro, container: CommandsContainer, manager: PermissionManager, config: Configuration) {
+fun addMacro(macro: Macro, container: CommandsContainer, manager: PermissionManager) {
     macros.add(macro)
-    setupMacro(macro, container, manager, config)
+    setupMacro(macro, container, manager)
 }
 
-fun setupMacro(macro: Macro, container: CommandsContainer, manager: PermissionManager, config: Configuration) {
-    container.command(macro.name, { execute { if (checkMacroDelay(macro, it.channel, config)) it.respond(macro.message) } })
+fun setupMacro(macro: Macro, container: CommandsContainer, manager: PermissionManager) {
+    container.command(macro.name, {
+        expect(arg(SentenceArg, optional = true, default = ""));
+        execute { it.respond(macro.message) }
+    })
     CommandRecommender.addPossibility(macro.name)
     manager.setPermission(macro.name, PermissionLevel.Everyone)
 }
@@ -229,17 +230,14 @@ private fun saveMacroList(macros: List<Macro>) {
     file.printWriter().use { out -> out.println(json) }
 }
 
-fun checkMacroDelay(macro: Macro, channel: MessageChannel, config: Configuration): Boolean {
-    val delay = config.serverInformation.macroDelay * 1000
-    if (delay <= 0)
-        return true
+fun canUseMacro(macroName: String, channel: MessageChannel, delay: Int): Boolean {
+    if (delay <= 0) return true
 
     val channelMap = macroPreviousTime.getOrPut(channel.id, { hashMapOf() })
-    val previousTime = channelMap[macro.name]
+    val previousTime = channelMap[macroName]
 
-    if (previousTime?.let { timeToDifference(it) < -delay} != false) {
-        val now = DateTime.now().millis
-        channelMap[macro.name] = now
+    if (previousTime?.let { timeToDifference(it) < -delay * 1000} != false) {
+        channelMap[macroName] = DateTime.now().millis
 
         return true
     }
