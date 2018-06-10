@@ -31,10 +31,10 @@ private val mapLocation = configPath("macros.json")
 val macros = loadMacroList()
 
 // ChannelId -> (Macro -> Timestamp)
-var macroPreviousTime = hashMapOf<String, HashMap<String, Long>>()
+val macroPreviousTime = hashMapOf<String, HashMap<String, Long>>()
 
 @CommandSet
-fun macroCommands(permManager: PermissionManager) =
+fun macroCommands(permManager: PermissionManager, config: Configuration) =
     commands {
         command("addmacro") {
             expect(WordArg, WordArg, SentenceArg)
@@ -53,7 +53,7 @@ fun macroCommands(permManager: PermissionManager) =
                     return@execute
                 }
 
-                addMacro(Macro(name, message, category), it.container, permManager)
+                addMacro(Macro(name, message, category), it.container, permManager, config)
                 saveMacroList(macros)
 
                 it.safeRespond("**$name** (category: **$category**) will now respond with: **$message**")
@@ -69,7 +69,7 @@ fun macroCommands(permManager: PermissionManager) =
                 val message = it.args.component2() as String
 
                 removeMacro(macro, it.container, permManager)
-                addMacro(macro.copy(message=message), it.container, permManager)
+                addMacro(macro.copy(message=message), it.container, permManager, config)
 
                 saveMacroList(macros)
 
@@ -97,7 +97,7 @@ fun macroCommands(permManager: PermissionManager) =
                             ?: return@execute it.safeRespond("Couldn't find macro: $arg")
 
                     removeMacro(macro, it.container, permManager)
-                    addMacro(macro.copy(category=newCategory), it.container, permManager)
+                    addMacro(macro.copy(category=newCategory), it.container, permManager, config)
                 }
 
                 saveMacroList(macros)
@@ -120,7 +120,7 @@ fun macroCommands(permManager: PermissionManager) =
                     return@execute it.safeRespond("The macro $newName already exists.")
 
                 removeMacro(oldMacro, it.container, permManager)
-                addMacro(oldMacro.copy(name=newName), it.container, permManager)
+                addMacro(oldMacro.copy(name=newName), it.container, permManager, config)
 
                 saveMacroList(macros)
 
@@ -171,17 +171,17 @@ fun macroCommands(permManager: PermissionManager) =
     }
 
 fun setupMacroCommands(container: CommandsContainer, manager: PermissionManager, config: Configuration, guilds: List<Guild>) {
-    macros.forEach { macro ->
-        container.command(macro.name, { execute { if (checkMacroDelay(macro, it.channel, config)) it.respond(macro.message) } })
-        CommandRecommender.addPossibility(macro.name)
-        manager.setPermission(macro.name, PermissionLevel.Everyone)
-    }
+    macros.forEach { setupMacro(it, container, manager, config) }
     macroPreviousTime.putAll(guilds.map{ it.textChannels }.flatten().associate { it.id to hashMapOf<String, Long>() } )
 }
 
-fun addMacro(macro: Macro, container: CommandsContainer, manager: PermissionManager) {
+fun addMacro(macro: Macro, container: CommandsContainer, manager: PermissionManager, config: Configuration) {
     macros.add(macro)
-    container.command(macro.name, { execute { it.respond(macro.message) } })
+    setupMacro(macro, container, manager, config)
+}
+
+fun setupMacro(macro: Macro, container: CommandsContainer, manager: PermissionManager, config: Configuration) {
+    container.command(macro.name, { execute { if (checkMacroDelay(macro, it.channel, config)) it.respond(macro.message) } })
     CommandRecommender.addPossibility(macro.name)
     manager.setPermission(macro.name, PermissionLevel.Everyone)
 }
@@ -234,12 +234,12 @@ fun checkMacroDelay(macro: Macro, channel: MessageChannel, config: Configuration
     if (delay <= 0)
         return true
 
-    val channelMap = macroPreviousTime[channel.id]
-    val previousTime = channelMap?.get(macro.name)
+    val channelMap = macroPreviousTime.getOrPut(channel.id, { hashMapOf() })
+    val previousTime = channelMap[macro.name]
 
     if (previousTime?.let { timeToDifference(it) < -delay} != false) {
         val now = DateTime.now().millis
-        channelMap?.set(macro.name, now)
+        channelMap[macro.name] = now
 
         return true
     }
