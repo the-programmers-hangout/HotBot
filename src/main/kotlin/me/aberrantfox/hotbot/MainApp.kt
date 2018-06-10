@@ -3,6 +3,8 @@ package me.aberrantfox.hotbot
 import me.aberrantfox.hotbot.commands.LowerUserArg
 import me.aberrantfox.hotbot.commands.development.EngineContainer
 import me.aberrantfox.hotbot.commands.development.EngineContainer.setupScriptEngine
+import me.aberrantfox.hotbot.commands.utility.canUseMacro
+import me.aberrantfox.hotbot.commands.utility.macros
 import me.aberrantfox.hotbot.commands.utility.scheduleReminder
 import me.aberrantfox.hotbot.commands.utility.setupMacroCommands
 import me.aberrantfox.hotbot.database.forEachIgnoredID
@@ -49,9 +51,9 @@ private fun start(config: Configuration) = startBot(config.serverInformation.tok
     val container = registerCommands(commandPath, config.serverInformation.prefix)
     LowerUserArg.manager = manager
 
-    manager.setDefaultPermissions(container)
+    setupMacroCommands(container, manager, jda.guilds)
 
-    setupMacroCommands(container, manager)
+    manager.setDefaultPermissions(container)
 
     val failsBecause: (String?, Boolean) -> PreconditionResult = { reason, condition -> if (condition) Pass else Fail(reason) }
 
@@ -59,6 +61,7 @@ private fun start(config: Configuration) = startBot(config.serverInformation.tok
             { failsBecause("Only the owner can invoke commands in lockdown mode", !config.security.lockDownMode || it.author.id == config.serverInformation.ownerID) },
             { failsBecause(null, !config.security.ignoredIDs.contains(it.channel.id) && !config.security.ignoredIDs.contains(it.author.id)) },
             { failsBecause(null, manager.isChannelCommandIgnored(it.author, it.channel.id)) },
+            { failsBecause(null, it.command.name !in macros.map { it.name } || canUseMacro(it.command.name, it.channel, config.serverInformation.macroDelay)) },
             { failsBecause("You do not have the required permissions to use a command mention", manager.canPerformAction(it.author, config.permissionedActions.commandMention) || !it.message.mentionsSomeone()) },
             { failsBecause("You do not have the required permissions to send an invite.", manager.canPerformAction(it.author, config.permissionedActions.sendInvite) || !it.message.containsInvite()) },
             { failsBecause("You do not have the required permissions to send URLs", manager.canPerformAction(it.author, config.permissionedActions.sendURL) || !it.message.containsURL()) },
@@ -94,6 +97,7 @@ private fun start(config: Configuration) = startBot(config.serverInformation.tok
 
     logger.info("Fully setup, now ready for use.")
 }
+
 
 private fun setupLogger() {
     val console = ConsoleAppender()

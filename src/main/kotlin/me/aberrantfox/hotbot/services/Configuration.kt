@@ -20,9 +20,9 @@ class ServerInformation(val token: String = "insert-token",
                         val ownerID: String = "insert-id",
                         var prefix: String = "insert-prefix",
                         val guildid: String = "insert-guild-id",
+                        val macroDelay: Int = 30,
                         val suggestionPoolLimit: Int = 20,
                         val deleteWelcomeOnLeave: Boolean = true)
-
 
 data class Security(@Transient val ignoredIDs: MutableSet<String> = mutableSetOf(),
                     var lockDownMode: Boolean = false,

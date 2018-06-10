@@ -6,15 +6,18 @@ import com.google.gson.annotations.SerializedName
 import me.aberrantfox.hotbot.commands.MacroArg
 import me.aberrantfox.hotbot.permissions.PermissionLevel
 import me.aberrantfox.hotbot.permissions.PermissionManager
+import me.aberrantfox.hotbot.services.Configuration
 import me.aberrantfox.hotbot.services.configPath
-import me.aberrantfox.kjdautils.api.dsl.CommandSet
-import me.aberrantfox.kjdautils.api.dsl.CommandsContainer
-import me.aberrantfox.kjdautils.api.dsl.commands
-import me.aberrantfox.kjdautils.api.dsl.embed
+import me.aberrantfox.hotbot.utility.timeToDifference
+import me.aberrantfox.kjdautils.api.dsl.*
 import me.aberrantfox.kjdautils.internal.command.CommandRecommender
 import me.aberrantfox.kjdautils.internal.command.arguments.SentenceArg
 import me.aberrantfox.kjdautils.internal.command.arguments.SplitterArg
 import me.aberrantfox.kjdautils.internal.command.arguments.WordArg
+import me.aberrantfox.kjdautils.internal.command.convertOptionalArgs
+import net.dv8tion.jda.core.entities.Guild
+import net.dv8tion.jda.core.entities.MessageChannel
+import org.joda.time.DateTime
 import java.awt.Color
 import java.io.File
 
@@ -24,6 +27,9 @@ data class Macro(@SerializedName("name") val name: String,
 
 private val mapLocation = configPath("macros.json")
 val macros = loadMacroList()
+
+// ChannelId -> (Macro -> Timestamp)
+val macroPreviousTime = hashMapOf<String, HashMap<String, Long>>()
 
 @CommandSet
 fun macroCommands(permManager: PermissionManager) =
@@ -162,16 +168,21 @@ fun macroCommands(permManager: PermissionManager) =
         }
     }
 
-fun setupMacroCommands(container: CommandsContainer, manager: PermissionManager) =
-        macros.forEach { macro ->
-            container.command(macro.name, { execute { it.respond(macro.message) } })
-            CommandRecommender.addPossibility(macro.name)
-            manager.setPermission(macro.name, PermissionLevel.Everyone)
-        }
+fun setupMacroCommands(container: CommandsContainer, manager: PermissionManager, guilds: List<Guild>) {
+    macros.forEach { setupMacro(it, container, manager) }
+    macroPreviousTime.putAll(guilds.map{ it.textChannels }.flatten().associate { it.id to hashMapOf<String, Long>() } )
+}
 
 fun addMacro(macro: Macro, container: CommandsContainer, manager: PermissionManager) {
     macros.add(macro)
-    container.command(macro.name, { execute { it.respond(macro.message) } })
+    setupMacro(macro, container, manager)
+}
+
+fun setupMacro(macro: Macro, container: CommandsContainer, manager: PermissionManager) {
+    container.command(macro.name, {
+        expect(arg(SentenceArg, optional = true, default = ""));
+        execute { it.respond(macro.message) }
+    })
     CommandRecommender.addPossibility(macro.name)
     manager.setPermission(macro.name, PermissionLevel.Everyone)
 }
@@ -217,4 +228,19 @@ private fun saveMacroList(macros: List<Macro>) {
 
     file.delete()
     file.printWriter().use { out -> out.println(json) }
+}
+
+fun canUseMacro(macroName: String, channel: MessageChannel, delay: Int): Boolean {
+    if (delay <= 0) return true
+
+    val channelMap = macroPreviousTime.getOrPut(channel.id, { hashMapOf() })
+    val previousTime = channelMap[macroName]
+
+    if (previousTime?.let { timeToDifference(it) < -delay * 1000} != false) {
+        channelMap[macroName] = DateTime.now().millis
+
+        return true
+    }
+
+    return false
 }
