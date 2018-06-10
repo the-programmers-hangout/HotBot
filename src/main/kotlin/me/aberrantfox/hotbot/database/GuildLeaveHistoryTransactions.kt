@@ -36,3 +36,10 @@ fun getLeaveHistory(member: String, guildId: String) =
                         it[GuildLeaveHistory.ban])
             }
         }
+
+fun hasLeaveHistory(member: String, guildId: String) =
+        transaction {
+            GuildLeaveHistory.select {
+                Op.build { (GuildLeaveHistory.member eq member) and (GuildLeaveHistory.guildId eq guildId) }
+            }.count() > 0
+        }
