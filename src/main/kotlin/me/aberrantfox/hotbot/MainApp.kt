@@ -61,7 +61,7 @@ private fun start(config: Configuration) = startBot(config.serverInformation.tok
             { failsBecause(null, manager.isChannelCommandIgnored(it.author, it.channel.id)) },
             { failsBecause("You do not have the required permissions to use a command mention", manager.canPerformAction(it.author, config.permissionedActions.commandMention) || !it.message.mentionsSomeone()) },
             { failsBecause("You do not have the required permissions to send an invite.", manager.canPerformAction(it.author, config.permissionedActions.sendInvite) || !it.message.containsInvite()) },
-            { failsBecause("You do not have the required permissions to send URLs", manager.canPerformAction(it.author, config.permissionedActions.sendURL) || !it.message.containsURL()) },
+            { failsBecause("You do not have the required permissions to send URLs", it.command.name in listOf("uploadtext", "suggest") || !it.message.containsURL() || manager.canPerformAction(it.author, config.permissionedActions.sendURL)) },
             { failsBecause("Did you really think I would let you do that? :thinking:", manager.canUseCommand(it.author, it.command.name)) }
     )
 
