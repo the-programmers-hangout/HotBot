@@ -176,6 +176,10 @@ fun strikeCommands(config: Configuration, log: BotLogger) =
 
                 it.respond(buildHistoryEmbed(target, true, getHistory(target.id),
                         getHistoryCount(target.id), getNotesByUser(target.id), it, guild, config))
+
+                val leaveHistory = getLeaveHistory(target.id, guild.id)
+                if (leaveHistory.isNotEmpty())
+                    it.respond(buildleaveHistoryEmbed(target, leaveHistory))
             }
         }
 
@@ -284,6 +288,27 @@ private fun administerPunishment(config: Configuration, user: User, strikeQuanti
     }
 }
 
+private fun buildleaveHistoryEmbed(target: User, leaveHistory: List<LeaveHistoryRecord>) = embed {
+    setTitle("${target.fullName()}'s Guild Leave History")
+    setColor(Color.MAGENTA)
+
+    leaveHistory.forEachIndexed { num, record ->
+        ifield {
+            name = "Record"
+            value = "#${num + 1}"
+        }
+        ifield {
+            name = "Joined"
+            value = record.joinDate.toString("yyyy-MM-dd")
+        }
+
+        ifield {
+            name = if (record.ban) "Banned" else "Left"
+            value = record.leaveDate.toString("yyyy-MM-dd")
+        }
+    }
+}
+
 private fun buildHistoryEmbed(target: User, includeModerator: Boolean, records: List<StrikeRecord>,
                               historyCount: Int, notes: List<NoteRecord>?, it: CommandEvent, guild: Guild,
                               config: Configuration) =
@@ -310,6 +335,7 @@ private fun buildHistoryEmbed(target: User, includeModerator: Boolean, records: 
                     value +="\nHistory has been invoked **$historyCount** times."
                 }
             }
+
 
             field {
                 name = ""
