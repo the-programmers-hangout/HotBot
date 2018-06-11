@@ -79,7 +79,7 @@ object HelpConf {
             errors.add("Duplicate Commands: ${duplicates.keys.joinToString(", ")}")
         }
 
-        val undocumentedCommands = commandNames.filterNot { docCommandNames.contains(it) || macros.map { it.name }.contains(it) }
+        val undocumentedCommands = commandNames.filterNot { docCommandNames.contains(it) || it in macros }
         if (undocumentedCommands.isNotEmpty()) {
             errors.add("Undocumented Commands: ${undocumentedCommands.joinToString(", ")}")
         }
