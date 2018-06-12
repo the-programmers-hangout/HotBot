@@ -2,7 +2,6 @@ package me.aberrantfox.hotbot.commands.development
 
 import jdk.nashorn.api.scripting.NashornScriptEngineFactory
 import me.aberrantfox.hotbot.services.Configuration
-import me.aberrantfox.hotbot.services.HelpConf
 import me.aberrantfox.hotbot.services.configPath
 import me.aberrantfox.kjdautils.api.dsl.CommandSet
 import me.aberrantfox.kjdautils.api.dsl.CommandsContainer
@@ -22,7 +21,6 @@ object EngineContainer {
         engine.put("jda", jda)
         engine.put("container", container)
         engine.put("config", config)
-        engine.put("help", HelpConf)
         engine.put("log", logger)
 
         val setupScripts = File(configPath("scripts${File.separator}jsapi"))
