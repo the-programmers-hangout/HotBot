@@ -6,7 +6,6 @@ import com.google.gson.annotations.SerializedName
 import me.aberrantfox.hotbot.commands.MacroArg
 import me.aberrantfox.hotbot.permissions.PermissionLevel
 import me.aberrantfox.hotbot.permissions.PermissionManager
-import me.aberrantfox.hotbot.services.Configuration
 import me.aberrantfox.hotbot.services.configPath
 import me.aberrantfox.hotbot.utility.timeToDifference
 import me.aberrantfox.kjdautils.api.dsl.*
@@ -14,22 +13,22 @@ import me.aberrantfox.kjdautils.internal.command.CommandRecommender
 import me.aberrantfox.kjdautils.internal.command.arguments.SentenceArg
 import me.aberrantfox.kjdautils.internal.command.arguments.SplitterArg
 import me.aberrantfox.kjdautils.internal.command.arguments.WordArg
-import me.aberrantfox.kjdautils.internal.command.convertOptionalArgs
-import net.dv8tion.jda.core.entities.Guild
 import net.dv8tion.jda.core.entities.MessageChannel
 import org.joda.time.DateTime
 import java.awt.Color
 import java.io.File
 
-data class Macro(@SerializedName("name") val name: String,
-                 @SerializedName("message") val message: String,
-                 @SerializedName("category") val category: String)
+typealias ChannelId = String
+typealias Timestamp = Long
+
+data class Macro(val name: String,
+                 val message: String,
+                 val category: String,
+                 @Transient val lastUseTimestamp: MutableMap<ChannelId, Timestamp> = hashMapOf())
 
 private val mapLocation = configPath("macros.json")
-val macros = loadMacroList()
+val macros = hashMapOf<String, Macro>()
 
-// ChannelId -> (Macro -> Timestamp)
-val macroPreviousTime = hashMapOf<String, HashMap<String, Long>>()
 
 @CommandSet
 fun macroCommands(permManager: PermissionManager) =
@@ -41,7 +40,7 @@ fun macroCommands(permManager: PermissionManager) =
                 val category = (it.args.component2() as String).toLowerCase()
                 val message = it.args.component3() as String
 
-                if (macros.any { it.name.toLowerCase() == name }) {
+                if (name in macros) {
                     it.respond("Yea... that macro exists...")
                     return@execute
                 }
@@ -52,7 +51,7 @@ fun macroCommands(permManager: PermissionManager) =
                 }
 
                 addMacro(Macro(name, message, category), it.container, permManager)
-                saveMacroList(macros)
+                saveMacroList(macros.values)
 
                 it.safeRespond("**$name** (category: **$category**) will now respond with: **$message**")
             }
@@ -69,7 +68,7 @@ fun macroCommands(permManager: PermissionManager) =
                 removeMacro(macro, it.container, permManager)
                 addMacro(macro.copy(message=message), it.container, permManager)
 
-                saveMacroList(macros)
+                saveMacroList(macros.values)
 
                 it.safeRespond("**$name** (category: **${macro.category}**) will now respond with: **$message**")
             }
@@ -90,15 +89,16 @@ fun macroCommands(permManager: PermissionManager) =
                 val newCategory = splitArgs.getOrNull(1)?.toLowerCase()?.trim()
                         ?: return@execute it.respond("Must pass a category.")
 
-                macroArgs.forEach { arg ->
-                    val macro = macros.find { it.name.toLowerCase() == arg.toLowerCase() }
-                            ?: return@execute it.safeRespond("Couldn't find macro: $arg")
+                macroArgs.map { it.toLowerCase() }
+                         .forEach { arg ->
+                             val macro = macros[arg]
+                                     ?: return@execute it.safeRespond("Couldn't find macro: $arg")
 
-                    removeMacro(macro, it.container, permManager)
-                    addMacro(macro.copy(category=newCategory), it.container, permManager)
-                }
+                             removeMacro(macro, it.container, permManager)
+                             addMacro(macro.copy(category=newCategory), it.container, permManager)
+                         }
 
-                saveMacroList(macros)
+                saveMacroList(macros.values)
 
                 it.safeRespond("${macroArgs.joinToString(", ")} moved to $newCategory")
             }
@@ -114,13 +114,13 @@ fun macroCommands(permManager: PermissionManager) =
                 if (it.container.has(newName))
                     return@execute it.safeRespond("A command already exists with the name $newName")
 
-                if (macros.any { it.name.toLowerCase() == newName })
+                if (newName in macros)
                     return@execute it.safeRespond("The macro $newName already exists.")
 
                 removeMacro(oldMacro, it.container, permManager)
                 addMacro(oldMacro.copy(name=newName), it.container, permManager)
 
-                saveMacroList(macros)
+                saveMacroList(macros.values)
 
                 it.safeRespond("**${oldMacro.name}** renamed to **$newName**")
             }
@@ -142,16 +142,16 @@ fun macroCommands(permManager: PermissionManager) =
             execute {
                 val categoryName = (it.args.component1() as String).toLowerCase()
 
-                val toRemove = macros.filter { it.category.toLowerCase() == categoryName }
+                val toRemove = macros.filterValues { it.category.toLowerCase() == categoryName }
 
                 if (toRemove.isEmpty()) {
                     it.safeRespond("$categoryName isn't the name of a known macro category.")
                     return@execute
                 }
 
-                toRemove.forEach { macro -> removeMacro(macro, it.container, permManager) }
+                toRemove.values.forEach { macro -> removeMacro(macro, it.container, permManager) }
 
-                saveMacroList(macros)
+                saveMacroList(macros.values)
 
                 it.safeRespond("${toRemove.size} macros removed.")
             }
@@ -159,7 +159,7 @@ fun macroCommands(permManager: PermissionManager) =
 
         command("listmacros") {
             execute {
-                val grouped = macros.groupBy { it.category.toLowerCase() }
+                val grouped = macros.values.groupBy { it.category.toLowerCase() }
 
                 val macroEmbed = buildMacrosEmbed(grouped)
 
@@ -168,17 +168,10 @@ fun macroCommands(permManager: PermissionManager) =
         }
     }
 
-fun setupMacroCommands(container: CommandsContainer, manager: PermissionManager, guilds: List<Guild>) {
-    macros.forEach { setupMacro(it, container, manager) }
-    macroPreviousTime.putAll(guilds.map{ it.textChannels }.flatten().associate { it.id to hashMapOf<String, Long>() } )
-}
+fun setupMacroCommands(container: CommandsContainer, manager: PermissionManager) = loadMacroList().forEach { addMacro(it, container, manager) }
 
 fun addMacro(macro: Macro, container: CommandsContainer, manager: PermissionManager) {
-    macros.add(macro)
-    setupMacro(macro, container, manager)
-}
-
-fun setupMacro(macro: Macro, container: CommandsContainer, manager: PermissionManager) {
+    macros[macro.name.toLowerCase()] = macro
     container.command(macro.name, {
         expect(arg(SentenceArg, optional = true, default = ""));
         execute { it.respond(macro.message) }
@@ -188,12 +181,12 @@ fun setupMacro(macro: Macro, container: CommandsContainer, manager: PermissionMa
 }
 
 fun removeMacro(macro: Macro, container: CommandsContainer, manager: PermissionManager) {
-    macros.remove(macro)
+    macros.remove(macro.name)
     container.commands.remove(macro.name)
     CommandRecommender.removePossibility(macro.name)
 }
 
-private fun buildMacrosEmbed(groupedMacros: Map<String, List<Macro>>) =
+private fun buildMacrosEmbed(groupedMacros: Map<String, Collection<Macro>>) =
         embed {
             title("Currently Available Macros")
 
@@ -208,20 +201,19 @@ private fun buildMacrosEmbed(groupedMacros: Map<String, List<Macro>>) =
             }
         }
 
-private fun loadMacroList(): MutableList<Macro> {
+private fun loadMacroList(): List<Macro> {
     val file = File(mapLocation)
     val gson = Gson()
 
     if (!(file.exists())) {
-        return mutableListOf()
+        return listOf()
     }
 
-    val macros = gson.fromJson<MutableList<Macro>>(file.readText())
-
-    return macros
+    return gson.fromJson<List<Macro>>(file.readText())
+               .map { it.copy(lastUseTimestamp = hashMapOf()) } // hack, because gson was setting the transient field as null, not the default value
 }
 
-private fun saveMacroList(macros: List<Macro>) {
+private fun saveMacroList(macros: Collection<Macro>) {
     val gson = Gson()
     val json = gson.toJson(macros)
     val file = File(mapLocation)
@@ -230,14 +222,13 @@ private fun saveMacroList(macros: List<Macro>) {
     file.printWriter().use { out -> out.println(json) }
 }
 
-fun canUseMacro(macroName: String, channel: MessageChannel, delay: Int): Boolean {
+fun canUseMacro(macro: Macro, channel: MessageChannel, delay: Int): Boolean {
     if (delay <= 0) return true
 
-    val channelMap = macroPreviousTime.getOrPut(channel.id, { hashMapOf() })
-    val previousTime = channelMap[macroName]
+    val previousTime = macro.lastUseTimestamp[channel.id]
 
     if (previousTime?.let { timeToDifference(it) < -delay * 1000} != false) {
-        channelMap[macroName] = DateTime.now().millis
+        macro.lastUseTimestamp[channel.id] = DateTime.now().millis
 
         return true
     }

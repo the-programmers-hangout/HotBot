@@ -21,10 +21,10 @@ object PermissionLevelArg : ArgumentType {
 object MacroArg : ArgumentType {
     override val consumptionType = ConsumptionType.Single
     override fun isValid(arg: String, event: CommandEvent)
-            = macros.any { it.name.toLowerCase() == arg.toLowerCase() }
+            = arg.toLowerCase() in macros
 
     override fun convert(arg: String, args: List<String>, event: CommandEvent): ArgumentResult {
-        val macro = macros.firstOrNull { it.name.toLowerCase() == arg.toLowerCase() }
+        val macro = macros[arg.toLowerCase()]
 
         return if (macro != null) {
             ArgumentResult.Single(macro)

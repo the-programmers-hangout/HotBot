@@ -51,7 +51,7 @@ private fun start(config: Configuration) = startBot(config.serverInformation.tok
     val container = registerCommands(commandPath, config.serverInformation.prefix)
     LowerUserArg.manager = manager
 
-    setupMacroCommands(container, manager, jda.guilds)
+    setupMacroCommands(container, manager)
 
     manager.setDefaultPermissions(container)
 
@@ -61,7 +61,7 @@ private fun start(config: Configuration) = startBot(config.serverInformation.tok
             { failsBecause("Only the owner can invoke commands in lockdown mode", !config.security.lockDownMode || it.author.id == config.serverInformation.ownerID) },
             { failsBecause(null, !config.security.ignoredIDs.contains(it.channel.id) && !config.security.ignoredIDs.contains(it.author.id)) },
             { failsBecause(null, manager.isChannelCommandIgnored(it.author, it.channel.id)) },
-            { failsBecause(null, it.command.name !in macros.map { it.name } || canUseMacro(it.command.name, it.channel, config.serverInformation.macroDelay)) },
+            { failsBecause(null, it.command.name !in macros || canUseMacro(macros[it.command.name]!!, it.channel, config.serverInformation.macroDelay)) },
             { failsBecause("You do not have the required permissions to use a command mention", manager.canPerformAction(it.author, config.permissionedActions.commandMention) || !it.message.mentionsSomeone()) },
             { failsBecause("You do not have the required permissions to send an invite.", manager.canPerformAction(it.author, config.permissionedActions.sendInvite) || !it.message.containsInvite()) },
             { failsBecause("You do not have the required permissions to send URLs", it.command.name in listOf("uploadtext", "suggest") || !it.message.containsURL() || manager.canPerformAction(it.author, config.permissionedActions.sendURL)) },
