@@ -61,11 +61,11 @@ private fun start(config: Configuration) = startBot(config.serverInformation.tok
             { failsBecause("Only the owner can invoke commands in lockdown mode", !config.security.lockDownMode || it.author.id == config.serverInformation.ownerID) },
             { failsBecause(null, !config.security.ignoredIDs.contains(it.channel.id) && !config.security.ignoredIDs.contains(it.author.id)) },
             { failsBecause(null, manager.isChannelCommandIgnored(it.author, it.channel.id)) },
-            { failsBecause(null, it.command.name !in macros || canUseMacro(macros[it.command.name]!!, it.channel, config.serverInformation.macroDelay)) },
+            { failsBecause(null, it.commandStruct.commandName !in macros || canUseMacro(macros[it.commandStruct.commandName]!!, it.channel, config.serverInformation.macroDelay)) },
             { failsBecause("You do not have the required permissions to use a command mention", manager.canPerformAction(it.author, config.permissionedActions.commandMention) || !it.message.mentionsSomeone()) },
             { failsBecause("You do not have the required permissions to send an invite.", manager.canPerformAction(it.author, config.permissionedActions.sendInvite) || !it.message.containsInvite()) },
-            { failsBecause("You do not have the required permissions to send URLs", it.command.name in listOf("uploadtext", "suggest") || !it.message.containsURL() || manager.canPerformAction(it.author, config.permissionedActions.sendURL)) },
-            { failsBecause("Did you really think I would let you do that? :thinking:", manager.canUseCommand(it.author, it.command.name)) }
+            { failsBecause("You do not have the required permissions to send URLs", it.commandStruct.commandName in listOf("uploadtext", "suggest") || !it.message.containsURL() || manager.canPerformAction(it.author, config.permissionedActions.sendURL)) },
+            { failsBecause("Did you really think I would let you do that? :thinking:", manager.canUseCommand(it.author, it.commandStruct.commandName)) }
     )
 
     val helpErrors = HelpConf.getDocumentationErrors(container)
