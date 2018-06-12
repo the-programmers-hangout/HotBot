@@ -68,16 +68,6 @@ private fun start(config: Configuration) = startBot(config.serverInformation.tok
             { failsBecause("Did you really think I would let you do that? :thinking:", manager.canUseCommand(it.author, it.commandStruct.commandName)) }
     )
 
-    val helpErrors = HelpConf.getDocumentationErrors(container)
-
-    if (helpErrors.isNotEmpty()) {
-        println("The help documentation needs to be updated:")
-        helpErrors.forEach(::println)
-        if (!config.botInformation.developmentMode) {
-            return@startBot
-        }
-    }
-
     jda.guilds.forEach { setupMutedRole(it, config.security.mutedRole) }
     val mutedRole = jda.getRolesByName(config.security.mutedRole, true).first()
 
