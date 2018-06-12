@@ -10,7 +10,7 @@ import me.aberrantfox.kjdautils.internal.command.arguments.IntegerArg
 import me.aberrantfox.kjdautils.internal.command.arguments.UserArg
 import net.dv8tion.jda.core.entities.User
 
-@CommandSet
+@CommandSet("security")
 fun raidCommands(config: Configuration) = commands {
     command("viewRaiders") {
         execute {

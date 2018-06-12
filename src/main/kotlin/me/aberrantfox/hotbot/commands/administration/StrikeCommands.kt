@@ -28,7 +28,7 @@ object StrikeRequests {
     val map = HashMap<UserID, StrikeRequest>()
 }
 
-@CommandSet
+@CommandSet("infractions")
 fun strikeCommands(config: Configuration, log: BotLogger) =
     commands {
         command("warn") {

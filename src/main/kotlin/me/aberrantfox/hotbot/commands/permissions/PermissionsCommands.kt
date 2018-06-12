@@ -2,25 +2,22 @@ package me.aberrantfox.hotbot.commands.permissions
 
 import me.aberrantfox.hotbot.commands.CategoryArg
 import me.aberrantfox.hotbot.commands.PermissionLevelArg
+import me.aberrantfox.hotbot.commands.utility.macroCommandCategory
 import me.aberrantfox.hotbot.permissions.PermissionLevel
 import me.aberrantfox.hotbot.permissions.PermissionManager
-import me.aberrantfox.hotbot.services.CommandDescriptor
 import me.aberrantfox.hotbot.services.Configuration
-import me.aberrantfox.hotbot.services.HelpConf
 import me.aberrantfox.kjdautils.api.dsl.Command
 import me.aberrantfox.kjdautils.api.dsl.CommandSet
 import me.aberrantfox.kjdautils.api.dsl.commands
 import me.aberrantfox.kjdautils.api.dsl.embed
-import me.aberrantfox.kjdautils.extensions.stdlib.sanitiseMentions
 import me.aberrantfox.kjdautils.internal.command.arguments.CommandArg
 import me.aberrantfox.kjdautils.internal.command.arguments.RoleArg
 import me.aberrantfox.kjdautils.internal.command.arguments.TextChannelArg
-import me.aberrantfox.kjdautils.internal.command.tryRetrieveSnowflake
 import net.dv8tion.jda.core.entities.Role
 import net.dv8tion.jda.core.entities.TextChannel
 import java.awt.Color
 
-@CommandSet
+@CommandSet("permissions")
 fun permissionCommands(manager: PermissionManager, config: Configuration) =
         commands {
             command("setPermission") {

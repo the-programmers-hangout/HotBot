@@ -2,7 +2,6 @@ package me.aberrantfox.hotbot.commands.utility
 
 import com.github.salomonbrys.kotson.fromJson
 import com.google.gson.Gson
-import com.google.gson.annotations.SerializedName
 import me.aberrantfox.hotbot.commands.MacroArg
 import me.aberrantfox.hotbot.permissions.PermissionLevel
 import me.aberrantfox.hotbot.permissions.PermissionManager
@@ -30,7 +29,9 @@ private val mapLocation = configPath("macros.json")
 val macros = hashMapOf<String, Macro>()
 
 
-@CommandSet
+const val macroCommandCategory = "macro-commands"
+
+@CommandSet("macros")
 fun macroCommands(permManager: PermissionManager) =
     commands {
         command("addmacro") {

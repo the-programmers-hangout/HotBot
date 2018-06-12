@@ -25,7 +25,7 @@ import kotlin.math.roundToLong
 
 class ModerationCommands
 
-@CommandSet
+@CommandSet("moderation")
 fun moderationCommands(config: Configuration, mService: MService, manager: PermissionManager) = commands {
     command("ban") {
         expect(arg(LowerUserArg), arg(IntegerArg, true, 1), arg(SentenceArg))
@@ -101,6 +101,7 @@ fun moderationCommands(config: Configuration, mService: MService, manager: Permi
     }
 
     command("lockdown") {
+        category = "management"
         execute {
             config.security.lockDownMode = !config.security.lockDownMode
             it.respond("Lockdown mode is now set to: ${config.security.lockDownMode}.")
@@ -108,6 +109,7 @@ fun moderationCommands(config: Configuration, mService: MService, manager: Permi
     }
 
     command("prefix") {
+        category = "management"
         expect(WordArg)
         execute {
             val newPrefix = it.args[0] as String
@@ -118,6 +120,7 @@ fun moderationCommands(config: Configuration, mService: MService, manager: Permi
     }
 
     command("setfilter") {
+        category = "management"
         expect(PermissionLevelArg)
         execute {
             val level = it.args.component1() as me.aberrantfox.hotbot.permissions.PermissionLevel

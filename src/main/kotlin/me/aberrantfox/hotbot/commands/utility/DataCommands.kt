@@ -17,7 +17,7 @@ object Polls {
     val map = HashMap<String, PollContainer>()
 }
 
-@CommandSet
+@CommandSet("polling")
 fun dataCommands(config: Configuration) = commands {
     command("poll") {
         expect(SplitterArg)

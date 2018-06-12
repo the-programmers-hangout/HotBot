@@ -42,7 +42,7 @@ object EngineContainer {
 
 private const val functionName = "functionScope"
 
-@CommandSet
+@CommandSet("api")
 fun jsCommands() = commands {
     command("eval") {
         expect(SentenceArg)
