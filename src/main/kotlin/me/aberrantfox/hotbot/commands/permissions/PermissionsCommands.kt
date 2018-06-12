@@ -72,7 +72,9 @@ fun permissionCommands(manager: PermissionManager, config: Configuration) =
                     val category = it.args.component1() as String
                     val level = it.args.component2() as PermissionLevel
 
-                    val commands = HelpConf.listCommandsinCategory(category).map { it.name }
+                    val commands = it.container.commands.values
+                            .filter { it.category.toLowerCase() == category.toLowerCase() }
+                            .map { it.name }
 
                     if (commands.isEmpty()) {
                         it.respond("Either this category ($category) contains 0 commands, or it is not a real category :thinking:")
@@ -92,42 +94,45 @@ fun permissionCommands(manager: PermissionManager, config: Configuration) =
                                 "respective commands and the associated permission required to use those commands.")
 
 
-                        HelpConf.listCategories()
-                                .map { cat ->
-                                    val commandsInCategory = HelpConf.listCommandsinCategory(cat)
-                                    val text = commandsInCategory.joinToString("\n") { cmd -> "${cmd.name} -- ${manager.roleRequired(cmd.name)}" }
-                                    Pair(cat, text)
-                                }
-                                .forEach {
-                                    field {
-                                        name = it.first
-                                        value = it.second.sanitiseMentions()
-                                        inline = false
-                                    }
-                                }
+                        val grouped = it.container.commands.values
+                                .groupBy { it.category }
+                                .filterNot { it.key == macroCommandCategory }
+
+                        grouped.forEach { (category, cmds) ->
+                            field {
+                                name = category
+                                value = cmds.map { it.name }.sorted().joinToString("\n") { "$it -- ${manager.roleRequired(it)}" }
+                                inline = false
+                            }
+                        }
                     })
                 }
             }
 
             command("listavailable") {
                 execute {
-                    val available = HelpConf.listCategories().map { cat ->
-                        val cmds = HelpConf.listCommandsinCategory(cat)
-                                .filter { cmd -> manager.canUseCommand(it.author, cmd.name) }
-                                .map(CommandDescriptor::name)
-                                .joinToString()
+                    val grouped = it.container.commands.values.groupBy { it.category }
 
-                        Pair(cat, cmds)
-                    }.filter { it.second.isNotEmpty() }
+                    val available = grouped
+                            .map { (category, cmds) ->
+                                val availableCmds = cmds.filter { cmd ->
+                                    manager.canUseCommand(it.author, cmd.name)
+                                }
+
+                                category to availableCmds
+                            }
+                            .filter { it.second.isNotEmpty() }
+                            .filterNot { it.first == macroCommandCategory }
+                            .sortedByDescending { it.second.size }
 
                     it.respond(embed {
                         title("Commands available to you")
                         setColor(Color.green)
                         setThumbnail(it.author.effectiveAvatarUrl)
-                        available.forEach {
+                        available.forEach { (category, cmds) ->
                             field {
-                                name = it.first
-                                value = it.second
+                                name = category
+                                value = cmds.map { it.name }.sorted().joinToString()
                                 inline = false
                             }
                         }
