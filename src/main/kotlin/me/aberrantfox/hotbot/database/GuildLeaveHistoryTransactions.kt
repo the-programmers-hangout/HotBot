@@ -13,12 +13,12 @@ data class LeaveHistoryRecord(val member: String,
                               val leaveDate: DateTime,
                               val ban: Boolean)
 
-fun insertLeave(member: String, joinDate: DateTime, guildId: String, ban: Boolean = false) =
+fun insertLeave(member: String, joinDate: DateTime, leaveDate: DateTime, guildId: String, ban: Boolean = false) =
         transaction {
             GuildLeaveHistory.insert {
                 it[GuildLeaveHistory.member] = member
                 it[GuildLeaveHistory.joinDate] = joinDate
-                it[GuildLeaveHistory.leaveDate] = DateTime.now()
+                it[GuildLeaveHistory.leaveDate] = leaveDate
                 it[GuildLeaveHistory.guildId] = guildId
                 it[GuildLeaveHistory.ban] = ban
             }
