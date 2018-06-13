@@ -39,7 +39,6 @@ fun main(args: Array<String>) {
 }
 
 private fun start(config: Configuration) = startBot(config.serverInformation.token) {
-    setupLogger()
     setupDatabaseSchema(config)
 
     logger = convertChannels(config.logChannels, jda)
@@ -99,25 +98,6 @@ private fun start(config: Configuration) = startBot(config.serverInformation.tok
 }
 
 
-private fun setupLogger() {
-    val console = ConsoleAppender()
-    val pattern = "%d [%p|%c|%C{1}] %m%n"
-    console.layout = PatternLayout(pattern)
-    console.threshold = Level.INFO
-    console.activateOptions()
-
-    Logger.getRootLogger().addAppender(console)
-
-    val fa = FileAppender()
-    fa.name = "FileLogger"
-    fa.file = "hotbot.log"
-    fa.layout = PatternLayout("%d %-5p [%c{1}] %m%n")
-    fa.threshold = Level.DEBUG
-    fa.append = true
-    fa.activateOptions()
-
-    Logger.getRootLogger().addAppender(fa)
-}
 
 private fun setupMutedRole(guild: Guild, roleName: String) {
     val possibleRole = guild.getRolesByName(roleName, true).firstOrNull()
