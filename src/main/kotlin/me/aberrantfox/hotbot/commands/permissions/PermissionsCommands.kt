@@ -10,6 +10,7 @@ import me.aberrantfox.kjdautils.api.dsl.Command
 import me.aberrantfox.kjdautils.api.dsl.CommandSet
 import me.aberrantfox.kjdautils.api.dsl.commands
 import me.aberrantfox.kjdautils.api.dsl.embed
+import me.aberrantfox.kjdautils.extensions.stdlib.sanitiseMentions
 import me.aberrantfox.kjdautils.internal.command.arguments.CommandArg
 import me.aberrantfox.kjdautils.internal.command.arguments.RoleArg
 import me.aberrantfox.kjdautils.internal.command.arguments.TextChannelArg
@@ -101,7 +102,7 @@ fun permissionCommands(manager: PermissionManager, config: Configuration) =
                         grouped.forEach { (category, cmds) ->
                             field {
                                 name = category
-                                value = cmds.map { it.name }.sorted().joinToString("\n") { "$it -- ${manager.roleRequired(it)}" }
+                                value = cmds.map { it.name }.sorted().joinToString("\n") { "$it -- ${manager.roleRequired(it)}" }.sanitiseMentions()
                                 inline = false
                             }
                         }
