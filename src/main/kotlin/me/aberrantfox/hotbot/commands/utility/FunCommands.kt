@@ -13,7 +13,7 @@ import java.net.URLEncoder
 import java.util.*
 import khttp.get as kget
 
-@CommandSet
+@CommandSet("fun")
 fun funCommands() =
     commands {
         command("cat") {

@@ -16,7 +16,7 @@ import java.util.*
 import kotlin.concurrent.schedule
 import kotlin.math.roundToLong
 
-@CommandSet
+@CommandSet("utility")
 fun schedulerCommands(log: BotLogger) = commands {
     command("remindme") {
         expect(TimeStringArg, SentenceArg)
