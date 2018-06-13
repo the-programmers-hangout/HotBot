@@ -54,9 +54,7 @@ private fun start(config: Configuration) = startBot(config.serverInformation.tok
     setupMacroCommands(container, manager)
 
     manager.setDefaultPermissions(container)
-
     val failsBecause: (String?, Boolean) -> PreconditionResult = { reason, condition -> if (condition) Pass else Fail(reason) }
-
     val commandName: (CommandEvent) -> String = { it.commandStruct.commandName.toLowerCase() }
 
     registerCommandPreconditions(
@@ -70,13 +68,7 @@ private fun start(config: Configuration) = startBot(config.serverInformation.tok
             { failsBecause("Did you really think I would let you do that? :thinking:", manager.canUseCommand(it.author, commandName(it)) || !it.container.has(commandName(it))) }
     )
 
-    jda.guilds.forEach { setupMutedRole(it, config.security.mutedRole) }
-    val mutedRole = jda.getRolesByName(config.security.mutedRole, true).first()
-
-    handleLTSMutes(config, jda)
-    forEachIgnoredID { config.security.ignoredIDs.add(it) }
-    val tracker = MessageTracker(1)
-    registerInjectionObject(tracker, mutedRole)
+    registerInjectionObject(MessageTracker(1), MuteService(jda, config))
     registerListenersByPath("me.aberrantfox.hotbot.listeners")
 
     if (config.apiConfiguration.enableCleverBot) {
@@ -84,47 +76,20 @@ private fun start(config: Configuration) = startBot(config.serverInformation.tok
         registerListeners(MentionListener(config, jda.selfUser.name, manager))
     }
 
-    loadReminders(jda, logger)
     EngineContainer.engine = setupScriptEngine(jda, container, config, logger)
+    loadPersistence(jda, logger, config)
 
     logger.info("Fully setup, now ready for use.")
 }
 
-
-
-private fun setupMutedRole(guild: Guild, roleName: String) {
-    val possibleRole = guild.getRolesByName(roleName, true).firstOrNull()
-    val mutedRole = possibleRole ?: guild.controller.createRole().setName(roleName).complete()
-
-    guild.textChannels
-            .filter {
-                it.rolePermissionOverrides.none {
-                    it.role.name.toLowerCase() == roleName.toLowerCase()
-                }
-            }
-            .forEach {
-                it.createPermissionOverride(mutedRole).setDeny(Permission.MESSAGE_WRITE).queue()
-            }
-}
-
-
-private fun handleLTSMutes(config: Configuration, jda: JDA) {
-    getAllMutedMembers().forEach {
-        val difference = timeToDifference(it.unmuteTime)
-        val guild = jda.getGuildById(it.guildId)
-        val user = guild.getMemberById(it.user)
-
-        if (user != null) {
-            scheduleUnmute(guild, user.user, config, difference, it)
-        }
+fun loadPersistence(jda: JDA, logger: BotLogger, config: Configuration) {
+    forEachIgnoredID {
+        config.security.ignoredIDs.add(it)
     }
-}
 
-private fun loadReminders(jda: JDA, log: BotLogger) {
     forEachReminder {
         val difference = timeToDifference(it.remindTime)
         val user = jda.getUserById(it.member)
-
-        scheduleReminder(user, it.message, difference, log)
+        scheduleReminder(user, it.message, difference, logger)
     }
 }

@@ -83,6 +83,11 @@ fun moderationCommands(config: Configuration, mService: MService, manager: Permi
             val user = it.args.component1() as User
             val guild = it.jda.getGuildById(config.serverInformation.guildid)
 
+            if(user.id == it.jda.selfUser.id) {
+                it.respond("Nice try but I'm not going to gag myself.")
+                return@execute
+            }
+
             muteMember(guild, user, 5 * 1000 * 60, mService.messages.gagResponse, config, it.author)
         }
     }
@@ -95,6 +100,11 @@ fun moderationCommands(config: Configuration, mService: MService, manager: Permi
             val reason = it.args.component3() as String
 
             val guild = it.jda.getGuildById(config.serverInformation.guildid)
+
+            if (user.id == it.jda.selfUser.id) {
+                it.respond("Nice try but I'm not going to mute myself.")
+                return@execute
+            }
 
             muteMember(guild, user, time, reason, config, it.author)
         }

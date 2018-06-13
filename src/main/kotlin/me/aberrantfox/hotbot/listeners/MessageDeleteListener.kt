@@ -15,9 +15,7 @@ import net.dv8tion.jda.core.events.message.guild.GuildMessageUpdateEvent
 import java.awt.Color
 
 
-class MessageDeleteListener(val logger: BotLogger,
-                            val manager: PermissionManager,
-                            val config: Configuration) {
+class MessageDeleteListener(val logger: BotLogger, val manager: PermissionManager, val config: Configuration) {
     val list = LimitedList<Message>(5000)
 
     @Subscribe
