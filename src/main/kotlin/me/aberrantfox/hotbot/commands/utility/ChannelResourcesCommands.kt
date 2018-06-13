@@ -10,7 +10,7 @@ import me.aberrantfox.kjdautils.internal.command.arguments.SplitterArg
 import java.awt.Color
 import net.dv8tion.jda.core.entities.MessageChannel as Channel
 
-@CommandSet
+@CommandSet("resources")
 fun channelResourceCommands() = commands {
     command("addresource") {
         expect(SentenceArg)

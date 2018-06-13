@@ -9,7 +9,7 @@ import me.aberrantfox.kjdautils.internal.command.arguments.IntegerArg
 import me.aberrantfox.kjdautils.internal.command.arguments.SentenceArg
 import java.net.URLEncoder
 
-@CommandSet
+@CommandSet("fun")
 fun xkcdCommands() = commands {
     command("xkcd") {
         expect(arg(IntegerArg, true, { randomInt(1, getAmount()) }))

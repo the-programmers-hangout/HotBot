@@ -27,7 +27,7 @@ object Suggestions {
     val pool: UserElementPool = UserElementPool(poolName = "Suggestions")
 }
 
-@CommandSet
+@CommandSet("suggestions")
 fun suggestionCommands(config: Configuration) = commands {
     command("suggest") {
         expect(SentenceArg)

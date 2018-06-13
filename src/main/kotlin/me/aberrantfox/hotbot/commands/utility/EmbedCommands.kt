@@ -24,7 +24,7 @@ private object FHolder {
     var text = ""
 }
 
-@CommandSet
+@CommandSet("embed")
 fun embedCommands() =
     commands {
         command("clearembed") {

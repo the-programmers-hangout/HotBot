@@ -15,7 +15,7 @@ object SecurityLevelState {
     var alertLevel: SecurityLevel = SecurityLevel.Normal
 }
 
-@CommandSet
+@CommandSet("security")
 fun securityCommands() = commands {
     command("setSecuritylevel") {
         expect(WordArg)

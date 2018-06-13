@@ -36,7 +36,7 @@ object Project {
 
 val startTime = Date()
 
-@CommandSet
+@CommandSet("utility")
 fun utilCommands(mService: MService, manager: PermissionManager, config: Configuration, log: BotLogger) = commands {
     command("ping") {
         execute {

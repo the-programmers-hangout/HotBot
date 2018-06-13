@@ -56,7 +56,7 @@ object RankContainer {
     private fun save() = file.writeText(gson.toJson(config))
 }
 
-@CommandSet
+@CommandSet("ranks")
 fun rankCommands(config: Configuration) = commands {
     command("grant") {
         expect(RoleArg, LowerUserArg)

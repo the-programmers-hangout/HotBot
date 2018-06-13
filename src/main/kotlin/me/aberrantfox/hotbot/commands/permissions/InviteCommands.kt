@@ -7,7 +7,7 @@ import me.aberrantfox.kjdautils.extensions.jda.fullName
 import me.aberrantfox.kjdautils.internal.command.arguments.WordArg
 import me.aberrantfox.kjdautils.internal.logging.BotLogger
 
-@CommandSet
+@CommandSet("invite")
 fun inviteCommands(log: BotLogger) =
     commands {
         command("whitelistinvite") {

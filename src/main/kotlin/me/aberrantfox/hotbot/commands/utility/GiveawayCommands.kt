@@ -29,7 +29,7 @@ private const val timeUpdatePeriod = 5000L
 private const val giveawayEmbedTitle = "\uD83C\uDF89 GIVEAWAY! \uD83C\uDF89"
 private const val prizeFieldTitle = "Prize"
 
-@CommandSet
+@CommandSet("giveaway")
 fun giveawayCommands(log: BotLogger) = commands {
     command("giveawaystart") {
         expect(TimeStringArg, SentenceArg)
