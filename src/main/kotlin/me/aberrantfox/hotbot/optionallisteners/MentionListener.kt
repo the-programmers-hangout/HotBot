@@ -22,7 +22,7 @@ class MentionListener(val config: Configuration, val selfName: String, val manag
 
         if(config.security.ignoredIDs.contains(event.author.id)) return
 
-        if(manager.isChannelMentionIgnored(event.author, event.channel.id)) return
+        if(!manager.canUseCleverbotInChannel(event.author, event.channel.id)) return
 
         if(event.message.contentRaw.toLowerCase().contains(pattern)
             || event.message.isMentioned(event.jda.selfUser)) {

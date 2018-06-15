@@ -85,9 +85,11 @@ open class PermissionManager(val jda: JDA, val botConfig: Configuration,
 
     fun allChannelIgnoreLevels() = permissionsConfig.channelIgnoreLevels.toMap()
 
-    fun isChannelCommandIgnored(user: User, channelId: String) = getPermissionLevel(user) >= permissionsConfig.channelIgnoreLevels[channelId]?.command ?: PermissionLevel.Everyone
+    fun canUseCommandInChannel(user: User, channelId: String)
+            = getPermissionLevel(user) >= permissionsConfig.channelIgnoreLevels[channelId]?.command ?: PermissionLevel.Everyone
 
-    fun isChannelMentionIgnored(user: User, channelId: String) = getPermissionLevel(user) >= permissionsConfig.channelIgnoreLevels[channelId]?.mention ?: PermissionLevel.Everyone
+    fun canUseCleverbotInChannel(user: User, channelId: String)
+            = getPermissionLevel(user) >= permissionsConfig.channelIgnoreLevels[channelId]?.mention ?: PermissionLevel.Everyone
 
     fun listAvailableCommands(user: User) = permissionsConfig.permissions
             .filter { it.value <= getPermissionLevel(user) }

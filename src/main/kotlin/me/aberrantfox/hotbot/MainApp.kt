@@ -9,12 +9,10 @@ import me.aberrantfox.hotbot.commands.utility.scheduleReminder
 import me.aberrantfox.hotbot.commands.utility.setupMacroCommands
 import me.aberrantfox.hotbot.database.forEachIgnoredID
 import me.aberrantfox.hotbot.database.forEachReminder
-import me.aberrantfox.hotbot.database.getAllMutedMembers
 import me.aberrantfox.hotbot.database.setupDatabaseSchema
 import me.aberrantfox.hotbot.optionallisteners.MentionListener
 import me.aberrantfox.hotbot.permissions.PermissionManager
 import me.aberrantfox.hotbot.services.*
-import me.aberrantfox.hotbot.utility.scheduleUnmute
 import me.aberrantfox.hotbot.utility.timeToDifference
 import me.aberrantfox.kjdautils.api.dsl.CommandEvent
 import me.aberrantfox.kjdautils.api.startBot
@@ -27,9 +25,6 @@ import me.aberrantfox.kjdautils.internal.command.PreconditionResult
 import me.aberrantfox.kjdautils.internal.logging.BotLogger
 import me.aberrantfox.kjdautils.internal.logging.convertChannels
 import net.dv8tion.jda.core.JDA
-import net.dv8tion.jda.core.Permission
-import net.dv8tion.jda.core.entities.Guild
-import org.apache.log4j.*
 
 const val commandPath = "me.aberrantfox.hotbot.commands"
 
@@ -60,7 +55,7 @@ private fun start(config: Configuration) = startBot(config.serverInformation.tok
     registerCommandPreconditions(
             { failsBecause("Only the owner can invoke commands in lockdown mode", !config.security.lockDownMode || it.author.id == config.serverInformation.ownerID) },
             { failsBecause(null, !config.security.ignoredIDs.contains(it.channel.id) && !config.security.ignoredIDs.contains(it.author.id)) },
-            { failsBecause(null, manager.isChannelCommandIgnored(it.author, it.channel.id)) },
+            { failsBecause(null, manager.canUseCommandInChannel(it.author, it.channel.id)) },
             { failsBecause(null, commandName(it) !in macros || canUseMacro(macros[commandName(it)]!!, it.channel, config.serverInformation.macroDelay)) },
             { failsBecause("You do not have the required permissions to use a command mention", manager.canPerformAction(it.author, config.permissionedActions.commandMention) || !it.message.mentionsSomeone()) },
             { failsBecause("You do not have the required permissions to send an invite.", manager.canPerformAction(it.author, config.permissionedActions.sendInvite) || !it.message.containsInvite()) },
