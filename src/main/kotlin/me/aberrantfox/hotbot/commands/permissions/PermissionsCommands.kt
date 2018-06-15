@@ -42,13 +42,6 @@ fun permissionCommands(manager: PermissionManager, config: Configuration) =
                 }
             }
 
-            command("listcommandperms") {
-                description = "Display all current commands and the corresponding required permission level to use each of them."
-                execute {
-                    it.respond(manager.listAvailableCommands(it.author))
-                }
-            }
-
             command("roleids") {
                 description = "Display each role in the server with its corresponding ID"
                 execute {
