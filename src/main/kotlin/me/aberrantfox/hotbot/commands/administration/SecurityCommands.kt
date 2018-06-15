@@ -18,6 +18,7 @@ object SecurityLevelState {
 @CommandSet("security")
 fun securityCommands() = commands {
     command("setSecuritylevel") {
+        description = "Set the bot's security level"
         expect(WordArg)
         execute {
             val targetLevel = (it.args[0] as String).capitalize()
@@ -33,18 +34,21 @@ fun securityCommands() = commands {
     }
 
     command("securitylevel") {
+        description = "See what the current server security level is."
         execute {
             it.respond("Current security level: ${SecurityLevelState.alertLevel}")
         }
     }
 
     command("viewnewplayers") {
+        description = "View what the bot deems as new players"
         execute {
             it.respond("Current tracked new players: ${NewPlayers.names(it.jda)}")
         }
     }
 
     command("resetsecuritylevel") {
+        description = "Set the security level back to normal."
         execute {
             SecurityLevelState.alertLevel = SecurityLevel.Normal
             it.respond("Security level set to normal.")

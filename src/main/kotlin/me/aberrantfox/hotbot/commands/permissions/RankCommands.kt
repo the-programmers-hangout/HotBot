@@ -59,6 +59,7 @@ object RankContainer {
 @CommandSet("ranks")
 fun rankCommands(config: Configuration) = commands {
     command("grant") {
+        description = "Grant a rank to a user."
         expect(RoleArg, LowerUserArg)
         execute {
             val guild = it.jda.getGuildById(config.serverInformation.guildid)
@@ -68,6 +69,7 @@ fun rankCommands(config: Configuration) = commands {
     }
 
     command("revoke") {
+        description = "Revoke a rank from a user"
         expect(RoleArg, LowerUserArg)
         execute {
             val guild = it.jda.getGuildById(config.serverInformation.guildid)
@@ -77,6 +79,7 @@ fun rankCommands(config: Configuration) = commands {
     }
 
     command("makerolegrantable") {
+        description = "Allow a role to be granted."
         expect(RoleArg)
         execute {
             val role = it.args.component1() as Role
@@ -93,6 +96,7 @@ fun rankCommands(config: Configuration) = commands {
     }
 
     command("makeroleungrantable") {
+        description = "Disallow granting of this role"
         expect(RoleArg)
         execute {
             val role = it.args.component1() as Role
@@ -109,6 +113,7 @@ fun rankCommands(config: Configuration) = commands {
     }
 
     command("listgrantableroles") {
+        description = "List grantable roles"
         execute {
             it.safeRespond("Currently whitelisted roles: ${RankContainer.stringList()}")
         }

@@ -19,6 +19,7 @@ import kotlin.math.roundToLong
 @CommandSet("utility")
 fun schedulerCommands(log: BotLogger) = commands {
     command("remindme") {
+        description = "A command that'll remind you about something after the specified time."
         expect(TimeStringArg, SentenceArg)
         execute {
             val timeMilliSecs = (it.args.component1() as Double).roundToLong() * 1000

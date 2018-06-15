@@ -22,6 +22,7 @@ import java.awt.Color
 fun permissionCommands(manager: PermissionManager, config: Configuration) =
         commands {
             command("setPermission") {
+                description = "Set the permission level of the given command to the given permission level."
                 expect(CommandArg, PermissionLevelArg)
                 execute {
                     val command = it.args.component1() as Command
@@ -33,6 +34,7 @@ fun permissionCommands(manager: PermissionManager, config: Configuration) =
             }
 
             command("getPermission") {
+                description = "Get the current required permission level for a particular command."
                 expect(CommandArg)
                 execute {
                     val name = (it.args.component1() as Command).name
@@ -41,12 +43,14 @@ fun permissionCommands(manager: PermissionManager, config: Configuration) =
             }
 
             command("listcommandperms") {
+                description = "Display all current commands and the corresponding required permission level to use each of them."
                 execute {
                     it.respond(manager.listAvailableCommands(it.author))
                 }
             }
 
             command("roleids") {
+                description = "Display each role in the server with its corresponding ID"
                 execute {
                     val guild = it.jda.getGuildById(config.serverInformation.guildid)
                     it.safeRespond(guild.roles.joinToString("\n") { role -> "${role.name} :: ${role.id}" })
@@ -54,6 +58,7 @@ fun permissionCommands(manager: PermissionManager, config: Configuration) =
             }
 
             command("setallPermissions") {
+                description = "Set the permission of all commands to a specific role. Only available to the bot owner."
                 expect(PermissionLevelArg)
                 execute {
                     val level = it.args.component1() as PermissionLevel
@@ -68,6 +73,7 @@ fun permissionCommands(manager: PermissionManager, config: Configuration) =
             }
 
             command("setPermissions") {
+                description = "Set the permission of all commands in a category to a specific role (i.e. allow that role and roles above to use these commands). "
                 expect(CategoryArg, PermissionLevelArg)
                 execute {
                     val category = it.args.component1() as String
@@ -88,6 +94,7 @@ fun permissionCommands(manager: PermissionManager, config: Configuration) =
             }
 
             command("viewpermissions") {
+                description = "View all of the commands by category, listed with their associated permission."
                 execute {
                     it.respond(embed {
                         title("Command Permissions")
@@ -111,6 +118,7 @@ fun permissionCommands(manager: PermissionManager, config: Configuration) =
             }
 
             command("listavailable") {
+                description = "View commands available to you, based on your permission level."
                 execute {
                     val grouped = it.container.commands.values.groupBy { it.category }
 
@@ -142,6 +150,7 @@ fun permissionCommands(manager: PermissionManager, config: Configuration) =
             }
 
             command("setRoleLevel") {
+                description = "Set the PermissionLevel of a particular role."
                 expect(RoleArg, PermissionLevelArg)
                 execute {
                     val role = it.args.component1() as Role
@@ -154,6 +163,7 @@ fun permissionCommands(manager: PermissionManager, config: Configuration) =
             }
 
             command("viewRoleAssignments") {
+                description = "View the assigned permission levels of any role which has an assigned permission level"
                 execute {
                     it.respond(embed {
                         title("Role Assignments")
@@ -182,6 +192,7 @@ fun permissionCommands(manager: PermissionManager, config: Configuration) =
             }
 
             command("setChannelCommandIgnore") {
+                description = "Set the minimum role required to invoke a command in the given channel"
                 expect(TextChannelArg, PermissionLevelArg)
                 execute {
                     val channel = it.args.component1() as TextChannel
@@ -193,6 +204,7 @@ fun permissionCommands(manager: PermissionManager, config: Configuration) =
             }
 
             command("setChannelMentionIgnore") {
+                description = "Set the minimum role required for the bot to reply to a mention, if mentions are enabled"
                 expect(TextChannelArg, PermissionLevelArg)
                 execute {
                     val channel = it.args.component1() as TextChannel
@@ -204,6 +216,7 @@ fun permissionCommands(manager: PermissionManager, config: Configuration) =
             }
 
             command("viewChannelIgnoreLevels") {
+                description = "Display the required roles to invoke/mention in the overridden channels"
                 execute { event ->
                     val map = manager.allChannelIgnoreLevels()
 

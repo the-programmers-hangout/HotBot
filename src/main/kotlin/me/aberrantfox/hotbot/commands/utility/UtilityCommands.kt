@@ -39,12 +39,14 @@ val startTime = Date()
 @CommandSet("utility")
 fun utilCommands(mService: MService, manager: PermissionManager, config: Configuration, log: BotLogger) = commands {
     command("ping") {
+        description = "Pong!"
         execute {
             it.respond("Responded in ${it.jda.ping}ms")
         }
     }
 
     command("botinfo") {
+        description = "Display the bot information."
         execute {
             it.respond(embed {
                 title(it.jda.selfUser.fullName())
@@ -72,6 +74,7 @@ fun utilCommands(mService: MService, manager: PermissionManager, config: Configu
     }
 
     command("serverinfo") {
+        description = "Display a message giving basic server information"
         execute {
             val guild = it.jda.getGuildById(config.serverInformation.guildid)
             val embed = produceServerInfoEmbed(guild, mService)
@@ -80,6 +83,7 @@ fun utilCommands(mService: MService, manager: PermissionManager, config: Configu
     }
 
     command("uptime") {
+        description = "Displays how long you have kept me, HOTBOT, AWAKE!"
         execute {
             val milliseconds = Date().time - startTime.time
             val seconds = (milliseconds / 1000) % 60
@@ -101,6 +105,7 @@ fun utilCommands(mService: MService, manager: PermissionManager, config: Configu
     }
 
     command("exit") {
+        description = "Exit, saving configurations."
         execute {
             it.respond("Exiting")
             saveConfig(config)
@@ -112,6 +117,7 @@ fun utilCommands(mService: MService, manager: PermissionManager, config: Configu
     }
 
     command("kill") {
+        description = "Exit, without saving configurations."
         execute {
             it.respond("Killing process, configurations will not be saved.")
             System.exit(0)
@@ -119,6 +125,7 @@ fun utilCommands(mService: MService, manager: PermissionManager, config: Configu
     }
 
     command("saveconfigurations") {
+        description = "Save the configuration of the bot. You may want to do this if you change the prefix."
         execute {
             saveConfig(config)
             it.respond("Configurations saved. I hope you know what you are doing...")
@@ -126,18 +133,21 @@ fun utilCommands(mService: MService, manager: PermissionManager, config: Configu
     }
 
     command("version") {
+        description = "Display the bot version -- this is updated via maven filtering."
         execute {
             it.respond("**Hotbot version**: ${Project.properties.version}")
         }
     }
 
     command("author") {
+        description = "Display project authors -- this is updated via maven filtering."
         execute {
             it.respond("**Project author**: ${Project.properties.author}")
         }
     }
 
     command("echo") {
+        description = "Echo a message to a channel"
         expect(TextChannelArg, SentenceArg)
         execute {
             val target = it.args[0] as TextChannel
@@ -148,6 +158,7 @@ fun utilCommands(mService: MService, manager: PermissionManager, config: Configu
     }
 
     command("viewcreationdate") {
+        description = "See when a user was created"
         expect(UserArg)
         execute {
             val target = it.args.component1() as User
@@ -156,6 +167,7 @@ fun utilCommands(mService: MService, manager: PermissionManager, config: Configu
     }
 
     command("uploadtext") {
+        description = "Uploads the given block of text/code to hastebin and removes the invocation"
         expect(SentenceArg)
         execute {
             val text = it.args.component1() as String
@@ -168,6 +180,7 @@ fun utilCommands(mService: MService, manager: PermissionManager, config: Configu
     }
 
     command("colour") {
+        description = "Shows an embed with the given hex colour code"
         expect(HexColourArg)
         execute {
             val colour = it.args.component1() as Int

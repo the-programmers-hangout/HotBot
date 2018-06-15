@@ -13,6 +13,7 @@ import net.dv8tion.jda.core.entities.User
 @CommandSet("security")
 fun raidCommands(config: Configuration) = commands {
     command("viewRaiders") {
+        description = "See what raiders are in the raidView"
         execute {
             if (MutedRaiders.set.isEmpty()) {
                 it.respond("No raiders... yay? (I hope that is a yay moment :D)")
@@ -24,6 +25,7 @@ fun raidCommands(config: Configuration) = commands {
     }
 
     command("freeRaider") {
+        description = "Free a raider by an ID, unmuting them. Do this rather than ban people as it'll exit them from the raidView as well."
         expect(UserArg)
         execute {
             if (MutedRaiders.set.isEmpty()) {
@@ -47,6 +49,7 @@ fun raidCommands(config: Configuration) = commands {
     }
 
     command("freeAllRaiders") {
+        description = "For freeing all raiders from the raid queue, unmuting them as well."
         execute {
             if (MutedRaiders.set.isEmpty()) {
                 it.respond("There are no raiders...")
@@ -65,6 +68,7 @@ fun raidCommands(config: Configuration) = commands {
     }
 
     command("banraider") {
+        description = "Ban a raider by an ID, do this rather than ban people as it'll exit them from the raidView"
         expect(UserArg, IntegerArg)
         execute {
             val user = it.args[0] as User
@@ -83,6 +87,7 @@ fun raidCommands(config: Configuration) = commands {
     }
 
     command("banautodetectedraid") {
+        description = "Ban all of the raiders in the raidview"
         expect(IntegerArg)
         execute {
             val delDays = (it.args[0]) as Int

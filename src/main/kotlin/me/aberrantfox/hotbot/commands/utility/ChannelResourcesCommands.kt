@@ -13,6 +13,7 @@ import net.dv8tion.jda.core.entities.MessageChannel as Channel
 @CommandSet("resources")
 fun channelResourceCommands() = commands {
     command("addresource") {
+        description = "Add a channel resource to the current channel."
         expect(SentenceArg)
         execute {
             val input = it.args[0] as String
@@ -36,18 +37,21 @@ fun channelResourceCommands() = commands {
     }
 
     command("listresources") {
+        description = "List current channel resources"
         execute {
             handleListResources(it)
         }
     }
 
     command("listresourcesids") {
+        description = "List current channel resources (w/ ids shown, for removeresource)"
         execute {
             handleListResources(it, true)
         }
     }
 
     command("removeresource") {
+        description = "Remove one or more of current channel resources"
         expect(SplitterArg)
         execute {
             val ids: List<Int>
@@ -74,6 +78,7 @@ fun channelResourceCommands() = commands {
     }
 
     command("resetresources") {
+        description = "Remove all of current channel resources."
         execute {
             val resourcesCount = fetchChannelResources(it.channel.id).size
             val channelMention = "<#${it.channel.id}>"

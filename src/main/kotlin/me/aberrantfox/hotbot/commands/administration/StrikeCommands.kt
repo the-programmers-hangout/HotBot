@@ -32,6 +32,7 @@ object StrikeRequests {
 fun strikeCommands(config: Configuration, log: BotLogger) =
     commands {
         command("warn") {
+            description = "Warn a member, giving them a 0 strike infraction with the given reason."
             expect(LowerUserArg, SentenceArg)
             execute {
                 val newArgs = listOf(it.args[0], 0, it.args[1])
@@ -43,6 +44,7 @@ fun strikeCommands(config: Configuration, log: BotLogger) =
         }
 
         command("strike") {
+            description = "Give a member a weighted infraction, with specified weight and reason. This may result in them being banned. Weights should be below or equal to StrikeCeil"
             expect(arg(LowerUserArg),
                    arg(IntegerArg, optional = true, default = 1),
                    arg(SentenceArg))
@@ -53,6 +55,7 @@ fun strikeCommands(config: Configuration, log: BotLogger) =
         }
 
         command("strikerequest") {
+            description = "Quite like the strike command, except another moderator reviews it before it is accepted."
             expect(LowerUserArg, IntegerArg, SentenceArg)
             execute {
                 val target = it.args.component1() as User
@@ -73,6 +76,7 @@ fun strikeCommands(config: Configuration, log: BotLogger) =
         }
 
         command("viewRequest") {
+            description = "View the current strike request, if any, on the given user."
             expect(LowerUserArg)
             execute {
                 val user = it.args.component1() as User
@@ -106,6 +110,7 @@ fun strikeCommands(config: Configuration, log: BotLogger) =
         }
 
         command("acceptrequest") {
+            description = "Accept a request for striking a user by another moderator. This will infract the target user."
             expect(LowerUserArg)
             execute {
                 val user = it.args.component1() as User
@@ -123,6 +128,7 @@ fun strikeCommands(config: Configuration, log: BotLogger) =
         }
 
         command("declinerequest") {
+            description = "Reject a request for a strike on a user. This will notify the invoker and delete the request."
             expect(LowerUserArg)
             execute {
                 val user = it.args.component1() as User
@@ -135,6 +141,7 @@ fun strikeCommands(config: Configuration, log: BotLogger) =
         }
 
         command("deleteRequest") {
+            description = "Delete a request made by yourself."
             expect(LowerUserArg)
             execute {
                 val user = it.args.component1() as User
@@ -153,6 +160,7 @@ fun strikeCommands(config: Configuration, log: BotLogger) =
         }
 
         command("listrequests") {
+            description = "List all current strike requests"
             execute {
                 if(StrikeRequests.map.isEmpty()) {
                     it.respond("No requests currently in place.")
@@ -167,6 +175,7 @@ fun strikeCommands(config: Configuration, log: BotLogger) =
         }
 
         command("history") {
+            description = "Display a user's infraction history."
             expect(UserArg)
             execute {
                 val target = it.args[0] as User
@@ -184,6 +193,7 @@ fun strikeCommands(config: Configuration, log: BotLogger) =
         }
 
         command("removestrike") {
+            description = "Delete a particular strike by ID (these are listed in the history command)."
             expect(IntegerArg)
             execute {
                 val strikeID = it.args[0] as Int
@@ -194,6 +204,7 @@ fun strikeCommands(config: Configuration, log: BotLogger) =
         }
 
         command("cleanse") {
+            description = "Completely wipe a user of all infractions. (Permanently deletes them)"
             expect(LowerUserArg)
             execute {
                 val user = it.args[0] as User
@@ -205,6 +216,7 @@ fun strikeCommands(config: Configuration, log: BotLogger) =
         }
 
         command("selfhistory") {
+            description = "See your own infraction history."
             execute {
                 val target = it.author
                 val guild = it.jda.getGuildById(config.serverInformation.guildid)

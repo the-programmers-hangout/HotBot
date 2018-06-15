@@ -11,6 +11,7 @@ import me.aberrantfox.kjdautils.internal.logging.BotLogger
 fun inviteCommands(log: BotLogger) =
     commands {
         command("whitelistinvite") {
+            description = "Allow an invite to be posted."
             expect(WordArg)
             execute {
                 val inv = it.args[0] as String
@@ -21,6 +22,7 @@ fun inviteCommands(log: BotLogger) =
         }
 
         command("unwhitelistinvite") {
+            description = "Remove an invitation from the whitelist."
             expect(WordArg)
             execute {
                 val inv = it.args[0] as String
