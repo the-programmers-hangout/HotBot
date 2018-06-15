@@ -173,7 +173,8 @@ fun utilCommands(mService: MService, manager: PermissionManager, config: Configu
             val text = it.args.component1() as String
             val response = post("https://hastebin.com/documents", data = text).jsonObject
 
-            it.message.delete().queue()
+            if (it.commandStruct.doubleInvocation)
+                it.message.delete().queue()
 
             it.respond("${it.author.fullName()}'s paste: https://hastebin.com/" + response.getString("key"))
         }

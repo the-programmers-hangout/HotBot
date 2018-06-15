@@ -55,7 +55,8 @@ fun moderationCommands(config: Configuration, mService: MService, manager: Permi
             }
 
             it.channel.history.retrievePast(amount + 1).queue { past ->
-                past.forEach { msg -> msg.delete().queue() }
+                past.drop(if (it.commandStruct.doubleInvocation) 0 else 1)
+                    .forEach { msg -> println(msg.contentRaw); msg.delete().queue() }
                 it.respond("Be nice. No spam.")
             }
         }
@@ -165,7 +166,8 @@ fun moderationCommands(config: Configuration, mService: MService, manager: Permi
                 return@execute
             }
 
-            it.message.delete().queue()
+            if (it.commandStruct.doubleInvocation)
+                it.message.delete().queue()
 
             it.channel.history.retrievePast(searchSpace + 1).queue { past ->
                 handleResponse(past, channel, targets, it.channel, it.author.asMention, config)
