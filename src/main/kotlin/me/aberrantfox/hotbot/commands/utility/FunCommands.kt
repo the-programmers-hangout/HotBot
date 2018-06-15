@@ -49,6 +49,7 @@ fun funCommands() =
 
                     else -> {it.respond(embed{
                         setTitle("$animal is not an animal")
+                        setDescription("You can use one of the following dog, cat, fox, bird, snake, otter or rabbit")
                         setColor(Color.RED)
                     })}
                 }
