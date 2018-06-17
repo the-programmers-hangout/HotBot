@@ -4,11 +4,12 @@ import com.github.ricksbrown.cowsay.Cowsay
 import me.aberrantfox.kjdautils.api.dsl.CommandSet
 import me.aberrantfox.kjdautils.api.dsl.arg
 import me.aberrantfox.kjdautils.api.dsl.commands
+import me.aberrantfox.kjdautils.api.dsl.embed
 import me.aberrantfox.kjdautils.internal.command.arguments.SentenceArg
 import me.aberrantfox.kjdautils.internal.command.arguments.SplitterArg
 import me.aberrantfox.kjdautils.internal.command.arguments.WordArg
 import org.jsoup.Jsoup
-import java.io.File
+import java.awt.Color
 import java.net.URLEncoder
 import java.util.*
 import khttp.get as kget
@@ -16,19 +17,6 @@ import khttp.get as kget
 @CommandSet("fun")
 fun funCommands() =
     commands {
-        command("cat") {
-            execute {
-                val json = kget("http://aws.random.cat/meow").jsonObject
-                it.respond(json.getString("file"))
-            }
-        }
-
-        command("bird") {
-            execute {
-                val json = kget("https://birdsare.cool/bird.json?exclude=webm,mp4").jsonObject
-                it.respond(json.getString("url"))
-            }
-        }
 
         command("flip") {
             expect(arg(SplitterArg, true, listOf("Heads", "Tails")))
@@ -41,10 +29,30 @@ fun funCommands() =
             }
         }
 
-        command("dog") {
+        command("animal") {
+            description = "Shows a cute animal. Animals implemented are dog, cat, fox, bird, snake, otter and rabbit"
+            expect(arg(WordArg, true, "random"))
+
             execute {
-                val json = kget("https://dog.ceo/api/breeds/image/random").jsonObject
-                it.respond(json.getString("message"))
+                var animal = it.args[0] as String
+
+                if(animal == "random"){ animal = randomAnimal() }
+
+                when (animal) {
+                    "dog" -> it.respond(buildAnimalEmbed(getDogImg()))
+                    "cat" -> it.respond(buildAnimalEmbed(getCatImg()))
+                    "fox" -> it.respond(buildAnimalEmbed(getFoxImg()))
+                    "bird" -> it.respond(buildAnimalEmbed(getBirdImg()))
+                    "snake" -> it.respond(buildAnimalEmbed(getSnakeImg()))
+                    "otter" -> it.respond(buildAnimalEmbed(getOtterImg()))
+                    "rabbit" -> it.respond(buildAnimalEmbed(getRabbitImg()))
+
+                    else -> {it.respond(embed{
+                        setTitle("$animal is not an animal")
+                        setDescription("You can use one of the following dog, cat, fox, bird, snake, otter or rabbit")
+                        setColor(Color.RED)
+                    })}
+                }
             }
         }
 
@@ -80,8 +88,31 @@ fun funCommands() =
 
     }
 
-
 object CowsayData {
     val validCows = Cowsay.say(arrayOf("-l")).split("\n").filterNot { listOf("sodomized", "head-in", "telebears").contains(it) }
 }
 
+private fun randomAnimal(): String{
+    val animals = listOf("dog", "cat", "fox", "bird", "snake", "otter", "rabbit")
+
+    return animals.shuffled().first()
+}
+
+private fun buildAnimalEmbed(URL: String) = embed {
+    setColor(Color.decode("#52be80"))
+    setImage(URL)
+}
+
+private fun getDogImg(): String = kget("https://dog.ceo/api/breeds/image/random").jsonObject.getString("message")
+
+private fun getCatImg(): String = kget("https://api.cheweybot.ga/cat").jsonObject.getString("data")
+
+private fun getFoxImg(): String = kget("https://randomfox.ca/floof").jsonObject.getString("image")
+
+private fun getBirdImg(): String = kget("https://api.cheweybot.ga/birb").jsonObject.getString("data")
+
+private fun getSnakeImg(): String = kget("https://api.cheweybot.ga/snake").jsonObject.getString("data")
+
+private fun getOtterImg(): String = kget("https://api.cheweybot.ga/otter").jsonObject.getString("data")
+
+private fun getRabbitImg(): String = kget("https://api.cheweybot.ga/rabbit").jsonObject.getString("data")
