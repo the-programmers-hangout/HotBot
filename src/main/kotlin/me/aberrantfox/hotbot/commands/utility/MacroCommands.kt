@@ -35,6 +35,7 @@ const val macroCommandCategory = "macro-commands"
 fun macroCommands(permManager: PermissionManager) =
     commands {
         command("addmacro") {
+            description = "Add a macro which will respond with the given message when invoked by the given name."
             expect(WordArg, WordArg, SentenceArg)
             execute {
                 val name = (it.args.component1() as String).toLowerCase()
@@ -60,6 +61,7 @@ fun macroCommands(permManager: PermissionManager) =
         }
 
         command("editmacro") {
+            description = "Change a macro's response message"
             expect(MacroArg, SentenceArg)
             execute {
                 val macro = it.args.component1() as Macro
@@ -76,6 +78,7 @@ fun macroCommands(permManager: PermissionManager) =
         }
 
         command("setmacrocategories") {
+            description = "Move one or many macros to a category."
             expect(SplitterArg)
             execute {
                 val splitArgs = it.args.component1() as List<String>
@@ -106,6 +109,7 @@ fun macroCommands(permManager: PermissionManager) =
         }
 
         command("renamemacro") {
+            description = "Change a macro's name, keeping the original response"
             expect(MacroArg, WordArg)
             execute {
                 val oldMacro = it.args.component1() as Macro
@@ -128,6 +132,7 @@ fun macroCommands(permManager: PermissionManager) =
         }
 
         command("removemacro") {
+            description = "Removes a macro with the given name"
             expect(MacroArg)
             execute {
                 val macro = it.args.component1() as Macro
@@ -139,6 +144,7 @@ fun macroCommands(permManager: PermissionManager) =
         }
 
         command("removemacros") {
+            description = "Removes a whole category of macros"
             expect(WordArg)
             execute {
                 val categoryName = (it.args.component1() as String).toLowerCase()
@@ -159,6 +165,7 @@ fun macroCommands(permManager: PermissionManager) =
         }
 
         command("listmacros") {
+            description = "List all of the currently available macros."
             execute {
                 val grouped = macros.values.groupBy { it.category.toLowerCase() }
 

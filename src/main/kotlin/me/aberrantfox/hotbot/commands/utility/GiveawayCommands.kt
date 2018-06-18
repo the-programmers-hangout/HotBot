@@ -32,6 +32,7 @@ private const val prizeFieldTitle = "Prize"
 @CommandSet("giveaway")
 fun giveawayCommands(log: BotLogger) = commands {
     command("giveawaystart") {
+        description = "Starts a giveaway in the channel it is invoked in."
         expect(TimeStringArg, SentenceArg)
         execute {
             val timeMilliSecs = (it.args.component1() as Double).roundToLong() * 1000
@@ -49,6 +50,7 @@ fun giveawayCommands(log: BotLogger) = commands {
     }
 
     command("giveawayend") {
+        description = "Force end a giveaway"
         expect(arg(MessageArg), arg(TextChannelArg, true, { it.channel }))
         execute {
             val message = it.args.component1() as Message
@@ -68,6 +70,7 @@ fun giveawayCommands(log: BotLogger) = commands {
     }
 
     command("giveawayreroll") {
+        description = "Reroll an ended giveaway to get a new winner"
         expect(arg(MessageArg), arg(TextChannelArg, true, { it.channel }))
         execute {
             val message = it.args.component1() as Message

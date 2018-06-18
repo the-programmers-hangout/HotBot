@@ -12,6 +12,7 @@ import java.net.URLEncoder
 @CommandSet("fun")
 fun xkcdCommands() = commands {
     command("xkcd") {
+        description = "Returns the XKCD comic number specified, or a random comic if you don't supply a number."
         expect(arg(IntegerArg, true, { randomInt(1, getAmount()) }))
         execute {
             val target = it.args.component1() as Int
@@ -28,12 +29,14 @@ fun xkcdCommands() = commands {
     }
 
     command("xkcd-latest") {
+        description = "Grabs the latest XKCD comic."
         execute {
             it.respond("https://xkcd.com/" + getAmount())
         }
     }
 
     command("xkcd-search") {
+        description = "Returns a XKCD comic that most closely matches your query."
         expect(SentenceArg)
         execute {
             val what = it.args.component1() as String

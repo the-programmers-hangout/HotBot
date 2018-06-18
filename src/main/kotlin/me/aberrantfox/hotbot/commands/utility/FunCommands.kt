@@ -17,8 +17,8 @@ import khttp.get as kget
 @CommandSet("fun")
 fun funCommands() =
     commands {
-
         command("flip") {
+            description = "Flips a coin. Optionally, print one of the choices given."
             expect(arg(SplitterArg, true, listOf("Heads", "Tails")))
             execute {
                 val options = it.args[0] as List<String>
@@ -32,7 +32,6 @@ fun funCommands() =
         command("animal") {
             description = "Shows a cute animal. Animals implemented are dog, cat, fox, bird, snake, otter and rabbit"
             expect(arg(WordArg, true, "random"))
-
             execute {
                 var animal = it.args[0] as String
 
@@ -57,6 +56,7 @@ fun funCommands() =
         }
 
         command("google") {
+            description = "google a thing"
             expect(SentenceArg)
             execute {
                 val google = "http://www.google.com/search?q="
@@ -71,6 +71,7 @@ fun funCommands() =
         }
 
         command("cowsay") {
+            description = "Displays a cowsay with a given message. Run with no arguments to get a list of valid cows."
             expect(arg(WordArg, true, {""}), arg(SentenceArg, true, {""}))
             execute {
                 val arg0 = it.args[0] as String

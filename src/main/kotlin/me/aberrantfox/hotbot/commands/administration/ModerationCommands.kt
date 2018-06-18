@@ -28,6 +28,7 @@ class ModerationCommands
 @CommandSet("moderation")
 fun moderationCommands(config: Configuration, mService: MService, manager: PermissionManager) = commands {
     command("ban") {
+        description = "Bans a member"
         expect(arg(LowerUserArg), arg(IntegerArg, true, 1), arg(SentenceArg))
         execute {
             val target = it.args.component1() as User
@@ -43,6 +44,7 @@ fun moderationCommands(config: Configuration, mService: MService, manager: Permi
     }
 
     command("nuke") {
+        description = "Delete the last 1 - 99 messages in the chat."
         expect(IntegerArg)
         execute {
             val amount = it.args.component1() as Int
@@ -53,13 +55,15 @@ fun moderationCommands(config: Configuration, mService: MService, manager: Permi
             }
 
             it.channel.history.retrievePast(amount + 1).queue { past ->
-                past.forEach { msg -> msg.delete().queue() }
+                past.drop(if (it.commandStruct.doubleInvocation) 0 else 1)
+                    .forEach { msg -> println(msg.contentRaw); msg.delete().queue() }
                 it.respond("Be nice. No spam.")
             }
         }
     }
 
     command("ignore") {
+        description = "Drop all commands from the given id (user or channel)"
         expect(WordArg)
         execute {
             val target = it.args.component1() as String
@@ -78,6 +82,7 @@ fun moderationCommands(config: Configuration, mService: MService, manager: Permi
     }
 
     command("gag") {
+        description = "Temporarily mute a user for a few minutes so that you can deal with something."
         expect(LowerUserArg)
         execute {
             val user = it.args.component1() as User
@@ -93,6 +98,7 @@ fun moderationCommands(config: Configuration, mService: MService, manager: Permi
     }
 
     command("mute") {
+        description = "Mute a member for a specified number of minutes."
         expect(LowerUserArg, TimeStringArg, SentenceArg)
         execute {
             val user = it.args.component1() as User
@@ -111,6 +117,7 @@ fun moderationCommands(config: Configuration, mService: MService, manager: Permi
     }
 
     command("lockdown") {
+        description = "Force the bot to ignore anyone who isn't the owner."
         category = "management"
         execute {
             config.security.lockDownMode = !config.security.lockDownMode
@@ -119,6 +126,7 @@ fun moderationCommands(config: Configuration, mService: MService, manager: Permi
     }
 
     command("prefix") {
+        description = "Set the bot prefix to the specified string (Cannot be a space)"
         category = "management"
         expect(WordArg)
         execute {
@@ -130,6 +138,7 @@ fun moderationCommands(config: Configuration, mService: MService, manager: Permi
     }
 
     command("setfilter") {
+        description = "Set the permission level required to run a command which contains a mention (used for mention sanitation)"
         category = "management"
         expect(PermissionLevelArg)
         execute {
@@ -140,6 +149,7 @@ fun moderationCommands(config: Configuration, mService: MService, manager: Permi
     }
 
     command("move") {
+        description = "Move every message sent by any of the users with the IDs listed found within the given search space to the specified channel."
         expect(WordArg, IntegerArg, TextChannelArg)
         execute {
             val targets = getTargets((it.args.component1() as String))
@@ -156,7 +166,8 @@ fun moderationCommands(config: Configuration, mService: MService, manager: Permi
                 return@execute
             }
 
-            it.message.delete().queue()
+            if (it.commandStruct.doubleInvocation)
+                it.message.delete().queue()
 
             it.channel.history.retrievePast(searchSpace + 1).queue { past ->
                 handleResponse(past, channel, targets, it.channel, it.author.asMention, config)
@@ -165,6 +176,7 @@ fun moderationCommands(config: Configuration, mService: MService, manager: Permi
     }
 
     command("badname") {
+        description = "Auto-nick a user with a bad name."
         expect(LowerUserArg, SentenceArg)
         execute {
             val target = it.args[0] as User
@@ -181,6 +193,7 @@ fun moderationCommands(config: Configuration, mService: MService, manager: Permi
     }
 
     command("joindate") {
+        description = "See when a member joined the guild."
         expect(UserArg)
         execute {
             val target = it.args[0] as User
@@ -196,6 +209,7 @@ fun moderationCommands(config: Configuration, mService: MService, manager: Permi
     }
 
     command("restart") {
+        description = "Restart the bot."
         execute {
             val javaBin = System.getProperty("java.home") + File.separator + "bin" + File.separator + "java"
             val currentJar = File(ModerationCommands::class.java.protectionDomain.codeSource.location.toURI())
@@ -210,6 +224,7 @@ fun moderationCommands(config: Configuration, mService: MService, manager: Permi
     }
 
     command("setbanreason") {
+        description = "Set the ban reason of someone logged who does not have a ban reason in the audit log."
         expect(UserArg, SentenceArg)
         execute {
             val target = it.args.component1() as User
@@ -221,6 +236,7 @@ fun moderationCommands(config: Configuration, mService: MService, manager: Permi
     }
 
     command("getbanreason") {
+        description = "Get the ban reason of someone logged who does not have a ban reason in the audit log."
         expect(UserArg)
         execute {
             val target = it.args.component1() as User
@@ -235,6 +251,7 @@ fun moderationCommands(config: Configuration, mService: MService, manager: Permi
     }
 
     command("note") {
+        description = "Add a note to a user's history"
         expect(LowerUserArg, SentenceArg)
         execute {
             val target = it.args.component1() as User
@@ -247,6 +264,7 @@ fun moderationCommands(config: Configuration, mService: MService, manager: Permi
     }
 
     command("removenote") {
+        description = "Removes a note by ID (listed in history)"
         expect(IntegerArg)
         execute {
             val noteId = it.args.component1() as Int
@@ -257,6 +275,7 @@ fun moderationCommands(config: Configuration, mService: MService, manager: Permi
     }
 
     command("cleansenotes") {
+        description = "Wipes all notes from a user (permanently deleted)."
         expect(LowerUserArg)
         execute {
             val target = it.args.component1() as User
@@ -267,6 +286,7 @@ fun moderationCommands(config: Configuration, mService: MService, manager: Permi
     }
 
     command("editnote") {
+        description = "Edits a note by ID (listed in history)"
         expect(IntegerArg, SentenceArg)
         execute {
             //get user id that note is placed on, use that in insertNote part. If possible, try to replace note at ID with a different note, rather than a different ID.
@@ -278,6 +298,7 @@ fun moderationCommands(config: Configuration, mService: MService, manager: Permi
     }
 
     command("badpfp") {
+        description = "Notifies the user that they should change their profile pic. If they don't do that within 30 minutes, they will be automatically banned."
         expect(LowerUserArg)
         execute {
             val user = it.args.component1() as User
@@ -302,6 +323,7 @@ fun moderationCommands(config: Configuration, mService: MService, manager: Permi
     }
 
     command("mutevoicechannel") {
+        description = "Mute all non-moderators in a voice channel."
         expect(VoiceChannelArg)
         execute {
             val voiceChannel = it.args.component1() as VoiceChannel
@@ -311,6 +333,7 @@ fun moderationCommands(config: Configuration, mService: MService, manager: Permi
     }
 
     command("unmutevoicechannel") {
+        description = "Unmute all users in a voice channel."
         expect(VoiceChannelArg)
         execute {
             val voiceChannel = it.args.component1() as VoiceChannel

@@ -30,6 +30,7 @@ object Suggestions {
 @CommandSet("suggestions")
 fun suggestionCommands(config: Configuration) = commands {
     command("suggest") {
+        description = "Send a suggestion to the pre-lim pool. Suggestions are reviewed by a mod before they are reviewed by the community."
         expect(SentenceArg)
         execute {
             val author = it.author.id
@@ -46,6 +47,7 @@ fun suggestionCommands(config: Configuration) = commands {
     }
 
     command("poolinfo") {
+        description = "Display how many suggestions are in the staging area."
         execute {
             it.respond(EmbedBuilder().setTitle("Suggestion Pool Info")
                 .setColor(Color.cyan)
@@ -55,6 +57,7 @@ fun suggestionCommands(config: Configuration) = commands {
     }
 
     command("pooltop") {
+        description = "See the suggestion in the pool next in line for review."
         execute {
             val suggestion = Suggestions.pool.peek()
             if (suggestion == null) {
@@ -67,6 +70,7 @@ fun suggestionCommands(config: Configuration) = commands {
     }
 
     command("poolaccept") {
+        description = "Move the suggestion at the top of the pool to the community review stage."
         execute {
             val suggestion = Suggestions.pool.top()
 
@@ -92,6 +96,7 @@ fun suggestionCommands(config: Configuration) = commands {
     }
 
     command("pooldeny") {
+        description = "Delete the suggestion at the top of the pool; this is for removing bad or vulgar suggestions."
         execute {
             val rejected = Suggestions.pool.top()
 
@@ -105,6 +110,7 @@ fun suggestionCommands(config: Configuration) = commands {
     }
 
     command("respond") {
+        description = "Respond to a suggestion in the community review stage. Suggestions here can be accepted or denied, must supply a reason."
         expect(WordArg, WordArg, SentenceArg)
         execute {
             val args = it.args
