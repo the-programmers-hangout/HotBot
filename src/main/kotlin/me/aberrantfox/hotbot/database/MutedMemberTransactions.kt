@@ -41,3 +41,9 @@ fun getAllMutedMembers() =
         }
         mutedMembers
     }
+
+fun isMemberMuted(user: String, guildId: String) =
+        transaction {
+            MutedMember.select {(MutedMember.member eq user) and (MutedMember.guildId eq guildId) }
+                       .count() > 0
+        }

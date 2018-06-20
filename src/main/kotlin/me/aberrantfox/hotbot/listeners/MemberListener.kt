@@ -18,6 +18,7 @@ import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.concurrent.schedule
 import me.aberrantfox.hotbot.services.UserID
+import me.aberrantfox.hotbot.utility.handleReJoinMute
 import net.dv8tion.jda.core.audit.ActionType
 
 typealias MessageID = String
@@ -42,6 +43,8 @@ class MemberListener(val configuration: Configuration, val logger: BotLogger, va
                 }
             }
         }
+
+        handleReJoinMute(event.guild, event.user, configuration, logger)
     }
 
     @Subscribe
