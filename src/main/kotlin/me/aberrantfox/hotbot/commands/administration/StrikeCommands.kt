@@ -272,23 +272,24 @@ private fun administerPunishment(config: Configuration, user: User, strikeQuanti
                 totalStrikes, config.security.strikeCeil, punishmentAction)
 
         chan.sendMessage(infractionEmbed).queue {
-            when (config.security.infractionActionMap[totalStrikes]) {
-                InfractionAction.Warn -> {
+            val action = config.security.infractionActionMap[totalStrikes]
+            when (action) {
+                is InfractionAction.Warn -> {
                     chan.sendMessage("This is your warning - Do not break the rules again.").queue()
                 }
 
-                InfractionAction.Kick -> {
+                is InfractionAction.Kick -> {
                     chan.sendMessage("You may return via this: https://discord.gg/BQN6BYE - please be mindful of the rules next time.")
                         .queue {
                             guild.controller.kick(user.id, reason).queue()
                         }
                 }
 
-                InfractionAction.Mute -> {
-                    muteMember(guild, user, 1000 * 60 * 60 * 24, "Infraction punishment.", config, moderator)
+                is InfractionAction.Mute -> {
+                    muteMember(guild, user, action.duration * 60L * 1000L, "Infraction punishment.", config, moderator)
                 }
 
-                InfractionAction.Ban -> {
+                is InfractionAction.Ban -> {
                     chan.sendMessage("Well... that happened. There may be an appeal system in the future. But for now, you're" +
                         " permanently banned. Sorry about that :) ").queue {
                         guild.controller.ban(user.id, 0, reason).queue()

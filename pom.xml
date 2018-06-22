@@ -28,6 +28,7 @@
         <joda-time.version>2.6</joda-time.version>
         <cowsay.version>1.0.3</cowsay.version>
         <gson-serializers.version>1.6.0</gson-serializers.version>
+        <gson-extra.version>0.2.1</gson-extra.version>
 
         <!-- Test Dependency Versions -->
         <junit.version>4.12</junit.version>
@@ -116,6 +117,12 @@
             <artifactId>Kutils</artifactId>
             <version>${kutils.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.danilopianini</groupId>
+            <artifactId>gson-extras</artifactId>
+            <version>${gson-extra.version}</version>
+        </dependency>
+
 
         <!-- Test Dependencies -->
         <dependency>
