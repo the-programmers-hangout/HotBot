@@ -30,7 +30,7 @@ class MessageDeleteListener(val logger: BotLogger, val manager: PermissionManage
 
         if(found != null) {
             logger.history(embed {
-                title("Message Edit")
+                title("Message Edited in ${found.channel.name}")
                 description("${event.author.asMention}(${event.author.fullName()})")
                 setColor(Color.ORANGE)
 
@@ -78,6 +78,7 @@ class MessageDeleteListener(val logger: BotLogger, val manager: PermissionManage
                     inline = false
                 }
             })
+            list.remove(found)
         }
     }
 
