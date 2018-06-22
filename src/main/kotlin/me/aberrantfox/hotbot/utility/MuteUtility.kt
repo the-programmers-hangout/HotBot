@@ -2,10 +2,13 @@ package me.aberrantfox.hotbot.utility
 
 import me.aberrantfox.hotbot.database.deleteMutedMember
 import me.aberrantfox.hotbot.database.insertMutedMember
+import me.aberrantfox.hotbot.database.isMemberMuted
 import me.aberrantfox.hotbot.permissions.PermissionManager
 import me.aberrantfox.hotbot.services.Configuration
 import me.aberrantfox.kjdautils.api.dsl.embed
+import me.aberrantfox.kjdautils.extensions.jda.fullName
 import me.aberrantfox.kjdautils.extensions.stdlib.convertToTimeString
+import me.aberrantfox.kjdautils.internal.logging.BotLogger
 import net.dv8tion.jda.core.entities.Guild
 import net.dv8tion.jda.core.entities.Member
 import net.dv8tion.jda.core.entities.User
@@ -136,3 +139,12 @@ fun removeMuteRole(guild: Guild, user: User, config: Configuration) =
                                 true)).queue()
             }
         }
+
+fun handleReJoinMute(guild: Guild, user: User, config: Configuration, log: BotLogger) {
+    if (isMemberMuted(user.id, guild.id)) {
+        log.alert("${user.fullName()} :: ${user.asMention} rejoined with a mute withstanding")
+        guild.controller.addRolesToMember(guild.getMemberById(user.id),
+                guild.getRolesByName(config.security.mutedRole, true)).queue()
+    }
+
+}
