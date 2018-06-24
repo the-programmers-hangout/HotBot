@@ -7,12 +7,15 @@ import me.aberrantfox.hotbot.permissions.PermissionManager
 import me.aberrantfox.hotbot.services.Configuration
 import me.aberrantfox.hotbot.services.MService
 import me.aberrantfox.hotbot.services.saveConfig
+import me.aberrantfox.hotbot.utility.muteMember
 import me.aberrantfox.kjdautils.api.dsl.CommandSet
+import me.aberrantfox.kjdautils.api.dsl.arg
 import me.aberrantfox.kjdautils.api.dsl.commands
 import me.aberrantfox.kjdautils.api.dsl.embed
 import me.aberrantfox.kjdautils.extensions.jda.fullName
 import me.aberrantfox.kjdautils.internal.command.arguments.SentenceArg
 import me.aberrantfox.kjdautils.internal.command.arguments.TextChannelArg
+import me.aberrantfox.kjdautils.internal.command.arguments.TimeStringArg
 import me.aberrantfox.kjdautils.internal.command.arguments.UserArg
 import me.aberrantfox.kjdautils.internal.logging.BotLogger
 import net.dv8tion.jda.core.OnlineStatus
@@ -21,6 +24,7 @@ import net.dv8tion.jda.core.entities.TextChannel
 import net.dv8tion.jda.core.entities.User
 import java.awt.Color
 import java.util.*
+import kotlin.math.roundToLong
 
 data class Properties(val version: String, val author: String)
 
@@ -193,6 +197,17 @@ fun utilCommands(mService: MService, manager: PermissionManager, config: Configu
                 setThumbnail("http://via.placeholder.com/40/${hex}?text=%20&")
             }
             it.respond(response)
+        }
+    }
+
+    command("selfmute") {
+        description = "Need to study for an hour and want no distractions? Mute yourself!"
+        expect(arg(TimeStringArg, true, "1h"))
+        execute {
+            val time = (it.args.component1() as Double).roundToLong() * 1000
+            val guild = it.jda.getGuildById(config.serverInformation.guildid)
+
+            muteMember(guild, it.author, time, "No distractions for a while? Got it", config, it.author)
         }
     }
 }
