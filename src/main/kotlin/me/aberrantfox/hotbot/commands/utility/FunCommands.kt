@@ -79,8 +79,7 @@ fun funCommands() =
 
                 it.safeRespond(when {
                     arg0.isBlank() && arg1.isBlank() -> CowsayData.validCows.joinToString (", ")
-                    arg0.isBlank() -> "```${Cowsay.say(arrayOf(arg0))}```"
-                    arg1.isBlank() -> "Message argument required"
+                    arg1.isBlank() -> "```${Cowsay.say(arrayOf(arg0))}```"
                     CowsayData.validCows.contains(arg0) -> "```${Cowsay.say(arrayOf("-f $arg0", arg1))}```"
                     else -> "```${Cowsay.say(arrayOf("$arg0 $arg1"))}```"
                 })
