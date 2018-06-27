@@ -14,7 +14,6 @@ import net.dv8tion.jda.core.entities.Role
 import net.dv8tion.jda.core.entities.User
 import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldBeGreaterThan
-import org.amshove.kluent.shouldContain
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.describe
 import org.jetbrains.spek.api.dsl.it
