@@ -56,7 +56,7 @@ fun moderationCommands(config: Configuration, mService: MService, manager: Permi
 
             it.channel.history.retrievePast(amount + 1).queue { past ->
                 past.drop(if (it.commandStruct.doubleInvocation) 0 else 1)
-                    .forEach { msg -> println(msg.contentRaw); msg.delete().queue() }
+                    .forEach { it.delete().queue() }
                 it.respond("Be nice. No spam.")
             }
         }
