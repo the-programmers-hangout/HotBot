@@ -14,8 +14,8 @@ const UserArg = Java.type("me.aberrantfox.kjdautils.internal.command.arguments.U
 const VoiceChannelArg = Java.type("me.aberrantfox.kjdautils.internal.command.arguments.VoiceChannelArg").INSTANCE
 const WordArg = Java.type("me.aberrantfox.kjdautils.internal.command.arguments.WordArg").INSTANCE
 
-const PermissionLevelArg = Java.type("me.aberrantfox.hotbot.commands.PermissionLevelArg").INSTANCE
-const MacroArg = Java.type("me.aberrantfox.hotbot.commands.MacroArg").INSTANCE
-const CategoryArg = Java.type("me.aberrantfox.hotbot.commands.CategoryArg").INSTANCE
-const LowerUserArg = Java.type("me.aberrantfox.hotbot.commands.LowerUserArg").INSTANCE
+const PermissionLevelArg = Java.type("me.aberrantfox.hotbot.arguments.PermissionLevelArg").INSTANCE
+const MacroArg = Java.type("me.aberrantfox.hotbot.arguments.MacroArg").INSTANCE
+const CategoryArg = Java.type("me.aberrantfox.hotbot.arguments.CategoryArg").INSTANCE
+const LowerUserArg = Java.type("me.aberrantfox.hotbot.arguments.LowerUserArg").INSTANCE
 

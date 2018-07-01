@@ -1,6 +1,6 @@
 package me.aberrantfox.hotbot
 
-import me.aberrantfox.hotbot.commands.LowerUserArg
+import me.aberrantfox.hotbot.arguments.LowerUserArg
 import me.aberrantfox.hotbot.commands.development.EngineContainer
 import me.aberrantfox.hotbot.commands.development.EngineContainer.setupScriptEngine
 import me.aberrantfox.hotbot.commands.utility.canUseMacro
