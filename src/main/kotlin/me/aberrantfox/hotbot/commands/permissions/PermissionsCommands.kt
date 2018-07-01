@@ -1,7 +1,7 @@
 package me.aberrantfox.hotbot.commands.permissions
 
-import me.aberrantfox.hotbot.commands.CategoryArg
-import me.aberrantfox.hotbot.commands.PermissionLevelArg
+import me.aberrantfox.hotbot.arguments.CategoryArg
+import me.aberrantfox.hotbot.arguments.PermissionLevelArg
 import me.aberrantfox.hotbot.commands.utility.macroCommandCategory
 import me.aberrantfox.hotbot.permissions.PermissionLevel
 import me.aberrantfox.hotbot.permissions.PermissionManager

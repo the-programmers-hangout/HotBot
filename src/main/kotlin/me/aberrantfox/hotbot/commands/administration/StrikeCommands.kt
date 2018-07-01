@@ -1,6 +1,6 @@
 package me.aberrantfox.hotbot.commands.administration
 
-import me.aberrantfox.hotbot.commands.LowerUserArg
+import me.aberrantfox.hotbot.arguments.LowerUserArg
 import me.aberrantfox.hotbot.database.*
 import me.aberrantfox.hotbot.services.Configuration
 import me.aberrantfox.hotbot.services.InfractionAction

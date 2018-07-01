@@ -2,7 +2,7 @@ package me.aberrantfox.hotbot.commands.utility
 
 import com.google.gson.Gson
 import khttp.post
-import me.aberrantfox.hotbot.commands.HexColourArg
+import me.aberrantfox.hotbot.arguments.HexColourArg
 import me.aberrantfox.hotbot.permissions.PermissionManager
 import me.aberrantfox.hotbot.services.Configuration
 import me.aberrantfox.hotbot.services.MService

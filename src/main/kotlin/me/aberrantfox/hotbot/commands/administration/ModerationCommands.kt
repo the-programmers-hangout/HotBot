@@ -1,7 +1,7 @@
 package me.aberrantfox.hotbot.commands.administration
 
-import me.aberrantfox.hotbot.commands.LowerUserArg
-import me.aberrantfox.hotbot.commands.PermissionLevelArg
+import me.aberrantfox.hotbot.arguments.LowerUserArg
+import me.aberrantfox.hotbot.arguments.PermissionLevelArg
 import me.aberrantfox.hotbot.database.*
 import me.aberrantfox.hotbot.permissions.PermissionManager
 import me.aberrantfox.hotbot.services.Configuration

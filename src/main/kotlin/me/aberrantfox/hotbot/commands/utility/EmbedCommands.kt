@@ -1,6 +1,6 @@
 package me.aberrantfox.hotbot.commands.utility
 
-import me.aberrantfox.hotbot.commands.HexColourArg
+import me.aberrantfox.hotbot.arguments.HexColourArg
 import me.aberrantfox.kjdautils.api.dsl.CommandSet
 import me.aberrantfox.kjdautils.api.dsl.arg
 import me.aberrantfox.kjdautils.api.dsl.commands

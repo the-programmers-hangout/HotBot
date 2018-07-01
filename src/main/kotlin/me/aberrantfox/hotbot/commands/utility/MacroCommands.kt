@@ -2,7 +2,7 @@ package me.aberrantfox.hotbot.commands.utility
 
 import com.github.salomonbrys.kotson.fromJson
 import com.google.gson.Gson
-import me.aberrantfox.hotbot.commands.MacroArg
+import me.aberrantfox.hotbot.arguments.MacroArg
 import me.aberrantfox.hotbot.permissions.PermissionLevel
 import me.aberrantfox.hotbot.permissions.PermissionManager
 import me.aberrantfox.hotbot.services.configPath

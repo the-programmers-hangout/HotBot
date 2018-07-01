@@ -1,7 +1,7 @@
 package me.aberrantfox.hotbot.commands.permissions
 
 import com.google.gson.Gson
-import me.aberrantfox.hotbot.commands.LowerUserArg
+import me.aberrantfox.hotbot.arguments.LowerUserArg
 import me.aberrantfox.hotbot.services.Configuration
 import me.aberrantfox.hotbot.services.configPath
 import me.aberrantfox.kjdautils.api.dsl.CommandEvent
@@ -9,7 +9,6 @@ import me.aberrantfox.kjdautils.api.dsl.CommandSet
 import me.aberrantfox.kjdautils.api.dsl.commands
 import me.aberrantfox.kjdautils.extensions.jda.fullName
 import me.aberrantfox.kjdautils.internal.command.arguments.RoleArg
-import me.aberrantfox.kjdautils.internal.command.arguments.UserArg
 import net.dv8tion.jda.core.entities.Guild
 import net.dv8tion.jda.core.entities.Role
 import net.dv8tion.jda.core.entities.User
