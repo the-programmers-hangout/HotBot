@@ -8,8 +8,11 @@ import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.concurrent.timerTask
 
+const val secondUnit = 1000
+const val minuteUnit = 60 * secondUnit
+const val hourUnit = 60 * minuteUnit
 
-open class IdTracker<T>(val trackTime: Int, val timeUnit: Int = 60) {
+open class IdTracker<T>(val trackTime: Int, val timeUnit: Int = hourUnit) {
     val map: ConcurrentHashMap<String, T> = ConcurrentHashMap()
 
     fun clear() = map.clear()
@@ -22,12 +25,12 @@ open class IdTracker<T>(val trackTime: Int, val timeUnit: Int = 60) {
     }
 
     private fun scheduleExit(key: String) =
-        Timer().schedule(timerTask {
+        Timer(true).schedule(timerTask {
             map.remove(key)
-        }, (trackTime * 1000 * 60 * timeUnit).toLong())
+        }, (trackTime  * timeUnit).toLong())
 }
 
-class DateTracker(trackTime: Int) : IdTracker<DateTime>(trackTime) {
+class DateTracker(trackTime: Int, timeUnit: Int = hourUnit) : IdTracker<DateTime>(trackTime, timeUnit) {
     fun pastMins(min: Int) =
         map.filterKeys {
             map[it]!!.isAfter(DateTime.now().minus(Minutes.minutes(min)))

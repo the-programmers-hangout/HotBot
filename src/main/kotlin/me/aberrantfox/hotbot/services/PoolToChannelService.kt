@@ -3,7 +3,6 @@ package me.aberrantfox.hotbot.services
 import com.fatboyindustrial.gsonjodatime.Converters
 import com.google.common.reflect.TypeToken
 import com.google.gson.GsonBuilder
-import me.aberrantfox.hotbot.extensions.stdlib.retrieveIdToName
 import net.dv8tion.jda.core.EmbedBuilder
 import net.dv8tion.jda.core.JDA
 import net.dv8tion.jda.core.entities.MessageEmbed
@@ -17,7 +16,7 @@ import java.util.*
 data class PoolRecord(val sender: String, val dateTime: DateTime, val message: String, val avatarURL: String) {
     fun describe(jda: JDA, datumName: String): MessageEmbed =
         EmbedBuilder()
-            .setTitle("$datumName by ${sender.retrieveIdToName(jda)}")
+            .setTitle("$datumName by ${jda.retrieveUserById(sender).complete().name}")
             .setDescription(message)
             .addField("Time of Creation", formatConstructionDate(), false)
             .addField("Member ID", sender, false)
@@ -25,7 +24,7 @@ data class PoolRecord(val sender: String, val dateTime: DateTime, val message: S
 
     fun prettyPrint(jda: JDA, datumName: String): EmbedBuilder =
         EmbedBuilder()
-            .setTitle("${sender.retrieveIdToName(jda)}'s $datumName")
+            .setTitle("${jda.retrieveUserById(sender).complete().name}'s $datumName")
             .addField("Time of Creation", formatConstructionDate(), false)
             .addField("Content", message, false)
             .setThumbnail(avatarURL)

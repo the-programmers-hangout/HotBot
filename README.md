@@ -39,7 +39,7 @@ Read the JavaScript code below (Please note, ES 5.1 syntax for now):
 const command = createCommand("jsecho")
 
 //state that in order to use the command, the user must provide some arguments, e.g. ++jsecho Hi there, this is a test!
-command.expect(argType.Sentence)
+command.expect(SentenceArg)
 
 //Provide a function that is called when the command is executed (It is passed a CommandEvent)
 command.execute((event) => {

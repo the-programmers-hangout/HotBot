@@ -1,13 +1,14 @@
 package me.aberrantfox.hotbot.listeners
 
-import me.aberrantfox.hotbot.commandframework.commands.utility.Polls
-import me.aberrantfox.hotbot.commandframework.commands.utility.emoteMap
+import com.google.common.eventbus.Subscribe
+import me.aberrantfox.hotbot.commands.utility.Polls
+import me.aberrantfox.hotbot.commands.utility.emoteMap
 import net.dv8tion.jda.core.events.message.react.MessageReactionAddEvent
-import net.dv8tion.jda.core.hooks.ListenerAdapter
 
 
-class PollListener : ListenerAdapter() {
-    override fun onMessageReactionAdd(e: MessageReactionAddEvent) {
+class PollListener {
+    @Subscribe
+    fun onMessageReactionAdd(e: MessageReactionAddEvent) {
         if(e.user.id == e.jda.selfUser.id) {
             return
         }

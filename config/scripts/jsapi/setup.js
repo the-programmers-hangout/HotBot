@@ -1,8 +1,7 @@
-const argType = Java.type("me.aberrantfox.hotbot.commandframework.parsing.ArgumentType")
 const listener = Java.type("net.dv8tion.jda.core.hooks.ListenerAdapter")
 const EventListener = Java.extend(listener)
 const urlUtilities = Java.type("me.aberrantfox.hotbot.javautilities.UrlUtilities")
-const ArgumentTypeArray = Java.type("me.aberrantfox.hotbot.commandframework.parsing.ArgumentType[]")
+const ArgumentTypeArray = Java.type("me.aberrantfox.kjdautils.internal.command.ArgumentType[]")
 
 function createCommand(name) {
     return container.command(name, function(){})
@@ -30,12 +29,14 @@ function registerCommand(definition) {
     if(definition.expect && typeof definition.expect === "object") {
         command.expect(Java.to(definition.expect, ArgumentTypeArray))
     }
-    
-    command.execute = definition.execute
 
-    if(definition.help) {
-        help.add(definition.help.name, definition.help.description, definition.help.category, definition.help.structure, definition.help.example)
+    if (definition.description && typeof definition.description === "string") {
+        command.description = definition.description
     }
-}
 
-const log = container.log
+    command.category = (definition.category && typeof definition.category === "string")
+                        ? definition.category
+                        : "uncategorized"
+
+    command.execute = definition.execute
+}

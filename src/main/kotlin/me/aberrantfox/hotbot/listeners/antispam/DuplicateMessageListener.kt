@@ -1,22 +1,23 @@
 package me.aberrantfox.hotbot.listeners.antispam
 
-import me.aberrantfox.hotbot.commandframework.commands.administration.SecurityLevelState
-import me.aberrantfox.hotbot.extensions.jda.descriptor
-import me.aberrantfox.hotbot.extensions.jda.fullName
-import me.aberrantfox.hotbot.extensions.jda.isImagePost
-import me.aberrantfox.hotbot.logging.BotLogger
+import com.google.common.eventbus.Subscribe
+import me.aberrantfox.hotbot.commands.administration.SecurityLevelState
 import me.aberrantfox.hotbot.services.*
 import me.aberrantfox.hotbot.utility.permMuteMember
+import me.aberrantfox.kjdautils.extensions.jda.descriptor
+import me.aberrantfox.kjdautils.extensions.jda.isImagePost
+import me.aberrantfox.kjdautils.internal.logging.BotLogger
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent
-import net.dv8tion.jda.core.hooks.ListenerAdapter
 import org.joda.time.DateTime
 
 object MutedRaiders {
     val set = PersistentSet(configPath("raiders.json"))
 }
 
-class DuplicateMessageListener (val config: Configuration, val log: BotLogger, val tracker: MessageTracker) : ListenerAdapter() {
-    override fun onGuildMessageReceived(event: GuildMessageReceivedEvent) {
+class DuplicateMessageListener (val config: Configuration, val log: BotLogger, val tracker: MessageTracker) {
+
+    @Subscribe
+    fun onGuildMessageReceived(event: GuildMessageReceivedEvent) {
         if(event.message.isImagePost()) return
 
         val time = DateTime.now()
@@ -62,7 +63,7 @@ class DuplicateMessageListener (val config: Configuration, val log: BotLogger, v
 
         tracker.list(id)?.forEach { it.message.delete().queue() }
 
-        log.warning("${event.author.descriptor()} was muted for $reason")
+        log.alert("${event.author.descriptor()} was muted for $reason")
         tracker.removeUser(id)
     }
 }

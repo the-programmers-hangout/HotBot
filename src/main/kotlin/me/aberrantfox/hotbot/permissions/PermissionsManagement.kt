@@ -4,8 +4,8 @@ import com.google.gson.GsonBuilder
 import kotlinx.coroutines.experimental.CommonPool
 import kotlinx.coroutines.experimental.Job
 import kotlinx.coroutines.experimental.launch
-import me.aberrantfox.hotbot.dsls.command.CommandsContainer
 import me.aberrantfox.hotbot.services.Configuration
+import me.aberrantfox.kjdautils.api.dsl.CommandsContainer
 import net.dv8tion.jda.core.JDA
 import net.dv8tion.jda.core.entities.Role
 import net.dv8tion.jda.core.entities.User
@@ -23,10 +23,14 @@ enum class PermissionLevel {
     }
 }
 
-data class PermissionsConfiguration(val permissions: HashMap<String, PermissionLevel> = HashMap(),
-                                    val roleMappings: HashMap<String, PermissionLevel> = HashMap())
+data class ChannelPermission (var command: PermissionLevel = PermissionLevel.Everyone,
+                              var mention: PermissionLevel = PermissionLevel.Everyone)
 
-open class PermissionManager(val jda: JDA, val container: CommandsContainer, val botConfig: Configuration,
+data class PermissionsConfiguration(val permissions: HashMap<String, PermissionLevel> = HashMap(),
+                                    val roleMappings: HashMap<String, PermissionLevel> = HashMap(),
+                                    val channelIgnoreLevels: HashMap<String, ChannelPermission> = HashMap())
+
+open class PermissionManager(val jda: JDA, val botConfig: Configuration,
                              permissionsConfigurationLocation: String = "config/permissions.json") {
 
     private val gson = GsonBuilder().setPrettyPrinting().create()
@@ -40,12 +44,16 @@ open class PermissionManager(val jda: JDA, val container: CommandsContainer, val
             PermissionsConfiguration()
         }
 
+        launch(CommonPool) { save() }
+    }
+
+    fun setDefaultPermissions(container: CommandsContainer): Job {
         container.commands
                 .map { it.key.toLowerCase() }
                 .filter { !(permissionsConfig.permissions.containsKey(it)) }
                 .forEach { permissionsConfig.permissions[it] = PermissionLevel.Administrator }
 
-        launch(CommonPool) { save() }
+        return launch(CommonPool) { save() }
     }
 
     fun save() = permissionsFile.writeText(gson.toJson(permissionsConfig))
@@ -61,6 +69,28 @@ open class PermissionManager(val jda: JDA, val container: CommandsContainer, val
 
     fun canUseCommand(user: User, command: String) = getPermissionLevel(user) >= permissionsConfig.permissions[command.toLowerCase()] ?: PermissionLevel.Owner
 
+    fun setChannelCommandIgnore(channelId: String, level: PermissionLevel): Job {
+        val channelPerm = permissionsConfig.channelIgnoreLevels[channelId] ?: ChannelPermission()
+        channelPerm.command = level
+        permissionsConfig.channelIgnoreLevels[channelId] = channelPerm
+        return launch(CommonPool) { save() }
+    }
+
+    fun setChannelMentionIgnore(channelId: String, level: PermissionLevel): Job {
+        val channelPerm = permissionsConfig.channelIgnoreLevels[channelId] ?: ChannelPermission()
+        channelPerm.mention = level
+        permissionsConfig.channelIgnoreLevels[channelId] = channelPerm
+        return launch(CommonPool) { save() }
+    }
+
+    fun allChannelIgnoreLevels() = permissionsConfig.channelIgnoreLevels.toMap()
+
+    fun canUseCommandInChannel(user: User, channelId: String)
+            = getPermissionLevel(user) >= permissionsConfig.channelIgnoreLevels[channelId]?.command ?: PermissionLevel.Everyone
+
+    fun canUseCleverbotInChannel(user: User, channelId: String)
+            = getPermissionLevel(user) >= permissionsConfig.channelIgnoreLevels[channelId]?.mention ?: PermissionLevel.Everyone
+
     fun listAvailableCommands(user: User) = permissionsConfig.permissions
             .filter { it.value <= getPermissionLevel(user) }
             .map { it.key }
@@ -71,7 +101,9 @@ open class PermissionManager(val jda: JDA, val container: CommandsContainer, val
         return launch(CommonPool) { save() }
     }
 
-    fun roleAssignemts() = permissionsConfig.roleMappings.entries
+    fun roleAssignments() = permissionsConfig.roleMappings.entries
+
+    fun compareUsers(userA: User, userB: User) = getPermissionLevel(userA).compareTo(getPermissionLevel(userB))
 
     private fun getPermissionLevel(user: User): PermissionLevel {
         if (botConfig.serverInformation.ownerID == user.id) return PermissionLevel.Owner

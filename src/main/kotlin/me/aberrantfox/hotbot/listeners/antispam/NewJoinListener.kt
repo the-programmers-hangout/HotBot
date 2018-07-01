@@ -1,20 +1,21 @@
 package me.aberrantfox.hotbot.listeners.antispam
 
 
-import me.aberrantfox.hotbot.extensions.stdlib.retrieveIdToName
+import com.google.common.eventbus.Subscribe
 import me.aberrantfox.hotbot.services.DateTracker
+import me.aberrantfox.hotbot.services.hourUnit
 import net.dv8tion.jda.core.JDA
 import net.dv8tion.jda.core.events.guild.member.GuildMemberJoinEvent
-import net.dv8tion.jda.core.hooks.ListenerAdapter
 import org.joda.time.DateTime
 
 object NewPlayers {
-    val cache = DateTracker(12)
-    fun names(jda: JDA) = cache.keyList().map { it.retrieveIdToName(jda) }
+    val cache = DateTracker(12, hourUnit)
+    fun names(jda: JDA) = cache.keyList().map { jda.retrieveUserById(it).complete().name }
 }
 
-class NewJoinListener : ListenerAdapter() {
-    override fun onGuildMemberJoin(event: GuildMemberJoinEvent) {
+class NewJoinListener  {
+    @Subscribe
+    fun onGuildMemberJoin(event: GuildMemberJoinEvent) {
         NewPlayers.cache.put(event.user.id, DateTime.now())
     }
 }

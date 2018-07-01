@@ -2,12 +2,13 @@ package me.aberrantfox.hotbot.utility
 
 import me.aberrantfox.hotbot.database.deleteMutedMember
 import me.aberrantfox.hotbot.database.insertMutedMember
-import me.aberrantfox.hotbot.dsls.embed.embed
-import me.aberrantfox.hotbot.extensions.jda.getHighestRole
-import me.aberrantfox.hotbot.extensions.stdlib.convertToTimeString
-import me.aberrantfox.hotbot.permissions.PermissionLevel
+import me.aberrantfox.hotbot.database.isMemberMuted
 import me.aberrantfox.hotbot.permissions.PermissionManager
 import me.aberrantfox.hotbot.services.Configuration
+import me.aberrantfox.kjdautils.api.dsl.embed
+import me.aberrantfox.kjdautils.extensions.jda.fullName
+import me.aberrantfox.kjdautils.extensions.stdlib.convertToTimeString
+import me.aberrantfox.kjdautils.internal.logging.BotLogger
 import net.dv8tion.jda.core.entities.Guild
 import net.dv8tion.jda.core.entities.Member
 import net.dv8tion.jda.core.entities.User
@@ -31,8 +32,7 @@ fun permMuteMember(guild: Guild, user: User, reason: String, config: Configurati
     }
 }
 
-fun muteMember(guild: Guild, user: User, time: Long, reason: String,
-               config: Configuration, moderator: User) {
+fun muteMember(guild: Guild, user: User, time: Long, reason: String, config: Configuration, moderator: User) {
     guild.controller.addRolesToMember(guild.getMemberById(user.id),
             guild.getRolesByName(config.security.mutedRole, true)).queue()
     val timeString = time.convertToTimeString()
@@ -78,11 +78,12 @@ fun unmuteVoiceChannel(guild: Guild, voiceChannel: VoiceChannel, moderator: User
     }
 }
 
-private fun buildMuteEmbed(userMention: String, timeString: String,
-                           reason: String) = embed {
+private fun buildMuteEmbed(userMention: String, timeString: String, reason: String) = embed {
     title("Mute")
-    description(
-            "$userMention, you have been muted.\nA muted user cannot speak, post in channels, or react to messages.")
+    description("""
+                    | $userMention, you have been muted. A muted user cannot speak/post in channels.
+                    | If you believe this to be in error, please contact a staff member.
+                """.trimMargin())
 
     field {
         name = "Length"
@@ -127,12 +128,22 @@ fun removeMuteRole(guild: Guild, user: User, config: Configuration,
 
 fun removeMuteRole(guild: Guild, user: User, config: Configuration) =
         user.openPrivateChannel().queue {
-            it.sendMessage(
-                    "${user.name} - you have been unmuted. Please respect our rules to prevent further infractions.")
-                    .queue {
-                        guild.controller.removeRolesFromMember(
-                                guild.getMemberById(user.id),
-                                guild.getRolesByName(config.security.mutedRole,
-                                        true)).queue()
-                    }
+            it.sendMessage(embed {
+                setTitle("${user.name} - you have been unmuted.")
+                setColor(Color.RED)
+            }).queue {
+                guild.controller.removeRolesFromMember(
+                        guild.getMemberById(user.id),
+                        guild.getRolesByName(config.security.mutedRole,
+                                true)).queue()
+            }
         }
+
+fun handleReJoinMute(guild: Guild, user: User, config: Configuration, log: BotLogger) {
+    if (isMemberMuted(user.id, guild.id)) {
+        log.alert("${user.fullName()} :: ${user.asMention} rejoined with a mute withstanding")
+        guild.controller.addRolesToMember(guild.getMemberById(user.id),
+                guild.getRolesByName(config.security.mutedRole, true)).queue()
+    }
+
+}
