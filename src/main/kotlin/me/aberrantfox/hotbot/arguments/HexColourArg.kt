@@ -16,7 +16,11 @@ object HexColourArg : ArgumentType {
 
         val hex = if (arg.length == 7) arg.substring(1) else arg
         return try {
-            ArgumentResult.Single(hex.toInt(16))
+            val int = hex.toInt(16)
+            when {
+                int >= 0 -> ArgumentResult.Single(int)
+                else -> ArgumentResult.Error("Last I checked, hex colors are positive")
+            }
         } catch (e: NumberFormatException) {
             ArgumentResult.Error("Invalid colour argument.")
         }
