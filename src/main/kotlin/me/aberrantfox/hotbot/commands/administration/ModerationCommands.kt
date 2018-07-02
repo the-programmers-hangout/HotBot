@@ -50,8 +50,8 @@ fun moderationCommands(config: Configuration, mService: MService, manager: Permi
             val users = (it.args.component2() as List<User>).map { it.id }
             val amount = it.args.component3() as Int
 
-            if (amount !in 1..99) {
-                it.respond("You can only nuke between 1 and 99 messages")
+            if (amount !in 2..99) {
+                it.respond("You can only nuke between 2 and 99 messages")
                 return@execute
             }
 
@@ -156,9 +156,9 @@ fun moderationCommands(config: Configuration, mService: MService, manager: Permi
 
     command("move") {
         description = "Move every message sent by any of the users with the IDs listed found within the given search space to the specified channel."
-        expect(WordArg, IntegerArg, TextChannelArg)
+        expect(MultipleArg(UserArg), IntegerArg, TextChannelArg)
         execute {
-            val targets = getTargets((it.args.component1() as String))
+            val targets = it.args.component1() as List<User>
             val searchSpace = it.args.component2() as Int
             val channel = it.args.component3() as TextChannel
 
@@ -176,7 +176,7 @@ fun moderationCommands(config: Configuration, mService: MService, manager: Permi
                 it.message.delete().queue()
 
             it.channel.history.retrievePast(searchSpace + 1).queue { past ->
-                handleResponse(past, channel, targets, it.channel, it.author.asMention, config)
+                handleResponse(past, channel, targets, it.channel as TextChannel, it.author.asMention, config)
             }
         }
     }
@@ -349,13 +349,14 @@ fun moderationCommands(config: Configuration, mService: MService, manager: Permi
     }
 }
 
-private fun handleResponse(past: List<Message>, channel: MessageChannel, targets: List<String>, error: MessageChannel,
+private fun handleResponse(past: List<Message>, channel: TextChannel, targets: List<User>, sourceChannel: TextChannel,
                            source: String, config: Configuration) {
 
 
+    val targetIDs = targets.map { it.id }
     val messages = if (past.firstOrNull()?.isCommandInvocation(KJDAConfiguration(prefix=config.serverInformation.prefix)) == true)
                        // Without ++move command invocation message
-                       past.subList(1, past.size).filter { targets.contains(it.author.id)}
+                       past.subList(1, past.size).filter { it.author.id in targetIDs }
                    else
                        /*
                        Without extra message that could've been the ++move message but wasn't.
@@ -363,18 +364,23 @@ private fun handleResponse(past: List<Message>, channel: MessageChannel, targets
                        causing the possibility but not guarantee of the ++move command invocation being
                        included in the past List.
                        */
-                       past.subList(0, past.size - 1).filter {targets.contains(it.author.id)}
+                       past.subList(0, past.size - 1).filter { it.author.id in targetIDs }
 
     if (messages.isEmpty()) {
-        error.sendMessage("No messages found").queue()
+        sourceChannel.sendMessage("No messages found").queue()
         return
     }
 
-    val responseEmbed = buildResponseEmbed(error, source, messages)
+    val responseEmbed = buildResponseEmbed(sourceChannel, source, messages)
 
     channel.sendMessage(responseEmbed).queue {
-        messages.forEach {
-            it.delete().queue()
+        if (messages.size == 1)
+            messages.first().delete().queue()
+        else
+            sourceChannel.deleteMessages(messages).queue()
+
+        targets.forEach {
+            it.sendPrivateMessage("Your messages have been moved to ${channel.asMention}")
         }
     }
 }
@@ -410,9 +416,3 @@ private fun buildResponseEmbed(orig: MessageChannel, sourceMod: String, messages
             setColor(Color.CYAN)
         }
 
-private fun getTargets(msg: String): List<String> =
-    if (msg.contains(",")) {
-        msg.split(",")
-    } else {
-        listOf(msg)
-    }
