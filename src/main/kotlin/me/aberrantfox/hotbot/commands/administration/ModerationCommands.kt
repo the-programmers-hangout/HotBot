@@ -1,7 +1,6 @@
 package me.aberrantfox.hotbot.commands.administration
 
-import me.aberrantfox.hotbot.arguments.LowerUserArg
-import me.aberrantfox.hotbot.arguments.PermissionLevelArg
+import me.aberrantfox.hotbot.arguments.*
 import me.aberrantfox.hotbot.database.*
 import me.aberrantfox.hotbot.permissions.PermissionManager
 import me.aberrantfox.hotbot.services.Configuration
@@ -44,20 +43,27 @@ fun moderationCommands(config: Configuration, mService: MService, manager: Permi
     }
 
     command("nuke") {
-        description = "Delete the last 1 - 99 messages in the chat."
-        expect(IntegerArg)
+        description = "Delete up to 99 last messages in the channel. Default channel will the one invoked on. If a number of users are given, their messages will be deleted in the given search space"
+        expect(arg(TextChannelArg, optional = true, default = { it.channel }), arg(MultipleArg(UserArg), optional = true), arg(IntegerArg))
         execute {
-            val amount = it.args.component1() as Int
+            val channel = it.args.component1() as TextChannel
+            val users = (it.args.component2() as List<User>).map { it.id }
+            val amount = it.args.component3() as Int
 
             if (amount !in 1..99) {
                 it.respond("You can only nuke between 1 and 99 messages")
                 return@execute
             }
 
-            it.channel.history.retrievePast(amount + 1).queue { past ->
-                past.drop(if (it.commandStruct.doubleInvocation) 0 else 1)
-                    .forEach { it.delete().queue() }
-                it.respond("Be nice. No spam.")
+            val sameChannel = it.channel.id == channel.id
+            channel.history.retrievePast(amount + if (sameChannel) 1 else 0).queue { past ->
+                channel.deleteMessagesByIds(past.drop(if (sameChannel && it.commandStruct.doubleInvocation) 0 else 1)
+                        .filter { users.isEmpty() || it.author.id in users }
+                        .map { it.id }).queue()
+
+                channel.sendMessage("Be nice. No spam.").queue()
+                if (!sameChannel)
+                    it.respond("$amount messages deleted.")
             }
         }
     }
