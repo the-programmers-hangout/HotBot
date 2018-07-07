@@ -61,7 +61,7 @@ object PermissionSpec : Spek({
     describe("Permission Manager") {
         val manager = PermissionManager(TestData.jdaMock, TestData.config, TestData.permsFilePath)
         beforeGroup {
-            manager.setDefaultPermissions(TestData.container)
+            manager.defaultAndPrunePermissions(TestData.container)
             runBlocking { manager.setPermission(TestData.commandName, PermissionLevel.JrMod).join() }
             manager.assignRoleLevel(TestData.modRole, PermissionLevel.Moderator)
         }

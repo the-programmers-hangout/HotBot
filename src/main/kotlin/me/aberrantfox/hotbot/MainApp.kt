@@ -48,7 +48,7 @@ private fun start(config: Configuration) = startBot(config.serverInformation.tok
 
     setupMacroCommands(container, manager)
 
-    manager.setDefaultPermissions(container)
+    manager.defaultAndPrunePermissions(container)
     val failsBecause: (String?, Boolean) -> PreconditionResult = { reason, condition -> if (condition) Pass else Fail(reason) }
     val commandName: (CommandEvent) -> String = { it.commandStruct.commandName.toLowerCase() }
 

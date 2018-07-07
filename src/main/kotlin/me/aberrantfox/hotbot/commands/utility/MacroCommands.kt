@@ -181,6 +181,7 @@ fun addMacro(macro: Macro, container: CommandsContainer, manager: PermissionMana
 fun removeMacro(macro: Macro, container: CommandsContainer, manager: PermissionManager) {
     macros.remove(macro.name)
     container.commands.remove(macro.name)
+    manager.removePermissions(macro.name)
     CommandRecommender.removePossibility(macro.name)
 }
 
