@@ -2,7 +2,9 @@ package me.aberrantfox.hotbot.commands.utility
 
 import com.github.salomonbrys.kotson.fromJson
 import com.google.gson.Gson
+import me.aberrantfox.hotbot.arguments.CategoryArg
 import me.aberrantfox.hotbot.arguments.MacroArg
+import me.aberrantfox.hotbot.arguments.MultipleArg
 import me.aberrantfox.hotbot.permissions.PermissionLevel
 import me.aberrantfox.hotbot.permissions.PermissionManager
 import me.aberrantfox.hotbot.services.configPath
@@ -79,25 +81,12 @@ fun macroCommands(permManager: PermissionManager) =
 
         command("setmacrocategories") {
             description = "Move one or many macros to a category."
-            expect(SplitterArg)
+            expect(MultipleArg(MacroArg), WordArg)
             execute {
-                val splitArgs = it.args.component1() as List<String>
+                val macroArgs = it.args.component1() as List<Macro>
+                val newCategory = it.args.component2() as String
 
-                if (splitArgs.size > 2) {
-                    return@execute it.respond("Too many arguments passed. Pass macros and a category only.")
-                }
-
-                val macroArgs = splitArgs.firstOrNull()?.trim()?.split(' ')
-                        ?: return@execute it.respond("Must pass at least one macro")
-
-                val newCategory = splitArgs.getOrNull(1)?.toLowerCase()?.trim()
-                        ?: return@execute it.respond("Must pass a category.")
-
-                macroArgs.map { it.toLowerCase() }
-                         .forEach { arg ->
-                             val macro = macros[arg]
-                                     ?: return@execute it.safeRespond("Couldn't find macro: $arg")
-
+                macroArgs.forEach { macro ->
                              removeMacro(macro, it.container, permManager)
                              addMacro(macro.copy(category=newCategory), it.container, permManager)
                          }
@@ -192,6 +181,7 @@ fun addMacro(macro: Macro, container: CommandsContainer, manager: PermissionMana
 fun removeMacro(macro: Macro, container: CommandsContainer, manager: PermissionManager) {
     macros.remove(macro.name)
     container.commands.remove(macro.name)
+    manager.removePermissions(macro.name)
     CommandRecommender.removePossibility(macro.name)
 }
 

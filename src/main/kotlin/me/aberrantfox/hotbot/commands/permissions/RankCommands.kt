@@ -9,6 +9,7 @@ import me.aberrantfox.kjdautils.api.dsl.CommandSet
 import me.aberrantfox.kjdautils.api.dsl.commands
 import me.aberrantfox.kjdautils.extensions.jda.fullName
 import me.aberrantfox.kjdautils.internal.command.arguments.RoleArg
+import me.aberrantfox.kjdautils.internal.command.arguments.WordArg
 import net.dv8tion.jda.core.entities.Guild
 import net.dv8tion.jda.core.entities.Role
 import net.dv8tion.jda.core.entities.User
@@ -96,12 +97,11 @@ fun rankCommands(config: Configuration) = commands {
 
     command("makeroleungrantable") {
         description = "Disallow granting of this role"
-        expect(RoleArg)
+        expect(WordArg)
         execute {
-            val role = it.args.component1() as Role
-            val roleName = role.name
+            val roleName = (it.args.component1() as String).toLowerCase()
 
-            if (!(RankContainer.canUse(roleName))) {
+            if (!RankContainer.canUse(roleName)) {
                 it.respond("Error: a role with that name hasn't been made grantable or doesn't exist")
                 return@execute
             }

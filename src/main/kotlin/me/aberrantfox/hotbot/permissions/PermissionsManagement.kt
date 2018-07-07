@@ -47,16 +47,24 @@ open class PermissionManager(val jda: JDA, val botConfig: Configuration,
         launch(CommonPool) { save() }
     }
 
-    fun setDefaultPermissions(container: CommandsContainer): Job {
-        container.commands
-                .map { it.key.toLowerCase() }
-                .filter { !(permissionsConfig.permissions.containsKey(it)) }
+    fun defaultAndPrunePermissions(container: CommandsContainer): Job {
+        val commandNames = container.commands.map { it.key.toLowerCase() }
+
+        commandNames.filter { !(permissionsConfig.permissions.containsKey(it)) }
                 .forEach { permissionsConfig.permissions[it] = PermissionLevel.Administrator }
+
+        permissionsConfig.permissions.filterKeys { it !in commandNames }.
+                forEach{ permissionsConfig.permissions.remove(it.key) }
 
         return launch(CommonPool) { save() }
     }
 
-    fun save() = permissionsFile.writeText(gson.toJson(permissionsConfig))
+    fun removePermissions(command: String) {
+        permissionsConfig.permissions.remove(command)
+        launch(CommonPool) { save() }
+    }
+
+    fun save() = synchronized(permissionsFile) { permissionsFile.writeText(gson.toJson(permissionsConfig)) }
 
     fun setPermission(command: String, level: PermissionLevel): Job {
         permissionsConfig.permissions[command.toLowerCase()] = level
