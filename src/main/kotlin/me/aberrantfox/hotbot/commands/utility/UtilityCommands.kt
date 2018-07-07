@@ -59,18 +59,22 @@ fun utilCommands(mService: MService, manager: PermissionManager, config: Configu
                 setThumbnail(it.jda.selfUser.effectiveAvatarUrl)
 
                 field {
-                    name = "Author"
+                    name = "Creator"
                     value = "Fox#0001"
                     inline = false
                 }
                 field {
+                    name = "Contributors"
+                    value = "JoshTheWall#3698, Moe#9999, Sudonym#8623"
+                }
+                field {
                     name = "Technologies"
-                    value = "Kotlin, JDA, SQL, Maven"
+                    value = "Built with Kotlin us KUtils and JDA"
                     inline = false
                 }
                 field {
                     name = "Repository link"
-                    value = "https://github.com/AberrantFox/hotbot"
+                    value = "https://gitlab.com/AberrantFox/hotbot"
                     inline = false
                 }
             })
