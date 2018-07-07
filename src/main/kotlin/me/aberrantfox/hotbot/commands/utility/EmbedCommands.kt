@@ -1,6 +1,7 @@
 package me.aberrantfox.hotbot.commands.utility
 
 import me.aberrantfox.hotbot.arguments.HexColourArg
+import me.aberrantfox.hotbot.commands.utility.EHolder.message
 import me.aberrantfox.kjdautils.api.dsl.CommandSet
 import me.aberrantfox.kjdautils.api.dsl.arg
 import me.aberrantfox.kjdautils.api.dsl.commands
@@ -11,8 +12,10 @@ import me.aberrantfox.kjdautils.internal.command.arguments.*
 import net.dv8tion.jda.core.EmbedBuilder
 import net.dv8tion.jda.core.entities.Message
 import net.dv8tion.jda.core.entities.MessageEmbed
+import net.dv8tion.jda.core.entities.TextChannel
 import net.dv8tion.jda.core.entities.User
 import java.time.Instant
+import java.util.function.Consumer
 
 private object EHolder {
     var embed: EmbedBuilder = EmbedBuilder()
@@ -77,19 +80,29 @@ fun embedCommands() =
 
         command("copyembed") {
             description = "Copies the embed from the message with the given id into the embed builder. The channelId from which to get the embed is optional and will default to the one you invoked the command in."
-            expect(arg(MessageArg),
-                   arg(TextChannelArg, optional = true, default = { it.channel }))
+            expect(arg(WordArg), arg(TextChannelArg, optional = true, default = { it.channel }))
             execute {
-                val message = it.args.component1() as Message
+                val messageID = it.args.component1() as String
+                val channel = it.args.component2() as TextChannel
 
-                val embed = message.embeds.firstOrNull()
-                if (embed == null) {
-                    it.respond("Message doesn't contain any embeds")
-                    return@execute
+                val success = Consumer<Message> { msg ->
+                    val embed = msg.embeds.firstOrNull()
+                    if (embed == null) {
+                        it.respond("Message doesn't contain any embeds")
+                        return@Consumer
+                    }
+
+                    EHolder.embed = EmbedBuilder(embed)
+                    EHolder.message = msg
                 }
 
-                EHolder.embed = EmbedBuilder(embed)
-                EHolder.message = message
+                val failure = Consumer<Throwable> { _ -> it.respond("Couldn't find message with that ID in the given channel.") }
+
+                try {
+                    channel.getMessageById(messageID).queue(success, failure)
+                } catch (e: IllegalArgumentException) {
+                    it.respond("Invalid message ID given.")
+                }
             }
         }
 
