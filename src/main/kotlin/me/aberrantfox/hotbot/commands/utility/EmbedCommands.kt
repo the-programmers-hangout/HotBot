@@ -42,13 +42,15 @@ fun embedCommands() =
 
         command("sendembed") {
             description = "Send the embed in the channel. This will not call clearEmbed."
+            expect(arg(TextChannelArg, true, { it.channel }))
             execute {
                 if (EHolder.embed.isEmpty) {
                     it.respond("No embed to send.")
                     return@execute
                 }
 
-                it.respond(EHolder.embed.build())
+                val channel = it.args.component1() as TextChannel
+                channel.sendMessage(EHolder.embed.build()).queue()
             }
         }
 
