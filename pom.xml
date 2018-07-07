@@ -13,7 +13,7 @@
         <project.author>Fox#0001</project.author>
 
         <!-- Kotlin/Discord Dependency versions -->
-        <kotlin.version>1.2.51</kotlin.version>
+        <kotlin.version>1.2.50</kotlin.version>
         <coroutines.version>0.22</coroutines.version>
         <kutils.version>0.8.1</kutils.version>
 

@@ -90,6 +90,13 @@ fun utilCommands(mService: MService, manager: PermissionManager, config: Configu
         }
     }
 
+    command("invite") {
+        description = "Display a permanent invite for the server"
+        execute {
+            it.respond(mService.messages.permanentInviteLink)
+        }
+    }
+
     command("uptime") {
         description = "Displays how long you have kept me, HOTBOT, AWAKE!"
         execute {
