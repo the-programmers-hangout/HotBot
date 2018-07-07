@@ -53,10 +53,10 @@ private fun start(config: Configuration) = startBot(config.serverInformation.tok
     val commandName: (CommandEvent) -> String = { it.commandStruct.commandName.toLowerCase() }
 
     registerCommandPreconditions(
-            { failsBecause("Only the owner can invoke commands in lockdown mode", !config.security.lockDownMode || it.author.id == config.serverInformation.ownerID) },
             { failsBecause(null, !config.security.ignoredIDs.contains(it.channel.id) && !config.security.ignoredIDs.contains(it.author.id)) },
             { failsBecause(null, manager.canUseCommandInChannel(it.author, it.channel.id)) },
             { failsBecause(null, commandName(it) !in macros || canUseMacro(macros[commandName(it)]!!, it.channel, config.serverInformation.macroDelay)) },
+            { failsBecause("Only the owner can invoke commands in lockdown mode", !config.security.lockDownMode || it.author.id == config.serverInformation.ownerID) },
             { failsBecause("You do not have the required permissions to use a command mention", manager.canPerformAction(it.author, config.permissionedActions.commandMention) || !it.message.mentionsSomeone()) },
             { failsBecause("You do not have the required permissions to send an invite.", manager.canPerformAction(it.author, config.permissionedActions.sendInvite) || !it.message.containsInvite()) },
             { failsBecause("You do not have the required permissions to send URLs", commandName(it) in listOf("uploadtext", "suggest") || !it.message.containsURL() || manager.canPerformAction(it.author, config.permissionedActions.sendURL)) },
