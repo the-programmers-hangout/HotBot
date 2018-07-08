@@ -7,7 +7,7 @@ import me.aberrantfox.kjdautils.api.dsl.commands
 import me.aberrantfox.kjdautils.api.dsl.embed
 import me.aberrantfox.kjdautils.extensions.jda.fullName
 
-@CommandSet("karma")
+@CommandSet("karmacmds")
 fun karmaCommands() = commands {
     command("karma") {
         description = "View your karma level"
