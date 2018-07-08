@@ -212,8 +212,8 @@ fun utilCommands(mService: MService, manager: PermissionManager, config: Configu
     }
 
     command("selfmute") {
-        description = "Need to study for an hour and want no distractions? Mute yourself!"
-        expect(arg(TimeStringArg, true, "1h"))
+        description = "Need to study and want no distractions? Mute yourself! (Length defaults to 1 hour)"
+        expect(arg(TimeStringArg, true, 3600.0))
         execute {
             val time = (it.args.component1() as Double).roundToLong() * 1000
             val guild = it.jda.getGuildById(config.serverInformation.guildid)

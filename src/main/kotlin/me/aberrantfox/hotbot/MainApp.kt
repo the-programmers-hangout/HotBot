@@ -42,7 +42,7 @@ private fun start(config: Configuration) = startBot(config.serverInformation.tok
     val messageService = MService()
     val manager = PermissionManager(jda, config)
 
-    registerInjectionObject(messageService, config, logger, manager)
+    registerInjectionObject(messageService, config, logger, manager, this.config)
     val container = registerCommands(commandPath, config.serverInformation.prefix)
     LowerUserArg.manager = manager
 

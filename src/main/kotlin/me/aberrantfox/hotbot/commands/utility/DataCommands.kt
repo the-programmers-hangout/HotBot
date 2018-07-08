@@ -57,7 +57,7 @@ fun dataCommands(config: Configuration) = commands {
         }
     }
     command("finishpoll") {
-        description = "Conclude a poll, based on the embed message ID of the poll."
+        description = "Conclude a poll, based on the embed message ID."
         expect(WordArg)
         execute {
             val pollID = it.args.component1() as String

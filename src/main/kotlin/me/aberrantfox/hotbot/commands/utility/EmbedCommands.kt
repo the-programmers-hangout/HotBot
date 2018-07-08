@@ -41,7 +41,7 @@ fun embedCommands() =
         }
 
         command("sendembed") {
-            description = "Send the embed in the channel. This will not call clearEmbed."
+            description = "Send the embed in the given channel. This will not call clearEmbed."
             expect(arg(TextChannelArg, true, { it.channel }))
             execute {
                 if (EHolder.embed.isEmpty) {
@@ -109,7 +109,7 @@ fun embedCommands() =
         }
 
         command("editfield") {
-            description = "Edits a field in the current embed being worked on. The passed index should be from 0 to fields.size - 1. Properties: name, text (or value), inline."
+            description = "Edits a field in the current embed being worked on. The passed index should be from 0 to fields.size - 1. Properties: name, text/value, inline."
             expect(IntegerArg, WordArg, SentenceArg)
             execute {
                 val fields = EHolder.embed.fields

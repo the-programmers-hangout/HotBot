@@ -31,7 +31,7 @@ private val mapLocation = configPath("macros.json")
 val macros = hashMapOf<String, Macro>()
 
 
-const val macroCommandCategory = "macro-commands"
+const val macroCommandCategory = ""
 
 @CommandSet("macros")
 fun macroCommands(permManager: PermissionManager) =
@@ -93,7 +93,7 @@ fun macroCommands(permManager: PermissionManager) =
 
                 saveMacroList(macros.values)
 
-                it.safeRespond("${macroArgs.joinToString(", ")} moved to $newCategory")
+                it.safeRespond("${macroArgs.joinToString(", ") { it.name }} moved to $newCategory")
             }
         }
 

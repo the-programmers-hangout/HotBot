@@ -10,6 +10,7 @@ import net.dv8tion.jda.core.JDA
 import net.dv8tion.jda.core.entities.Role
 import net.dv8tion.jda.core.entities.User
 import java.io.File
+import java.util.concurrent.ConcurrentHashMap
 
 enum class PermissionLevel {
     Everyone, Member, JrMod, Moderator, Administrator, Owner;
@@ -26,9 +27,9 @@ enum class PermissionLevel {
 data class ChannelPermission (var command: PermissionLevel = PermissionLevel.Everyone,
                               var mention: PermissionLevel = PermissionLevel.Everyone)
 
-data class PermissionsConfiguration(val permissions: HashMap<String, PermissionLevel> = HashMap(),
-                                    val roleMappings: HashMap<String, PermissionLevel> = HashMap(),
-                                    val channelIgnoreLevels: HashMap<String, ChannelPermission> = HashMap())
+data class PermissionsConfiguration(val permissions: ConcurrentHashMap<String, PermissionLevel> = ConcurrentHashMap(),
+                                    val roleMappings: ConcurrentHashMap<String, PermissionLevel> = ConcurrentHashMap(),
+                                    val channelIgnoreLevels: ConcurrentHashMap<String, ChannelPermission> = ConcurrentHashMap())
 
 open class PermissionManager(val jda: JDA, val botConfig: Configuration,
                              permissionsConfigurationLocation: String = "config/permissions.json") {
@@ -53,8 +54,9 @@ open class PermissionManager(val jda: JDA, val botConfig: Configuration,
         commandNames.filter { !(permissionsConfig.permissions.containsKey(it)) }
                 .forEach { permissionsConfig.permissions[it] = PermissionLevel.Administrator }
 
-        permissionsConfig.permissions.filterKeys { it !in commandNames }.
-                forEach{ permissionsConfig.permissions.remove(it.key) }
+        permissionsConfig.permissions.toMap()
+                .filterKeys { it !in commandNames }
+                .forEach { permissionsConfig.permissions.remove(it.key) }
 
         return launch(CommonPool) { save() }
     }

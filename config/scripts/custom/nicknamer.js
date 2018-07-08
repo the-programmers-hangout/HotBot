@@ -1,7 +1,7 @@
 registerCommand({
     name: "nick",
     description: "Set a user's nickname",
-    category: "fun",
+    category: "moderation",
     expect: [LowerUserArg, SentenceArg],
     execute: (event) => {
         const guild = jda.getGuildById(config.serverInformation.guildid)

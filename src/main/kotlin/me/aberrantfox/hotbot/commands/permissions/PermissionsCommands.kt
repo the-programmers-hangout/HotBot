@@ -66,7 +66,7 @@ fun permissionCommands(manager: PermissionManager, config: Configuration) =
             }
 
             command("setPermissions") {
-                description = "Set the permission of all commands in a category to a specific role (i.e. allow that role and roles above to use these commands). "
+                description = "Set the permission level of all commands in a category to the given role."
                 expect(CategoryArg, PermissionLevelArg)
                 execute {
                     val category = it.args.component1() as String
@@ -87,7 +87,7 @@ fun permissionCommands(manager: PermissionManager, config: Configuration) =
             }
 
             command("viewpermissions") {
-                description = "View all of the commands by category, listed with their associated permission."
+                description = "View all of the commands by category, listed with their associated permission level."
                 execute {
                     it.respond(embed {
                         title("Command Permissions")
@@ -156,7 +156,7 @@ fun permissionCommands(manager: PermissionManager, config: Configuration) =
             }
 
             command("viewRoleAssignments") {
-                description = "View the assigned permission levels of any role which has an assigned permission level"
+                description = "View the permission levels any roles have been assigned."
                 execute {
                     it.respond(embed {
                         title("Role Assignments")

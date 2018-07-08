@@ -8,7 +8,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 data class KarmaRecord(val who: String, val karma: Int)
 
 fun leaderBoard() = transaction {
-    KarmaTable.selectAll().orderBy(KarmaTable.karma).limit(10).toList()
+    KarmaTable.selectAll().orderBy(KarmaTable.karma, false).limit(10).toList()
             .map { KarmaRecord(it[KarmaTable.member], it[KarmaTable.karma]) }
 }
 
