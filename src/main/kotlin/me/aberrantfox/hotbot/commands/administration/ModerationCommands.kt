@@ -25,7 +25,7 @@ import kotlin.math.roundToLong
 class ModerationCommands
 
 @CommandSet("moderation")
-fun moderationCommands(config: Configuration, mService: MService, manager: PermissionManager) = commands {
+fun moderationCommands(kConfig: KJDAConfiguration, config: Configuration, mService: MService, manager: PermissionManager) = commands {
     command("ban") {
         description = "Bans a member"
         expect(arg(LowerUserArg), arg(IntegerArg, true, 1), arg(SentenceArg))
@@ -44,7 +44,9 @@ fun moderationCommands(config: Configuration, mService: MService, manager: Permi
 
     command("nuke") {
         description = "Delete up to 99 last messages in the channel. Default channel will the one invoked on. If a number of users are given, their messages will be deleted in the given search space"
-        expect(arg(TextChannelArg, optional = true, default = { it.channel }), arg(MultipleArg(UserArg), optional = true), arg(IntegerArg))
+        expect(arg(TextChannelArg, optional = true, default = { it.channel }),
+                arg(MultipleArg(UserArg), optional = true),
+                arg(IntegerArg))
         execute {
             val channel = it.args.component1() as TextChannel
             val users = (it.args.component2() as List<User>).map { it.id }
@@ -56,14 +58,30 @@ fun moderationCommands(config: Configuration, mService: MService, manager: Permi
             }
 
             val sameChannel = it.channel.id == channel.id
+            val singlePrefixInvocationDeleted = !it.commandStruct.doubleInvocation && kConfig.deleteOnInvocation
+
             channel.history.retrievePast(amount + if (sameChannel) 1 else 0).queue { past ->
-                channel.deleteMessagesByIds(past.drop(if (sameChannel && it.commandStruct.doubleInvocation) 0 else 1)
-                        .filter { users.isEmpty() || it.author.id in users }
-                        .map { it.id }).queue()
+
+                val noSinglePrefixMsg = past.drop(if (sameChannel && singlePrefixInvocationDeleted) 1 else 0)
+
+                val userFiltered =
+                        if (!users.isEmpty()) {
+                            noSinglePrefixMsg.filter { it.author.id in users }
+                        } else {
+                            noSinglePrefixMsg
+                        }
+
+                val messageIDs = userFiltered.map { it.id }
+
+                try {
+                    channel.deleteMessagesByIds(messageIDs).queue()
+                } catch (e: IllegalArgumentException) { // some messages older than 2 weeks
+                    userFiltered.forEach { it.delete().queue() }
+                }
 
                 channel.sendMessage("Be nice. No spam.").queue()
-                if (!sameChannel)
-                    it.respond("$amount messages deleted.")
+
+                if (!sameChannel) it.respond("$amount messages deleted.")
             }
         }
     }
