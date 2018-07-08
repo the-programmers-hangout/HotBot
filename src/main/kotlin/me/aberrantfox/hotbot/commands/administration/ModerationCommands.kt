@@ -156,6 +156,7 @@ fun moderationCommands(kConfig: KJDAConfiguration, config: Configuration, mServi
         execute {
             val newPrefix = it.args[0] as String
             config.serverInformation.prefix = newPrefix
+            kConfig.prefix = newPrefix
             it.respond("Prefix is now $newPrefix. Please invoke commands using that prefix in the future." +
                 "To save this configuration, use the saveconfigurations command.")
         }
@@ -194,7 +195,7 @@ fun moderationCommands(kConfig: KJDAConfiguration, config: Configuration, mServi
                 it.message.delete().queue()
 
             it.channel.history.retrievePast(searchSpace + 1).queue { past ->
-                handleResponse(past, channel, targets, it.channel as TextChannel, it.author.asMention, config)
+                handleResponse(past, channel, targets, it.channel as TextChannel, it.author.asMention, kConfig)
             }
         }
     }
@@ -368,11 +369,11 @@ fun moderationCommands(kConfig: KJDAConfiguration, config: Configuration, mServi
 }
 
 private fun handleResponse(past: List<Message>, channel: TextChannel, targets: List<User>, sourceChannel: TextChannel,
-                           source: String, config: Configuration) {
+                           source: String, kConfig: KJDAConfiguration) {
 
 
     val targetIDs = targets.map { it.id }
-    val messages = if (past.firstOrNull()?.isCommandInvocation(KJDAConfiguration(prefix=config.serverInformation.prefix)) == true)
+    val messages = if (past.firstOrNull()?.isCommandInvocation(kConfig) == true)
                        // Without ++move command invocation message
                        past.subList(1, past.size).filter { it.author.id in targetIDs }
                    else
