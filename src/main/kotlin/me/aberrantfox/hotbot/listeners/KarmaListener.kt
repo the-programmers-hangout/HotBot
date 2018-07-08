@@ -25,7 +25,7 @@ class KarmaListener(val mService: MService) {
         val karmaResult = karmaService.isKarmaMessage(message)
 
         if(karmaResult is Positive) {
-            addKarma(event.member.user, 1)
+            addKarma(karmaResult.member.user, 1)
             event.channel.sendMessage(mService.messages.karmaMessage.replace("%mention%", karmaResult.member.asMention)).queue()
             waitingUsers.add(event.member.user.id)
 
