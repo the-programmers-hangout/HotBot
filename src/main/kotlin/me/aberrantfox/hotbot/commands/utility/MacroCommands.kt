@@ -31,7 +31,7 @@ private val mapLocation = configPath("macros.json")
 val macros = hashMapOf<String, Macro>()
 
 
-const val macroCommandCategory = "macro-commands"
+const val macroCommandCategory = ""
 
 @CommandSet("macros")
 fun macroCommands(permManager: PermissionManager) =
