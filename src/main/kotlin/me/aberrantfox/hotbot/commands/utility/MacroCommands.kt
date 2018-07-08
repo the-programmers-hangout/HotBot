@@ -93,7 +93,7 @@ fun macroCommands(permManager: PermissionManager) =
 
                 saveMacroList(macros.values)
 
-                it.safeRespond("${macroArgs.joinToString(", ")} moved to $newCategory")
+                it.safeRespond("${macroArgs.joinToString(", ") { it.name }} moved to $newCategory")
             }
         }
 
