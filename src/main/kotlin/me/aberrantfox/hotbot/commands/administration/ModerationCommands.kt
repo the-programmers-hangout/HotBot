@@ -27,7 +27,7 @@ class ModerationCommands
 @CommandSet("moderation")
 fun moderationCommands(kConfig: KJDAConfiguration, config: Configuration, mService: MService, manager: PermissionManager) = commands {
     command("ban") {
-        description = "Bans a member"
+        description = "Bans a member for the passed reason, deleting a given number of days messages."
         expect(arg(LowerUserArg), arg(IntegerArg, true, 1), arg(SentenceArg))
         execute {
             val target = it.args.component1() as User
@@ -43,7 +43,7 @@ fun moderationCommands(kConfig: KJDAConfiguration, config: Configuration, mServi
     }
 
     command("nuke") {
-        description = "Delete up to 99 last messages in the channel. Default channel will the one invoked on. If a number of users are given, their messages will be deleted in the given search space"
+        description = "Delete 2 - 99 past messages in the given channel (default is the invoked channel). If users are given, only messages from those will be deleted."
         expect(arg(TextChannelArg, optional = true, default = { it.channel }),
                 arg(MultipleArg(UserArg), optional = true),
                 arg(IntegerArg))
@@ -87,7 +87,7 @@ fun moderationCommands(kConfig: KJDAConfiguration, config: Configuration, mServi
     }
 
     command("ignore") {
-        description = "Drop all commands from the given id (user or channel)"
+        description = "Drop and don't respond to anything from the given id (user or channel)"
         expect(WordArg)
         execute {
             val target = it.args.component1() as String
@@ -106,7 +106,7 @@ fun moderationCommands(kConfig: KJDAConfiguration, config: Configuration, mServi
     }
 
     command("gag") {
-        description = "Temporarily mute a user for a few minutes so that you can deal with something."
+        description = "Temporarily mute a user for 5 minutes so that you can deal with something."
         expect(LowerUserArg)
         execute {
             val user = it.args.component1() as User
@@ -122,7 +122,7 @@ fun moderationCommands(kConfig: KJDAConfiguration, config: Configuration, mServi
     }
 
     command("mute") {
-        description = "Mute a member for a specified number of minutes."
+        description = "Mute a member for a specified amount of time with the given reason."
         expect(LowerUserArg, TimeStringArg, SentenceArg)
         execute {
             val user = it.args.component1() as User
@@ -173,7 +173,7 @@ fun moderationCommands(kConfig: KJDAConfiguration, config: Configuration, mServi
     }
 
     command("move") {
-        description = "Move every message sent by any of the users with the IDs listed found within the given search space to the specified channel."
+        description = "Move messages sent by the users passed found within the last given number of messages to the specified channel."
         expect(MultipleArg(UserArg), IntegerArg, TextChannelArg)
         execute {
             val targets = it.args.component1() as List<User>

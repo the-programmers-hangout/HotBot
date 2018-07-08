@@ -68,7 +68,7 @@ fun raidCommands(config: Configuration) = commands {
     }
 
     command("banraider") {
-        description = "Ban a raider by an ID, do this rather than ban people as it'll exit them from the raidView"
+        description = "Ban a raider by an ID"
         expect(UserArg, IntegerArg)
         execute {
             val user = it.args[0] as User

@@ -110,7 +110,7 @@ fun suggestionCommands(config: Configuration) = commands {
     }
 
     command("respond") {
-        description = "Respond to a suggestion in the community review stage. Suggestions here can be accepted or denied, must supply a reason."
+        description = "Respond to a suggestion in the review stage, given the target id, response (accepted, denied, review), and reason."
         expect(WordArg, WordArg, SentenceArg)
         execute {
             val args = it.args

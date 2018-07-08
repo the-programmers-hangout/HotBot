@@ -51,7 +51,7 @@ fun channelResourceCommands() = commands {
     }
 
     command("removeresource") {
-        description = "Remove one or more of current channel resources"
+        description = "Remove one or more of the current channel's resources"
         expect(SplitterArg)
         execute {
             val ids: List<Int>
@@ -78,7 +78,7 @@ fun channelResourceCommands() = commands {
     }
 
     command("resetresources") {
-        description = "Remove all of current channel resources."
+        description = "Remove all of the current channel's resources."
         execute {
             val resourcesCount = fetchChannelResources(it.channel.id).size
             val channelMention = "<#${it.channel.id}>"
