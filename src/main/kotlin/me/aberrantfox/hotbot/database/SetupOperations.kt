@@ -29,7 +29,7 @@ fun setupDatabaseSchema(config: Configuration) {
 
     transaction {
         SchemaUtils.create(Strikes, HistoryCount, Suggestions, BanRecords, CommandPermissions,
-                ChannelResources, Notes, MutedMember, IgnoredIDs, Reminder, GuildLeaveHistory)
+                ChannelResources, Notes, MutedMember, IgnoredIDs, Reminder, GuildLeaveHistory, KarmaTable)
         logger.addLogger(StdOutSqlLogger)
     }
 }
@@ -111,4 +111,10 @@ object GuildLeaveHistory : Table() {
     val leaveDate = date("leaveDate")
     val ban = bool("ban")
     val guildId = varchar("guildId", 18)
+}
+
+object KarmaTable : Table() {
+    val id = integer("id").autoIncrement().primaryKey()
+    val member = varchar("member", 18)
+    val karma = integer("karma")
 }
