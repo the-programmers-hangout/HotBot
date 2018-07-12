@@ -9,6 +9,7 @@ import me.aberrantfox.hotbot.utility.muteMember
 import me.aberrantfox.hotbot.utility.muteVoiceChannel
 import me.aberrantfox.hotbot.utility.unmuteVoiceChannel
 import me.aberrantfox.kjdautils.api.dsl.*
+import me.aberrantfox.kjdautils.extensions.jda.descriptor
 import me.aberrantfox.kjdautils.extensions.jda.fullName
 import me.aberrantfox.kjdautils.extensions.jda.isCommandInvocation
 import me.aberrantfox.kjdautils.extensions.jda.sendPrivateMessage
@@ -133,6 +134,11 @@ fun moderationCommands(kConfig: KJDAConfiguration, config: Configuration, mServi
 
             if (user.id == it.jda.selfUser.id) {
                 it.respond("Nice try but I'm not going to mute myself.")
+                return@execute
+            }
+
+            if (isMemberMuted(user.id, guild.id)){
+                it.respond("${user.descriptor()} is already muted")
                 return@execute
             }
 
