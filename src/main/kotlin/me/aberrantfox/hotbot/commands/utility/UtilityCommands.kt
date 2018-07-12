@@ -224,6 +224,11 @@ fun utilCommands(mService: MService, manager: PermissionManager, config: Configu
                 return@execute
             }
 
+            if(time > 1000*60*60){
+                it.respond("Sorry but you can't mute yourself for more than an hour at a time")
+                return@execute
+            }
+
             muteMember(guild, it.author, time, "No distractions for a while? Got it", config, it.author)
         }
     }
