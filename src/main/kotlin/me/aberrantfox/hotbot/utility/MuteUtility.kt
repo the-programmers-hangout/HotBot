@@ -117,6 +117,11 @@ fun scheduleUnmute(guild: Guild, user: User, config: Configuration, time: Long,
 
 fun removeMuteRole(guild: Guild, user: User, config: Configuration,
                    record: MuteRecord) {
+
+    if(!isMemberMuted(user.id, guild.id)){
+        return
+    }
+
     if (user.mutualGuilds.isEmpty()) {
         deleteMutedMember(record)
         return

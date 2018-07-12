@@ -7,6 +7,7 @@ import me.aberrantfox.hotbot.services.Configuration
 import me.aberrantfox.hotbot.services.MService
 import me.aberrantfox.hotbot.utility.muteMember
 import me.aberrantfox.hotbot.utility.muteVoiceChannel
+import me.aberrantfox.hotbot.utility.removeMuteRole
 import me.aberrantfox.hotbot.utility.unmuteVoiceChannel
 import me.aberrantfox.kjdautils.api.dsl.*
 import me.aberrantfox.kjdautils.extensions.jda.descriptor
@@ -143,6 +144,20 @@ fun moderationCommands(kConfig: KJDAConfiguration, config: Configuration, mServi
             }
 
             muteMember(guild, user, time, reason, config, it.author)
+        }
+    }
+
+    command("unmute") {
+        description = "Unmute a previously muted member"
+        expect(LowerUserArg)
+        execute {
+            val user = it.args.component1() as User
+            val guild = it.jda.getGuildById(config.serverInformation.guildid)
+
+            if(!isMemberMuted(user.id, guild.id)){ it.respond("${user.descriptor()} isn't muted")}
+
+            removeMuteRole(guild, user, config)
+            deleteMutedMember(user.id, guild.id)
         }
     }
 
