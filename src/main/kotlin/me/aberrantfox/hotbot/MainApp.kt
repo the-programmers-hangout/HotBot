@@ -41,10 +41,14 @@ private fun start(config: Configuration) = startBot(config.serverInformation.tok
 
     val messageService = MService()
     val manager = PermissionManager(jda, config)
+    val aliasService = AliasService(manager)
 
-    registerInjectionObject(messageService, config, logger, manager, this.config)
+    registerInjectionObject(messageService, config, logger, manager, this.config, aliasService)
     val container = registerCommands(commandPath, config.serverInformation.prefix)
+
     LowerUserArg.manager = manager
+    aliasService.container = container
+    aliasService.loadAliases()
 
     setupMacroCommands(container, manager)
 

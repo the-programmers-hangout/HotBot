@@ -20,4 +20,5 @@ config/invite-whitelist.json
 config/pools/
 config/permissions.json
 config/ratelimit/
+config/aliases.json
 data/
