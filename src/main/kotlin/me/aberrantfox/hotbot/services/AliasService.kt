@@ -16,11 +16,14 @@ class AliasService(private val manager: PermissionManager,
 
     fun loadAliases() {
         val file = File(aliasesLocation)
-        if (!file.exists())
-            return
+        val json = if (!file.exists()) {
+            AliasService::class.java.getResource("/default-aliases.json").readText()
+        } else {
+            file.readText()
+        }
 
         val gson = Gson()
-        gson.fromJson<HashMap<String, String>>(file.readText())
+        gson.fromJson<HashMap<String, String>>(json)
             .forEach { add(it.key to it.value) }
     }
 
