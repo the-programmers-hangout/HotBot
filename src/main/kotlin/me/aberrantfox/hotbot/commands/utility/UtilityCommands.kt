@@ -224,8 +224,8 @@ fun utilCommands(mService: MService, manager: PermissionManager, config: Configu
                 return@execute
             }
 
-            if(time > 1000*60*60){
-                it.respond("Sorry but you can't mute yourself for more than an hour at a time")
+            if(time > 1000*60*config.serverInformation.maxSelfmuteMinutes){
+                it.respond("Sorry but you can't mute yourself for that long")
                 return@execute
             }
 
