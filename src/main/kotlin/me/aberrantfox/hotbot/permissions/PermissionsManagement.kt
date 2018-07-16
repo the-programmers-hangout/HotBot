@@ -6,7 +6,9 @@ import kotlinx.coroutines.experimental.Job
 import kotlinx.coroutines.experimental.launch
 import me.aberrantfox.hotbot.services.Configuration
 import me.aberrantfox.kjdautils.api.dsl.CommandsContainer
+import me.aberrantfox.kjdautils.internal.command.tryRetrieveSnowflake
 import net.dv8tion.jda.core.JDA
+import net.dv8tion.jda.core.entities.Member
 import net.dv8tion.jda.core.entities.Role
 import net.dv8tion.jda.core.entities.User
 import java.io.File
@@ -118,7 +120,8 @@ open class PermissionManager(val jda: JDA, val botConfig: Configuration,
     private fun getPermissionLevel(user: User): PermissionLevel {
         if (botConfig.serverInformation.ownerID == user.id) return PermissionLevel.Owner
 
-        val member = jda.getGuildById(botConfig.serverInformation.guildid).getMember(user)
+        val member = tryRetrieveSnowflake(jda) { jda.getGuildById(botConfig.serverInformation.guildid).getMember(user) } as Member?
+                ?: return PermissionLevel.Everyone
 
         if (member.roles.isEmpty()) return PermissionLevel.Everyone
 
