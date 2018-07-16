@@ -25,6 +25,15 @@ fun deleteMutedMember(record: MuteRecord) =
         }
     }
 
+fun deleteMutedMember(userId: String, guildId:String) =
+        transaction {
+            MutedMember.deleteWhere {
+                Op.build {
+                    (MutedMember.member eq userId) and (MutedMember.guildId eq guildId)
+                }
+            }
+        }
+
 fun getAllMutedMembers() =
     transaction {
         val mutedMembers = mutableListOf<MuteRecord>()
