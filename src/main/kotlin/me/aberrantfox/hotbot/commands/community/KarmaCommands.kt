@@ -6,6 +6,8 @@ import me.aberrantfox.kjdautils.api.dsl.CommandSet
 import me.aberrantfox.kjdautils.api.dsl.commands
 import me.aberrantfox.kjdautils.api.dsl.embed
 import me.aberrantfox.kjdautils.extensions.jda.fullName
+import me.aberrantfox.kjdautils.internal.command.arguments.UserArg
+import net.dv8tion.jda.core.entities.User
 
 @CommandSet("karmacmds")
 fun karmaCommands() = commands {
@@ -34,6 +36,16 @@ fun karmaCommands() = commands {
                     }
                 }
             })
+        }
+    }
+
+    command("viewkarma") {
+        description = "View the karma of a specified user"
+        expect(UserArg)
+        execute{
+            val user = it.args.component1() as User
+            val karma = getKarma(user)
+            it.respond("${user.fullName()}'s karma is $karma")
         }
     }
 }
