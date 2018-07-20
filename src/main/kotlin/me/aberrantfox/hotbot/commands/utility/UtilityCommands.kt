@@ -3,6 +3,7 @@ package me.aberrantfox.hotbot.commands.utility
 import com.google.gson.Gson
 import khttp.post
 import me.aberrantfox.hotbot.arguments.HexColourArg
+import me.aberrantfox.hotbot.database.isMemberMuted
 import me.aberrantfox.hotbot.permissions.PermissionManager
 import me.aberrantfox.hotbot.services.Configuration
 import me.aberrantfox.hotbot.services.MService
@@ -217,6 +218,16 @@ fun utilCommands(mService: MService, manager: PermissionManager, config: Configu
         execute {
             val time = (it.args.component1() as Double).roundToLong() * 1000
             val guild = it.jda.getGuildById(config.serverInformation.guildid)
+
+            if(isMemberMuted(it.author.id, guild.id)) {
+                it.respond("Nice try but you're already muted")
+                return@execute
+            }
+
+            if(time > 1000*60*config.serverInformation.maxSelfmuteMinutes){
+                it.respond("Sorry but you can't mute yourself for that long")
+                return@execute
+            }
 
             muteMember(guild, it.author, time, "No distractions for a while? Got it", config, it.author)
         }

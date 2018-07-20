@@ -10,10 +10,7 @@ import me.aberrantfox.kjdautils.extensions.stdlib.isBooleanValue
 import me.aberrantfox.kjdautils.extensions.stdlib.toBooleanValue
 import me.aberrantfox.kjdautils.internal.command.arguments.*
 import net.dv8tion.jda.core.EmbedBuilder
-import net.dv8tion.jda.core.entities.Message
-import net.dv8tion.jda.core.entities.MessageEmbed
-import net.dv8tion.jda.core.entities.TextChannel
-import net.dv8tion.jda.core.entities.User
+import net.dv8tion.jda.core.entities.*
 import java.time.Instant
 import java.util.function.Consumer
 
@@ -49,7 +46,7 @@ fun embedCommands() =
                     return@execute
                 }
 
-                val channel = it.args.component1() as TextChannel
+                val channel = it.args.component1() as MessageChannel
                 channel.sendMessage(EHolder.embed.build()).queue()
             }
         }
