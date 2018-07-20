@@ -29,6 +29,8 @@ class KarmaService {
 
         if ( !thanks.contains(trimmedContent) ) return Negative
 
+        if(target.user.isBot) return Negative
+
         return Positive(target)
     }
 

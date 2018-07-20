@@ -3,6 +3,7 @@ package me.aberrantfox.hotbot.listeners
 import com.google.common.eventbus.Subscribe
 import me.aberrantfox.hotbot.database.addKarma
 import me.aberrantfox.hotbot.database.removeKarma
+import me.aberrantfox.hotbot.services.Configuration
 import me.aberrantfox.hotbot.services.KarmaService
 import me.aberrantfox.hotbot.services.MService
 import me.aberrantfox.hotbot.services.Positive
@@ -13,7 +14,7 @@ import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
-class KarmaListener(val mService: MService, val log: BotLogger) {
+class KarmaListener(val mService: MService, val log: BotLogger, val config: Configuration) {
     private val karmaService = KarmaService()
     private val waitingUsers = ConcurrentHashMap.newKeySet<String>()
 
@@ -23,8 +24,11 @@ class KarmaListener(val mService: MService, val log: BotLogger) {
 
         if(waitingUsers.contains(event.author.id)) return
 
+        if(config.security.ignoredIDs.contains(event.author.id)) return
+
         val message = event.message
         val karmaResult = karmaService.isKarmaMessage(message)
+
 
         if(karmaResult is Positive) {
             addKarma(karmaResult.member.user, 1)
@@ -37,7 +41,7 @@ class KarmaListener(val mService: MService, val log: BotLogger) {
                 override fun run() {
                     waitingUsers.remove(event.member.user.id)
                 }
-            }, 1000 * 5)
+            }, config.serverInformation.karmaGiveDelay.toLong())
         }
     }
 
