@@ -24,7 +24,8 @@ class ServerInformation(val token: String = "insert-token",
                         val macroDelay: Int = 30,
                         val suggestionPoolLimit: Int = 20,
                         val deleteWelcomeOnLeave: Boolean = true,
-                        val maxSelfmuteMinutes: Int = 60)
+                        val maxSelfmuteMinutes: Int = 60,
+                        val karmaGiveDelay: Int = 1000 * 60 * 60)
 
 data class Security(@Transient val ignoredIDs: MutableSet<String> = mutableSetOf(),
                     var lockDownMode: Boolean = false,

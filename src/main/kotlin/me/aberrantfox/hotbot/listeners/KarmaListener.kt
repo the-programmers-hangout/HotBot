@@ -41,7 +41,7 @@ class KarmaListener(val mService: MService, val log: BotLogger, val config: Conf
                 override fun run() {
                     waitingUsers.remove(event.member.user.id)
                 }
-            }, 1000 * 5)
+            }, config.serverInformation.karmaGiveDelay.toLong())
         }
     }
 
