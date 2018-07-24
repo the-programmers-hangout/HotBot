@@ -105,14 +105,14 @@ private fun buildAnimalEmbed(URL: String) = embed {
 
 private fun getDogImg(): String = kget("https://dog.ceo/api/breeds/image/random").jsonObject.getString("message")
 
-private fun getCatImg(): String = kget("https://api.cheweybot.ga/cat").jsonObject.getString("data")
+private fun getCatImg(): String = kget("https://api.chewey-bot.ga/cat").jsonObject.getString("data")
 
 private fun getFoxImg(): String = kget("https://randomfox.ca/floof").jsonObject.getString("image")
 
-private fun getBirdImg(): String = kget("https://api.cheweybot.ga/birb").jsonObject.getString("data")
+private fun getBirdImg(): String = kget("https://api.chewey-bot.ga/birb").jsonObject.getString("data")
 
-private fun getSnakeImg(): String = kget("https://api.cheweybot.ga/snake").jsonObject.getString("data")
+private fun getSnakeImg(): String = kget("https://api.chewey-bot.ga/snake").jsonObject.getString("data")
 
-private fun getOtterImg(): String = kget("https://api.cheweybot.ga/otter").jsonObject.getString("data")
+private fun getOtterImg(): String = kget("https://api.chewey-bot.ga/otter").jsonObject.getString("data")
 
-private fun getRabbitImg(): String = kget("https://api.cheweybot.ga/rabbit").jsonObject.getString("data")
+private fun getRabbitImg(): String = kget("https://api.chewey-bot.ga/rabbit").jsonObject.getString("data")
