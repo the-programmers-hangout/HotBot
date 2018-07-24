@@ -96,3 +96,4 @@ private val animalMap = mapOf(
         "otter" to { kget("https://api.chewey-bot.ga/otter").jsonObject.getString("data") },
         "rabbit" to { kget("https://api.chewey-bot.ga/rabbit").jsonObject.getString("data") }
 )
+
