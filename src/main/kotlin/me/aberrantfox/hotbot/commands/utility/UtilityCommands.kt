@@ -239,7 +239,7 @@ fun produceServerInfoEmbed(guild: Guild, mService: MService) =
         title(guild.name)
         setColor(Color.MAGENTA)
         description(mService.messages.serverDescription)
-        setFooter("Guild creation date: ${guild.creationTime}", "http://i.imgur.com/iwwEprG.png")
+        setFooter("Guild creation date: ${guild.creationTime.format(DateTimeFormatter.RFC_1123_DATE_TIME)}", "http://i.imgur.com/iwwEprG.png")
         setThumbnail("http://i.imgur.com/DFoaG7k.png")
 
         field {
