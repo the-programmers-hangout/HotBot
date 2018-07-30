@@ -9,6 +9,7 @@ import me.aberrantfox.kjdautils.api.dsl.CommandSet
 import me.aberrantfox.kjdautils.api.dsl.commands
 import me.aberrantfox.kjdautils.api.dsl.embed
 import me.aberrantfox.kjdautils.extensions.jda.sendPrivateMessage
+import me.aberrantfox.kjdautils.internal.command.arguments.ChoiceArg
 import me.aberrantfox.kjdautils.internal.command.arguments.SentenceArg
 import me.aberrantfox.kjdautils.internal.command.arguments.WordArg
 import net.dv8tion.jda.core.EmbedBuilder
@@ -69,61 +70,55 @@ fun suggestionCommands(config: Configuration) = commands {
         }
     }
 
-    command("poolaccept") {
-        description = "Move the suggestion at the top of the pool to the community review stage."
+    command("pool") {
+        description = "Accept or deny the suggestion at the top of the pool. If accepted, move to the community review stage"
+        expect(ChoiceArg("accept", "deny"))
         execute {
+            val response = it.args.component1() as String
             val suggestion = Suggestions.pool.top()
-
             if (suggestion == null) {
                 it.respond("The suggestion pool is empty... :)")
                 return@execute
             }
 
-            val guild = it.jda.getGuildById(config.serverInformation.guildid)
+            if (response == "accept") {
+                val guild = it.jda.getGuildById(config.serverInformation.guildid)
 
-            val channel = guild.textChannels.findLast { channel ->
-                channel.id == config.messageChannels.suggestionChannel
+                val channel = guild.textChannels.findLast { channel ->
+                    channel.id == config.messageChannels.suggestionChannel
+                }
+
+                channel?.sendMessage(buildSuggestionMessage(suggestion, it.jda, SuggestionStatus.Review).build())?.queue {
+                    trackSuggestion(SuggestionRecord(it.id, SuggestionStatus.Review, suggestion))
+
+                    it.addReaction("⬆").queue()
+                    it.addReaction("⬇").queue()
+                }
+                it.respond(embed {
+                    setTitle("Accepted suggestion")
+                    setDescription(suggestion.message)
+                    setColor(Color.GREEN)
+                })
+            } else {
+                it.respond(embed {
+                    setTitle("Denied suggestion")
+                    setDescription(suggestion.message)
+                    setColor(Color.RED)
+                })
             }
-
-
-            channel?.sendMessage(buildSuggestionMessage(suggestion, it.jda, SuggestionStatus.Review).build())?.queue {
-                trackSuggestion(SuggestionRecord(it.id, SuggestionStatus.Review, suggestion))
-
-                it.addReaction("⬆").queue()
-                it.addReaction("⬇").queue()
-            }
-        }
-    }
-
-    command("pooldeny") {
-        description = "Delete the suggestion at the top of the pool; this is for removing bad or vulgar suggestions."
-        execute {
-            val rejected = Suggestions.pool.top()
-
-            if (rejected == null) {
-                it.respond("The suggestion pool is empty... :)")
-                return@execute
-            }
-
-            it.respond(rejected.describe(it.jda, "Suggestion"))
         }
     }
 
     command("respond") {
         description = "Respond to a suggestion in the review stage, given the target id, response (accepted, denied, review), and reason."
-        expect(WordArg, WordArg, SentenceArg)
+        expect(WordArg, ChoiceArg("accepted", "denied", "review"), SentenceArg)
         execute {
             val args = it.args
 
             val target = args[0] as String
             val response = args[1] as String
             val reason = args[2] as String
-            val status = inputToStatus(response)
-
-            if (status == null) {
-                it.respond("Valid responses are 'accepted', 'denied' and 'review'... use accordingly.")
-                return@execute
-            }
+            val status = inputToStatus(response)!!
 
             val guild = it.jda.getGuildById(config.serverInformation.guildid)
 
@@ -134,7 +129,7 @@ fun suggestionCommands(config: Configuration) = commands {
                 return@execute
             }
 
-            channel.getMessageById(target).queue {
+            channel.getMessageById(target).queue { msg ->
                 val suggestion = obtainSuggestion(target)
                 val message = buildSuggestionMessage(suggestion.poolInfo, it.jda, status)
                 val reasonTitle = "Reason for Status"
@@ -142,7 +137,7 @@ fun suggestionCommands(config: Configuration) = commands {
                 val suggestionUpdateMessage = buildSuggestionUpdateEmbed(suggestion, reason, status)
 
                 try {
-                    it.jda.retrieveUserById(suggestion.member).complete()
+                    msg.jda.retrieveUserById(suggestion.member).complete()
                             .sendPrivateMessage(suggestionUpdateMessage)
                 }
                 finally {
@@ -151,7 +146,13 @@ fun suggestionCommands(config: Configuration) = commands {
                     message.addField(reasonTitle, reason, false)
                     updateSuggestion(target, status)
 
-                    it.editMessage(message.build()).queue()
+                    msg.editMessage(message.build()).queue()
+
+                    it.respond(embed {
+                        setTitle("$status suggestion")
+                        setDescription(suggestion.idea)
+                        setColor(status.colour)
+                    })
                 }
             }
         }
