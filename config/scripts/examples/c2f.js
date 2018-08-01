@@ -1,6 +1,6 @@
 const command = createCommand("c2f")
 
-command.expect(argType.Integer)
+command.expect(IntegerArg)
 
 command.execute((event) => {
     const arg1 = event.args[0]

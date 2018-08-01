@@ -1,0 +1,6 @@
+{
+    "hastebin":"uploadtext",
+    "creationdate": "viewcreationdate",
+    "resources": "listresources",
+    "macros": "listmacros"
+}

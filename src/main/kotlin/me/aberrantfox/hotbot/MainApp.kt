@@ -1,153 +1,94 @@
 package me.aberrantfox.hotbot
 
-import me.aberrantfox.hotbot.commandframework.CommandExecutor
-import me.aberrantfox.hotbot.commandframework.commands.development.EngineContainer
-import me.aberrantfox.hotbot.commandframework.commands.development.EngineContainer.setupScriptEngine
-import me.aberrantfox.hotbot.commandframework.commands.utility.macros
-import me.aberrantfox.hotbot.commandframework.commands.utility.scheduleReminder
-import me.aberrantfox.hotbot.database.getAllMutedMembers
+import me.aberrantfox.hotbot.arguments.LowerUserArg
+import me.aberrantfox.hotbot.commands.development.EngineContainer
+import me.aberrantfox.hotbot.commands.development.EngineContainer.setupScriptEngine
+import me.aberrantfox.hotbot.commands.utility.canUseMacro
+import me.aberrantfox.hotbot.commands.utility.macros
+import me.aberrantfox.hotbot.commands.utility.scheduleReminder
+import me.aberrantfox.hotbot.commands.utility.setupMacroCommands
 import me.aberrantfox.hotbot.database.forEachIgnoredID
 import me.aberrantfox.hotbot.database.forEachReminder
 import me.aberrantfox.hotbot.database.setupDatabaseSchema
-import me.aberrantfox.hotbot.dsls.command.produceContainer
-import me.aberrantfox.hotbot.extensions.jda.hasRole
-import me.aberrantfox.hotbot.listeners.*
-import me.aberrantfox.hotbot.listeners.antispam.DuplicateMessageListener
-import me.aberrantfox.hotbot.listeners.antispam.InviteListener
-import me.aberrantfox.hotbot.listeners.antispam.NewJoinListener
-import me.aberrantfox.hotbot.listeners.antispam.TooManyMentionsListener
-import me.aberrantfox.hotbot.logging.BotLogger
-import me.aberrantfox.hotbot.logging.convertChannels
+import me.aberrantfox.hotbot.optionallisteners.MentionListener
 import me.aberrantfox.hotbot.permissions.PermissionManager
 import me.aberrantfox.hotbot.services.*
-import me.aberrantfox.hotbot.utility.scheduleUnmute
 import me.aberrantfox.hotbot.utility.timeToDifference
-import net.dv8tion.jda.core.AccountType
+import me.aberrantfox.kjdautils.api.dsl.CommandEvent
+import me.aberrantfox.kjdautils.api.startBot
+import me.aberrantfox.kjdautils.extensions.jda.containsInvite
+import me.aberrantfox.kjdautils.extensions.jda.containsURL
+import me.aberrantfox.kjdautils.extensions.jda.mentionsSomeone
+import me.aberrantfox.kjdautils.internal.command.Fail
+import me.aberrantfox.kjdautils.internal.command.Pass
+import me.aberrantfox.kjdautils.internal.command.PreconditionResult
+import me.aberrantfox.kjdautils.internal.logging.BotLogger
+import me.aberrantfox.kjdautils.internal.logging.convertChannels
 import net.dv8tion.jda.core.JDA
-import net.dv8tion.jda.core.JDABuilder
-import net.dv8tion.jda.core.Permission
-import net.dv8tion.jda.core.entities.Guild
-import org.apache.log4j.*
 
+const val commandPath = "me.aberrantfox.hotbot.commands"
 
 fun main(args: Array<String>) {
-    setupLogger()
-    println("Starting to load hotbot.")
-    val container = produceContainer()
     val config = loadConfig() ?: return
-
     saveConfig(config)
+    start(config)
+}
 
-    val helpErrors = HelpConf.getDocumentationErrors(container)
-    if (helpErrors.isNotEmpty()) {
-        println("The help documentation needs to be updated:")
-        helpErrors.forEach(::println)
-
-        if( !(config.botInformation.developmentMode) ) {
-            return
-        }
-    }
-
+private fun start(config: Configuration) = startBot(config.serverInformation.token) {
     setupDatabaseSchema(config)
 
-    val jda = JDABuilder(AccountType.BOT).setToken(config.serverInformation.token).buildBlocking()
-    val logger = convertChannels(config.logChannels, jda)
+    logger = convertChannels(config.logChannels, jda)
 
-    jda.guilds.forEach { setupMutedRole(it, config.security.mutedRole) }
-
-    logger.info("connected")
-    val mutedRole = jda.getRolesByName(config.security.mutedRole, true).first()
-    val tracker = MessageTracker(1)
-    val manager = PermissionManager(jda, container, config)
     val messageService = MService()
+    val manager = PermissionManager(jda, config)
+    val aliasService = AliasService(manager)
 
-    forEachIgnoredID { config.security.ignoredIDs.add(it) }
+    registerInjectionObject(messageService, config, logger, manager, this.config, aliasService)
+    val container = registerCommands(commandPath, config.serverInformation.prefix)
 
-    container.newLogger(logger)
+    LowerUserArg.manager = manager
+    aliasService.container = container
+    aliasService.loadAliases()
 
-    jda.addEventListener(
-            CommandExecutor(config, container, jda, logger, manager, messageService),
-            MemberListener(config, logger, messageService),
-            InviteListener(config, logger, manager),
-            VoiceChannelListener(logger),
-            NewChannelListener(mutedRole),
-            ChannelDeleteListener(logger),
-            DuplicateMessageListener(config, logger, tracker),
-            RoleListener(config),
-            PollListener(),
-            BanListener(config),
-            TooManyMentionsListener(logger, mutedRole),
-            MessageDeleteListener(logger, manager, config),
-            NewJoinListener())
+    setupMacroCommands(container, manager)
 
-    CommandRecommender.addAll(container.commands.keys.toList() + macros.map { it.name })
+    manager.defaultAndPrunePermissions(container)
+    val failsBecause: (String?, Boolean) -> PreconditionResult = { reason, condition -> if (condition) Pass else Fail(reason) }
+    val commandName: (CommandEvent) -> String = { it.commandStruct.commandName.toLowerCase() }
 
-    if(config.apiConfiguration.enableCleverBot) {
+    registerCommandPreconditions(
+            { failsBecause(null, !config.security.ignoredIDs.contains(it.channel.id) && !config.security.ignoredIDs.contains(it.author.id)) },
+            { failsBecause(null, manager.canUseCommandInChannel(it.author, it.channel.id)) },
+            { failsBecause(null, commandName(it) !in macros || canUseMacro(macros[commandName(it)]!!, it.channel, config.serverInformation.macroDelay)) },
+            { failsBecause("Only the owner can invoke commands in lockdown mode", !config.security.lockDownMode || it.author.id == config.serverInformation.ownerID) },
+            { failsBecause("You do not have the required permissions to use a command mention", manager.canPerformAction(it.author, config.permissionedActions.commandMention) || !it.message.mentionsSomeone()) },
+            { failsBecause("You do not have the required permissions to send an invite.", manager.canPerformAction(it.author, config.permissionedActions.sendInvite) || !it.message.containsInvite()) },
+            { failsBecause("You do not have the required permissions to send URLs", commandName(it) in listOf("uploadtext", "suggest") || !it.message.containsURL() || manager.canPerformAction(it.author, config.permissionedActions.sendURL)) },
+            { failsBecause("Did you really think I would let you do that? :thinking:", manager.canUseCommand(it.author, commandName(it)) || !it.container.has(commandName(it))) }
+    )
+
+    registerInjectionObject(MessageTracker(1), MuteService(jda, config))
+    registerListenersByPath("me.aberrantfox.hotbot.listeners")
+
+    if (config.apiConfiguration.enableCleverBot) {
         println("Enabling cleverbot integration.")
-        jda.addEventListener(MentionListener(config, jda.selfUser.name))
+        registerListeners(MentionListener(config, jda.selfUser.name, manager))
     }
 
-    handleLTSMutes(config, jda)
-    loadReminders(jda, logger)
-    EngineContainer.engine = setupScriptEngine(jda, container, config)
+    EngineContainer.engine = setupScriptEngine(jda, container, config, logger)
+    loadPersistence(jda, logger, config)
+
     logger.info("Fully setup, now ready for use.")
 }
 
-private fun setupLogger() {
-    val console = ConsoleAppender()
-    val pattern = "%d [%p|%c|%C{1}] %m%n"
-    console.layout = PatternLayout(pattern)
-    console.threshold = Level.INFO
-    console.activateOptions()
-
-    Logger.getRootLogger().addAppender(console)
-
-    val fa = FileAppender()
-    fa.name = "FileLogger"
-    fa.file = "hotbot.log"
-    fa.layout = PatternLayout("%d %-5p [%c{1}] %m%n")
-    fa.threshold = Level.DEBUG
-    fa.append = true
-    fa.activateOptions()
-
-    Logger.getRootLogger().addAppender(fa)
-}
-
-private fun setupMutedRole(guild: Guild, roleName: String) {
-    if (!guild.hasRole(roleName)) guild.controller.createRole().setName(roleName).complete()
-
-    handleRole(guild, roleName)
-}
-
-private fun handleRole(guild: Guild, roleName: String) {
-    val role = guild.getRolesByName(roleName, true).first()
-
-    guild.textChannels.forEach {
-        val hasOverride = it.rolePermissionOverrides.any {
-            it.role.name.toLowerCase() == roleName.toLowerCase()
-        }
-
-        if (!hasOverride) it.createPermissionOverride(role).setDeny(Permission.MESSAGE_WRITE).queue()
+fun loadPersistence(jda: JDA, logger: BotLogger, config: Configuration) {
+    forEachIgnoredID {
+        config.security.ignoredIDs.add(it)
     }
-}
 
-private fun handleLTSMutes(config: Configuration, jda: JDA) {
-    getAllMutedMembers().forEach {
-        val difference = timeToDifference(it.unmuteTime)
-        val guild = jda.getGuildById(it.guildId)
-        val user = guild.getMemberById(it.user)
-
-        if(user != null) {
-            scheduleUnmute(guild, user.user, config, difference, it)
-        }
-    }
-}
-
-private fun loadReminders(jda: JDA, log: BotLogger) {
     forEachReminder {
         val difference = timeToDifference(it.remindTime)
         val user = jda.getUserById(it.member)
-
-        scheduleReminder(user, it.message, difference, log)
+        scheduleReminder(user, it.message, difference, logger)
     }
 }

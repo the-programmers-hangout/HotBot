@@ -1,6 +1,6 @@
 package me.aberrantfox.hotbot.database
 
-import me.aberrantfox.hotbot.commandframework.commands.utility.SuggestionStatus
+import me.aberrantfox.hotbot.commands.utility.SuggestionStatus
 import me.aberrantfox.hotbot.services.PoolRecord
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction

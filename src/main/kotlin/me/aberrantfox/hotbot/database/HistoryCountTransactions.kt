@@ -43,3 +43,12 @@ fun hasHistoryCount(member: String) =
                 Op.build { HistoryCount.member eq member }
             }.count() > 0
         }
+
+fun resetHistoryCount(member: String): Unit {
+    if (hasHistoryCount(member))
+        transaction {
+            HistoryCount.update({ HistoryCount.member eq member}) {
+                it[HistoryCount.historyCount] = 0
+            }
+        }
+}

@@ -1,16 +1,11 @@
 registerCommand({
     name: "latex",
-    expect: [argType.Sentence],
+    description: "A command that will parse latex",
+    category: "fun",
+    expect: [SentenceArg],
     execute: (event) => {
         const text = event.args[0]
         processLatex(text, event.channel)
-    },
-    help: {
-        name: "latex",
-        description: "A command that will parse latex",
-        category: "fun",
-        structure: "{valid latex}",
-        example: "\\sum_0^\\infty \\frac{x^n}{n!}"
     }
 })
 

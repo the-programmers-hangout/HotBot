@@ -1,24 +1,23 @@
 package me.aberrantfox.hotbot.listeners
 
+import com.google.common.eventbus.Subscribe
 import me.aberrantfox.hotbot.database.ResourceSection
 import me.aberrantfox.hotbot.database.fetchChannelResources
 import me.aberrantfox.hotbot.database.removeAllChannelResources
-import me.aberrantfox.hotbot.dsls.embed.embed
-import me.aberrantfox.hotbot.logging.BotLogger
+import me.aberrantfox.kjdautils.api.dsl.embed
+import me.aberrantfox.kjdautils.internal.logging.BotLogger
 import net.dv8tion.jda.core.entities.MessageChannel
 import net.dv8tion.jda.core.events.channel.text.TextChannelDeleteEvent
-import net.dv8tion.jda.core.hooks.ListenerAdapter
 import java.awt.Color
 
-class ChannelDeleteListener(val log: BotLogger) : ListenerAdapter() {
-    override fun onTextChannelDelete(event: TextChannelDeleteEvent) {
+class ChannelDeleteListener(val log: BotLogger) {
+    @Subscribe
+    fun onTextChannelDelete(event: TextChannelDeleteEvent) {
         val resources = fetchChannelResources(event.channel.id, true)
-        if (resources.isEmpty()) {
-            return
-        }
+        if (resources.isEmpty()) return
 
         removeAllChannelResources(event.channel.id)
-        log.warning(buildDeleteResourcesEmbed(event.channel, resources))
+        log.alert(buildDeleteResourcesEmbed(event.channel, resources))
     }
 }
 
