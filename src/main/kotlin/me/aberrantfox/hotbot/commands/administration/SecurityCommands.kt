@@ -3,6 +3,7 @@ package me.aberrantfox.hotbot.commands.administration
 import me.aberrantfox.hotbot.listeners.antispam.NewPlayers
 import me.aberrantfox.kjdautils.api.dsl.CommandSet
 import me.aberrantfox.kjdautils.api.dsl.commands
+import me.aberrantfox.kjdautils.internal.command.arguments.ChoiceArg
 import me.aberrantfox.kjdautils.internal.command.arguments.WordArg
 
 enum class SecurityLevel(val matchCount: Int, val waitPeriod: Int, val maxAmount: Int) {
@@ -18,18 +19,11 @@ object SecurityLevelState {
 @CommandSet("security")
 fun securityCommands() = commands {
     command("setSecuritylevel") {
-        description = "Set the bot's security level"
-        expect(WordArg)
+        description = "Set the bot's security level to one of: ${names()}"
+        expect(ChoiceArg(*SecurityLevel.values()))
         execute {
-            val targetLevel = (it.args[0] as String).capitalize()
-
-            try {
-                val parsed = SecurityLevel.valueOf(targetLevel)
-                SecurityLevelState.alertLevel = parsed
-                it.respond("Level set to ${parsed.name}")
-            } catch (e: IllegalArgumentException) {
-                it.respond("SecurityLevel: $targetLevel is unknown, known levels are: ${names()}")
-            }
+            SecurityLevelState.alertLevel = it.args[0] as SecurityLevel
+            it.respond("Level set to ${SecurityLevelState.alertLevel}")
         }
     }
 

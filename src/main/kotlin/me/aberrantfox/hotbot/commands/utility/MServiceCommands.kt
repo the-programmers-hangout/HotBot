@@ -1,70 +1,63 @@
 package me.aberrantfox.hotbot.commands.utility
 
 import me.aberrantfox.hotbot.services.MService
+import me.aberrantfox.hotbot.services.Messages
 import me.aberrantfox.kjdautils.api.dsl.CommandSet
 import me.aberrantfox.kjdautils.api.dsl.commands
+import me.aberrantfox.kjdautils.api.dsl.embed
+import me.aberrantfox.kjdautils.internal.command.arguments.ChoiceArg
 import me.aberrantfox.kjdautils.internal.command.arguments.SentenceArg
+import java.awt.Color
+import kotlin.reflect.KMutableProperty
+import kotlin.reflect.full.createType
+import kotlin.reflect.full.declaredMemberProperties
 
+private val messages = Messages::class.declaredMemberProperties
+        .filter { it.returnType == String::class.createType() }
+        .filter { it is KMutableProperty<*> }
+        .map { it as KMutableProperty<*> }
+        .associateBy { it.name.toLowerCase() }
+
+object MessageConfigArg : ChoiceArg(*messages.keys.toTypedArray()) {
+    override val name = "Message"
+}
 
 @CommandSet("MessageConfiguration")
 fun messageConfiguration(mService: MService) = commands {
-    command("setBotDescription") {
-        description = "Set the description of the bot"
-        expect(SentenceArg)
+    command("set") {
+        description = "Set message for the given key. Available keys: ${messages.keys.joinToString(", ")}"
+        expect(MessageConfigArg, SentenceArg)
         execute {
-            val description = it.args[0] as String
-            mService.messages.botDescription = description
-            mService.writeMessages()
+            val key = it.args[0] as String
+            val message = it.args[1] as String
 
-            it.respond("Botinfo is now set to `$description`")
+            messages[key]!!.setter.call(mService.messages, message)
+
+            it.respond(embed {
+                setTitle("Message configuration changed")
+                setColor(Color.CYAN)
+                field {
+                    name = key
+                    value = message
+                }
+            })
         }
     }
 
-    command("setGagMessage") {
-        description = "Set the message sent to someone when the `gag` command is used on them"
-        expect(SentenceArg)
+    command("get") {
+        description = "Get configured message for the given key. Available keys: ${messages.keys.joinToString(", ")}"
+        expect(MessageConfigArg)
         execute {
-            val gagResponse = it.args[0] as String
-            mService.messages.gagResponse = gagResponse
-            mService.writeMessages()
+            val key = it.args[0] as String
 
-            it.respond("The message sent when someone is gagged is now `$gagResponse`")
-        }
-    }
-
-    command("setPermanentInvite") {
-        description = "Sets the invite link displayed when the `invite` command is run"
-        expect(SentenceArg)
-        execute {
-            val invite = it.args[0] as String
-            mService.messages.permanentInviteLink = invite
-            mService.writeMessages()
-
-            it.respond("The permanent invite link is now set to `$invite`")
-        }
-    }
-
-    command("setServerDescription") {
-        description = "Sets the description of the server displayed when the `serverinfo` command is run."
-        expect(SentenceArg)
-        execute {
-            val description = it.args[0] as String
-            mService.messages.serverDescription = description
-            mService.writeMessages()
-
-            it.respond("The server description is now set to `$description`")
-        }
-    }
-
-    command("setWelcomeMessage") {
-        description = "Set the message displayed at the bottom of every automatic greeting message"
-        expect(SentenceArg)
-        execute {
-            val description  = it.args[0] as String
-            mService.messages.welcomeDescription = description
-            mService.writeMessages()
-
-            it.respond("The server greeting is now set to `$description`")
+            it.respond(embed {
+                setTitle("Message configuration")
+                setColor(Color.CYAN)
+                field {
+                    name = key
+                    value = messages[key]!!.getter.call(mService.messages) as String
+                }
+            })
         }
     }
 }
