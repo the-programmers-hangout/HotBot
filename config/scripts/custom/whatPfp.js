@@ -5,7 +5,12 @@ registerCommand({
     expect: [UserArg],
     execute: (event) => {
         const userPfp = event.args[0].effectiveAvatarUrl
-        const reverseUrl = "https://www.google.com/searchbyimage?&image_url="
-        event.respond("<${reverseUrl}${userPfp}>")
+        const reverseUrl = "https://www.google.com/searchbyimage?image_url="
+        const embed = new EmbedBuilder()
+                           .setTitle("${event.args[0].getName()}'s pfp")
+                           .setImage(userPfp)
+                           .appendDescription("[Reverse Search](${reverseUrl}${userPfp})")
+                           .build()
+        event.respond(embed)
     }
 })
