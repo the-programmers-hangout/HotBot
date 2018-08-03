@@ -2,6 +2,7 @@ const listener = Java.type("net.dv8tion.jda.core.hooks.ListenerAdapter")
 const EventListener = Java.extend(listener)
 const urlUtilities = Java.type("me.aberrantfox.hotbot.javautilities.UrlUtilities")
 const ArgumentTypeArray = Java.type("me.aberrantfox.kjdautils.internal.command.ArgumentType[]")
+const EmbedBuilder = Java.type("net.dv8tion.jda.core.EmbedBuilder")
 
 function createCommand(name) {
     return container.command(name, function(){})
