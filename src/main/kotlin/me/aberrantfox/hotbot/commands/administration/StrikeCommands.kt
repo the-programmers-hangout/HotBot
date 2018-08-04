@@ -253,7 +253,7 @@ private fun infract(event: CommandEvent, guild: Guild, config: Configuration) {
 
     insertInfraction(target.id, event.author.id, strikeQuantity, reason)
 
-    event.author.sendPrivateMessage("User ${target.asMention} has been infracted with weight: $strikeQuantity, with reason:\n$reason")
+    event.safeRespond("User ${target.asMention} has been infracted with weight: $strikeQuantity, with reason:\n$reason")
 
     var totalStrikes = getMaxStrikes(target.id)
 
