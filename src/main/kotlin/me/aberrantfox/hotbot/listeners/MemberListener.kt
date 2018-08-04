@@ -35,7 +35,7 @@ class MemberListener(val configuration: Configuration, val logger: BotLogger, va
         val user = "${event.user.fullName()} :: ${event.user.asMention}"
         val date = event.user.creationTime.toString().formatJdaDate()
         val rejoin = hasLeaveHistory(event.user.id, event.guild.id)
-        val newUserThreshold = 700
+        val newUserThreshold = 5
 
         logger.info("$user created $numOfDays days ago ($date) -- ${if (rejoin) "re" else ""}joined the server")
 
