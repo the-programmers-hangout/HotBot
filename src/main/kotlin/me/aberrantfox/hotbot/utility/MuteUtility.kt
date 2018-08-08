@@ -9,6 +9,7 @@ import me.aberrantfox.kjdautils.api.dsl.embed
 import me.aberrantfox.kjdautils.extensions.jda.fullName
 import me.aberrantfox.kjdautils.extensions.stdlib.convertToTimeString
 import me.aberrantfox.kjdautils.internal.logging.BotLogger
+import me.aberrantfox.kjdautils.internal.logging.ChannelLogger
 import net.dv8tion.jda.core.entities.Guild
 import net.dv8tion.jda.core.entities.Member
 import net.dv8tion.jda.core.entities.User
@@ -48,34 +49,25 @@ fun muteMember(guild: Guild, user: User, time: Long, reason: String, config: Con
         insertMutedMember(record)
         scheduleUnmute(guild, user, config, time, record)
     }
-
-    moderator.openPrivateChannel().queue {
-        it.sendMessage(
-                "User ${user.asMention} has been muted for $timeString, with reason:\n\n$reason")
-                .queue()
-    }
+    notifyMuteAction(guild, user, timeString, reason, config)
 }
 
 fun muteVoiceChannel(guild: Guild, voiceChannel: VoiceChannel,
-                     moderator: User, config: Configuration, manager: PermissionManager) {
+                     config: Configuration, manager: PermissionManager) {
     voiceChannel.members
             .filter { !(manager.canPerformAction(it.user, config.permissionedActions.voiceChannelMuteThreshold)) }
             .forEach { guild.controller.setMute(it, true).queue() }
 
-    moderator.openPrivateChannel().queue {
-        it.sendMessage("All non-moderators in voice channel **${voiceChannel.name}** have been muted.").queue()
-    }
+    notifyVoiceMuteAction(guild, voiceChannel, config)
 }
 
-fun unmuteVoiceChannel(guild: Guild, voiceChannel: VoiceChannel, moderator: User) {
+fun unmuteVoiceChannel(guild: Guild, voiceChannel: VoiceChannel, config: Configuration) {
 
     voiceChannel.members.filterNot(Member::isOwner).forEach {
         guild.controller.setMute(it, false).queue()
     }
 
-    moderator.openPrivateChannel().queue {
-        it.sendMessage("All members in voice channel **${voiceChannel.name}** have been un-muted.").queue()
-    }
+    notifyVoiceUnmuteAction(guild, voiceChannel, config)
 }
 
 private fun buildMuteEmbed(userMention: String, timeString: String, reason: String) = embed {
@@ -151,4 +143,16 @@ fun handleReJoinMute(guild: Guild, user: User, config: Configuration, log: BotLo
                 guild.getRolesByName(config.security.mutedRole, true)).queue()
     }
 
+}
+
+fun notifyMuteAction(guild: Guild, user: User, time: String, reason: String, config: Configuration) {
+    guild.getTextChannelById(config.logChannels.alert).sendMessage("User ${user.asMention} has been muted for $time, with reason: $reason")
+}
+
+fun notifyVoiceMuteAction(guild: Guild, voiceChannel: VoiceChannel, config: Configuration) {
+    guild.getTextChannelById(config.logChannels.alert).sendMessage("All non-moderators in voice channel **${voiceChannel.name}** have been muted.").queue()
+}
+
+fun notifyVoiceUnmuteAction(guild: Guild, voiceChannel: VoiceChannel, config: Configuration) {
+    guild.getTextChannelById(config.logChannels.alert).sendMessage("All members in voice channel **${voiceChannel.name}** have been un-muted.").queue()
 }

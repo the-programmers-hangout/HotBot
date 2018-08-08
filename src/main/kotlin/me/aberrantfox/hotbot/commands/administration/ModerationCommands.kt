@@ -374,7 +374,7 @@ fun moderationCommands(kConfig: KJDAConfiguration, config: Configuration, mServi
         execute {
             val voiceChannel = it.args.component1() as VoiceChannel
             val guild = it.jda.getGuildById(config.serverInformation.guildid)
-            muteVoiceChannel(guild, voiceChannel, it.author, config, manager)
+            muteVoiceChannel(guild, voiceChannel, config, manager)
         }
     }
 
@@ -384,7 +384,7 @@ fun moderationCommands(kConfig: KJDAConfiguration, config: Configuration, mServi
         execute {
             val voiceChannel = it.args.component1() as VoiceChannel
             val guild = it.jda.getGuildById(config.serverInformation.guildid)
-            unmuteVoiceChannel(guild, voiceChannel, it.author)
+            unmuteVoiceChannel(guild, voiceChannel, config)
         }
     }
 }
