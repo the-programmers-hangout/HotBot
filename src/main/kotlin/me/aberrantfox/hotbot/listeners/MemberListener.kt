@@ -16,6 +16,7 @@ import org.joda.time.DateTime
 import java.awt.Color
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.TimeUnit
 import kotlin.concurrent.schedule
 import me.aberrantfox.hotbot.services.UserID
 import me.aberrantfox.hotbot.utility.handleReJoinMute
@@ -28,12 +29,23 @@ class MemberListener(val configuration: Configuration, val logger: BotLogger, va
 
     @Subscribe
     fun onGuildMemberJoin(event: GuildMemberJoinEvent) {
+
+        val secsSinceCreation = (System.currentTimeMillis() / 1000) - event.user.creationTime.toEpochSecond()
+        val numOfDays = TimeUnit.DAYS.convert(secsSinceCreation, TimeUnit.SECONDS).toInt()
+        val user = "${event.user.fullName()} :: ${event.user.asMention}"
+        val date = event.user.creationTime.toString().formatJdaDate()
+        val rejoin = hasLeaveHistory(event.user.id, event.guild.id)
+        val newUserThreshold = 5
+
+        logger.info("$user created $numOfDays days ago ($date) -- ${if (rejoin) "re" else ""}joined the server")
+
+        if (numOfDays <= newUserThreshold)
+            logger.alert("$user has joined the server but the account has only existed for $numOfDays day${if (numOfDays == 1) "" else "s"}. Potential action required.")
+
+        //Build welcome message
         val target = event.guild.textChannels.findLast { it.id == configuration.messageChannels.welcomeChannel }
         val response = mService.messages.onJoin.randomListItem().replace("%name%", "${event.user.asMention}(${event.user.fullName()})")
         val userImage = event.user.effectiveAvatarUrl
-
-        val rejoin = hasLeaveHistory(event.user.id, event.guild.id)
-        logger.info("${event.user.fullName()} :: ${event.user.asMention} created on ${event.user.creationTime.toString().formatJdaDate()} -- ${if (rejoin) "re" else ""}joined the server")
 
         target?.sendMessage(buildJoinMessage(response, userImage, if (rejoin) "Player Resumes!" else "Player Get!"))?.queue { msg ->
             msg.addReaction("\uD83D\uDC4B").queue {
