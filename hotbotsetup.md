@@ -1,43 +1,37 @@
 # How to setup Hotbot
 
-Note: this setup is meant for Windows - Linux users will install the same general programs and use the same general commands, though some of the specific steps (such as during installation, etc) may not be the same.
+Note: this setup is based on Windows. Linux users should follow the same steps, though certain minor aspects (binaries, wording, etc) may differ.
 
-In your preferred directory, `git clone` the source code from https://gitlab.com/Aberrantfox/hotbot or, if you prefer, visit the site and download the source as an .zip archive.
+In your preferred directory, `git clone` the source code from https://gitlab.com/Aberrantfox/hotbot or visit the site and download the source as a .zip archive.
 
 ## Installation
 
 #### Install Java
 
-If you'd simply like to run Hotbot, you should install the Java Runtime Environment (JRE) from the link below. 
-If you program in Java as well, you should install the Java Development Kit (JDK), which also contains the JRE.
-So if you find yourself in doubt, simply install the JRE.
-   
-Install from http://www.oracle.com/technetwork/java/javase/downloads/jdk10-downloads-4416644.html, clicking through the installer and changing your preferences as necessary.
-	
-	
-#### Install Intellij IDEA
-You may choose to install the Community Edition or the Ultimate Installation, you can find a description of their differences at the link below
+Download the most recent release from the [Java Downloads](http://www.oracle.com/technetwork/java/javase/downloads/jdk10-downloads-4416644.html) page and proceed through the installer.
 
-Download your preferred edition from https://www.jetbrains.com/idea/ and go through the installer
+#### Install IntelliJ IDEA
 
-If you choose the defaults during the installation, you will have everything you need for Hotbot, but if you'd rather customize your options, only Maven and JRE plugins are required for Hotbot.
-
+Download your preferred edition of [IntelliJ](https://www.jetbrains.com/idea/download/#section=windows) and proceed through the installer.
+For users who wish to customize their installation, only the Maven plugin is required. This plugin is included in the default installation.
 
 #### Install Apache Maven 
-Install from https://maven.apache.org/download.cgi and follow the instructions at https://maven.apache.org/install.html to install it.
 
+Note: this is not necessary if the IntelliJ maven plugin was installed.
+
+Download [Maven](https://maven.apache.org/download.cgi) and follow the [instructions](https://maven.apache.org/install.html) if needed.
 It is required that Maven is added to PATH.
 
 #### Install and setup MySQL 
 
-Install from https://dev.mysql.com/downloads/windows/installer/5.7.html
+Install [MySQL](https://dev.mysql.com/downloads/windows/installer/5.7.html) and follow the instructions below.
 
 **Important Note**:  This is a somewhat dated installation of MySQL, but your test bot may not work with newer versions of MySQL.
 
 1. If you want to install everything, it is fine to ignore the rest of the instructions in this section. 
    However, if you'd rather only install the components necessary for Hotbot, please continue reading.
 
-3. When prompted, under "custom," install the following by selecting the components to install:
+3. When prompted, under "custom" install the following by selecting the components to install:
    - MySQL server
    - MySQL Workbench
    - MySQL Notifier
@@ -46,10 +40,10 @@ Install from https://dev.mysql.com/downloads/windows/installer/5.7.html
    - Connector/J
  
 4. When prompted, select the following for each tab given:
-	- Under "Group Replication," select "Standalone MySQL Server / Classic MySQL Replication"
-	- Under "Type and Networking," click next
-	- Under "Authentication," select the legacy option.
-	- Under "Account and Roles," make and record the root password (you will need this later)
+	- Under "Group Replication", select "Standalone MySQL Server / Classic MySQL Replication"
+	- Under "Type and Networking", click next
+	- Under "Authentication", select the legacy option.
+	- Under "Account and Roles", make and record the root password (you will need this later)
 		- You don't need to make a user account
 	- Under "Windows Service", it is your personal choice whether to start the service at startup or not
 		- Keep everything else the same and finish the installation.
@@ -57,27 +51,27 @@ Install from https://dev.mysql.com/downloads/windows/installer/5.7.html
 ## Hotbot Setup
 
 #### Create a Test Server
-This is for the bot to run on, and can be made by clicking the "+" sign at the bottom left of Discord (you may have to scroll through your servers to see this.)
+Create a Discord server for the bot to run on. Follow the [guide](https://support.discordapp.com/hc/en-us/articles/204849977-How-do-I-create-a-server-) if needed.
 
 #### Create a Bot Account
 Create one here: https://discordapp.com/developers/applications/me
 
-- Under "General Information," 
+- Under "General Information" 
 	- Give an app icon and a name.
 	- Note that the name is not changeable, so make sure you like it!
 	- Record the client ID for future use.
-- Under "Bot,"
-	- Create a bot,
+- Under "Bot"
+	- Create a bot.
 	- Give it a username, app icon, and record the token for future use.
 		- Note: This is a secret token, don't reveal it!
-	- Uncheck the option to let it be a public bot so that only you can add it to servers 
+	- Uncheck the option to let it be a public bot so that only you can add it to servers.
 - Save changes
 
 #### Add the Bot to your Server 
 Go to this link: https://discordapi.com/permissions.html
 
 - Grant Administrator permissions to the bot by selecting the options.
-- Under "OAth URL Generator," enter the bot's client ID and click the link to add it to your server.
+- Under "OAth URL Generator" enter the bot's client ID and click the link to add it to your server.
 - Make sure that the bot's role is the highest role (under Owner, of course.)
 	
 #### Create a database for Hotbot
@@ -112,6 +106,6 @@ Go to this link: https://discordapi.com/permissions.html
 4. Run "java -jar \<targetJar\>.jar" on the jar with hotbot's dependencies.
 	- This may look something like "java -jar target/hotbot-6.0.2-jar-with-dependencies.jar" 	
 
-As an alternative, you can run Hotbot by opening the project in Intellij IDEA and clicking the green arrow directly left of the main function's definition in MainApp.kt (you may not see this if you're in Power Saving Mode)
+As an alternative, you can run Hotbot by opening the project in IntelliJ IDEA and clicking the green arrow directly left of the main function's definition in MainApp.kt (you may not see this if you're in Power Saving Mode)
 
 Thanks for contributing to Hotbot!
