@@ -48,7 +48,6 @@ private fun start(config: Configuration) = startBot(config.serverInformation.tok
 
     setupMacroCommands(container, manager)
 
-    manager.defaultAndPrunePermissions(container)
     val failsBecause: (String?, Boolean) -> PreconditionResult = { reason, condition -> if (condition) Pass else Fail(reason) }
     val commandName: (CommandEvent) -> String = { it.commandStruct.commandName.toLowerCase() }
 
@@ -72,6 +71,9 @@ private fun start(config: Configuration) = startBot(config.serverInformation.tok
     }
 
     EngineContainer.engine = setupScriptEngine(jda, container, config, logger)
+
+    manager.defaultAndPrunePermissions(container)
+
     loadPersistence(jda, logger, config)
 
     logger.info("Fully setup, now ready for use.")
