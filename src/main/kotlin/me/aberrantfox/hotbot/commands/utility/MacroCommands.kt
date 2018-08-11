@@ -38,7 +38,7 @@ fun macroCommands(permManager: PermissionManager) =
     commands {
         command("addmacro") {
             description = "Add a macro which will respond with the given message when invoked by the given name."
-            expect(WordArg, WordArg, SentenceArg)
+            expect(WordArg("Name"), WordArg("Category"), SentenceArg)
             execute {
                 val name = (it.args.component1() as String).toLowerCase()
                 val category = (it.args.component2() as String).toLowerCase()

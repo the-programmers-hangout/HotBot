@@ -5,12 +5,10 @@ import me.aberrantfox.kjdautils.internal.command.ArgumentResult
 import me.aberrantfox.kjdautils.internal.command.ArgumentType
 import me.aberrantfox.kjdautils.internal.command.ConsumptionType
 
-class MultipleArg(val base: ArgumentType) : ArgumentType {
-    override val name = "${base.name}..."
+class MultipleArg(val base: ArgumentType, name: String = "") : ArgumentType {
+    override val name = if (name.isNotBlank()) name else "${base.name}..."
     override val examples = ArrayList(base.examples.chunked(2 ).map { it.joinToString(" ") })
     override val consumptionType = ConsumptionType.Multiple
-    override fun isValid(arg: String, event: CommandEvent) = true
-
     override fun convert(arg: String, args: List<String>, event: CommandEvent): ArgumentResult {
         val result = mutableListOf<Any>()
         val consumed = mutableListOf<String>()

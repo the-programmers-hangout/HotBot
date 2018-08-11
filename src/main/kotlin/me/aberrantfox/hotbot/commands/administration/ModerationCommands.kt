@@ -16,7 +16,9 @@ import me.aberrantfox.kjdautils.extensions.jda.isCommandInvocation
 import me.aberrantfox.kjdautils.extensions.jda.sendPrivateMessage
 import me.aberrantfox.kjdautils.extensions.stdlib.randomListItem
 import me.aberrantfox.kjdautils.internal.command.arguments.*
+import me.aberrantfox.kjdautils.internal.logging.BotLogger
 import net.dv8tion.jda.core.entities.*
+import org.jetbrains.exposed.sql.exposedLogger
 import java.awt.Color
 import java.io.File
 import java.text.SimpleDateFormat
@@ -27,7 +29,7 @@ import kotlin.math.roundToLong
 class ModerationCommands
 
 @CommandSet("moderation")
-fun moderationCommands(kConfig: KJDAConfiguration, config: Configuration, mService: MService, manager: PermissionManager) = commands {
+fun moderationCommands(kConfig: KJDAConfiguration, config: Configuration, mService: MService, manager: PermissionManager, logger: BotLogger) = commands {
     command("ban") {
         description = "Bans a member for the passed reason, deleting a given number of days messages."
         expect(arg(LowerUserArg), arg(IntegerArg, true, 1), arg(SentenceArg))
@@ -216,7 +218,7 @@ fun moderationCommands(kConfig: KJDAConfiguration, config: Configuration, mServi
                 it.message.delete().queue()
 
             it.channel.history.retrievePast(searchSpace + 1).queue { past ->
-                handleResponse(past, channel, targets, it.channel as TextChannel, it.author.asMention, kConfig)
+                handleResponse(past, channel, targets, it.channel as TextChannel, it.author.asMention, kConfig, logger)
             }
         }
     }
@@ -233,7 +235,7 @@ fun moderationCommands(kConfig: KJDAConfiguration, config: Configuration, mServi
             val targetMember = guild.getMember(target)
 
             guild.controller.setNickname(targetMember, mService.messages.names.randomListItem()).queue {
-                target.sendPrivateMessage("Your name has been changed forcefully by a member of staff for reason: $reason")
+                target.sendPrivateMessage("Your name has been changed forcefully by a member of staff for reason: $reason", logger)
             }
         }
     }
@@ -353,16 +355,16 @@ fun moderationCommands(kConfig: KJDAConfiguration, config: Configuration, mServi
             val guild = it.jda.getGuildById(config.serverInformation.guildid)
 
             user.sendPrivateMessage("We have flagged your profile picture as inappropriate. " +
-                "Please change it within the next 30 minutes or you will be banned.")
+                "Please change it within the next 30 minutes or you will be banned.", logger)
 
             Timer().schedule(1000 * 60 * 30) {
                 if(avatar == it.jda.retrieveUserById(user.id).complete().effectiveAvatarUrl) {
-                    user.sendPrivateMessage("Hi, since you failed to change your profile picture, you are being banned.")
+                    user.sendPrivateMessage("Hi, since you failed to change your profile picture, you are being banned.", logger)
                     Timer().schedule(1000 * 10) {
                         guild.controller.ban(user, 1, "Having a bad profile picture and refusing to change it.").queue()
                     }
                 } else {
-                    user.sendPrivateMessage("Thank you for changing your avatar. You will not be banned.")
+                    user.sendPrivateMessage("Thank you for changing your avatar. You will not be banned.", logger)
                 }
             }
         }
@@ -390,7 +392,7 @@ fun moderationCommands(kConfig: KJDAConfiguration, config: Configuration, mServi
 }
 
 private fun handleResponse(past: List<Message>, channel: TextChannel, targets: List<User>, sourceChannel: TextChannel,
-                           source: String, kConfig: KJDAConfiguration) {
+                           source: String, kConfig: KJDAConfiguration, logger: BotLogger) {
 
 
     val targetIDs = targets.map { it.id }
@@ -420,7 +422,7 @@ private fun handleResponse(past: List<Message>, channel: TextChannel, targets: L
             sourceChannel.deleteMessages(messages).queue()
 
         targets.forEach {
-            it.sendPrivateMessage("Your messages have been moved to ${channel.asMention}")
+            it.sendPrivateMessage("Your messages have been moved to ${channel.asMention}", logger)
         }
     }
 }

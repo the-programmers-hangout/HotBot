@@ -39,7 +39,7 @@ fun strikeCommands(config: Configuration, log: BotLogger) =
                 val e = it.copy(args=newArgs)
                 val guild = it.jda.getGuildById(config.serverInformation.guildid)
 
-                infract(e, guild, config)
+                infract(e, guild, config, log)
             }
         }
 
@@ -50,7 +50,7 @@ fun strikeCommands(config: Configuration, log: BotLogger) =
                    arg(SentenceArg))
             execute {
                 val guild = it.jda.getGuildById(config.serverInformation.guildid)
-                infract(it, guild, config)
+                infract(it, guild, config, log)
             }
         }
 
@@ -120,7 +120,7 @@ fun strikeCommands(config: Configuration, log: BotLogger) =
                 val request = StrikeRequests.map[user.id]!!
                 val newArgs = listOf(request.user, request.amount, request.reason)
                 val guild = it.jda.getGuildById(config.serverInformation.guildid)
-                infract(it.copy(args = newArgs), guild, config)
+                infract(it.copy(args = newArgs), guild, config, log)
 
                 StrikeRequests.map.remove(user.id)
                 it.respond("Strike request on ${user.asMention} was accepted.")
@@ -222,7 +222,7 @@ fun strikeCommands(config: Configuration, log: BotLogger) =
                 val guild = it.jda.getGuildById(config.serverInformation.guildid)
 
                 target.sendPrivateMessage(buildHistoryEmbed(target, false, getHistory(target.id),
-                        getHistoryCount(target.id), null, it, guild, config))
+                        getHistoryCount(target.id), null, it, guild, config), log)
             }
         }
     }
@@ -235,7 +235,7 @@ private fun strikeAgainst(user: User, event: CommandEvent) =
         true
     }
 
-private fun infract(event: CommandEvent, guild: Guild, config: Configuration) {
+private fun infract(event: CommandEvent, guild: Guild, config: Configuration, log: BotLogger) {
     val args = event.args
     val target = args[0] as User
     val strikeQuantity = args[1] as Int

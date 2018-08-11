@@ -10,7 +10,7 @@ import me.aberrantfox.kjdautils.internal.command.arguments.WordArg
 fun aliasCommands(aliasService: AliasService) = commands {
     command("alias") {
         description = "Create an alias called the second argument to the first"
-        expect(WordArg, WordArg)
+        expect(WordArg("Target"), WordArg("Alias"))
         execute {
             val original = it.args.component1() as String
             val alias = it.args.component2() as String

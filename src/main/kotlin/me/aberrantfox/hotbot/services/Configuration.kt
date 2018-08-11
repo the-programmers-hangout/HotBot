@@ -64,7 +64,15 @@ sealed class InfractionAction {
     object Kick : InfractionAction()
     object Ban : InfractionAction()
     data class Mute(val duration: Long) : InfractionAction() // in minutes
+
+    override fun toString() = when(this) {
+        is Warn -> "Warn"
+        is Kick -> "Kick"
+        is Ban  -> "Ban"
+        is Mute -> "Mute"
+    }
 }
+
 
 
 private val configDir = System.getenv("HOTBOT_CONFIG_DIR") ?: "config"
