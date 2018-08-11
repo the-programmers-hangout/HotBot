@@ -5,12 +5,11 @@ import me.aberrantfox.kjdautils.internal.command.ArgumentResult
 import me.aberrantfox.kjdautils.internal.command.ArgumentType
 import me.aberrantfox.kjdautils.internal.command.ConsumptionType
 
-object HexColourArg : ArgumentType {
-    override val name = "Hex Colour"
+open class HexColourArg(override val name : String = "Hex Colour") : ArgumentType {
+    companion object : HexColourArg()
+
     override val examples = arrayListOf("#000000", "FFFF00", "#3498db", "db3434")
     override val consumptionType = ConsumptionType.Single
-    override fun isValid(arg: String, event: CommandEvent) = arg.length == 6 || arg.length == 7 && arg[0] == '#'
-
     override fun convert(arg: String, args: List<String>, event: CommandEvent): ArgumentResult {
         if (arg.length != 7 && arg.length != 6) return ArgumentResult.Error("Invalid colour argument.")
 

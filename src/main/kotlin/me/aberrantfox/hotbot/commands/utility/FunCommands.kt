@@ -32,7 +32,7 @@ fun funCommands() =
 
         command("animal") {
             description = "Shows a cute animal. Animals implemented are ${animalMap.keys.joinToString(", ")}"
-            expect(arg(ChoiceArg(*animalMap.keys.toTypedArray()), true, "random"))
+            expect(arg(ChoiceArg("Animal", *animalMap.keys.toTypedArray()), true, "random"))
             execute {
                 var animal = it.args[0] as String
 

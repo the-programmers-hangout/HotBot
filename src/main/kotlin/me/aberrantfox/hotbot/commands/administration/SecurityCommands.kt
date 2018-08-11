@@ -20,7 +20,7 @@ object SecurityLevelState {
 fun securityCommands() = commands {
     command("setSecuritylevel") {
         description = "Set the bot's security level to one of: ${names()}"
-        expect(ChoiceArg(*SecurityLevel.values()))
+        expect(ChoiceArg(name="Security Level", choices=*SecurityLevel.values()))
         execute {
             SecurityLevelState.alertLevel = it.args[0] as SecurityLevel
             it.respond("Level set to ${SecurityLevelState.alertLevel}")

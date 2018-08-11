@@ -12,6 +12,7 @@ import me.aberrantfox.kjdautils.extensions.jda.sendPrivateMessage
 import me.aberrantfox.kjdautils.internal.command.arguments.ChoiceArg
 import me.aberrantfox.kjdautils.internal.command.arguments.SentenceArg
 import me.aberrantfox.kjdautils.internal.command.arguments.WordArg
+import me.aberrantfox.kjdautils.internal.logging.BotLogger
 import net.dv8tion.jda.core.EmbedBuilder
 import net.dv8tion.jda.core.JDA
 import net.dv8tion.jda.core.entities.Guild
@@ -29,7 +30,7 @@ object Suggestions {
 }
 
 @CommandSet("suggestions")
-fun suggestionCommands(config: Configuration) = commands {
+fun suggestionCommands(config: Configuration, log: BotLogger) = commands {
     command("suggest") {
         description = "Send a suggestion to the pre-lim pool. Suggestions are reviewed by a mod before they are reviewed by the community."
         expect(SentenceArg)
@@ -138,7 +139,7 @@ fun suggestionCommands(config: Configuration) = commands {
 
                 try {
                     msg.jda.retrieveUserById(suggestion.member).complete()
-                            .sendPrivateMessage(suggestionUpdateMessage)
+                            .sendPrivateMessage(suggestionUpdateMessage, log)
                 }
                 finally {
                     message.fields.removeIf { it.name == reasonTitle }

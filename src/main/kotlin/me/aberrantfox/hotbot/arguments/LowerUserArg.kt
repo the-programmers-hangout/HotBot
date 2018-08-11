@@ -9,13 +9,13 @@ import me.aberrantfox.kjdautils.internal.command.ConsumptionType
 import me.aberrantfox.kjdautils.internal.command.tryRetrieveSnowflake
 import net.dv8tion.jda.core.entities.User
 
-object LowerUserArg : ArgumentType {
+open class LowerUserArg(override val name : String = "Lower Ranked User") : ArgumentType {
+    companion object : LowerUserArg()
+
     lateinit var manager: PermissionManager
 
-    override val name = "Lower Ranked User"
     override val examples = arrayListOf("@Bob", "197780697866305536", "302134543639511050")
     override val consumptionType = ConsumptionType.Single
-    override fun isValid(arg: String, event: CommandEvent) = true
 
     override fun convert(arg: String, args: List<String>, event: CommandEvent): ArgumentResult {
         val retrieved = tryRetrieveSnowflake(event.jda) { it.retrieveUserById(arg.trimToID()).complete() }

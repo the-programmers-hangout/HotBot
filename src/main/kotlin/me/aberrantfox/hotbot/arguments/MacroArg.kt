@@ -6,12 +6,11 @@ import me.aberrantfox.kjdautils.internal.command.ArgumentResult
 import me.aberrantfox.kjdautils.internal.command.ArgumentType
 import me.aberrantfox.kjdautils.internal.command.ConsumptionType
 
-object MacroArg : ArgumentType {
-    override val name = "Macro"
+open class MacroArg(override val name : String = "Macro") : ArgumentType {
+    companion object : MacroArg()
+
     override val examples = arrayListOf("ask", "wrapcode", "cc", "date")
     override val consumptionType = ConsumptionType.Single
-    override fun isValid(arg: String, event: CommandEvent) = arg.toLowerCase() in macros
-
     override fun convert(arg: String, args: List<String>, event: CommandEvent): ArgumentResult {
         val macro = macros[arg.toLowerCase()]
 

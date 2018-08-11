@@ -18,9 +18,7 @@ private val messages = Messages::class.declaredMemberProperties
         .map { it as KMutableProperty<*> }
         .associateBy { it.name.toLowerCase() }
 
-object MessageConfigArg : ChoiceArg(*messages.keys.toTypedArray()) {
-    override val name = "Message"
-}
+object MessageConfigArg : ChoiceArg("Message Name", *messages.keys.toTypedArray())
 
 @CommandSet("MessageConfiguration")
 fun messageConfiguration(mService: MService) = commands {

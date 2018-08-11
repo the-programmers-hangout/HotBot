@@ -37,7 +37,7 @@ fun scheduleReminder(user: User, message: String, timeMilli: Long, log: BotLogge
     fun remindTask() {
         deleteReminder(user.id, message)
         log.info("${user.fullName()} reminded themselves about: $message")
-        user.sendPrivateMessage("Hi, you asked me to remind you about: $message")
+        user.sendPrivateMessage("Hi, you asked me to remind you about: $message", log)
     }
 
     if (timeMilli <= 0) {
