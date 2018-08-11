@@ -41,8 +41,8 @@ fun suggestionCommands(config: Configuration, log: BotLogger) = commands {
             val response = Suggestions.pool.addRecord(author, it.author.effectiveAvatarUrl, message)
 
             when (response) {
-                AddResponse.PoolFull -> it.respond("You have enough suggestions in the pool for now...")
-                AddResponse.UserFull -> it.respond("There are too many suggestions in the pool to handle your request currently... sorry about that.")
+                AddResponse.UserFull -> it.respond("You have enough suggestions in the pool for now...")
+                AddResponse.PoolFull -> it.respond("There are too many suggestions in the pool to handle your request currently... sorry about that.")
                 AddResponse.Accepted -> it.respond("Your suggestion has been added to the review-pool. If it passes it'll be pushed out to the suggestions channel.")
             }
         }
