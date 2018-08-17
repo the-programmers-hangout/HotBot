@@ -1,6 +1,7 @@
 package me.aberrantfox.hotbot.listeners
 
 import com.google.common.eventbus.Subscribe
+import me.aberrantfox.hotbot.commands.administration.sendWelcome
 import me.aberrantfox.hotbot.database.hasLeaveHistory
 import me.aberrantfox.hotbot.database.insertLeave
 import me.aberrantfox.hotbot.services.Configuration
@@ -41,17 +42,18 @@ class MemberListener(val configuration: Configuration, val logger: BotLogger, va
 
         if (numOfDays <= newUserThreshold)
             logger.alert("$user has joined the server but the account has only existed for $numOfDays day${if (numOfDays == 1) "" else "s"}. Potential action required.")
+        if(sendWelcome){
+            //Build welcome message
+            val target = event.guild.textChannels.findLast { it.id == configuration.messageChannels.welcomeChannel }
+            val response = mService.messages.onJoin.randomListItem().replace("%name%", "${event.user.asMention}(${event.user.fullName()})")
+            val userImage = event.user.effectiveAvatarUrl
 
-        //Build welcome message
-        val target = event.guild.textChannels.findLast { it.id == configuration.messageChannels.welcomeChannel }
-        val response = mService.messages.onJoin.randomListItem().replace("%name%", "${event.user.asMention}(${event.user.fullName()})")
-        val userImage = event.user.effectiveAvatarUrl
-
-        target?.sendMessage(buildJoinMessage(response, userImage, if (rejoin) "Player Resumes!" else "Player Get!"))?.queue { msg ->
-            msg.addReaction("\uD83D\uDC4B").queue {
-                welcomeMessages.put(event.user.id, msg.id)
-                Timer().schedule(1000 * 60 * 60) {
-                    welcomeMessages.takeIf { it.containsKey(event.user.id) }?.remove(event.user.id)
+            target?.sendMessage(buildJoinMessage(response, userImage, if (rejoin) "Player Resumes!" else "Player Get!"))?.queue { msg ->
+                msg.addReaction("\uD83D\uDC4B").queue {
+                    welcomeMessages.put(event.user.id, msg.id)
+                    Timer().schedule(1000 * 60 * 60) {
+                        welcomeMessages.takeIf { it.containsKey(event.user.id) }?.remove(event.user.id)
+                    }
                 }
             }
         }
