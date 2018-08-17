@@ -169,8 +169,9 @@ fun utilCommands(mService: MService, manager: PermissionManager, config: Configu
         execute {
             val target = it.args[0] as TextChannel
             val message = it.args[1] as String
+            val safeMessage = message.replace("@","")
 
-            target.sendMessage(message).queue()
+            target.sendMessage(safeMessage).queue()
         }
     }
 
