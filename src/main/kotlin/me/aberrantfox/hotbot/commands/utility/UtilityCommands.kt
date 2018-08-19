@@ -14,6 +14,7 @@ import me.aberrantfox.kjdautils.api.dsl.arg
 import me.aberrantfox.kjdautils.api.dsl.commands
 import me.aberrantfox.kjdautils.api.dsl.embed
 import me.aberrantfox.kjdautils.extensions.jda.fullName
+import me.aberrantfox.kjdautils.extensions.stdlib.sanitiseMentions
 import me.aberrantfox.kjdautils.internal.command.arguments.SentenceArg
 import me.aberrantfox.kjdautils.internal.command.arguments.TextChannelArg
 import me.aberrantfox.kjdautils.internal.command.arguments.TimeStringArg
@@ -169,8 +170,7 @@ fun utilCommands(mService: MService, manager: PermissionManager, config: Configu
         execute {
             val target = it.args[0] as TextChannel
             val message = it.args[1] as String
-            val safeMessage = message.replace("@","")
-
+            val safeMessage = message.sanitiseMentions()
             target.sendMessage(safeMessage).queue()
         }
     }
