@@ -389,6 +389,28 @@ fun moderationCommands(kConfig: KJDAConfiguration, config: Configuration, mServi
             unmuteVoiceChannel(guild, voiceChannel, config)
         }
     }
+
+    command("nick"){
+        description = "Nickname a user. If no name is specified, reset the nickname."
+        expect(arg(LowerUserArg),arg(SentenceArg,true,""))
+        execute{
+            val user = it.args.component1() as User
+            var nickname = it.args.component2() as String
+
+            if (nickname.length>32){
+                it.respond("Please enter a nickname no more than 32 characters.")
+                return@execute
+            }
+
+            if (nickname.isEmpty()) nickname = user.name
+
+            val guild = it.jda.getGuildById(config.serverInformation.guildid)
+            val targetMember = guild.getMember(user)
+
+            guild.controller.setNickname(targetMember, nickname).queue()
+        }
+    }
+
 }
 
 private fun handleResponse(past: List<Message>, channel: TextChannel, targets: List<User>, sourceChannel: TextChannel,
