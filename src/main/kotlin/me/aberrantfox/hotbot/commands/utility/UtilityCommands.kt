@@ -19,11 +19,13 @@ import me.aberrantfox.kjdautils.internal.command.arguments.TextChannelArg
 import me.aberrantfox.kjdautils.internal.command.arguments.TimeStringArg
 import me.aberrantfox.kjdautils.internal.command.arguments.UserArg
 import me.aberrantfox.kjdautils.internal.logging.BotLogger
+import me.aberrantfox.hotbot.javautilities.UrlUtilities.sendImageToChannel
 import net.dv8tion.jda.core.OnlineStatus
 import net.dv8tion.jda.core.entities.Guild
 import net.dv8tion.jda.core.entities.TextChannel
 import net.dv8tion.jda.core.entities.User
 import java.awt.Color
+import java.net.URLEncoder
 import java.time.format.DateTimeFormatter
 import java.util.*
 import kotlin.math.roundToLong
@@ -213,6 +215,37 @@ fun utilCommands(mService: MService, manager: PermissionManager, config: Configu
             it.respond(response)
         }
     }
+
+    command("whatpfp"){
+        description = "Returns the reverse image url of a users profile picture."
+        expect(UserArg)
+        execute {
+            val user = it.args.component1() as User
+            val reverseSearchUrl = "<https://www.google.com/searchbyimage?&image_url=${user.effectiveAvatarUrl}>"
+
+            val embed = embed {
+                setTitle("${user.name}'s pfp")
+                setColor(Color.BLUE)
+                setImage(user.effectiveAvatarUrl)
+                setDescription("[Reverse Search]($reverseSearchUrl)")
+            }
+
+            it.respond(embed)
+        }
+    }
+
+    command ("latex"){
+        description = "A command that will parse latex"
+        expect(SentenceArg)
+        execute {
+            val input = it.args.component1() as String
+            val latex = URLEncoder.encode(input, "UTF-8")
+
+            val url = "http://chart.apis.google.com/chart?cht=tx&chl=$latex"
+            sendImageToChannel(url, "latex-processed.png", "Could not process latex", it.channel)
+        }
+    }
+
 
     command("selfmute") {
         description = "Need to study and want no distractions? Mute yourself! (Length defaults to 1 hour)"
