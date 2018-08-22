@@ -10,7 +10,7 @@ import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent
 
 class MentionListener(val config: Configuration, val selfName: String, val manager: PermissionManager) {
     private val rateLimiter = APIRateLimiter(config.apiConfiguration.cleverBotApiCallLimit, 0, "CleverBot")
-    private val pattern = Regex("(\\s|^)${selfName}(\\s|$)")
+    private val pattern = Regex("(\\s|^)$selfName(\\s|$)")
 
     @Subscribe
     fun onGuildMessageReceived(event: GuildMessageReceivedEvent) {

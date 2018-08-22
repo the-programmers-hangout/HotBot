@@ -139,7 +139,7 @@ private fun retrievePrize(message: Message): String {
     val giveawayEmbed = message.embeds.firstOrNull()
 
     val prize = Giveaways.giveaways[message.id]?.prize
-            ?: if (giveawayEmbed?.title == giveawayEmbedTitle) { // fallback if bot restarted
+            ?: if (giveawayEmbed?.title == giveawayEmbedTitle) {
                    giveawayEmbed
                            .fields
                            .firstOrNull { it.name == prizeFieldTitle }?.value ?: "prize"

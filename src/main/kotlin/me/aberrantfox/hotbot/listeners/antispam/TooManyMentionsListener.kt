@@ -4,8 +4,6 @@ import com.google.common.eventbus.Subscribe
 import me.aberrantfox.hotbot.services.MuteService
 import me.aberrantfox.kjdautils.extensions.jda.fullName
 import me.aberrantfox.kjdautils.internal.logging.BotLogger
-import net.dv8tion.jda.core.entities.Member
-import net.dv8tion.jda.core.entities.Role
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent
 
 

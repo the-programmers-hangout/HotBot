@@ -61,7 +61,7 @@ fun jsCommands() = commands {
 
 private fun createFunctionContext(scriptBody: String) =
     """
-        function ${functionName}(event) {
+        function $functionName(event) {
             $scriptBody
         };
     """.trimIndent()

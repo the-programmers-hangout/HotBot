@@ -2,7 +2,6 @@ package me.aberrantfox.hotbot.commands.utility
 
 import com.github.salomonbrys.kotson.fromJson
 import com.google.gson.Gson
-import me.aberrantfox.hotbot.arguments.CategoryArg
 import me.aberrantfox.hotbot.arguments.MacroArg
 import me.aberrantfox.hotbot.arguments.MultipleArg
 import me.aberrantfox.hotbot.permissions.PermissionLevel
@@ -12,7 +11,6 @@ import me.aberrantfox.hotbot.utility.timeToDifference
 import me.aberrantfox.kjdautils.api.dsl.*
 import me.aberrantfox.kjdautils.internal.command.CommandRecommender
 import me.aberrantfox.kjdautils.internal.command.arguments.SentenceArg
-import me.aberrantfox.kjdautils.internal.command.arguments.SplitterArg
 import me.aberrantfox.kjdautils.internal.command.arguments.WordArg
 import net.dv8tion.jda.core.entities.MessageChannel
 import org.joda.time.DateTime

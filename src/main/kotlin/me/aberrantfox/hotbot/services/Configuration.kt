@@ -78,7 +78,7 @@ sealed class InfractionAction {
 
 
 private val configDir = System.getenv("HOTBOT_CONFIG_DIR") ?: "config"
-private val configLocation = "config.json"
+private const val configLocation = "config.json"
 
 private val infractionAdapter = RuntimeTypeAdapterFactory
         .of(InfractionAction::class.java)
@@ -92,7 +92,7 @@ private val gson = GsonBuilder()
         .registerTypeAdapterFactory(infractionAdapter)
         .create()
 
-fun configPath(fileName: String) = "${configDir}/${fileName}"
+fun configPath(fileName: String) = "$configDir/$fileName"
 
 fun loadConfig(): Configuration? {
     val configFile = File(configPath(configLocation))
@@ -105,9 +105,8 @@ fun loadConfig(): Configuration? {
     }
 
     val json = configFile.readLines().stream().reduce("", { a: String, b: String -> a + b })
-    val configuration = gson.fromJson<Configuration>(json)
 
-    return configuration
+    return gson.fromJson(json)
 }
 
 fun saveConfig(config: Configuration) {

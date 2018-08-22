@@ -209,8 +209,8 @@ fun utilCommands(mService: MService, manager: PermissionManager, config: Configu
             val response = embed {
                 setColor(colour)
                 setTitle("Colour")
-                setDescription("#${hex}")
-                setThumbnail("http://via.placeholder.com/40/${hex}?text=%20&")
+                setDescription("#$hex")
+                setThumbnail("http://via.placeholder.com/40/$hex?text=%20&")
             }
             it.respond(response)
         }

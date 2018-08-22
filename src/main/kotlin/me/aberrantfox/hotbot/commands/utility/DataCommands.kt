@@ -44,7 +44,7 @@ fun dataCommands(config: Configuration) = commands {
                 setColor(Color.CYAN)
                 answers.forEachIndexed { i, e ->
                     field {
-                        name = "${numberMap[i + 1]} ${e}"
+                        name = "${numberMap[i + 1]} $e"
                         inline = false
                     }
                 }
