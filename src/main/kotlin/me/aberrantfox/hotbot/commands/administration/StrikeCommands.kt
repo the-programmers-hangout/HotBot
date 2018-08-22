@@ -259,45 +259,37 @@ private fun infract(event: CommandEvent, guild: Guild, config: Configuration, lo
 
     if (totalStrikes > config.security.strikeCeil) totalStrikes = config.security.strikeCeil
 
-    administerPunishment(config, target, strikeQuantity, reason, guild, event.author, totalStrikes)
+    administerPunishment(config, log, target, strikeQuantity, reason, guild, event.author, totalStrikes)
 }
 
-private fun administerPunishment(config: Configuration, user: User, strikeQuantity: Int, reason: String,
-                                 guild: Guild, moderator: User, totalStrikes: Int) {
+private fun administerPunishment(config: Configuration, log: BotLogger, user: User, strikeQuantity: Int,
+                                 reason: String, guild: Guild, moderator: User, totalStrikes: Int) {
 
-    user.openPrivateChannel().queue { chan ->
+    val punishmentAction = config.security.infractionActionMap[totalStrikes]?.toString() ?: "None"
+    val infractionEmbed = buildInfractionEmbed(user.asMention, reason, strikeQuantity,
+            totalStrikes, config.security.strikeCeil, punishmentAction)
+    val action = config.security.infractionActionMap[totalStrikes]
 
-        val punishmentAction = config.security.infractionActionMap[totalStrikes]?.toString() ?: "None"
-        val infractionEmbed = buildInfractionEmbed(user.asMention, reason, strikeQuantity,
-                totalStrikes, config.security.strikeCeil, punishmentAction)
-
-        chan.sendMessage(infractionEmbed).queue {
-            val action = config.security.infractionActionMap[totalStrikes]
-            when (action) {
-                is InfractionAction.Warn -> {
-                    chan.sendMessage("This is your warning - Do not break the rules again.").queue()
-                }
-
-                is InfractionAction.Kick -> {
-                    chan.sendMessage("You may return via this: https://discord.gg/BQN6BYE - please be mindful of the rules next time.")
-                        .queue {
-                            guild.controller.kick(user.id, reason).queue()
-                        }
-                }
-
-                is InfractionAction.Mute -> {
-                    muteMember(guild, user, action.duration * 60L * 1000L, "Infraction punishment.", config, moderator)
-                }
-
-                is InfractionAction.Ban -> {
-                    chan.sendMessage("Well... that happened. There may be an appeal system in the future. But for now, you're" +
-                        " permanently banned. Sorry about that :) ").queue {
-                        guild.controller.ban(user.id, 0, reason).queue()
-                    }
-                }
-            }
+    user.sendPrivateMessage(infractionEmbed, log)
+    when (action) {
+        is InfractionAction.Warn -> {
+            user.sendPrivateMessage("This is your warning - Do not break the rules again.", log)
         }
 
+        is InfractionAction.Kick -> {
+            user.sendPrivateMessage("You may return via this: https://discord.gg/BQN6BYE - please be mindful of the rules next time.", log)
+            guild.controller.kick(user.id, reason).queue()
+        }
+
+        is InfractionAction.Mute -> {
+            muteMember(guild, user, action.duration * 60L * 1000L, "Infraction punishment.", config, moderator, log)
+        }
+
+        is InfractionAction.Ban -> {
+            user.sendPrivateMessage("Well... that happened. There may be an appeal system in the future. But for now, you're" +
+                    " permanently banned. Sorry about that :) ", log)
+            guild.controller.ban(user.id, 0, reason).queue()
+        }
     }
 }
 
