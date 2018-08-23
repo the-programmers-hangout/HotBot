@@ -12,7 +12,7 @@ class AliasService(private val manager: PermissionManager,
                    private val aliasesLocation: String = "config/aliases.json") {
     lateinit var container: CommandsContainer
 
-    val aliases: HashMap<String, String> = hashMapOf()
+    private val aliases: HashMap<String, String> = hashMapOf()
 
     fun loadAliases() {
         val file = File(aliasesLocation)

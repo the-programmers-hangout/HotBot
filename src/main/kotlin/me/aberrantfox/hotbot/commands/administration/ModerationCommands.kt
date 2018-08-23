@@ -18,7 +18,6 @@ import me.aberrantfox.kjdautils.extensions.stdlib.randomListItem
 import me.aberrantfox.kjdautils.internal.command.arguments.*
 import me.aberrantfox.kjdautils.internal.logging.BotLogger
 import net.dv8tion.jda.core.entities.*
-import org.jetbrains.exposed.sql.exposedLogger
 import java.awt.Color
 import java.io.File
 import java.text.SimpleDateFormat
@@ -465,7 +464,7 @@ private fun buildResponseEmbed(orig: MessageChannel, sourceMod: String, messages
 
             messages.reversed().forEach {
                 val attachments = it.attachments
-                val content = if (attachments.size > 0 && attachments[0].isImage())
+                val content = if (attachments.size > 0 && attachments[0].isImage)
                                   attachments[0].proxyUrl
                               else
                                   it.contentRaw

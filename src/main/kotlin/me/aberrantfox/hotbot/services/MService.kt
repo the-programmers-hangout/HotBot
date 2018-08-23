@@ -27,6 +27,6 @@ class MService {
         }
     }
 
-    fun writeMessages() = messageFile.writeText(Gson().toJson(messages))
+    private fun writeMessages() = messageFile.writeText(Gson().toJson(messages))
     private fun loadMessages() = Gson().fromJson(File(messageFileLocation).readText(), Messages::class.java)
 }
