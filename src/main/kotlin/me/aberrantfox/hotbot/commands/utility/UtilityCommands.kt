@@ -264,7 +264,7 @@ fun utilCommands(mService: MService, manager: PermissionManager, config: Configu
                 return@execute
             }
 
-            muteMember(guild, it.author, time, "No distractions for a while? Got it", config, it.author)
+            muteMember(guild, it.author, time, "No distractions for a while? Got it", config, it.author, log)
         }
     }
 }

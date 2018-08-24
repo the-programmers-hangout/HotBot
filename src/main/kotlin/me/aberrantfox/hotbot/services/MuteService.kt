@@ -3,6 +3,7 @@ package me.aberrantfox.hotbot.services
 import me.aberrantfox.hotbot.database.getAllMutedMembers
 import me.aberrantfox.hotbot.utility.scheduleUnmute
 import me.aberrantfox.hotbot.utility.timeToDifference
+import me.aberrantfox.kjdautils.internal.logging.BotLogger
 import net.dv8tion.jda.core.JDA
 import net.dv8tion.jda.core.Permission
 import net.dv8tion.jda.core.entities.Guild
@@ -10,7 +11,10 @@ import net.dv8tion.jda.core.entities.Guild
 private typealias GuildID = String
 private typealias MuteRoleID = String
 
-class MuteService(val jda: JDA, val config: Configuration, val roleName: String = config.security.mutedRole) {
+class MuteService(val jda: JDA,
+                  val config: Configuration,
+                  val roleName: String = config.security.mutedRole,
+                  val log: BotLogger) {
     private val muteMap = hashMapOf<GuildID, MuteRoleID>()
 
     init {
@@ -44,7 +48,7 @@ class MuteService(val jda: JDA, val config: Configuration, val roleName: String 
             val user = guild.getMemberById(it.user)
 
             if (user != null) {
-                scheduleUnmute(guild, user.user, config, difference, it)
+                scheduleUnmute(guild, user.user, config, log, difference, it)
             }
         }
     }

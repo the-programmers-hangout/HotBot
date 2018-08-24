@@ -66,7 +66,7 @@ private fun start(config: Configuration) = startBot(config.serverInformation.tok
             { failsBecause("Did you really think I would let you do that? :thinking:", manager.canUseCommand(it.author, commandName(it)) || !it.container.has(commandName(it))) }
     )
 
-    registerInjectionObject(MessageTracker(1), MuteService(jda, config))
+    registerInjectionObject(MessageTracker(1), MuteService(jda, config, log = logger))
     registerListenersByPath("me.aberrantfox.hotbot.listeners")
 
     if (config.apiConfiguration.enableCleverBot) {

@@ -28,7 +28,11 @@ import kotlin.math.roundToLong
 class ModerationCommands
 
 @CommandSet("moderation")
-fun moderationCommands(kConfig: KJDAConfiguration, config: Configuration, mService: MService, manager: PermissionManager, logger: BotLogger) = commands {
+fun moderationCommands(kConfig: KJDAConfiguration,
+                       config: Configuration,
+                       mService: MService,
+                       manager: PermissionManager,
+                       logger: BotLogger) = commands {
     command("ban") {
         description = "Bans a member for the passed reason, deleting a given number of days messages."
         expect(arg(LowerUserArg), arg(IntegerArg, true, 1), arg(SentenceArg))
@@ -120,7 +124,7 @@ fun moderationCommands(kConfig: KJDAConfiguration, config: Configuration, mServi
                 return@execute
             }
 
-            muteMember(guild, user, 5 * 1000 * 60, mService.messages.gagResponse, config, it.author)
+            muteMember(guild, user, 5 * 1000 * 60, mService.messages.gagResponse, config, it.author, logger)
         }
     }
 
@@ -144,7 +148,7 @@ fun moderationCommands(kConfig: KJDAConfiguration, config: Configuration, mServi
                 return@execute
             }
 
-            muteMember(guild, user, time, reason, config, it.author)
+            muteMember(guild, user, time, reason, config, it.author, logger)
         }
     }
 
@@ -157,7 +161,7 @@ fun moderationCommands(kConfig: KJDAConfiguration, config: Configuration, mServi
 
             if(!isMemberMuted(user.id, guild.id)){ it.respond("${user.descriptor()} isn't muted")}
 
-            removeMuteRole(guild, user, config)
+            removeMuteRole(guild, user, config, logger)
             deleteMutedMember(user.id, guild.id)
         }
     }
