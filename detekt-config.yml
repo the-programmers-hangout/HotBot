@@ -60,7 +60,7 @@ comments:
   CommentOverPrivateProperty:
     active: false
   EndOfSentenceFormat:
-    active: false
+    active: true
     endOfSentenceFormat: ([.?!][ \t\n\r\f<])|([.?!]$)
   UndocumentedPublicClass:
     active: false
@@ -78,7 +78,7 @@ complexity:
     threshold: 4
   ComplexInterface:
     active: false
-    threshold: 10
+    threshold: 15
     includeStaticDeclarations: false
   ComplexMethod:
     active: true
@@ -88,10 +88,10 @@ complexity:
     active: false
   LargeClass:
     active: true
-    threshold: 150
+    threshold: 200
   LongMethod:
     active: true
-    threshold: 20
+    threshold: 25
   LongParameterList:
     active: true
     threshold: 6
@@ -103,7 +103,7 @@ complexity:
     active: true
     threshold: 4
   StringLiteralDuplication:
-    active: false
+    active: true
     threshold: 3
     ignoreAnnotation: true
     excludeStringsWithLessThan5Characters: true
@@ -350,13 +350,13 @@ potential-bugs:
   DuplicateCaseInWhenExpression:
     active: true
   EqualsAlwaysReturnsTrueOrFalse:
-    active: false
+    active: true
   EqualsWithHashCodeExist:
     active: true
   ExplicitGarbageCollectionCall:
     active: true
   InvalidRange:
-    active: false
+    active: true
   IteratorHasNextCallsNextMethod:
     active: false
   IteratorNotThrowingNoSuchElementException:
@@ -392,7 +392,7 @@ style:
     includeLineWrapping: false
   ForbiddenComment:
     active: true
-    values: 'TODO:,FIXME:,STOPSHIP:'
+    values: 'TODO:,FIXME:,STOPSHIP:,HACK:'
   ForbiddenImport:
     active: false
     imports: ''
@@ -412,17 +412,17 @@ style:
     ignoreCompanionObjectPropertyDeclaration: true
     ignoreAnnotation: false
     ignoreNamedArgument: true
-    ignoreEnums: false
+    ignoreEnums: true
   MandatoryBracesIfStatements:
     active: false
   MaxLineLength:
     active: true
     maxLineLength: 120
-    excludePackageStatements: false
-    excludeImportStatements: false
+    excludePackageStatements: true
+    excludeImportStatements: true
     excludeCommentStatements: false
   MayBeConst:
-    active: false
+    active: true
   ModifierOrder:
     active: true
   NestedClassesVisibility:
@@ -430,54 +430,54 @@ style:
   NewLineAtEndOfFile:
     active: true
   NoTabs:
-    active: false
+    active: true
   OptionalAbstractKeyword:
     active: true
   OptionalUnit:
-    active: false
+    active: true
   OptionalWhenBraces:
-    active: false
+    active: true
   PreferToOverPairSyntax:
     active: false
   ProtectedMemberInFinalClass:
     active: false
   RedundantVisibilityModifierRule:
-    active: false
-  ReturnCount:
     active: true
+  ReturnCount:
+    active: false
     max: 2
     excludedFunctions: "equals"
   SafeCast:
     active: true
   SerialVersionUIDInSerializableClass:
-    active: false
-  SpacingBetweenPackageAndImports:
-    active: false
-  ThrowsCount:
     active: true
+  SpacingBetweenPackageAndImports:
+    active: true
+  ThrowsCount:
+    active: false
     max: 2
   TrailingWhitespace:
-    active: false
+    active: true
   UnnecessaryAbstractClass:
-    active: false
+    active: true
   UnnecessaryInheritance:
-    active: false
+    active: true
   UnnecessaryParentheses:
-    active: false
+    active: true
   UntilInsteadOfRangeTo:
     active: false
   UnusedImports:
-    active: false
+    active: true
   UnusedPrivateMember:
-    active: false
+    active: true
     allowedNames: "(_|ignored|expected)"
   UseDataClass:
-    active: false
+    active: true
     excludeAnnotatedClasses: ""
   UtilityClassWithPublicConstructor:
-    active: false
+    active: true
   VarCouldBeVal:
     active: false
   WildcardImport:
-    active: true
+    active: false
     excludeImports: 'java.util.*,kotlinx.android.synthetic.*'
