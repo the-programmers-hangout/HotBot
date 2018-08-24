@@ -291,6 +291,19 @@
                     </dependency>
                 </dependencies>
             </plugin>
+
+            <!-- Static analysis -->
+            <plugin>
+                <groupId>com.github.ozsie</groupId>
+                <artifactId>detekt-maven-plugin</artifactId>
+                <version>1.0.0.RC8</version>
+                <executions>
+                    <execution>
+                        <phase>verify</phase>
+                        <goals><goal>check</goal></goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 
@@ -302,6 +315,14 @@
             <id>bintray-kotlin-exposed</id>
             <name>bintray-plugins</name>
             <url>http://dl.bintray.com/kotlin/exposed</url>
+        </pluginRepository>
+        <pluginRepository>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <id>bintray-ozsie-maven</id>
+            <name>bintray-plugins</name>
+            <url>https://dl.bintray.com/ozsie/maven</url>
         </pluginRepository>
     </pluginRepositories>
 </project>

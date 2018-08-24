@@ -22,3 +22,5 @@ config/permissions.json
 config/ratelimit/
 config/aliases.json
 data/
+mvn
+detekt/**
