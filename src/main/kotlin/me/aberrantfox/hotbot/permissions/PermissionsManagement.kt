@@ -16,14 +16,6 @@ import java.util.concurrent.ConcurrentHashMap
 
 enum class PermissionLevel {
     Everyone, Member, JrMod, Moderator, Administrator, Owner;
-    companion object {
-        fun isLevel(name: String) = PermissionLevel.values()
-                .map { it.name.toLowerCase() }
-                .any { it == name.toLowerCase() }
-
-        fun convertToPermission(level: String) = PermissionLevel.values()
-                .first { it.name.toLowerCase() == level.toLowerCase() }
-    }
 }
 
 data class ChannelPermission (var command: PermissionLevel = PermissionLevel.Everyone,
@@ -102,11 +94,6 @@ open class PermissionManager(val jda: JDA, val botConfig: Configuration,
 
     fun canUseCleverbotInChannel(user: User, channelId: String)
             = getPermissionLevel(user) >= permissionsConfig.channelIgnoreLevels[channelId]?.mention ?: PermissionLevel.Everyone
-
-    fun listAvailableCommands(user: User) = permissionsConfig.permissions
-            .filter { it.value <= getPermissionLevel(user) }
-            .map { it.key }
-            .joinToString()
 
     fun assignRoleLevel(role: Role, level: PermissionLevel): Job {
         permissionsConfig.roleMappings[role.id] = level

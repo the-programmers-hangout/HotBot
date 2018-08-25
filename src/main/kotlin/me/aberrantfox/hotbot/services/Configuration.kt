@@ -17,7 +17,7 @@ open class Configuration(open val serverInformation: ServerInformation = ServerI
                          val permissionedActions: PermissionedActions = PermissionedActions(),
                          val botInformation: BotInformation = BotInformation())
 
-class ServerInformation(val token: String = "insert-token",
+data class ServerInformation(val token: String = "insert-token",
                         val ownerID: String = "insert-id",
                         var prefix: String = "insert-prefix",
                         val guildid: String = "insert-guild-id",

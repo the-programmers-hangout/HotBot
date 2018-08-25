@@ -33,8 +33,4 @@ class KarmaService {
 
         return Positive(target)
     }
-
-    fun grantKarma(member: Member, amount: Int) {
-
-    }
 }

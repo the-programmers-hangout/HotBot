@@ -10,7 +10,6 @@ import me.aberrantfox.kjdautils.extensions.jda.deleteIfExists
 import me.aberrantfox.kjdautils.extensions.jda.fullName
 import me.aberrantfox.kjdautils.extensions.stdlib.containsInvite
 import me.aberrantfox.kjdautils.internal.logging.BotLogger
-import net.dv8tion.jda.core.JDA
 import net.dv8tion.jda.core.entities.Guild
 import net.dv8tion.jda.core.entities.Member
 import net.dv8tion.jda.core.entities.Message
@@ -36,14 +35,14 @@ class InviteListener(val config: Configuration, val logger: BotLogger, val manag
 
     @Subscribe
     fun onGuildMessageUpdate(event: GuildMessageUpdateEvent) =
-            handlePossibleInviteMessage(event.member, event.message, event.guild, event.channel, event.author.isBot, event.jda)
+            handlePossibleInviteMessage(event.member, event.message, event.guild, event.channel, event.author.isBot)
 
     @Subscribe
     fun onGuildMessageReceived(event: GuildMessageReceivedEvent) =
-            handlePossibleInviteMessage(event.member, event.message, event.guild, event.channel, event.author.isBot, event.jda)
+            handlePossibleInviteMessage(event.member, event.message, event.guild, event.channel, event.author.isBot)
 
     private fun handlePossibleInviteMessage(author: Member?, message: Message, guild: Guild, channel: TextChannel,
-                                            isBot: Boolean, jda: JDA) {
+                                            isBot: Boolean) {
         if (isBot || author == null) return
 
         val id = author.user.id
