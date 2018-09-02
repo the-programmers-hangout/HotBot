@@ -78,13 +78,7 @@ fun moderationCommands(kConfig: KJDAConfiguration,
                             noSinglePrefixMsg
                         }
 
-                val messageIDs = userFiltered.map { it.id }
-
-                try {
-                    channel.deleteMessagesByIds(messageIDs).queue()
-                } catch (e: IllegalArgumentException) { // some messages older than 2 weeks
-                    userFiltered.forEach { it.delete().queue() }
-                }
+                safeDeleteMessages(channel, userFiltered)
 
                 channel.sendMessage("Be nice. No spam.").queue()
 
@@ -441,10 +435,11 @@ private fun handleResponse(past: List<Message>, channel: TextChannel, targets: L
     val responseEmbed = buildResponseEmbed(sourceChannel, source, messages)
 
     channel.sendMessage(responseEmbed).queue {
-        if (messages.size == 1)
+        if (messages.size == 1) {
             messages.first().delete().queue()
-        else
-            sourceChannel.deleteMessages(messages).queue()
+        } else {
+            safeDeleteMessages(sourceChannel, messages)
+        }
 
         targets.forEach {
             it.sendPrivateMessage("Your messages have been moved to ${channel.asMention}", logger)
@@ -478,3 +473,19 @@ private fun buildResponseEmbed(orig: MessageChannel, sourceMod: String, messages
             setColor(Color.CYAN)
         }
 
+fun safeDeleteMessages(channel: TextChannel,
+                       messages: List<Message>) =
+        try {
+            channel.deleteMessages(messages).queue()
+        } catch (e: IllegalArgumentException) { // some messages older than 2 weeks => can't mass delete
+            messages.forEach { it.delete().queue() }
+        }
+
+fun safeDeleteMessagesByIds(channel: TextChannel,
+                            messageIDs: List<String>,
+                            messages: List<Message>) =
+        try {
+            channel.deleteMessagesByIds(messageIDs).queue()
+        } catch (e: IllegalArgumentException) { // some messages older than 2 weeks => can't mass delete
+            messages.forEach { it.delete().queue() }
+        }
