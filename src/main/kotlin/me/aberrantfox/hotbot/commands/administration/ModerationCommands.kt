@@ -467,12 +467,7 @@ private fun buildResponseEmbed(orig: MessageChannel, sourceMod: String, messages
             }
 
             messages.reversed().forEach {
-                val attachments = it.attachments
-                val content = if (attachments.size > 0 && attachments[0].isImage)
-                                  attachments[0].proxyUrl
-                              else
-                                  it.contentRaw
-
+                val content = "${it.contentRaw}\n${it.attachments.joinToString("\n") { it.url }}"
                 field {
                     name = "Message"
                     value = "${it.author.asMention}: $content" // Can't mention in 'name'
