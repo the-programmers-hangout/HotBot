@@ -44,7 +44,7 @@ private const val functionName = "functionScope"
 fun jsCommands() = commands {
     command("eval") {
         description = "Evaluate Nashorn JavaScript code - without an automatic response."
-        expect(SentenceArg)
+        expect(SentenceArg("Nashorn JavaScript Code"))
         execute {
             val script = it.args.component1() as String
             val functionContext = createFunctionContext(script)

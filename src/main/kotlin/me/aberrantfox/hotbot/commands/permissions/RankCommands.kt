@@ -97,7 +97,7 @@ fun rankCommands(config: Configuration) = commands {
 
     command("makeroleungrantable") {
         description = "Disallow granting of this role"
-        expect(WordArg)
+        expect(WordArg("Role Name"))
         execute {
             val roleName = (it.args.component1() as String).toLowerCase()
 

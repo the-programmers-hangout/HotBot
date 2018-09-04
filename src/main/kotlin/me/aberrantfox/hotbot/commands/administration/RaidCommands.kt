@@ -70,7 +70,7 @@ fun raidCommands(config: Configuration, logger: BotLogger) = commands {
 
     command("banraider") {
         description = "Ban a raider by an ID"
-        expect(UserArg, IntegerArg)
+        expect(UserArg, IntegerArg("Message Deletion Days"))
         execute {
             val user = it.args[0] as User
             val delDays = (it.args[1] as Int)
@@ -89,7 +89,7 @@ fun raidCommands(config: Configuration, logger: BotLogger) = commands {
 
     command("banautodetectedraid") {
         description = "Ban all of the raiders in the raidview"
-        expect(IntegerArg)
+        expect(IntegerArg("Message Deletion Days"))
         execute {
             val delDays = (it.args[0]) as Int
 

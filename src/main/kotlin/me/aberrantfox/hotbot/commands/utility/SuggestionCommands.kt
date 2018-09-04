@@ -33,7 +33,7 @@ object Suggestions {
 fun suggestionCommands(config: Configuration, log: BotLogger) = commands {
     command("suggest") {
         description = "Send a suggestion to the pre-lim pool. Suggestions are reviewed by a mod before they are reviewed by the community."
-        expect(SentenceArg)
+        expect(SentenceArg("Suggestion Message"))
         execute {
             val author = it.author.id
             val message = it.args[0] as String
@@ -73,7 +73,7 @@ fun suggestionCommands(config: Configuration, log: BotLogger) = commands {
 
     command("pool") {
         description = "Accept or deny the suggestion at the top of the pool. If accepted, move to the community review stage"
-        expect(ChoiceArg("accept", "deny"))
+        expect(ChoiceArg(name="Response", choices=*arrayOf("accept", "deny")))
         execute {
             val response = it.args.component1() as String
             val suggestion = Suggestions.pool.top()
@@ -112,7 +112,9 @@ fun suggestionCommands(config: Configuration, log: BotLogger) = commands {
 
     command("respond") {
         description = "Respond to a suggestion in the review stage, given the target id, response (accepted, denied, review), and reason."
-        expect(WordArg, ChoiceArg("accepted", "denied", "review"), SentenceArg)
+        expect(WordArg("Message ID"),
+                ChoiceArg(name="Status", choices=*arrayOf("accepted", "denied", "review")),
+                SentenceArg("Response Message"))
         execute {
             val args = it.args
 

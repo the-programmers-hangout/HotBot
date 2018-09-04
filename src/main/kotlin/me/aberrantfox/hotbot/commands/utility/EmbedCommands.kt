@@ -78,7 +78,8 @@ fun embedCommands() =
 
         command("copyembed") {
             description = "Copies the embed from the message with the given id into the embed builder. The channelId from which to get the embed is optional and will default to the one you invoked the command in."
-            expect(arg(WordArg), arg(TextChannelArg, optional = true, default = { it.channel }))
+            expect(arg(WordArg("Message ID")),
+                    arg(TextChannelArg, optional = true, default = { it.channel }))
             execute {
                 val messageID = it.args.component1() as String
                 val channel = it.args.component2() as TextChannel
@@ -106,7 +107,9 @@ fun embedCommands() =
 
         command("editfield") {
             description = "Edits a field in the current embed being worked on. The passed index should be from 0 to fields.size - 1. Properties: name, text/value, inline."
-            expect(IntegerArg, WordArg, SentenceArg)
+            expect(IntegerArg("Field Index"),
+                    WordArg("Field Property"),
+                    SentenceArg("New Property Value"))
             execute {
                 val fields = EHolder.embed.fields
 
@@ -147,7 +150,7 @@ fun embedCommands() =
 
         command("settitle") {
             description = "Set the title of the embed in memory"
-            expect(SentenceArg)
+            expect(SentenceArg("Title"))
             execute {
                 val title = it.args[0] as String
                 EHolder.embed.setTitle(title)
@@ -156,7 +159,7 @@ fun embedCommands() =
 
         command("setdescription") {
             description = "Set the description of the embed"
-            expect(SentenceArg)
+            expect(SentenceArg("Description"))
             execute {
                 val description = it.args[0] as String
                 EHolder.embed.setDescription(description)
@@ -196,7 +199,7 @@ fun embedCommands() =
 
         command("setimage") {
             description = "Set the image of the embed"
-            expect(UrlArg)
+            expect(UrlArg("Image URL"))
             execute {
                 val url = it.args[0] as String
                 EHolder.embed.setImage(url)
@@ -205,7 +208,7 @@ fun embedCommands() =
 
         command("setfooter") {
             description = "Set the footer of the embed, including the URL and text"
-            expect(UrlArg, UrlArg)
+            expect(UrlArg("Footer Icon URL"), SentenceArg("Footer Text"))
             execute {
                 val iconURL = it.args[0] as String
                 val text = it.args[1] as String
@@ -216,7 +219,7 @@ fun embedCommands() =
 
         command("addblankfield") {
             description = "Add a blank field to the embed"
-            expect(ChoiceArg)
+            expect(ChoiceArg(name="Inline", choices = *arrayOf(true, false)))
             execute {
                 val inline = it.args[0] as Boolean
                 EHolder.embed.addBlankField(inline)
@@ -254,7 +257,7 @@ fun embedCommands() =
 
         command("setfname") {
             description = "Set the field name or title"
-            expect(SentenceArg)
+            expect(SentenceArg("Field name/title"))
             execute {
                 val name = it.args[0] as String
                 FHolder.name = name
@@ -263,7 +266,7 @@ fun embedCommands() =
 
         command("setftext") {
             description = "Set the field text in memory"
-            expect(SentenceArg)
+            expect(SentenceArg("Field text/value"))
             execute {
                 val text = it.args[0] as String
                 FHolder.text = text
@@ -272,7 +275,7 @@ fun embedCommands() =
 
         command("setthumbnail") {
             description = "Set the thumbnail of the embed"
-            expect(UrlArg)
+            expect(UrlArg("Image URL"))
             execute {
                 val url = it.args[0] as String
                 EHolder.embed.setThumbnail(url)

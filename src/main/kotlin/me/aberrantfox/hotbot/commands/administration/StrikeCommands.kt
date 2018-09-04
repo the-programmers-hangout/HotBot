@@ -33,7 +33,7 @@ fun strikeCommands(config: Configuration, log: BotLogger) =
     commands {
         command("warn") {
             description = "Warn a member, giving them a 0 strike infraction with the given reason."
-            expect(LowerUserArg, SentenceArg)
+            expect(LowerUserArg, SentenceArg("Warn Reason"))
             execute {
                 val newArgs = listOf(it.args[0], 0, it.args[1])
                 val e = it.copy(args=newArgs)
@@ -46,8 +46,8 @@ fun strikeCommands(config: Configuration, log: BotLogger) =
         command("strike") {
             description = "Give a member a weighted infraction for the given reason, defaulting to a weight of 1."
             expect(arg(LowerUserArg),
-                   arg(IntegerArg, optional = true, default = 1),
-                   arg(SentenceArg))
+                   arg(IntegerArg("Weight"), optional = true, default = 1),
+                   arg(SentenceArg("Infraction Reason")))
             execute {
                 val guild = it.jda.getGuildById(config.serverInformation.guildid)
                 infract(it, guild, config, log)
@@ -56,7 +56,7 @@ fun strikeCommands(config: Configuration, log: BotLogger) =
 
         command("strikerequest") {
             description = "Like the strike command, except another moderator reviews it before it is accepted."
-            expect(LowerUserArg, IntegerArg, SentenceArg)
+            expect(LowerUserArg, IntegerArg("Weight"), SentenceArg("Infraction Reason"))
             execute {
                 val target = it.args.component1() as User
                 val amount = it.args.component2() as Int
@@ -77,7 +77,7 @@ fun strikeCommands(config: Configuration, log: BotLogger) =
 
         command("viewRequest") {
             description = "View the current strike request, if any, on the given user - the user who is getting infracted."
-            expect(LowerUserArg)
+            expect(LowerUserArg("User Receiving Infraction"))
             execute {
                 val user = it.args.component1() as User
 
@@ -111,7 +111,7 @@ fun strikeCommands(config: Configuration, log: BotLogger) =
 
         command("acceptrequest") {
             description = "Accept a request for striking a user by another moderator. Pass in the user who will be infracted, not the moderator."
-            expect(LowerUserArg)
+            expect(LowerUserArg("User Receiving Infraction"))
             execute {
                 val user = it.args.component1() as User
 
@@ -129,7 +129,7 @@ fun strikeCommands(config: Configuration, log: BotLogger) =
 
         command("declinerequest") {
             description = "Reject a request for a strike on a user. This will notify the invoker and delete the request. Pass in the user who would have been infracted."
-            expect(LowerUserArg)
+            expect(LowerUserArg("User Receiving Infraction"))
             execute {
                 val user = it.args.component1() as User
 
@@ -142,7 +142,7 @@ fun strikeCommands(config: Configuration, log: BotLogger) =
 
         command("deleteRequest") {
             description = "Delete a request made by yourself."
-            expect(LowerUserArg)
+            expect(LowerUserArg("User Receiving Infraction"))
             execute {
                 val user = it.args.component1() as User
 
@@ -194,7 +194,7 @@ fun strikeCommands(config: Configuration, log: BotLogger) =
 
         command("removestrike") {
             description = "Delete a particular strike by ID (these are listed in the history command)."
-            expect(IntegerArg)
+            expect(IntegerArg("Infraction ID"))
             execute {
                 val strikeID = it.args[0] as Int
                 val amountRemoved = removeInfraction(strikeID)
