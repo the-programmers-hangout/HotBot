@@ -77,7 +77,7 @@ fun embedCommands() =
         }
 
         command("copyembed") {
-            description = "Copies the embed from the message with the given id into the embed builder. The channelId from which to get the embed is optional and will default to the one you invoked the command in."
+            description = "Copies the embed from the message with the given id into the embed builder. The channel from which to get the embed is optional and will default to the one you invoked the command in."
             expect(arg(WordArg("Message ID")),
                     arg(TextChannelArg, optional = true, default = { it.channel }))
             execute {
@@ -106,7 +106,7 @@ fun embedCommands() =
         }
 
         command("editfield") {
-            description = "Edits a field in the current embed being worked on. The passed index should be from 0 to fields.size - 1. Properties: name, text/value, inline."
+            description = "Edits field in the current embed being worked on. The passed index should be from 0 to fields.size - 1. Properties: name/title, text/value, inline."
             expect(IntegerArg("Field Index"),
                     WordArg("Field Property"),
                     SentenceArg("New Property Value"))
@@ -158,7 +158,7 @@ fun embedCommands() =
         }
 
         command("setdescription") {
-            description = "Set the description of the embed"
+            description = "Set the description of the embed in memory"
             expect(SentenceArg("Description"))
             execute {
                 val description = it.args[0] as String
@@ -189,7 +189,7 @@ fun embedCommands() =
         }
 
         command("setauthor") {
-            description = "Set a user with the given ID to be the author"
+            description = "Set a user with the given ID to be the author of the embed"
             expect(UserArg)
             execute {
                 val target = it.args.component1() as User
@@ -218,7 +218,7 @@ fun embedCommands() =
         }
 
         command("addblankfield") {
-            description = "Add a blank field to the embed"
+            description = "Add a blank field to the embed, specifying if it's inline"
             expect(ChoiceArg(name="Inline", choices = *arrayOf(true, false)))
             execute {
                 val inline = it.args[0] as Boolean

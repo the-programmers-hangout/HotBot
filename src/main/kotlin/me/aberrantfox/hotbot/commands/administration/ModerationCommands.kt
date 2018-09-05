@@ -227,7 +227,7 @@ fun moderationCommands(kConfig: KJDAConfiguration,
     }
 
     command("badname") {
-        description = "Auto-nick a user with a bad name."
+        description = "Auto-nick a user with a bad name, for the given reason."
         expect(LowerUserArg,
                 SentenceArg("Rename Reason"))
         execute {
@@ -338,7 +338,7 @@ fun moderationCommands(kConfig: KJDAConfiguration,
     }
 
     command("editnote") {
-        description = "Edits a note by ID (listed in history)"
+        description = "Edits a note by ID (listed in history), replacing the content with the given text"
         expect(IntegerArg("Note ID"), SentenceArg("New Note Content"))
         execute {
             //get user id that note is placed on, use that in insertNote part. If possible, try to replace note at ID with a different note, rather than a different ID.
