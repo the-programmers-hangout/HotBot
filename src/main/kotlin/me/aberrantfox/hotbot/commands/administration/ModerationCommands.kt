@@ -35,7 +35,9 @@ fun moderationCommands(kConfig: KJDAConfiguration,
                        logger: BotLogger) = commands {
     command("ban") {
         description = "Bans a member for the passed reason, deleting a given number of days messages."
-        expect(arg(LowerUserArg), arg(IntegerArg, true, 1), arg(SentenceArg))
+        expect(arg(LowerUserArg),
+                arg(IntegerArg("Message Deletion Days [Default: 1]"), true, 1),
+                arg(SentenceArg("Ban Reason")))
         execute {
             val target = it.args.component1() as User
             val deleteMessageDays = it.args.component2() as Int
@@ -89,7 +91,7 @@ fun moderationCommands(kConfig: KJDAConfiguration,
 
     command("ignore") {
         description = "Drop and don't respond to anything from the given id (user or channel)"
-        expect(WordArg)
+        expect(WordArg("User or Channel ID"))
         execute {
             val target = it.args.component1() as String
 
@@ -124,7 +126,9 @@ fun moderationCommands(kConfig: KJDAConfiguration,
 
     command("mute") {
         description = "Mute a member for a specified amount of time with the given reason."
-        expect(LowerUserArg, TimeStringArg, SentenceArg)
+        expect(LowerUserArg,
+                TimeStringArg,
+                SentenceArg("Mute Reason"))
         execute {
             val user = it.args.component1() as User
             val time = (it.args.component2() as Double).roundToLong() * 1000
@@ -172,7 +176,7 @@ fun moderationCommands(kConfig: KJDAConfiguration,
     command("prefix") {
         description = "Set the bot prefix to the specified string (Cannot be a space)"
         category = "management"
-        expect(WordArg)
+        expect(WordArg("New Prefix"))
         execute {
             val newPrefix = it.args[0] as String
             config.serverInformation.prefix = newPrefix
@@ -195,7 +199,9 @@ fun moderationCommands(kConfig: KJDAConfiguration,
 
     command("move") {
         description = "Move messages sent by the users passed found within the last given number of messages to the specified channel."
-        expect(MultipleArg(UserArg), IntegerArg, TextChannelArg)
+        expect(MultipleArg(UserArg),
+                IntegerArg("Number of Messages to Search Back"),
+                TextChannelArg)
         execute {
             val targets = it.args.component1() as List<User>
             val searchSpace = it.args.component2() as Int
@@ -221,8 +227,9 @@ fun moderationCommands(kConfig: KJDAConfiguration,
     }
 
     command("badname") {
-        description = "Auto-nick a user with a bad name."
-        expect(LowerUserArg, SentenceArg)
+        description = "Auto-nick a user with a bad name, for the given reason."
+        expect(LowerUserArg,
+                SentenceArg("Rename Reason"))
         execute {
             val target = it.args[0] as User
             val reason = it.args[1] as String
@@ -270,7 +277,7 @@ fun moderationCommands(kConfig: KJDAConfiguration,
 
     command("setbanreason") {
         description = "Set the ban reason of someone logged who does not have a ban reason in the audit log."
-        expect(UserArg, SentenceArg)
+        expect(UserArg, SentenceArg("Ban Reason"))
         execute {
             val target = it.args.component1() as User
             val reason = it.args.component2() as String
@@ -297,7 +304,7 @@ fun moderationCommands(kConfig: KJDAConfiguration,
 
     command("note") {
         description = "Add a note to a user's history"
-        expect(LowerUserArg, SentenceArg)
+        expect(LowerUserArg, SentenceArg("Note Content"))
         execute {
             val target = it.args.component1() as User
             val note = it.args.component2() as String
@@ -310,7 +317,7 @@ fun moderationCommands(kConfig: KJDAConfiguration,
 
     command("removenote") {
         description = "Removes a note by ID (listed in history)"
-        expect(IntegerArg)
+        expect(IntegerArg("Note ID"))
         execute {
             val noteId = it.args.component1() as Int
             val notesRemoved = removeNoteById(noteId)
@@ -331,8 +338,8 @@ fun moderationCommands(kConfig: KJDAConfiguration,
     }
 
     command("editnote") {
-        description = "Edits a note by ID (listed in history)"
-        expect(IntegerArg, SentenceArg)
+        description = "Edits a note by ID (listed in history), replacing the content with the given text"
+        expect(IntegerArg("Note ID"), SentenceArg("New Note Content"))
         execute {
             //get user id that note is placed on, use that in insertNote part. If possible, try to replace note at ID with a different note, rather than a different ID.
             val noteId = it.args.component1() as Int
@@ -389,7 +396,7 @@ fun moderationCommands(kConfig: KJDAConfiguration,
 
     command("nick"){
         description = "Nickname a user. If no name is specified, reset the nickname."
-        expect(arg(LowerUserArg),arg(SentenceArg,true,""))
+        expect(arg(LowerUserArg),arg(SentenceArg("New Nickname"),true,""))
         execute{
             val user = it.args.component1() as User
             var nickname = it.args.component2() as String

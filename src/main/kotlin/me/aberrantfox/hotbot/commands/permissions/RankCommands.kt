@@ -59,7 +59,7 @@ object RankContainer {
 @CommandSet("ranks")
 fun rankCommands(config: Configuration) = commands {
     command("grant") {
-        description = "Grant a rank to a user."
+        description = "Grant a role to a user."
         expect(RoleArg, LowerUserArg)
         execute {
             val guild = it.jda.getGuildById(config.serverInformation.guildid)
@@ -69,7 +69,7 @@ fun rankCommands(config: Configuration) = commands {
     }
 
     command("revoke") {
-        description = "Revoke a rank from a user"
+        description = "Revoke a role from a user"
         expect(RoleArg, LowerUserArg)
         execute {
             val guild = it.jda.getGuildById(config.serverInformation.guildid)
@@ -97,7 +97,7 @@ fun rankCommands(config: Configuration) = commands {
 
     command("makeroleungrantable") {
         description = "Disallow granting of this role"
-        expect(WordArg)
+        expect(WordArg("Role Name"))
         execute {
             val roleName = (it.args.component1() as String).toLowerCase()
 

@@ -24,7 +24,7 @@ object MessageConfigArg : ChoiceArg("Message Name", *messages.keys.toTypedArray(
 fun messageConfiguration(mService: MService) = commands {
     command("set") {
         description = "Set message for the given key. Available keys: ${messages.keys.joinToString(", ")}"
-        expect(MessageConfigArg, SentenceArg)
+        expect(MessageConfigArg, SentenceArg("Message"))
         execute {
             val key = it.args[0] as String
             val message = it.args[1] as String

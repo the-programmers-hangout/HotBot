@@ -20,7 +20,7 @@ fun funCommands() =
     commands {
         command("flip") {
             description = "Flips a coin. Optionally, print one of the choices given."
-            expect(arg(SplitterArg, true, listOf("Heads", "Tails")))
+            expect(arg(SplitterArg("Choice 1 | Choice 2 | ..."), true, listOf("Heads", "Tails")))
             execute {
                 val options = it.args[0] as List<String>
                 var choice = options[Random().nextInt(options.size)]
@@ -32,7 +32,7 @@ fun funCommands() =
 
         command("animal") {
             description = "Shows a cute animal. Animals implemented are ${animalMap.keys.joinToString(", ")}"
-            expect(arg(ChoiceArg("Animal", *animalMap.keys.toTypedArray()), true, "random"))
+            expect(arg(ChoiceArg(name="Animal", choices=*animalMap.keys.toTypedArray()), true, "random"))
             execute {
                 var animal = it.args[0] as String
 
@@ -43,7 +43,7 @@ fun funCommands() =
 
         command("google") {
             description = "google a thing"
-            expect(SentenceArg)
+            expect(SentenceArg("Query"))
             execute {
                 val google = "http://www.google.com/search?q="
                 val search = it.args[0] as String
@@ -58,7 +58,7 @@ fun funCommands() =
 
         command("cowsay") {
             description = "Displays a cowsay with a given message. Run with no arguments to get a list of valid cows."
-            expect(arg(WordArg, true, {""}), arg(SentenceArg, true, {""}))
+            expect(arg(WordArg("Cow"), true, {""}), arg(SentenceArg("Message"), true, {""}))
             execute {
                 val arg0 = it.args[0] as String
                 val arg1 = it.args[1] as String

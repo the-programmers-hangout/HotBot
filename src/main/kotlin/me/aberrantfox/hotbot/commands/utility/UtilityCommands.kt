@@ -168,7 +168,7 @@ fun utilCommands(mService: MService, manager: PermissionManager, config: Configu
 
     command("echo") {
         description = "Echo a message to a channel"
-        expect(TextChannelArg, SentenceArg)
+        expect(TextChannelArg, SentenceArg("Message"))
         execute {
             val target = it.args[0] as TextChannel
             val message = it.args[1] as String
@@ -188,7 +188,7 @@ fun utilCommands(mService: MService, manager: PermissionManager, config: Configu
 
     command("uploadtext") {
         description = "Uploads the given block of text/code to hastebin and removes the invocation"
-        expect(SentenceArg)
+        expect(SentenceArg("Text"))
         execute {
             val text = it.args.component1() as String
             val response = post("https://hastebin.com/documents", data = text).jsonObject
@@ -236,7 +236,7 @@ fun utilCommands(mService: MService, manager: PermissionManager, config: Configu
 
     command ("latex"){
         description = "A command that will parse latex"
-        expect(SentenceArg)
+        expect(SentenceArg("LaTeX Text"))
         execute {
             val input = it.args.component1() as String
             val latex = URLEncoder.encode(input, "UTF-8")

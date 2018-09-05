@@ -21,7 +21,7 @@ object Polls {
 fun dataCommands(config: Configuration) = commands {
     command("poll") {
         description = "Create a poll with one question and 2 to 9 answers."
-        expect(SplitterArg)
+        expect(SplitterArg("Question | Answer | Answer | ..."))
         execute {
             val splitArgs = it.args.first() as List<String>
 
@@ -58,7 +58,7 @@ fun dataCommands(config: Configuration) = commands {
     }
     command("finishpoll") {
         description = "Conclude a poll, based on the embed message ID."
-        expect(WordArg)
+        expect(WordArg("Message ID"))
         execute {
             val pollID = it.args.component1() as String
 

@@ -51,7 +51,7 @@ fun permissionCommands(manager: PermissionManager, config: Configuration) =
             }
 
             command("setallPermissions") {
-                description = "Set the permission of all commands to a specific role. Only available to the bot owner."
+                description = "Set the permission of all commands to a specific permission level. Only available to the bot owner."
                 expect(PermissionLevelArg)
                 execute {
                     val level = it.args.component1() as PermissionLevel
@@ -66,7 +66,7 @@ fun permissionCommands(manager: PermissionManager, config: Configuration) =
             }
 
             command("setPermissions") {
-                description = "Set the permission level of all commands in a category to the given role."
+                description = "Set the permission level of all commands in a category to the given permission level."
                 expect(CategoryArg, PermissionLevelArg)
                 execute {
                     val category = it.args.component1() as String

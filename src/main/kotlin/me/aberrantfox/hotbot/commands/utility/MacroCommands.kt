@@ -36,7 +36,7 @@ fun macroCommands(permManager: PermissionManager) =
     commands {
         command("addmacro") {
             description = "Add a macro which will respond with the given message when invoked by the given name."
-            expect(WordArg("Name"), WordArg("Category"), SentenceArg)
+            expect(WordArg("Name"), WordArg("Category"), SentenceArg("Message"))
             execute {
                 val name = (it.args.component1() as String).toLowerCase()
                 val category = (it.args.component2() as String).toLowerCase()
@@ -62,7 +62,7 @@ fun macroCommands(permManager: PermissionManager) =
 
         command("editmacro") {
             description = "Change a macro's response message"
-            expect(MacroArg, SentenceArg)
+            expect(MacroArg, SentenceArg("New Message"))
             execute {
                 val macro = it.args.component1() as Macro
                 val name = macro.name.toLowerCase()
@@ -79,7 +79,7 @@ fun macroCommands(permManager: PermissionManager) =
 
         command("setmacrocategories") {
             description = "Move one or many macros to a category."
-            expect(MultipleArg(MacroArg), WordArg)
+            expect(MultipleArg(MacroArg), WordArg("Category"))
             execute {
                 val macroArgs = it.args.component1() as List<Macro>
                 val newCategory = it.args.component2() as String
@@ -97,7 +97,7 @@ fun macroCommands(permManager: PermissionManager) =
 
         command("renamemacro") {
             description = "Change a macro's name, keeping the original response"
-            expect(MacroArg, WordArg)
+            expect(MacroArg, WordArg("New Name"))
             execute {
                 val oldMacro = it.args.component1() as Macro
 
@@ -132,7 +132,7 @@ fun macroCommands(permManager: PermissionManager) =
 
         command("removemacros") {
             description = "Removes a whole category of macros"
-            expect(WordArg)
+            expect(WordArg("Category"))
             execute {
                 val categoryName = (it.args.component1() as String).toLowerCase()
 

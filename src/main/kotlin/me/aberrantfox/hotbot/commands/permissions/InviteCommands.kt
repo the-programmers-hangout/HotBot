@@ -12,7 +12,7 @@ fun inviteCommands(log: BotLogger) =
     commands {
         command("whitelistinvite") {
             description = "Allow an invite to be posted."
-            expect(WordArg)
+            expect(WordArg("Invite URL"))
             execute {
                 val inv = it.args[0] as String
                 RecentInvites.ignore.add(inv)
@@ -23,7 +23,7 @@ fun inviteCommands(log: BotLogger) =
 
         command("unwhitelistinvite") {
             description = "Remove an invitation from the whitelist."
-            expect(WordArg)
+            expect(WordArg("Invite URL"))
             execute {
                 val inv = it.args[0] as String
                 RecentInvites.ignore.remove(inv)
