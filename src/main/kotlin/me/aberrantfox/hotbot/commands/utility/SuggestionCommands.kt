@@ -13,9 +13,8 @@ import me.aberrantfox.kjdautils.internal.command.arguments.ChoiceArg
 import me.aberrantfox.kjdautils.internal.command.arguments.SentenceArg
 import me.aberrantfox.kjdautils.internal.command.arguments.WordArg
 import me.aberrantfox.kjdautils.internal.logging.BotLogger
-import net.dv8tion.jda.core.EmbedBuilder
-import net.dv8tion.jda.core.JDA
-import net.dv8tion.jda.core.entities.Guild
+import net.dv8tion.jda.core.*
+import net.dv8tion.jda.core.entities.*
 import java.awt.Color
 
 
@@ -37,7 +36,6 @@ fun suggestionCommands(config: Configuration, log: BotLogger) = commands {
         execute {
             val author = it.author.id
             val message = it.args[0] as String
-
             val response = Suggestions.pool.addRecord(author, it.author.effectiveAvatarUrl, message)
 
             when (response) {
@@ -82,6 +80,8 @@ fun suggestionCommands(config: Configuration, log: BotLogger) = commands {
                 return@execute
             }
 
+            var status = SuggestionStatus.Denied
+
             if (response == "accept") {
                 val guild = it.jda.getGuildById(config.serverInformation.guildid)
 
@@ -95,18 +95,15 @@ fun suggestionCommands(config: Configuration, log: BotLogger) = commands {
                     it.addReaction("⬆").queue()
                     it.addReaction("⬇").queue()
                 }
-                it.respond(embed {
-                    setTitle("Accepted suggestion")
-                    setDescription(suggestion.message)
-                    setColor(Color.GREEN)
-                })
-            } else {
-                it.respond(embed {
-                    setTitle("Denied suggestion")
-                    setDescription(suggestion.message)
-                    setColor(Color.RED)
-                })
+
+                status = SuggestionStatus.Accepted
             }
+
+            it.respond(embed {
+                setTitle("${status.message} suggestion")
+                setDescription(suggestion.message)
+                setColor(status.colour)
+            })
         }
     }
 
@@ -117,14 +114,12 @@ fun suggestionCommands(config: Configuration, log: BotLogger) = commands {
                 SentenceArg("Response Message"))
         execute {
             val args = it.args
-
             val target = args[0] as String
             val response = args[1] as String
             val reason = args[2] as String
             val status = inputToStatus(response)!!
 
             val guild = it.jda.getGuildById(config.serverInformation.guildid)
-
             val channel = fetchSuggestionChannel(guild, config)
 
             if (!(isTracked(target)) || channel.getMessageById(target) == null) {
@@ -134,7 +129,7 @@ fun suggestionCommands(config: Configuration, log: BotLogger) = commands {
 
             channel.getMessageById(target).queue { msg ->
                 val suggestion = obtainSuggestion(target)
-                val message = buildSuggestionMessage(suggestion.poolInfo, it.jda, status)
+                val message = buildArchiveMessage(suggestion.poolInfo, it.jda, status, msg.reactions)
                 val reasonTitle = "Reason for Status"
 
                 val suggestionUpdateMessage = buildSuggestionUpdateEmbed(suggestion, reason, status)
@@ -145,7 +140,6 @@ fun suggestionCommands(config: Configuration, log: BotLogger) = commands {
                 }
                 finally {
                     message.fields.removeIf { it.name == reasonTitle }
-
                     message.addField(reasonTitle, reason, false)
                     updateSuggestion(target, status)
 
@@ -208,3 +202,18 @@ private fun buildSuggestionMessage(suggestion: PoolRecord, jda: JDA, status: Sug
         .setColor(status.colour)
         .setDescription(suggestion.message)
         .addField("Suggestion Status", status.message, false)
+
+private fun buildArchiveMessage(suggestion: PoolRecord, jda: JDA, status: SuggestionStatus, reactions: List<MessageReaction>): EmbedBuilder {
+    val embed = buildSuggestionMessage(suggestion, jda, status)
+
+    if (reactions.size < 2)
+        return embed
+
+    val reactionText =
+        "${reactions[0].reactionEmote.name} ${reactions[0].count - 1}   " +
+        "${reactions[1].reactionEmote.name} ${reactions[1].count - 1}"
+
+    embed.addField("Community Response", reactionText, false)
+
+    return embed
+}
