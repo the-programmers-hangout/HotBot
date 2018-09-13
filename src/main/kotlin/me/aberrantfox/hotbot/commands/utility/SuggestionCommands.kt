@@ -125,14 +125,14 @@ fun suggestionCommands(config: Configuration, log: BotLogger) = commands {
 
             val guild = it.jda.getGuildById(config.serverInformation.guildid)
 
-            val channel = fetchSuggestionChannel(guild, config)
+            val suggestionChannel = fetchSuggestionChannel(guild, config)
 
-            if (!(isTracked(target)) || channel.getMessageById(target) == null) {
+            if (!(isTracked(target)) || suggestionChannel.getMessageById(target) == null) {
                 it.respond("That is not a valid message or a suggestion by the ID.")
                 return@execute
             }
 
-            channel.getMessageById(target).queue { msg ->
+            suggestionChannel.getMessageById(target).queue { msg ->
                 val suggestion = obtainSuggestion(target)
                 val message = buildSuggestionMessage(suggestion.poolInfo, it.jda, status)
                 val reasonTitle = "Reason for Status"
@@ -149,9 +149,15 @@ fun suggestionCommands(config: Configuration, log: BotLogger) = commands {
                     message.addField(reasonTitle, reason, false)
                     updateSuggestion(target, status)
 
-                    val archive = fetchArchiveChannel(guild, config)
-                    archive.sendMessage(message.build()).queue()
-                    msg.deleteIfExists()
+                    val archiveChannel = fetchArchiveChannel(guild, config)
+
+                    if (suggestionChannel.id != archiveChannel.id) {
+                        archiveChannel.sendMessage(message.build()).queue()
+                        msg.deleteIfExists()
+                    }
+                    else {
+                        msg.editMessage(message.build()).queue()
+                    }
 
                     it.respond(embed {
                         setTitle("$status suggestion")
