@@ -24,16 +24,15 @@ class MessageDeleteListener(val logger: BotLogger, val manager: PermissionManage
 
         if(shouldBeLogged(event.author)) return
 
-        val found = list.find { it == event.message }
-
         if(event.message.contentRaw.startsWith(config.serverInformation.prefix)) return
+
+        val found = list.find { it == event.message }
 
         if(found != null) {
             logger.history(embed {
-                title("Message Edited in ${found.channel.name}")
-                description("${event.author.asMention}(${event.author.fullName()})")
+                title("Message Edited")
+                description("${event.author.asMention}(${event.author.fullName()}) in ${event.channel.asMention}")
                 setColor(Color.ORANGE)
-
 
                 field {
                     name = "Old"
@@ -68,12 +67,12 @@ class MessageDeleteListener(val logger: BotLogger, val manager: PermissionManage
 
         if(found != null) {
             logger.history(embed {
-                title("Message Delete")
-                description("${found.author.asMention}(${found.author.fullName()})")
+                title("Message Deleted")
+                description("${found.author.asMention}(${found.author.fullName()}) in ${event.channel.asMention}")
                 setColor(Color.ORANGE)
 
                 field {
-                    name = "Message in ${found.channel.name}"
+                    name = "Deleted Message"
                     value = found.contentRaw
                     inline = false
                 }
