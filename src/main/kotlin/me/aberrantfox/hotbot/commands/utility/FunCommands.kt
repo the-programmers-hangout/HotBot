@@ -23,9 +23,10 @@ fun funCommands() =
             execute {
                 val options = it.args[0] as List<String>
                 var choice = options[Random().nextInt(options.size)]
-                if (options.size == 1)
-                    choice += "\n... were you expecting something else ? :thinking: Did you forget the `|` separator ?"
-                it.safeRespond(choice)
+                val response = if (options.size == 1) "Yeah, I don't know what you are expecting by only giving one choice."
+                                      else "Flipping amongst (${options.joinToString(", ")}) got you...\n$choice!"
+
+                it.safeRespond(response)
             }
         }
 
