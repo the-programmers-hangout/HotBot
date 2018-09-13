@@ -39,7 +39,8 @@ data class Security(@Transient val ignoredIDs: MutableSet<String> = mutableSetOf
 
 data class MessageChannels(val welcomeChannel: String = "insert-id",
                            val suggestionChannel: String = "insert-id",
-                           val profileChannel: String = "insert-channel-id")
+                           val suggestionArchive: String = "insert-id",
+                           val profileChannel: String = "insert-id")
 
 data class ApiConfiguration(val cleverbotAPIKey: String = "insert-api-key",
                             val cleverBotApiCallLimit: Int = 10000,

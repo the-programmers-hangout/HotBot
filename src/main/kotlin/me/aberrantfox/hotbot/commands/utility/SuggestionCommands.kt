@@ -8,7 +8,7 @@ import me.aberrantfox.hotbot.services.UserElementPool
 import me.aberrantfox.kjdautils.api.dsl.CommandSet
 import me.aberrantfox.kjdautils.api.dsl.commands
 import me.aberrantfox.kjdautils.api.dsl.embed
-import me.aberrantfox.kjdautils.extensions.jda.sendPrivateMessage
+import me.aberrantfox.kjdautils.extensions.jda.*
 import me.aberrantfox.kjdautils.internal.command.arguments.ChoiceArg
 import me.aberrantfox.kjdautils.internal.command.arguments.SentenceArg
 import me.aberrantfox.kjdautils.internal.command.arguments.WordArg
@@ -149,7 +149,9 @@ fun suggestionCommands(config: Configuration, log: BotLogger) = commands {
                     message.addField(reasonTitle, reason, false)
                     updateSuggestion(target, status)
 
-                    msg.editMessage(message.build()).queue()
+                    val archive = fetchArchiveChannel(guild, config)
+                    archive.sendMessage(message.build()).queue()
+                    msg.deleteIfExists()
 
                     it.respond(embed {
                         setTitle("$status suggestion")
@@ -163,6 +165,8 @@ fun suggestionCommands(config: Configuration, log: BotLogger) = commands {
 }
 
 private fun fetchSuggestionChannel(guild: Guild, config: Configuration) = guild.getTextChannelById(config.messageChannels.suggestionChannel)
+
+private fun fetchArchiveChannel(guild: Guild, config: Configuration) = guild.getTextChannelById(config.messageChannels.suggestionArchive)
 
 private fun inputToStatus(input: String): SuggestionStatus? = SuggestionStatus.values().findLast { it.name.toLowerCase() == input.toLowerCase() }
 
