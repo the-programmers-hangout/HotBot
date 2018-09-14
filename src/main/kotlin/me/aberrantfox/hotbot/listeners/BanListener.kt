@@ -10,7 +10,6 @@ class BanListener() {
     @Subscribe
     fun onGuildBan(event: GuildBanEvent) {
         Timer().schedule(5 * 1000) {
-            println("Marking as banned")
             markLastRecordAsBan(event.user.id, event.guild.id)
         }
     }
