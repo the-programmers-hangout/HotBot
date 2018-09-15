@@ -8,7 +8,7 @@ import me.aberrantfox.hotbot.services.UserElementPool
 import me.aberrantfox.kjdautils.api.dsl.CommandSet
 import me.aberrantfox.kjdautils.api.dsl.commands
 import me.aberrantfox.kjdautils.api.dsl.embed
-import me.aberrantfox.kjdautils.extensions.jda.sendPrivateMessage
+import me.aberrantfox.kjdautils.extensions.jda.*
 import me.aberrantfox.kjdautils.internal.command.arguments.ChoiceArg
 import me.aberrantfox.kjdautils.internal.command.arguments.SentenceArg
 import me.aberrantfox.kjdautils.internal.command.arguments.WordArg
@@ -120,14 +120,15 @@ fun suggestionCommands(config: Configuration, log: BotLogger) = commands {
             val status = inputToStatus(response)!!
 
             val guild = it.jda.getGuildById(config.serverInformation.guildid)
-            val channel = fetchSuggestionChannel(guild, config)
 
-            if (!(isTracked(target)) || channel.getMessageById(target) == null) {
+            val suggestionChannel = fetchSuggestionChannel(guild, config)
+
+            if (!(isTracked(target)) || suggestionChannel.getMessageById(target) == null) {
                 it.respond("That is not a valid message or a suggestion by the ID.")
                 return@execute
             }
 
-            channel.getMessageById(target).queue { msg ->
+            suggestionChannel.getMessageById(target).queue { msg ->
                 val suggestion = obtainSuggestion(target)
                 val message = buildArchiveMessage(suggestion.poolInfo, it.jda, status, msg.reactions)
                 val reasonTitle = "Reason for Status"
@@ -143,7 +144,15 @@ fun suggestionCommands(config: Configuration, log: BotLogger) = commands {
                     message.addField(reasonTitle, reason, false)
                     updateSuggestion(target, status)
 
-                    msg.editMessage(message.build()).queue()
+                    val archiveChannel = fetchArchiveChannel(guild, config)
+
+                    if (suggestionChannel.id != archiveChannel.id) {
+                        archiveChannel.sendMessage(message.build()).queue()
+                        msg.deleteIfExists()
+                    }
+                    else {
+                        msg.editMessage(message.build()).queue()
+                    }
 
                     it.respond(embed {
                         setTitle("$status suggestion")
@@ -157,6 +166,8 @@ fun suggestionCommands(config: Configuration, log: BotLogger) = commands {
 }
 
 private fun fetchSuggestionChannel(guild: Guild, config: Configuration) = guild.getTextChannelById(config.messageChannels.suggestionChannel)
+
+private fun fetchArchiveChannel(guild: Guild, config: Configuration) = guild.getTextChannelById(config.messageChannels.suggestionArchive)
 
 private fun inputToStatus(input: String): SuggestionStatus? = SuggestionStatus.values().findLast { it.name.toLowerCase() == input.toLowerCase() }
 
