@@ -168,7 +168,7 @@ fun utilCommands(mService: MService, manager: PermissionManager, config: Configu
 
     command("echo") {
         description = "Echo a message to a channel"
-        expect(TextChannelArg, SentenceArg("Message"))
+        expect(arg(TextChannelArg, optional=true, default={ it.channel }), arg(SentenceArg("Message")))
         execute {
             val target = it.args[0] as TextChannel
             val message = it.args[1] as String

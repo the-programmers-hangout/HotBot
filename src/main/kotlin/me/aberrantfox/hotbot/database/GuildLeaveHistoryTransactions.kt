@@ -1,9 +1,6 @@
 package me.aberrantfox.hotbot.database
 
-import org.jetbrains.exposed.sql.Op
-import org.jetbrains.exposed.sql.and
-import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.joda.time.DateTime
 
@@ -22,6 +19,18 @@ fun insertLeave(member: String, joinDate: DateTime, leaveDate: DateTime, guildId
                 it[GuildLeaveHistory.guildId] = guildId
                 it[GuildLeaveHistory.ban] = ban
             }
+        }
+
+fun markLastRecordAsBan(member: String, guildId: String) =
+        transaction {
+            GuildLeaveHistory
+                    .select { (GuildLeaveHistory.member eq member) and (GuildLeaveHistory.guildId eq guildId) }
+                    .orderBy(GuildLeaveHistory.leaveDate to false, GuildLeaveHistory.id to false)
+                    .firstOrNull()
+                    ?.let { it[GuildLeaveHistory.id] }
+                    ?.let { id ->
+                        GuildLeaveHistory.update({ GuildLeaveHistory.id eq id }) { it[GuildLeaveHistory.ban] = true }
+                    }
         }
 
 fun getLeaveHistory(member: String, guildId: String) =
