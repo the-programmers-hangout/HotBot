@@ -268,7 +268,7 @@ fun utilCommands(mService: MService, manager: PermissionManager, config: Configu
     }
 
     command("remainingmute") {
-        description="Return the remaing time of a mute"
+        description="Return the remaining time of a mute"
         execute {
             val unmuteTime = getUnmuteRecord(it.author.id, config.serverInformation.guildid)-DateTime().millis
             it.respond(timeToString(unmuteTime))
