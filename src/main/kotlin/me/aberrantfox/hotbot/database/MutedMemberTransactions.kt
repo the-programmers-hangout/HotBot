@@ -56,3 +56,12 @@ fun isMemberMuted(user: String, guildId: String) =
             MutedMember.select {(MutedMember.member eq user) and (MutedMember.guildId eq guildId) }
                        .count() > 0
         }
+
+fun getUnmuteRecord(user: String, guildId: String) =
+        transaction {
+            val select = MutedMember.select {
+                Op.build { (MutedMember.member eq user) and (MutedMember.guildId eq guildId)}
+                }.first()
+            select[MutedMember.unmuteTime]
+        }
+
