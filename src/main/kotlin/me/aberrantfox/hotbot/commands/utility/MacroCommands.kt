@@ -55,7 +55,7 @@ fun macroCommands(permManager: PermissionManager) =
                 addMacro(Macro(name, message, category), it.container, permManager)
                 saveMacroList(macros.values)
 
-                it.safeRespond("**$name** (category: **$category**) will now respond with: **$message**")
+                it.respond("**$name** (category: **$category**) will now respond with: **$message**")
             }
 
         }
@@ -73,7 +73,7 @@ fun macroCommands(permManager: PermissionManager) =
 
                 saveMacroList(macros.values)
 
-                it.safeRespond("**$name** (category: **${macro.category}**) will now respond with: **$message**")
+                it.respond("**$name** (category: **${macro.category}**) will now respond with: **$message**")
             }
         }
 
@@ -91,7 +91,7 @@ fun macroCommands(permManager: PermissionManager) =
 
                 saveMacroList(macros.values)
 
-                it.safeRespond("${macroArgs.joinToString(", ") { it.name }} moved to $newCategory")
+                it.respond("${macroArgs.joinToString(", ") { it.name }} moved to $newCategory")
             }
         }
 
@@ -104,17 +104,17 @@ fun macroCommands(permManager: PermissionManager) =
                 val newName = (it.args.component2() as String).toLowerCase()
 
                 if (it.container.has(newName))
-                    return@execute it.safeRespond("A command already exists with the name $newName")
+                    return@execute it.respond("A command already exists with the name $newName")
 
                 if (newName in macros)
-                    return@execute it.safeRespond("The macro $newName already exists.")
+                    return@execute it.respond("The macro $newName already exists.")
 
                 removeMacro(oldMacro, it.container, permManager)
                 addMacro(oldMacro.copy(name=newName), it.container, permManager)
 
                 saveMacroList(macros.values)
 
-                it.safeRespond("**${oldMacro.name}** renamed to **$newName**")
+                it.respond("**${oldMacro.name}** renamed to **$newName**")
             }
         }
 
@@ -126,7 +126,7 @@ fun macroCommands(permManager: PermissionManager) =
 
                 removeMacro(macro, it.container, permManager)
 
-                it.safeRespond("${macro.name} - this macro is now gone.")
+                it.respond("${macro.name} - this macro is now gone.")
             }
         }
 
@@ -139,7 +139,7 @@ fun macroCommands(permManager: PermissionManager) =
                 val toRemove = macros.filterValues { it.category.toLowerCase() == categoryName }
 
                 if (toRemove.isEmpty()) {
-                    it.safeRespond("$categoryName isn't the name of a known macro category.")
+                    it.respond("$categoryName isn't the name of a known macro category.")
                     return@execute
                 }
 
@@ -147,7 +147,7 @@ fun macroCommands(permManager: PermissionManager) =
 
                 saveMacroList(macros.values)
 
-                it.safeRespond("${toRemove.size} macros removed.")
+                it.respond("${toRemove.size} macros removed.")
             }
         }
 

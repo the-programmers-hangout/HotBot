@@ -26,8 +26,6 @@ import me.aberrantfox.kjdautils.internal.logging.BotLogger
 import me.aberrantfox.kjdautils.internal.logging.convertChannels
 import net.dv8tion.jda.core.JDA
 
-const val commandPath = "me.aberrantfox.hotbot.commands"
-
 fun main(args: Array<String>) {
     val config = loadConfig() ?: return
     saveConfig(config)
@@ -43,8 +41,14 @@ private fun start(config: Configuration) = startBot(config.serverInformation.tok
     val manager = PermissionManager(jda, config)
     val aliasService = AliasService(manager)
 
-    registerInjectionObject(messageService, config, logger, manager, this.config, aliasService)
-    val container = registerCommands(commandPath, config.serverInformation.prefix)
+    registerInjectionObject(messageService, config, logger, manager, this.config, aliasService,
+            MessageTracker(1), MuteService(jda, config, log = logger))
+
+    configure {
+        prefix = config.serverInformation.prefix
+        commandPath = "me.aberrantfox.hotbot.commands"
+        listenerPath = "me.aberrantfox.hotbot.listeners"
+    }
 
     LowerUserArg.manager = manager
     aliasService.container = container
@@ -66,9 +70,6 @@ private fun start(config: Configuration) = startBot(config.serverInformation.tok
             { failsBecause("Did you really think I would let you do that? :thinking:", manager.canUseCommand(it.author, commandName(it)) || !it.container.has(commandName(it))) }
     )
 
-    registerInjectionObject(MessageTracker(1), MuteService(jda, config, log = logger))
-    registerListenersByPath("me.aberrantfox.hotbot.listeners")
-
     if (config.apiConfiguration.enableCleverBot) {
         println("Enabling cleverbot integration.")
         registerListeners(MentionListener(config, jda.selfUser.name, manager))
@@ -76,7 +77,7 @@ private fun start(config: Configuration) = startBot(config.serverInformation.tok
 
     EngineContainer.engine = setupScriptEngine(jda, container, config, logger)
 
-    manager.defaultAndPrunePermissions(container)
+    manager.defaultAndPrunePermissions(container) // call this after loading all commands
 
     loadPersistence(jda, logger, config)
 

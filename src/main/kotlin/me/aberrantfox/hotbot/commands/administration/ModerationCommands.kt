@@ -67,7 +67,7 @@ fun moderationCommands(kConfig: KJDAConfiguration,
             }
 
             val sameChannel = it.channel.id == channel.id
-            val singlePrefixInvocationDeleted = !it.commandStruct.doubleInvocation && kConfig.deleteOnInvocation
+            val singlePrefixInvocationDeleted = it.stealthInvocation
 
             channel.history.retrievePast(amount + if (sameChannel) 1 else 0).queue { past ->
 
