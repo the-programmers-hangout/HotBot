@@ -85,7 +85,6 @@ fun dataCommands(config: Configuration) = commands {
                     .reduceRight { a, b -> "$a, $b"}
 
                 it.respond("The highest rated answers were: $answerString")
-                println("test")
             }
         }
     }
