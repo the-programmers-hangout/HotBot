@@ -32,6 +32,7 @@ import java.awt.Color
 import java.net.URLEncoder
 import java.time.format.DateTimeFormatter
 import java.util.*
+import kotlin.NoSuchElementException
 import kotlin.math.roundToLong
 
 data class Properties(val version: String, val author: String)
@@ -270,8 +271,13 @@ fun utilCommands(mService: MService, manager: PermissionManager, config: Configu
     command("remainingmute") {
         description="Return the remaining time of a mute"
         execute {
-            val unmuteTime = getUnmuteRecord(it.author.id, config.serverInformation.guildid)-DateTime().millis
-            it.respond(timeToString(unmuteTime))
+            try{
+                val unmuteTime = getUnmuteRecord(it.author.id, config.serverInformation.guildid)-DateTime().millis
+                it.respond(timeToString(unmuteTime))
+            }catch (e: NoSuchElementException){
+                it.respond("You aren't currently muted...")
+            }
+
         }
     }
 }
