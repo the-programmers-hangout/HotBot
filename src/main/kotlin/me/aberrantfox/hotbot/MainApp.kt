@@ -48,6 +48,7 @@ private fun start(config: Configuration) = startBot(config.serverInformation.tok
         prefix = config.serverInformation.prefix
         commandPath = "me.aberrantfox.hotbot.commands"
         listenerPath = "me.aberrantfox.hotbot.listeners"
+        deleteMode = config.serverInformation.deletionMode
     }
 
     LowerUserArg.manager = manager
