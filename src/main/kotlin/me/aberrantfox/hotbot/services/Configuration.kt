@@ -44,7 +44,8 @@ data class MessageChannels(val welcomeChannel: String = "insert-id",
 
 data class ApiConfiguration(val cleverbotAPIKey: String = "insert-api-key",
                             val cleverBotApiCallLimit: Int = 10000,
-                            val enableCleverBot: Boolean = false)
+                            val enableCleverBot: Boolean = false,
+                            val animalAPI: String = "insert-chewey-api-key")
 
 data class PermissionedActions(var sendInvite: PermissionLevel = PermissionLevel.Moderator,
                                var sendURL: PermissionLevel = PermissionLevel.Moderator,
