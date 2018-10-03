@@ -49,6 +49,7 @@ private fun start(config: Configuration) = startBot(config.serverInformation.tok
         commandPath = "me.aberrantfox.hotbot.commands"
         listenerPath = "me.aberrantfox.hotbot.listeners"
         deleteMode = config.serverInformation.deletionMode
+        visibilityPredicate = { cmd, user, chan, _ -> manager.canUseCommand(user, cmd) && manager.canUseCommandInChannel(user, chan.id) }
     }
 
     LowerUserArg.manager = manager
