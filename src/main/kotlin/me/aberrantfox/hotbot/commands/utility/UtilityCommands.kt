@@ -3,6 +3,7 @@ package me.aberrantfox.hotbot.commands.utility
 import com.google.gson.Gson
 import khttp.post
 import me.aberrantfox.hotbot.arguments.HexColourArg
+import me.aberrantfox.hotbot.database.getUnmuteRecord
 import me.aberrantfox.hotbot.database.isMemberMuted
 import me.aberrantfox.hotbot.permissions.PermissionManager
 import me.aberrantfox.hotbot.services.Configuration
@@ -21,14 +22,17 @@ import me.aberrantfox.kjdautils.internal.command.arguments.TimeStringArg
 import me.aberrantfox.kjdautils.internal.command.arguments.UserArg
 import me.aberrantfox.kjdautils.internal.logging.BotLogger
 import me.aberrantfox.hotbot.javautilities.UrlUtilities.sendImageToChannel
+import me.aberrantfox.hotbot.utility.timeToString
 import net.dv8tion.jda.core.OnlineStatus
 import net.dv8tion.jda.core.entities.Guild
 import net.dv8tion.jda.core.entities.TextChannel
 import net.dv8tion.jda.core.entities.User
+import org.joda.time.DateTime
 import java.awt.Color
 import java.net.URLEncoder
 import java.time.format.DateTimeFormatter
 import java.util.*
+import kotlin.NoSuchElementException
 import kotlin.math.roundToLong
 
 data class Properties(val version: String, val author: String)
@@ -106,10 +110,6 @@ fun utilCommands(mService: MService, manager: PermissionManager, config: Configu
         description = "Displays how long you have kept me, HOTBOT, AWAKE!"
         execute {
             val milliseconds = Date().time - startTime.time
-            val seconds = (milliseconds / 1000) % 60
-            val minutes = (milliseconds / (1000 * 60)) % 60
-            val hours = (milliseconds / (1000 * 60 * 60)) % 24
-            val days = (milliseconds / (1000 * 60 * 60 * 24))
 
             it.respond(embed {
                 setColor(Color.WHITE)
@@ -118,7 +118,7 @@ fun utilCommands(mService: MService, manager: PermissionManager, config: Configu
 
                 field {
                     name = "That's been"
-                    value = "$days day(s), $hours hour(s), $minutes minute(s) and $seconds second(s)"
+                    value = timeToString(milliseconds)
                 }
             })
         }
@@ -265,6 +265,19 @@ fun utilCommands(mService: MService, manager: PermissionManager, config: Configu
             }
 
             muteMember(guild, it.author, time, "No distractions for a while? Got it", config, it.author, log)
+        }
+    }
+
+    command("remainingmute") {
+        description="Return the remaining time of a mute"
+        execute {
+            try{
+                val unmuteTime = getUnmuteRecord(it.author.id, config.serverInformation.guildid)-DateTime().millis
+                it.respond(timeToString(unmuteTime))
+            }catch (e: NoSuchElementException){
+                it.respond("You aren't currently muted...")
+            }
+
         }
     }
 }
