@@ -1,6 +1,7 @@
 package me.aberrantfox.hotbot.commands.utility
 
 import com.github.ricksbrown.cowsay.Cowsay
+import me.aberrantfox.hotbot.services.Configuration
 import me.aberrantfox.kjdautils.api.dsl.CommandSet
 import me.aberrantfox.kjdautils.api.dsl.arg
 import me.aberrantfox.kjdautils.api.dsl.commands
@@ -15,8 +16,11 @@ import java.net.URLEncoder
 import java.util.*
 import khttp.get as kget
 
+
+var animalAPI = ""
+
 @CommandSet("fun")
-fun funCommands() =
+fun funCommands(config: Configuration) =
     commands {
         command("flip") {
             description = "Flips a coin. Optionally, print one of the choices given."
@@ -31,6 +35,7 @@ fun funCommands() =
             }
         }
 
+        animalAPI = "?auth=${config.apiConfiguration.animalAPI}"
         command("animal") {
             description = "Shows a cute animal. Animals implemented are ${animalMap.keys.joinToString(", ")}"
             expect(arg(ChoiceArg(name="Animal", choices=*animalMap.keys.toTypedArray()), true, "random"))
@@ -90,11 +95,11 @@ private fun buildAnimalEmbed(URL: String) = embed {
 
 private val animalMap = mapOf(
         "dog" to { kget("https://dog.ceo/api/breeds/image/random").jsonObject.getString("message") },
-        "cat" to { kget("https://api.chewey-bot.ga/cat").jsonObject.getString("data") },
+        "cat" to { kget("https://api.chewey-bot.ga/cat$animalAPI").jsonObject.getString("data") },
         "fox" to { kget("https://randomfox.ca/floof").jsonObject.getString("image") },
-        "bird" to { kget("https://api.chewey-bot.ga/birb").jsonObject.getString("data") },
-        "snake" to { kget("https://api.chewey-bot.ga/snake").jsonObject.getString("data") },
-        "otter" to { kget("https://api.chewey-bot.ga/otter").jsonObject.getString("data") },
-        "rabbit" to { kget("https://api.chewey-bot.ga/rabbit").jsonObject.getString("data") }
+        "bird" to { kget("https://api.chewey-bot.ga/birb$animalAPI").jsonObject.getString("data") },
+        "snake" to { kget("https://api.chewey-bot.ga/snake$animalAPI").jsonObject.getString("data") },
+        "otter" to { kget("https://api.chewey-bot.ga/otter$animalAPI").jsonObject.getString("data") },
+        "rabbit" to { kget("https://api.chewey-bot.ga/rabbit$animalAPI").jsonObject.getString("data") }
 )
 
