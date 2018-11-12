@@ -29,6 +29,7 @@ class ServerInformation(val token: String = "insert-token",
 
 data class Security(@Transient val ignoredIDs: MutableSet<String> = mutableSetOf(),
                     var lockDownMode: Boolean = false,
+                    var verboseLogging: Boolean = false,
                     val infractionActionMap: HashMap<Int, InfractionAction> = hashMapOf(
                             0 to InfractionAction.Warn,
                             1 to InfractionAction.Mute(60),
