@@ -4,7 +4,9 @@ import com.google.common.eventbus.Subscribe
 import me.aberrantfox.kjdautils.internal.logging.BotLogger
 import me.aberrantfox.hotbot.permissions.PermissionManager
 import me.aberrantfox.hotbot.services.Configuration
+import net.dv8tion.jda.core.entities.Message
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent
+import org.apache.tika.Tika
 
 class FileListener (val config: Configuration, val manager: PermissionManager, val log: BotLogger){
     @Subscribe fun onMessageReceived(event: GuildMessageReceivedEvent) {
@@ -16,7 +18,7 @@ class FileListener (val config: Configuration, val manager: PermissionManager, v
 
         if (message.attachments.isEmpty()) return
 
-        val containsIllegalAttachment = message.attachments.any { notAllowed(it.fileName) }
+        val containsIllegalAttachment = message.attachments.any { notAllowed(it) }
 
         if (containsIllegalAttachment){
             val fileNames = ArrayList<String>()
@@ -32,9 +34,10 @@ class FileListener (val config: Configuration, val manager: PermissionManager, v
         }
 
     }
-    private val regex = "^.*\\.(jpg|jpeg|gif|png|mp4|webm|mov)\$".toRegex()
+    private val regex = "image/(jpg|jpeg|gif|png|mp4|webm|mov)\$".toRegex()
 
-    private fun notAllowed (fileName: String): Boolean {
-        return (!regex.matches(fileName))
+    private fun notAllowed (attachment: Message.Attachment): Boolean {
+        val type = Tika().detect(attachment.inputStream)
+        return !regex.matches(type)
     }
 }
