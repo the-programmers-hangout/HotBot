@@ -2,7 +2,7 @@ package me.aberrantfox.hotbot.permissions
 
 import com.nhaarman.mockito_kotlin.doReturn
 import com.nhaarman.mockito_kotlin.mock
-import kotlinx.coroutines.experimental.runBlocking
+import kotlinx.coroutines.runBlocking
 import me.aberrantfox.hotbot.services.Configuration
 import me.aberrantfox.hotbot.services.ServerInformation
 import me.aberrantfox.kjdautils.api.dsl.Command
