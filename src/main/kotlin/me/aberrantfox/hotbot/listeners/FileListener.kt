@@ -1,9 +1,9 @@
 package me.aberrantfox.hotbot.listeners
 
 import com.google.common.eventbus.Subscribe
-import me.aberrantfox.kjdautils.internal.logging.BotLogger
 import me.aberrantfox.hotbot.permissions.PermissionManager
 import me.aberrantfox.hotbot.services.Configuration
+import me.aberrantfox.kjdautils.internal.logging.BotLogger
 import net.dv8tion.jda.core.entities.Message
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent
 import org.apache.tika.Tika
@@ -26,18 +26,18 @@ class FileListener (val config: Configuration, val manager: PermissionManager, v
 
             message.delete().queue()
             val user = event.author.asMention
-            val files = fileNames.toString().substring(1,fileNames.toString().length-1)
+            val files = fileNames.toString().substring(1 until fileNames.toString().length)
             log.alert("$user attempted to send the illegal file(s) $files in ${event.channel.asMention}")
-
             val userResponse = "Please don't send that file type here $user, use an online service (such as https://hastebin.com)"
             event.channel.sendMessage(userResponse).queue()
         }
 
     }
-    private val regex = "image/(jpg|jpeg|gif|png|mp4|webm|mov)\$".toRegex()
+    private val images = "image/(jpg|jpeg|gif|png)\$".toRegex()
+    private val movies = "video/(mp4|webm|mov)\$".toRegex()
 
     private fun notAllowed (attachment: Message.Attachment): Boolean {
         val type = Tika().detect(attachment.inputStream)
-        return !regex.matches(type)
+        return !(images.matches(type) || movies.matches(type))
     }
 }
