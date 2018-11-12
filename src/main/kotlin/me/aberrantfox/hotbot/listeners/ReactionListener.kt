@@ -9,16 +9,15 @@ import net.dv8tion.jda.core.entities.MessageChannel
 import net.dv8tion.jda.core.entities.MessageReaction
 import net.dv8tion.jda.core.events.message.react.MessageReactionAddEvent
 import net.dv8tion.jda.core.events.message.react.MessageReactionRemoveEvent
-import net.dv8tion.jda.core.hooks.ListenerAdapter
 
-class ReactionListener(val config: Configuration, val log: BotLogger) : ListenerAdapter() {
+class ReactionListener(val config: Configuration, val log: BotLogger) {
     @Subscribe
-    override fun onMessageReactionAdd(event: MessageReactionAddEvent?) {
+    fun onMessageReactionAdd(event: MessageReactionAddEvent?) {
         if (event != null) handleReaction(event.member, event.reactionEmote, event.reaction, event.channel, "added")
     }
 
     @Subscribe
-    override fun onMessageReactionRemove(event: MessageReactionRemoveEvent?) {
+    fun onMessageReactionRemove(event: MessageReactionRemoveEvent?) {
         if (event != null) handleReaction(event.member, event.reactionEmote, event.reaction, event.channel, "removed")
     }
 
