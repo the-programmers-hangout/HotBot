@@ -18,8 +18,7 @@
 
         <!-- Kotlin/Discord Dependency versions -->
         <kotlin.version>1.2.50</kotlin.version>
-        <coroutines.version>0.22</coroutines.version>
-        <kutils.version>0.8.9</kutils.version>
+        <kutils.version>0.9.3</kutils.version>
 
         <!-- Other Dependencies -->
         <jsoup.version>1.11.1</jsoup.version>
@@ -107,11 +106,6 @@
             <groupId>com.fatboyindustrial.gson-jodatime-serialisers</groupId>
             <artifactId>gson-jodatime-serialisers</artifactId>
             <version>${gson-serializers.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.kotlinx</groupId>
-            <artifactId>kotlinx-coroutines-core</artifactId>
-            <version>${coroutines.version}</version>
         </dependency>
         <dependency>
             <groupId>com.github.ricksbrown</groupId>
