@@ -31,7 +31,7 @@ fun funCommands(config: Configuration) =
                 val response = if (options.size == 1) "Yeah, I don't know what you are expecting by only giving one choice."
                                       else "Flipping amongst (${options.joinToString(", ")}) got you...\n$choice!"
 
-                it.safeRespond(response)
+                it.respond(response)
             }
         }
 
@@ -69,7 +69,7 @@ fun funCommands(config: Configuration) =
                 val arg0 = it.args[0] as String
                 val arg1 = it.args[1] as String
 
-                it.safeRespond(when {
+                it.respond(when {
                     arg0.isBlank() && arg1.isBlank() -> CowsayData.validCows.joinToString (", ")
                     arg1.isBlank() -> "```${Cowsay.say(arrayOf(arg0))}```"
                     CowsayData.validCows.contains(arg0) -> "```${Cowsay.say(arrayOf("-f $arg0", arg1))}```"

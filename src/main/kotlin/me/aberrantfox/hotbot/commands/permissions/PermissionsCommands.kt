@@ -29,7 +29,7 @@ fun permissionCommands(manager: PermissionManager, config: Configuration) =
                     val level = it.args.component2() as PermissionLevel
 
                     manager.setPermission(command.name, level)
-                    it.safeRespond("${command.name} is now accessible to ${level.name} and higher")
+                    it.respond("${command.name} is now accessible to ${level.name} and higher")
                 }
             }
 
@@ -38,7 +38,7 @@ fun permissionCommands(manager: PermissionManager, config: Configuration) =
                 expect(CommandArg)
                 execute {
                     val name = (it.args.component1() as Command).name
-                    it.safeRespond("The required role is: ${manager.roleRequired(name).name}")
+                    it.respond("The required role is: ${manager.roleRequired(name).name}")
                 }
             }
 
@@ -46,7 +46,7 @@ fun permissionCommands(manager: PermissionManager, config: Configuration) =
                 description = "Display each role in the server with its corresponding ID"
                 execute {
                     val guild = it.jda.getGuildById(config.serverInformation.guildid)
-                    it.safeRespond(guild.roles.joinToString("\n") { role -> "${role.name} :: ${role.id}" })
+                    it.respond(guild.roles.joinToString("\n") { role -> "${role.name} :: ${role.id}" })
                 }
             }
 
@@ -82,7 +82,7 @@ fun permissionCommands(manager: PermissionManager, config: Configuration) =
                     }
 
                     commands.forEach { command -> manager.setPermission(command, level) }
-                    it.safeRespond("${level.name} now has access to: ${commands.joinToString(prefix = "`", postfix = "`")}")
+                    it.respond("${level.name} now has access to: ${commands.joinToString(prefix = "`", postfix = "`")}")
                 }
             }
 

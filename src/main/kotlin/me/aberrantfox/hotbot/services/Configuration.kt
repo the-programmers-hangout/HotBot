@@ -4,6 +4,7 @@ import com.github.salomonbrys.kotson.fromJson
 import com.google.gson.GsonBuilder
 import com.google.gson.typeadapters.RuntimeTypeAdapterFactory
 import me.aberrantfox.hotbot.permissions.PermissionLevel
+import me.aberrantfox.kjdautils.api.dsl.PrefixDeleteMode
 import me.aberrantfox.kjdautils.internal.logging.ChannelIdHolder
 import java.io.File
 import java.util.*
@@ -25,7 +26,8 @@ class ServerInformation(val token: String = "insert-token",
                         val suggestionPoolLimit: Int = 20,
                         val deleteWelcomeOnLeave: Boolean = true,
                         val maxSelfmuteMinutes: Int = 60,
-                        val karmaGiveDelay: Int = 1000 * 60 * 60)
+                        val karmaGiveDelay: Int = 1000 * 60 * 60,
+                        val deletionMode: PrefixDeleteMode = PrefixDeleteMode.Single)
 
 data class Security(@Transient val ignoredIDs: MutableSet<String> = mutableSetOf(),
                     var lockDownMode: Boolean = false,
