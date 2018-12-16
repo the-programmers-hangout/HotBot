@@ -1,6 +1,6 @@
 package me.aberrantfox.hotbot.database
 
-import me.aberrantfox.hotbot.commandframework.commands.utility.SuggestionStatus
+import me.aberrantfox.hotbot.commands.utility.SuggestionStatus
 import me.aberrantfox.hotbot.services.Configuration
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
@@ -29,7 +29,7 @@ fun setupDatabaseSchema(config: Configuration) {
 
     transaction {
         SchemaUtils.create(Strikes, HistoryCount, Suggestions, BanRecords, CommandPermissions,
-                ChannelResources, Notes, MutedMember, IgnoredIDs, Reminder)
+                ChannelResources, Notes, MutedMember, IgnoredIDs, Reminder, GuildLeaveHistory, KarmaTable)
         logger.addLogger(StdOutSqlLogger)
     }
 }
@@ -102,4 +102,19 @@ object Reminder : Table() {
     val member = varchar("member", 18)
     val message = text("message")
     val remindTime = long("remindTime")
+}
+
+object GuildLeaveHistory : Table() {
+    val id = integer("id").autoIncrement().primaryKey()
+    val member = varchar("member", 18)
+    val joinDate = date("joinDate")
+    val leaveDate = date("leaveDate")
+    val ban = bool("ban")
+    val guildId = varchar("guildId", 18)
+}
+
+object KarmaTable : Table() {
+    val id = integer("id").autoIncrement().primaryKey()
+    val member = varchar("member", 18)
+    val karma = integer("karma")
 }

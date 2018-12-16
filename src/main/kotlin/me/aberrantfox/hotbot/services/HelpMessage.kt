@@ -1,7 +1,8 @@
 package me.aberrantfox.hotbot.services
 
 import com.google.gson.Gson
-import me.aberrantfox.hotbot.dsls.command.CommandsContainer
+import me.aberrantfox.hotbot.commands.utility.macros
+import me.aberrantfox.kjdautils.api.dsl.CommandsContainer
 import java.io.File
 
 
@@ -78,7 +79,7 @@ object HelpConf {
             errors.add("Duplicate Commands: ${duplicates.keys.joinToString(", ")}")
         }
 
-        val undocumentedCommands = commandNames.filterNot { docCommandNames.contains(it) }
+        val undocumentedCommands = commandNames.filterNot { docCommandNames.contains(it) || it in macros }
         if (undocumentedCommands.isNotEmpty()) {
             errors.add("Undocumented Commands: ${undocumentedCommands.joinToString(", ")}")
         }

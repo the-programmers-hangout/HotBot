@@ -1,10 +1,11 @@
 package me.aberrantfox.hotbot.services
 
 import com.github.salomonbrys.kotson.fromJson
-import com.google.gson.Gson
 import com.google.gson.GsonBuilder
-import me.aberrantfox.hotbot.logging.ChannelIdHolder
+import com.google.gson.typeadapters.RuntimeTypeAdapterFactory
 import me.aberrantfox.hotbot.permissions.PermissionLevel
+import me.aberrantfox.kjdautils.api.dsl.PrefixDeleteMode
+import me.aberrantfox.kjdautils.internal.logging.ChannelIdHolder
 import java.io.File
 import java.util.*
 
@@ -17,31 +18,44 @@ open class Configuration(open val serverInformation: ServerInformation = ServerI
                          val permissionedActions: PermissionedActions = PermissionedActions(),
                          val botInformation: BotInformation = BotInformation())
 
-open class ServerInformation(val token: String = "insert-token",
-                             open val ownerID: String = "insert-id",
-                             var prefix: String = "insert-prefix",
-                             open val guildid: String = "insert-guild-id",
-                             val suggestionPoolLimit: Int = 20)
+class ServerInformation(val token: String = "insert-token",
+                        val ownerID: String = "insert-id",
+                        var prefix: String = "insert-prefix",
+                        val guildid: String = "insert-guild-id",
+                        val macroDelay: Int = 30,
+                        val suggestionPoolLimit: Int = 20,
+                        val deleteWelcomeOnLeave: Boolean = true,
+                        val maxSelfmuteMinutes: Int = 60,
+                        val karmaGiveDelay: Int = 1000 * 60 * 60,
+                        val deletionMode: PrefixDeleteMode = PrefixDeleteMode.Single)
 
 data class Security(@Transient val ignoredIDs: MutableSet<String> = mutableSetOf(),
                     var lockDownMode: Boolean = false,
-                    val infractionActionMap: HashMap<Int, InfractionAction> = HashMap(),
+                    val infractionActionMap: HashMap<Int, InfractionAction> = hashMapOf(
+                            0 to InfractionAction.Warn,
+                            1 to InfractionAction.Mute(60),
+                            2 to InfractionAction.Mute(24 * 60),
+                            3 to InfractionAction.Ban),
                     val mutedRole: String = "Muted",
                     val strikeCeil: Int = 3)
 
 data class MessageChannels(val welcomeChannel: String = "insert-id",
                            val suggestionChannel: String = "insert-id",
-                           val profileChannel: String = "insert-channel-id")
+                           val suggestionArchive: String = "insert-id",
+                           val profileChannel: String = "insert-id")
 
 data class ApiConfiguration(val cleverbotAPIKey: String = "insert-api-key",
                             val cleverBotApiCallLimit: Int = 10000,
-                            val enableCleverBot: Boolean = false)
+                            val enableCleverBot: Boolean = false,
+                            val animalAPI: String = "insert-chewey-api-key")
 
 data class PermissionedActions(var sendInvite: PermissionLevel = PermissionLevel.Moderator,
                                var sendURL: PermissionLevel = PermissionLevel.Moderator,
                                var commandMention: PermissionLevel = PermissionLevel.Moderator,
                                val ignoreLogging: PermissionLevel = PermissionLevel.Moderator,
-                               var voiceChannelMuteThreshold: PermissionLevel = PermissionLevel.Moderator)
+                               var voiceChannelMuteThreshold: PermissionLevel = PermissionLevel.Moderator,
+                               var sendUnfilteredFiles: PermissionLevel = PermissionLevel.Moderator)
+
 
 data class DatabaseCredentials(val username: String = "root",
                                val password: String = "",
@@ -50,15 +64,39 @@ data class DatabaseCredentials(val username: String = "root",
 
 data class BotInformation(val developmentMode: Boolean = true)
 
-enum class InfractionAction {
-    Warn, Mute, Kick, Ban
+
+sealed class InfractionAction {
+    object Warn : InfractionAction()
+    object Kick : InfractionAction()
+    object Ban : InfractionAction()
+    data class Mute(val duration: Long) : InfractionAction() // in minutes
+
+    override fun toString() = when(this) {
+        is Warn -> "Warn"
+        is Kick -> "Kick"
+        is Ban  -> "Ban"
+        is Mute -> "Mute"
+    }
 }
 
-private val configDir = System.getenv("HOTBOT_CONFIG_DIR") ?: "config"
-private val configLocation = "config.json"
-private val gson = GsonBuilder().setPrettyPrinting().create()
 
-fun configPath(fileName: String) = "${configDir}/${fileName}"
+
+private val configDir = System.getenv("HOTBOT_CONFIG_DIR") ?: "config"
+private const val configLocation = "config.json"
+
+private val infractionAdapter = RuntimeTypeAdapterFactory
+        .of(InfractionAction::class.java)
+        .registerSubtype(InfractionAction.Warn::class.java)
+        .registerSubtype(InfractionAction.Kick::class.java)
+        .registerSubtype(InfractionAction.Ban::class.java)
+        .registerSubtype(InfractionAction.Mute::class.java)
+
+private val gson = GsonBuilder()
+        .setPrettyPrinting()
+        .registerTypeAdapterFactory(infractionAdapter)
+        .create()
+
+fun configPath(fileName: String) = "$configDir/$fileName"
 
 fun loadConfig(): Configuration? {
     val configFile = File(configPath(configLocation))
@@ -71,9 +109,8 @@ fun loadConfig(): Configuration? {
     }
 
     val json = configFile.readLines().stream().reduce("", { a: String, b: String -> a + b })
-    val configuration = gson.fromJson<Configuration>(json)
 
-    return configuration
+    return gson.fromJson(json)
 }
 
 fun saveConfig(config: Configuration) {

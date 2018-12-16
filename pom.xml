@@ -6,16 +6,39 @@
 
     <groupId>me.aberrantfox.</groupId>
     <artifactId>hotbot</artifactId>
-    <version>6.0.2</version>
+    <version>6.3.3-LTS</version>
 
     <properties>
         <main.class>me.aberrantfox.hotbot.MainAppKt</main.class>
-        <kotlin.version>1.2.30</kotlin.version>
-        <junit.version>4.12</junit.version>
-        <jupiter.version>5.0.0-M4</jupiter.version>
-        <junitPlatformVersion>1.0.0-M4</junitPlatformVersion>
-        <jda.version>3.6.0_367</jda.version>
         <project.author>Fox#0001</project.author>
+
+        <!-- Project Encoding -->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <!-- Kotlin/Discord Dependency versions -->
+        <kotlin.version>1.3.10</kotlin.version>
+        <kutils.version>0.9.4</kutils.version>
+
+        <!-- Other Dependencies -->
+        <jsoup.version>1.11.1</jsoup.version>
+        <kotson.version>2.5.0</kotson.version>
+        <slf4j.version>1.7.25</slf4j.version>
+        <reflections.version>0.9.11</reflections.version>
+        <khttp.version>0.1.0</khttp.version>
+        <exposed.version>0.9.1</exposed.version>
+        <jdbc.version>5.1.43</jdbc.version>
+        <joda-time.version>2.6</joda-time.version>
+        <cowsay.version>1.0.3</cowsay.version>
+        <gson-serializers.version>1.6.0</gson-serializers.version>
+        <gson-extra.version>0.2.1</gson-extra.version>
+
+        <!-- Test Dependency Versions -->
+        <spek.version>1.1.5</spek.version>
+        <kluent.version>1.38</kluent.version>
+        <mockito.version>1.5.0</mockito.version>
+        <junit.version>5.2.0</junit.version>
+        <junitPlatformSurefire.version>1.2.0</junitPlatformSurefire.version>
     </properties>
 
     <dependencies>
@@ -25,49 +48,49 @@
             <version>${kotlin.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.github.salomonbrys.kotson</groupId>
-            <artifactId>kotson</artifactId>
-            <version>2.5.0</version>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-reflect</artifactId>
+            <version>${kotlin.version}</version>
         </dependency>
         <dependency>
-            <groupId>net.dv8tion</groupId>
-            <artifactId>JDA</artifactId>
-            <version>${jda.version}</version>
+            <groupId>com.github.salomonbrys.kotson</groupId>
+            <artifactId>kotson</artifactId>
+            <version>${kotson.version}</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
-            <version>1.7.25</version>
+            <version>${slf4j.version}</version>
         </dependency>
         <dependency>
             <groupId>org.reflections</groupId>
             <artifactId>reflections</artifactId>
-            <version>0.9.11</version>
+            <version>${reflections.version}</version>
         </dependency>
         <dependency>
             <groupId>khttp</groupId>
             <artifactId>khttp</artifactId>
-            <version>0.1.0</version>
+            <version>${khttp.version}</version>
         </dependency>
         <dependency>
             <groupId>org.jetbrains.exposed</groupId>
             <artifactId>exposed</artifactId>
-            <version>0.9.1</version>
+            <version>${exposed.version}</version>
         </dependency>
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>5.1.43</version>
+            <version>${jdbc.version}</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.7.25</version>
+            <version>${slf4j.version}</version>
         </dependency>
         <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
-            <version>2.6</version>
+            <version>${joda-time.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -82,77 +105,59 @@
         <dependency>
             <groupId>com.fatboyindustrial.gson-jodatime-serialisers</groupId>
             <artifactId>gson-jodatime-serialisers</artifactId>
-            <version>1.6.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.kotlinx</groupId>
-            <artifactId>kotlinx-coroutines-core</artifactId>
-            <version>0.22</version>
+            <version>${gson-serializers.version}</version>
         </dependency>
         <dependency>
             <groupId>com.github.ricksbrown</groupId>
             <artifactId>cowsay</artifactId>
-            <version>1.0.3</version>
+            <version>${cowsay.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
+            <version>${jsoup.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.gitlab.aberrantfox</groupId>
+            <artifactId>Kutils</artifactId>
+            <version>${kutils.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.danilopianini</groupId>
+            <artifactId>gson-extras</artifactId>
+            <version>${gson-extra.version}</version>
+        </dependency>
+
 
         <!-- Test Dependencies -->
         <dependency>
-            <groupId>com.nhaarman</groupId>
-            <artifactId>mockito-kotlin</artifactId>
-            <version>1.5.0</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.platform</groupId>
-            <artifactId>junit-platform-console</artifactId>
-            <version>${junitPlatformVersion}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.platform</groupId>
-            <artifactId>junit-platform-runner</artifactId>
-            <version>${junitPlatformVersion}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.platform</groupId>
-            <artifactId>junit-platform-engine</artifactId>
-            <version>${junitPlatformVersion}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.platform</groupId>
-            <artifactId>junit-platform-launcher</artifactId>
-            <version>${junitPlatformVersion}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
-            <version>${jupiter.version}</version>
+            <groupId>org.jetbrains.spek</groupId>
+            <artifactId>spek-api</artifactId>
+            <version>${spek.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
-            <version>${jupiter.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.junit.vintage</groupId>
-            <artifactId>junit-vintage-engine</artifactId>
-            <version>4.12.0-M4</version>
+            <groupId>org.amshove.kluent</groupId>
+            <artifactId>kluent</artifactId>
+            <version>${kluent.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.jsoup</groupId>
-            <artifactId>jsoup</artifactId>
-            <version>1.11.1</version>
+            <groupId>com.nhaarman</groupId>
+            <artifactId>mockito-kotlin</artifactId>
+            <version>${mockito.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains.spek</groupId>
+            <artifactId>spek-junit-platform-engine</artifactId>
+            <version>${spek.version}</version>
         </dependency>
     </dependencies>
     <repositories>
@@ -168,6 +173,10 @@
             <id>bintray-kotlin-exposed</id>
             <name>bintray</name>
             <url>http://dl.bintray.com/kotlin/exposed</url>
+        </repository>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
         </repository>
     </repositories>
 
@@ -187,9 +196,6 @@
         <plugins>
             <plugin>
                 <artifactId>kotlin-maven-plugin</artifactId>
-                <configuration>
-                    <experimentalCoroutines>enable</experimentalCoroutines>
-                </configuration>
                 <groupId>org.jetbrains.kotlin</groupId>
                 <version>${kotlin.version}</version>
                 <executions>
@@ -197,6 +203,13 @@
                         <id>compile</id>
                         <goals>
                             <goal>compile</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>test-compile</id>
+                        <phase>test-compile</phase>
+                        <goals>
+                            <goal>test-compile</goal>
                         </goals>
                     </execution>
                 </executions>
@@ -228,10 +241,46 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.0</version>
+                <executions>
+                    <execution>
+                        <id>compile</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>testCompile</id>
+                        <phase>test-compile</phase>
+                        <goals>
+                            <goal>testCompile</goal>
+                        </goals>
+                    </execution>
+                </executions>
                 <configuration>
                     <source>1.9</source>
                     <target>1.9</target>
                 </configuration>
+            </plugin>
+
+            <!-- Testing-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.21.0</version>
+                <configuration>
+                    <includes>
+                        <include>**/*Spec.*</include>
+                    </includes>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.junit.platform</groupId>
+                        <artifactId>junit-platform-surefire-provider</artifactId>
+                        <version>${junitPlatformSurefire.version}</version>
+                    </dependency>
+                </dependencies>
             </plugin>
         </plugins>
     </build>
