@@ -25,7 +25,9 @@ class KarmaService {
 
         if(target.user == message.author) return Negative
 
-        val trimmedContent = content.replace(target.asMention, "").trim()
+        val trimmedContent = content.replace(target.asMention, "")
+                                    .replace(target.user.asMention, "")
+                                    .trim()
 
         if ( !thanks.contains(trimmedContent) ) return Negative
 
