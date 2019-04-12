@@ -46,8 +46,7 @@ private fun start(config: Configuration) = startBot(config.serverInformation.tok
 
     configure {
         prefix = config.serverInformation.prefix
-        commandPath = "me.aberrantfox.hotbot.commands"
-        listenerPath = "me.aberrantfox.hotbot.listeners"
+        globalPath = "me.aberrantfox.hotbot"
         deleteMode = config.serverInformation.deletionMode
         visibilityPredicate = { cmd, user, chan, _ -> manager.canUseCommand(user, cmd) && manager.canUseCommandInChannel(user, chan.id) }
     }
@@ -74,7 +73,7 @@ private fun start(config: Configuration) = startBot(config.serverInformation.tok
 
     if (config.apiConfiguration.enableCleverBot) {
         println("Enabling cleverbot integration.")
-        registerListeners(MentionListener(config, jda.selfUser.name, manager))
+        registerListeners(MentionListener(config, jda, manager))
     }
 
     EngineContainer.engine = setupScriptEngine(jda, container, config, logger)

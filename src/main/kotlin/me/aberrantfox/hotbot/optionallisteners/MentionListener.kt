@@ -5,10 +5,12 @@ import com.michaelwflaherty.cleverbotapi.CleverBotQuery
 import me.aberrantfox.hotbot.permissions.PermissionManager
 import me.aberrantfox.hotbot.services.APIRateLimiter
 import me.aberrantfox.hotbot.services.Configuration
+import net.dv8tion.jda.core.JDA
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent
 
 
-class MentionListener(val config: Configuration, val selfName: String, val manager: PermissionManager) {
+class MentionListener(val config: Configuration, val jda: JDA, val manager: PermissionManager) {
+    private val selfName = jda.selfUser.name
     private val rateLimiter = APIRateLimiter(config.apiConfiguration.cleverBotApiCallLimit, 0, "CleverBot")
     private val pattern = Regex("(\\s|^)$selfName(\\s|$)")
 
