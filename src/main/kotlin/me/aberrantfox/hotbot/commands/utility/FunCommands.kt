@@ -2,22 +2,12 @@ package me.aberrantfox.hotbot.commands.utility
 
 import com.github.ricksbrown.cowsay.Cowsay
 import me.aberrantfox.hotbot.services.Configuration
-import me.aberrantfox.kjdautils.api.dsl.CommandSet
-import me.aberrantfox.kjdautils.api.dsl.arg
-import me.aberrantfox.kjdautils.api.dsl.commands
-import me.aberrantfox.kjdautils.api.dsl.embed
-import me.aberrantfox.kjdautils.internal.command.arguments.ChoiceArg
-import me.aberrantfox.kjdautils.internal.command.arguments.SentenceArg
-import me.aberrantfox.kjdautils.internal.command.arguments.SplitterArg
-import me.aberrantfox.kjdautils.internal.command.arguments.WordArg
+import me.aberrantfox.kjdautils.api.dsl.*
+import me.aberrantfox.kjdautils.internal.command.arguments.*
 import org.jsoup.Jsoup
-import java.awt.Color
 import java.net.URLEncoder
-import java.util.*
+import java.util.Random
 import khttp.get as kget
-
-
-var animalAPI = ""
 
 @CommandSet("fun")
 fun funCommands(config: Configuration) =
@@ -32,18 +22,6 @@ fun funCommands(config: Configuration) =
                                       else "Flipping amongst (${options.joinToString(", ")}) got you...\n$choice!"
 
                 it.respond(response)
-            }
-        }
-
-        animalAPI = "?auth=${config.apiConfiguration.animalAPI}"
-        command("animal") {
-            description = "Shows a cute animal. Animals implemented are ${animalMap.keys.joinToString(", ")}"
-            expect(arg(ChoiceArg(name="Animal", choices=*animalMap.keys.toTypedArray()), true, "random"))
-            execute {
-                var animal = it.args[0] as String
-
-                if(animal == "random"){ animal = randomAnimal() }
-                it.respond(buildAnimalEmbed(animalMap[animal]!!.invoke()))
             }
         }
 
@@ -83,23 +61,3 @@ fun funCommands(config: Configuration) =
 object CowsayData {
     val validCows = Cowsay.say(arrayOf("-l")).split("\n").filterNot { listOf("sodomized", "head-in", "telebears").contains(it) }
 }
-
-private fun randomAnimal(): String{
-    return animalMap.keys.shuffled().first()
-}
-
-private fun buildAnimalEmbed(URL: String) = embed {
-    setColor(Color.decode("#52be80"))
-    setImage(URL)
-}
-
-private val animalMap = mapOf(
-        "dog" to { kget("https://dog.ceo/api/breeds/image/random").jsonObject.getString("message") },
-        "cat" to { kget("https://api.chewey-bot.ga/cat$animalAPI").jsonObject.getString("data") },
-        "fox" to { kget("https://randomfox.ca/floof").jsonObject.getString("image") },
-        "bird" to { kget("https://api.chewey-bot.ga/birb$animalAPI").jsonObject.getString("data") },
-        "snake" to { kget("https://api.chewey-bot.ga/snake$animalAPI").jsonObject.getString("data") },
-        "otter" to { kget("https://api.chewey-bot.ga/otter$animalAPI").jsonObject.getString("data") },
-        "rabbit" to { kget("https://api.chewey-bot.ga/rabbit$animalAPI").jsonObject.getString("data") }
-)
-
