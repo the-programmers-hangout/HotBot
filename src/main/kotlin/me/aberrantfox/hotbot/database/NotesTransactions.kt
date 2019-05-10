@@ -19,7 +19,7 @@ fun insertNote(member: String, moderator: String, note: String) =
                 it[Notes.member] = member
                 it[Notes.moderator] = moderator
                 it[Notes.note] = note
-                it[Notes.date] = DateTime.now()
+                it[date] = DateTime.now()
             }
         }
 
@@ -28,7 +28,7 @@ fun replaceNote(id: Int, note: String, moderator: String) =
             Notes.update({Notes.id eq id}) {
                 it[Notes.moderator] = moderator
                 it[Notes.note] = note
-                it[Notes.date] = DateTime.now()
+                it[date] = DateTime.now()
             }
         }
 

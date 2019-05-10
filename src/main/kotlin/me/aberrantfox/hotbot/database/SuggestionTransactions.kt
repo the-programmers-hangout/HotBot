@@ -14,12 +14,12 @@ data class SuggestionRecord(val messageID: String, val status: SuggestionStatus,
 fun trackSuggestion(suggestion: SuggestionRecord) =
         transaction {
             Suggestions.insert {
-                it[Suggestions.id] = suggestion.messageID
-                it[Suggestions.date] = suggestion.date
-                it[Suggestions.idea] = suggestion.idea
-                it[Suggestions.member] = suggestion.member
-                it[Suggestions.status] = suggestion.status
-                it[Suggestions.avatarURL] = suggestion.avatarURL
+                it[id] = suggestion.messageID
+                it[date] = suggestion.date
+                it[idea] = suggestion.idea
+                it[member] = suggestion.member
+                it[status] = suggestion.status
+                it[avatarURL] = suggestion.avatarURL
             }
         }
 
