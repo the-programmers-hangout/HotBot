@@ -44,7 +44,7 @@ fun giveawayCommands(log: BotLogger) = commands {
 
     command("giveawayend") {
         description = "Force end a giveaway"
-        expect(arg(MessageArg("Embed Message ID")), arg(TextChannelArg, true, { it.channel }))
+        expect(arg(MessageArg("Embed Message ID")), arg(TextChannelArg, true) { it.channel })
         execute {
             val message = it.args.component1() as Message
             if (!message.isGiveaway()) {
@@ -64,7 +64,7 @@ fun giveawayCommands(log: BotLogger) = commands {
 
     command("giveawayreroll") {
         description = "Reroll an ended giveaway to get a new winner"
-        expect(arg(MessageArg("Embed Message ID")), arg(TextChannelArg, true, { it.channel }))
+        expect(arg(MessageArg("Embed Message ID")), arg(TextChannelArg, true) { it.channel })
         execute {
             val message = it.args.component1() as Message
             if (!message.isGiveaway()) {

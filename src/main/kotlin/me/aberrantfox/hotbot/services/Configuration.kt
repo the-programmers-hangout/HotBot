@@ -108,7 +108,7 @@ fun loadConfig(): Configuration? {
         return null
     }
 
-    val json = configFile.readLines().stream().reduce("", { a: String, b: String -> a + b })
+    val json = configFile.readLines().stream().reduce("") { a: String, b: String -> a + b }
 
     return gson.fromJson(json)
 }
