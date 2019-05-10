@@ -12,7 +12,7 @@ const val secondUnit = 1000
 const val minuteUnit = 60 * secondUnit
 const val hourUnit = 60 * minuteUnit
 
-open class IdTracker<T>(val trackTime: Int, val timeUnit: Int = hourUnit) {
+open class IdTracker<T>(private val trackTime: Int, private val timeUnit: Int = hourUnit) {
     val map: ConcurrentHashMap<String, T> = ConcurrentHashMap()
 
     fun clear() = map.clear()

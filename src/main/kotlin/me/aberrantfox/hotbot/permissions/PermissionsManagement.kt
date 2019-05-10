@@ -29,7 +29,7 @@ data class PermissionsConfiguration(val permissions: ConcurrentHashMap<String, P
                                     val roleMappings: ConcurrentHashMap<String, PermissionLevel> = ConcurrentHashMap(),
                                     val channelIgnoreLevels: ConcurrentHashMap<String, ChannelPermission> = ConcurrentHashMap())
 
-open class PermissionManager(val jda: JDA, val botConfig: Configuration,
+open class PermissionManager(val jda: JDA, private val botConfig: Configuration,
                              permissionsConfigurationLocation: String = "config/permissions.json") {
 
     private val gson = GsonBuilder().setPrettyPrinting().create()

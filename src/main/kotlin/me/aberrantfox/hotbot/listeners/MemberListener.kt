@@ -24,7 +24,7 @@ import me.aberrantfox.hotbot.utility.handleReJoinMute
 
 typealias MessageID = String
 
-class MemberListener(val configuration: Configuration, val logger: BotLogger, val mService: MService) {
+class MemberListener(val configuration: Configuration, private val logger: BotLogger, private val mService: MService) {
     private val welcomeMessages = ConcurrentHashMap<UserID, MessageID>()
 
     @Subscribe

@@ -7,7 +7,7 @@ import me.aberrantfox.kjdautils.internal.logging.BotLogger
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent
 
 
-class TooManyMentionsListener(val log: BotLogger, val muteService: MuteService) {
+class TooManyMentionsListener(val log: BotLogger, private val muteService: MuteService) {
     @Subscribe
     fun onGuildMessageReceived(event: GuildMessageReceivedEvent) {
         val member = event.member ?: return // Message is a WebhookMessage if null
