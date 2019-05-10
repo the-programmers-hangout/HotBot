@@ -21,7 +21,6 @@ import java.util.concurrent.TimeUnit
 import kotlin.concurrent.schedule
 import me.aberrantfox.hotbot.services.UserID
 import me.aberrantfox.hotbot.utility.handleReJoinMute
-import net.dv8tion.jda.core.audit.ActionType
 
 typealias MessageID = String
 

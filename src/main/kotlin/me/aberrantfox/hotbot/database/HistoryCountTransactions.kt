@@ -44,7 +44,7 @@ fun hasHistoryCount(member: String) =
             }.count() > 0
         }
 
-fun resetHistoryCount(member: String): Unit {
+fun resetHistoryCount(member: String) {
     if (hasHistoryCount(member))
         transaction {
             HistoryCount.update({ HistoryCount.member eq member}) {

@@ -34,9 +34,7 @@ fun setKarma(user: User, amount: Int): Unit = transaction {
         }
     } else {
         KarmaTable.update({ KarmaTable.member eq user.id }) {
-            with(SqlExpressionBuilder) {
-                it[karma] = amount
-            }
+            it[karma] = amount
         }
     }
 
