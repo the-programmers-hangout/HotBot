@@ -49,7 +49,7 @@ class MemberListener(val configuration: Configuration, private val logger: BotLo
 
             target?.sendMessage(buildJoinMessage(response, userImage, if (rejoin) "Player Resumes!" else "Player Get!"))?.queue { msg ->
                 msg.addReaction("\uD83D\uDC4B").queue {
-                    welcomeMessages.put(event.user.id, msg.id)
+                    welcomeMessages[event.user.id] = msg.id
                     Timer().schedule(1000 * 60 * 60) {
                         welcomeMessages.takeIf { it.containsKey(event.user.id) }?.remove(event.user.id)
                     }

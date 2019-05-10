@@ -111,7 +111,7 @@ private fun buildResourcesEmbed(channel: Channel, resources: Map<String, Resourc
         title("${channel.name.toUpperCase()} RESOURCES")
         description("Current channel resources:\n\n")
 
-        resources.forEach { _, rs ->
+        resources.forEach { (_, rs) ->
             val sb = StringBuilder()
 
             rs.items.forEach { info -> sb.append("$info\n") }

@@ -69,7 +69,7 @@ fun strikeCommands(config: Configuration, log: BotLogger) =
 
                 val request = StrikeRequest(target, reason, amount, it.author)
 
-                StrikeRequests.map.put(target.id, request)
+                StrikeRequests.map[target.id] = request
                 it.respond("This has been logged and will be accepted or declined, thank you.")
                 log.info("${it.author.fullName()} has a new strike request. Use viewRequest ${target.asMention} to see it.")
             }

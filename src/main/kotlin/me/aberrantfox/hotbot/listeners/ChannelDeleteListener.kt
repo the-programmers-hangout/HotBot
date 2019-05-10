@@ -1,9 +1,7 @@
 package me.aberrantfox.hotbot.listeners
 
 import com.google.common.eventbus.Subscribe
-import me.aberrantfox.hotbot.database.ResourceSection
-import me.aberrantfox.hotbot.database.fetchChannelResources
-import me.aberrantfox.hotbot.database.removeAllChannelResources
+import me.aberrantfox.hotbot.database.*
 import me.aberrantfox.kjdautils.api.dsl.embed
 import me.aberrantfox.kjdautils.internal.logging.BotLogger
 import net.dv8tion.jda.core.entities.MessageChannel
@@ -27,7 +25,7 @@ private fun buildDeleteResourcesEmbed(channel: MessageChannel, resources: Map<St
             title("Deleted ${channel.name}'s resources")
             description("Deleted channel resources:")
 
-            resources.forEach { _, section ->
+            resources.forEach { (_, section) ->
                 field {
                     name = section.section
                     value = section.items.joinToString("\n")
