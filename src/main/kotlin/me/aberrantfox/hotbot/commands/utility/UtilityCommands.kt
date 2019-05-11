@@ -3,23 +3,36 @@ package me.aberrantfox.hotbot.commands.utility
 import com.google.gson.Gson
 import khttp.post
 import me.aberrantfox.hotbot.arguments.HexColourArg
-import me.aberrantfox.hotbot.database.*
-import me.aberrantfox.hotbot.javautilities.UrlUtilities.sendImageToChannel
+import me.aberrantfox.hotbot.database.getUnmuteRecord
+import me.aberrantfox.hotbot.database.isMemberMuted
 import me.aberrantfox.hotbot.permissions.PermissionManager
-import me.aberrantfox.hotbot.services.*
-import me.aberrantfox.hotbot.utility.*
-import me.aberrantfox.kjdautils.api.dsl.*
+import me.aberrantfox.hotbot.services.Configuration
+import me.aberrantfox.hotbot.services.MService
+import me.aberrantfox.hotbot.services.saveConfig
+import me.aberrantfox.hotbot.utility.muteMember
+import me.aberrantfox.kjdautils.api.dsl.CommandSet
+import me.aberrantfox.kjdautils.api.dsl.arg
+import me.aberrantfox.kjdautils.api.dsl.commands
+import me.aberrantfox.kjdautils.api.dsl.embed
 import me.aberrantfox.kjdautils.extensions.jda.fullName
 import me.aberrantfox.kjdautils.extensions.stdlib.sanitiseMentions
-import me.aberrantfox.kjdautils.internal.command.arguments.*
+import me.aberrantfox.kjdautils.internal.command.arguments.SentenceArg
+import me.aberrantfox.kjdautils.internal.command.arguments.TextChannelArg
+import me.aberrantfox.kjdautils.internal.command.arguments.TimeStringArg
+import me.aberrantfox.kjdautils.internal.command.arguments.UserArg
 import me.aberrantfox.kjdautils.internal.logging.BotLogger
+import me.aberrantfox.hotbot.javautilities.UrlUtilities.sendImageToChannel
+import me.aberrantfox.hotbot.utility.timeToString
 import net.dv8tion.jda.core.OnlineStatus
-import net.dv8tion.jda.core.entities.*
+import net.dv8tion.jda.core.entities.Guild
+import net.dv8tion.jda.core.entities.TextChannel
+import net.dv8tion.jda.core.entities.User
 import org.joda.time.DateTime
 import java.awt.Color
 import java.net.URLEncoder
 import java.time.format.DateTimeFormatter
-import java.util.Date
+import java.util.*
+import kotlin.NoSuchElementException
 import kotlin.math.roundToLong
 
 data class Properties(val version: String, val author: String)
@@ -83,6 +96,13 @@ fun utilCommands(mService: MService, manager: PermissionManager, config: Configu
             val guild = it.jda.getGuildById(config.serverInformation.guildid)
             val embed = produceServerInfoEmbed(guild, mService)
             it.respond(embed)
+        }
+    }
+
+    command("invite") {
+        description = "Display a permanent invite for the server"
+        execute {
+            it.respond(mService.messages.permanentInviteLink)
         }
     }
 
