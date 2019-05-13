@@ -24,8 +24,7 @@ private fun start(config: Configuration) = startBot(config.serverInformation.tok
 
     val manager = PermissionManager(jda, config)
 
-    registerInjectionObject(config, container, logger, manager, this.config,
-        MessageTracker(1), MuteService(jda, config, log = logger))
+    registerInjectionObject(config, container, logger, manager, this.config)
 
     configure {
         prefix = config.serverInformation.prefix

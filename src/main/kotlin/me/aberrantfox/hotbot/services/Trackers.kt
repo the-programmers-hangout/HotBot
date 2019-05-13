@@ -1,10 +1,10 @@
 package me.aberrantfox.hotbot.services
 
+import me.aberrantfox.kjdautils.api.annotation.Service
 import net.dv8tion.jda.core.entities.Message
 import org.apache.commons.text.similarity.LevenshteinDistance
-import org.joda.time.DateTime
-import org.joda.time.Minutes
-import java.util.*
+import org.joda.time.*
+import java.util.Timer
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.concurrent.timerTask
 
@@ -45,7 +45,8 @@ class WeightTracker(trackTime: Int) : IdTracker<Int>(trackTime) {
     }
 }
 
-class MessageTracker(trackTime: Int) : IdTracker<LimitedList<AccurateMessage>>(trackTime) {
+@Service
+class MessageTracker : IdTracker<LimitedList<AccurateMessage>>(1) {
     private val calc = LevenshteinDistance()
 
     fun addMessage(acMsg: AccurateMessage): Int {

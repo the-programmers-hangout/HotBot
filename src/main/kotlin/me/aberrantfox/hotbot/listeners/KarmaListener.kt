@@ -1,12 +1,8 @@
 package me.aberrantfox.hotbot.listeners
 
 import com.google.common.eventbus.Subscribe
-import me.aberrantfox.hotbot.database.addKarma
-import me.aberrantfox.hotbot.database.removeKarma
-import me.aberrantfox.hotbot.services.Configuration
-import me.aberrantfox.hotbot.services.KarmaService
-import me.aberrantfox.hotbot.services.MessageService
-import me.aberrantfox.hotbot.services.Positive
+import me.aberrantfox.hotbot.database.*
+import me.aberrantfox.hotbot.services.*
 import me.aberrantfox.kjdautils.extensions.jda.fullName
 import me.aberrantfox.kjdautils.internal.logging.BotLogger
 import net.dv8tion.jda.core.events.guild.member.GuildMemberLeaveEvent
@@ -14,8 +10,7 @@ import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
-class KarmaListener(val messageService: MessageService, val log: BotLogger, val config: Configuration) {
-    private val karmaService = KarmaService()
+class KarmaListener(val messageService: MessageService, private val karmaService: KarmaService, val log: BotLogger, val config: Configuration) {
     private val waitingUsers = ConcurrentHashMap.newKeySet<String>()
 
     @Subscribe
