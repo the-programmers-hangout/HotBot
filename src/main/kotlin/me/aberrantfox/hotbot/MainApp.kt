@@ -23,10 +23,9 @@ private fun start(config: Configuration) = startBot(config.serverInformation.tok
     logger = convertChannels(config.logChannels, jda)
 
     val manager = PermissionManager(jda, config)
-    val aliasService = AliasService(manager)
 
-    registerInjectionObject(config, container, logger, manager, this.config, aliasService,
-            MessageTracker(1), MuteService(jda, config, log = logger))
+    registerInjectionObject(config, container, logger, manager, this.config,
+        MessageTracker(1), MuteService(jda, config, log = logger))
 
     configure {
         prefix = config.serverInformation.prefix
@@ -36,8 +35,6 @@ private fun start(config: Configuration) = startBot(config.serverInformation.tok
     }
 
     LowerUserArg.manager = manager
-    aliasService.container = container
-    aliasService.loadAliases()
 
     setupMacroCommands(container, manager)
 
