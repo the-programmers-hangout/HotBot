@@ -3,7 +3,7 @@ package me.aberrantfox.hotbot.utility
 import me.aberrantfox.hotbot.database.deleteMutedMember
 import me.aberrantfox.hotbot.database.insertMutedMember
 import me.aberrantfox.hotbot.database.isMemberMuted
-import me.aberrantfox.hotbot.permissions.PermissionManager
+import me.aberrantfox.hotbot.services.PermissionService
 import me.aberrantfox.hotbot.services.Configuration
 import me.aberrantfox.kjdautils.api.dsl.embed
 import me.aberrantfox.kjdautils.extensions.jda.fullName
@@ -45,7 +45,7 @@ fun muteMember(guild: Guild, user: User, time: Long, reason: String, config: Con
 }
 
 fun muteVoiceChannel(guild: Guild, voiceChannel: VoiceChannel,
-                     config: Configuration, manager: PermissionManager) {
+                     config: Configuration, manager: PermissionService) {
     voiceChannel.members
             .filter { !(manager.canPerformAction(it.user, config.permissionedActions.voiceChannelMuteThreshold)) }
             .forEach { guild.controller.setMute(it, true).queue() }

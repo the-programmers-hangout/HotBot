@@ -5,7 +5,7 @@ import khttp.post
 import me.aberrantfox.hotbot.arguments.HexColourArg
 import me.aberrantfox.hotbot.database.getUnmuteRecord
 import me.aberrantfox.hotbot.database.isMemberMuted
-import me.aberrantfox.hotbot.permissions.PermissionManager
+import me.aberrantfox.hotbot.services.PermissionService
 import me.aberrantfox.hotbot.services.Configuration
 import me.aberrantfox.hotbot.services.MessageService
 import me.aberrantfox.hotbot.services.saveConfig
@@ -50,7 +50,7 @@ object Project {
 val startTime = Date()
 
 @CommandSet("utility")
-fun utilCommands(messageService: MessageService, manager: PermissionManager, config: Configuration, log: BotLogger) = commands {
+fun utilCommands(messageService: MessageService, manager: PermissionService, config: Configuration, log: BotLogger) = commands {
     command("ping") {
         description = "Pong!"
         execute {

@@ -4,7 +4,6 @@ import me.aberrantfox.hotbot.arguments.LowerUserArg
 import me.aberrantfox.hotbot.commands.utility.*
 import me.aberrantfox.hotbot.database.*
 import me.aberrantfox.hotbot.optionallisteners.MentionListener
-import me.aberrantfox.hotbot.permissions.PermissionManager
 import me.aberrantfox.hotbot.services.*
 import me.aberrantfox.hotbot.utility.timeToDifference
 import me.aberrantfox.kjdautils.api.startBot
@@ -22,7 +21,7 @@ private fun start(config: Configuration) = startBot(config.serverInformation.tok
 
     logger = convertChannels(config.logChannels, jda)
 
-    val manager = PermissionManager(jda, config)
+    val manager = PermissionService(jda, config)
 
     registerInjectionObject(config, container, logger, manager, this.config)
 

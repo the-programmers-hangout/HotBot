@@ -2,11 +2,11 @@ package me.aberrantfox.hotbot.listeners
 
 import com.google.common.eventbus.Subscribe
 import me.aberrantfox.kjdautils.internal.logging.BotLogger
-import me.aberrantfox.hotbot.permissions.PermissionManager
+import me.aberrantfox.hotbot.services.PermissionService
 import me.aberrantfox.hotbot.services.Configuration
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent
 
-class FileListener (val config: Configuration, val manager: PermissionManager, val log: BotLogger){
+class FileListener (val config: Configuration, val manager: PermissionService, val log: BotLogger){
     @Subscribe fun onMessageReceived(event: GuildMessageReceivedEvent) {
         val message = event.message
 

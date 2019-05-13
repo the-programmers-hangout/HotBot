@@ -1,6 +1,6 @@
 package me.aberrantfox.hotbot.arguments
 
-import me.aberrantfox.hotbot.permissions.PermissionManager
+import me.aberrantfox.hotbot.services.PermissionService
 import me.aberrantfox.kjdautils.api.dsl.CommandEvent
 import me.aberrantfox.kjdautils.extensions.stdlib.trimToID
 import me.aberrantfox.kjdautils.internal.command.ArgumentResult
@@ -12,7 +12,7 @@ import net.dv8tion.jda.core.entities.User
 open class LowerUserArg(override val name : String = "Lower Ranked User") : ArgumentType {
     companion object : LowerUserArg()
 
-    lateinit var manager: PermissionManager
+    lateinit var manager: PermissionService
 
     override val examples = arrayListOf("@Bob", "197780697866305536", "302134543639511050")
     override val consumptionType = ConsumptionType.Single

@@ -2,14 +2,13 @@ package me.aberrantfox.hotbot.services
 
 import com.github.salomonbrys.kotson.fromJson
 import com.google.gson.Gson
-import me.aberrantfox.hotbot.permissions.PermissionManager
 import me.aberrantfox.kjdautils.api.annotation.Service
 import me.aberrantfox.kjdautils.api.dsl.CommandsContainer
 import me.aberrantfox.kjdautils.internal.command.CommandRecommender
 import java.io.File
 
 @Service
-class AliasService(private val manager: PermissionManager,
+class AliasService(private val manager: PermissionService,
                    private val container: CommandsContainer) {
 
     private val aliases: HashMap<String, String> = hashMapOf()

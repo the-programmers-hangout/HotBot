@@ -2,9 +2,7 @@ package me.aberrantfox.hotbot.commands.administration
 
 import me.aberrantfox.hotbot.arguments.*
 import me.aberrantfox.hotbot.database.*
-import me.aberrantfox.hotbot.permissions.PermissionManager
-import me.aberrantfox.hotbot.services.Configuration
-import me.aberrantfox.hotbot.services.MessageService
+import me.aberrantfox.hotbot.services.*
 import me.aberrantfox.hotbot.utility.muteMember
 import me.aberrantfox.hotbot.utility.muteVoiceChannel
 import me.aberrantfox.hotbot.utility.removeMuteRole
@@ -31,7 +29,7 @@ class ModerationCommands
 fun moderationCommands(kConfig: KJDAConfiguration,
                        config: Configuration,
                        messageService: MessageService,
-                       manager: PermissionManager,
+                       manager: PermissionService,
                        logger: BotLogger) = commands {
     command("ban") {
         description = "Bans a member for the passed reason, deleting a given number of days messages."
@@ -191,7 +189,7 @@ fun moderationCommands(kConfig: KJDAConfiguration,
         category = "management"
         expect(PermissionLevelArg)
         execute {
-            val level = it.args.component1() as me.aberrantfox.hotbot.permissions.PermissionLevel
+            val level = it.args.component1() as PermissionLevel
             config.permissionedActions.commandMention = level
             it.respond("Permission level now set to: ${level.name} ; be sure to save configurations.")
         }

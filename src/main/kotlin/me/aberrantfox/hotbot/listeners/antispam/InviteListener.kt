@@ -1,7 +1,7 @@
 package me.aberrantfox.hotbot.listeners.antispam
 
 import com.google.common.eventbus.Subscribe
-import me.aberrantfox.hotbot.permissions.PermissionManager
+import me.aberrantfox.hotbot.services.PermissionService
 import me.aberrantfox.hotbot.services.Configuration
 import me.aberrantfox.hotbot.services.PersistentSet
 import me.aberrantfox.hotbot.services.WeightTracker
@@ -32,7 +32,7 @@ object RecentInvites {
     }
 }
 
-class InviteListener(val config: Configuration, val logger: BotLogger, val manager: PermissionManager) {
+class InviteListener(val config: Configuration, val logger: BotLogger, val manager: PermissionService) {
 
     @Subscribe
     fun onGuildMessageUpdate(event: GuildMessageUpdateEvent) =
