@@ -2,9 +2,8 @@ package me.aberrantfox.hotbot.optionallisteners
 
 import com.google.common.eventbus.Subscribe
 import com.michaelwflaherty.cleverbotapi.CleverBotQuery
-import me.aberrantfox.hotbot.services.PermissionService
-import me.aberrantfox.hotbot.services.APIRateLimiter
-import me.aberrantfox.hotbot.services.Configuration
+import me.aberrantfox.hotbot.services.*
+import me.aberrantfox.hotbot.utility.dataclasses.APIRateLimiter
 import net.dv8tion.jda.core.JDA
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent
 

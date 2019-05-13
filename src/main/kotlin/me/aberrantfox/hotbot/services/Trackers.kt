@@ -1,5 +1,6 @@
 package me.aberrantfox.hotbot.services
 
+import me.aberrantfox.hotbot.utility.types.LimitedList
 import me.aberrantfox.kjdautils.api.annotation.Service
 import net.dv8tion.jda.core.entities.Message
 import org.apache.commons.text.similarity.LevenshteinDistance

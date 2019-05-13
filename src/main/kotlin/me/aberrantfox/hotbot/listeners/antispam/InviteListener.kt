@@ -3,7 +3,7 @@ package me.aberrantfox.hotbot.listeners.antispam
 import com.google.common.eventbus.Subscribe
 import me.aberrantfox.hotbot.services.PermissionService
 import me.aberrantfox.hotbot.services.Configuration
-import me.aberrantfox.hotbot.services.PersistentSet
+import me.aberrantfox.hotbot.utility.types.PersistentSet
 import me.aberrantfox.hotbot.services.WeightTracker
 import me.aberrantfox.hotbot.services.configPath
 import me.aberrantfox.kjdautils.extensions.jda.deleteIfExists

@@ -1,7 +1,7 @@
 package me.aberrantfox.hotbot.database
 
 import me.aberrantfox.hotbot.commands.utility.SuggestionStatus
-import me.aberrantfox.hotbot.services.PoolRecord
+import me.aberrantfox.hotbot.utility.dataclasses.PoolRecord
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.joda.time.DateTime
