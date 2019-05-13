@@ -4,7 +4,7 @@ import me.aberrantfox.hotbot.arguments.*
 import me.aberrantfox.hotbot.database.*
 import me.aberrantfox.hotbot.permissions.PermissionManager
 import me.aberrantfox.hotbot.services.Configuration
-import me.aberrantfox.hotbot.services.MService
+import me.aberrantfox.hotbot.services.MessageService
 import me.aberrantfox.hotbot.utility.muteMember
 import me.aberrantfox.hotbot.utility.muteVoiceChannel
 import me.aberrantfox.hotbot.utility.removeMuteRole
@@ -30,7 +30,7 @@ class ModerationCommands
 @CommandSet("moderation")
 fun moderationCommands(kConfig: KJDAConfiguration,
                        config: Configuration,
-                       mService: MService,
+                       messageService: MessageService,
                        manager: PermissionManager,
                        logger: BotLogger) = commands {
     command("ban") {
@@ -120,7 +120,7 @@ fun moderationCommands(kConfig: KJDAConfiguration,
                 return@execute
             }
 
-            muteMember(guild, user, 5 * 1000 * 60, mService.messages.gagResponse, config, it.author, logger)
+            muteMember(guild, user, 5 * 1000 * 60, messageService.messages.gagResponse, config, it.author, logger)
         }
     }
 
@@ -238,7 +238,7 @@ fun moderationCommands(kConfig: KJDAConfiguration,
 
             val targetMember = guild.getMember(target)
 
-            guild.controller.setNickname(targetMember, mService.messages.names.randomListItem()).queue {
+            guild.controller.setNickname(targetMember, messageService.messages.names.randomListItem()).queue {
                 target.sendPrivateMessage("Your name has been changed forcefully by a member of staff for reason: $reason", logger)
             }
         }

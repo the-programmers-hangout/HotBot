@@ -3,18 +3,14 @@ package me.aberrantfox.hotbot
 import me.aberrantfox.hotbot.arguments.LowerUserArg
 import me.aberrantfox.hotbot.commands.development.EngineContainer
 import me.aberrantfox.hotbot.commands.development.EngineContainer.setupScriptEngine
-import me.aberrantfox.hotbot.commands.utility.scheduleReminder
-import me.aberrantfox.hotbot.commands.utility.setupMacroCommands
-import me.aberrantfox.hotbot.database.forEachIgnoredID
-import me.aberrantfox.hotbot.database.forEachReminder
-import me.aberrantfox.hotbot.database.setupDatabaseSchema
+import me.aberrantfox.hotbot.commands.utility.*
+import me.aberrantfox.hotbot.database.*
 import me.aberrantfox.hotbot.optionallisteners.MentionListener
 import me.aberrantfox.hotbot.permissions.PermissionManager
 import me.aberrantfox.hotbot.services.*
 import me.aberrantfox.hotbot.utility.timeToDifference
 import me.aberrantfox.kjdautils.api.startBot
-import me.aberrantfox.kjdautils.internal.logging.BotLogger
-import me.aberrantfox.kjdautils.internal.logging.convertChannels
+import me.aberrantfox.kjdautils.internal.logging.*
 import net.dv8tion.jda.core.JDA
 
 fun main(args: Array<String>) {
@@ -28,11 +24,10 @@ private fun start(config: Configuration) = startBot(config.serverInformation.tok
 
     logger = convertChannels(config.logChannels, jda)
 
-    val messageService = MService()
     val manager = PermissionManager(jda, config)
     val aliasService = AliasService(manager)
 
-    registerInjectionObject(messageService, config, logger, manager, this.config, aliasService,
+    registerInjectionObject(config, logger, manager, this.config, aliasService,
             MessageTracker(1), MuteService(jda, config, log = logger))
 
     configure {

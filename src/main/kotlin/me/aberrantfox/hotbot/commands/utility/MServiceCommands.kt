@@ -1,6 +1,6 @@
 package me.aberrantfox.hotbot.commands.utility
 
-import me.aberrantfox.hotbot.services.MService
+import me.aberrantfox.hotbot.services.MessageService
 import me.aberrantfox.hotbot.services.Messages
 import me.aberrantfox.kjdautils.api.dsl.CommandSet
 import me.aberrantfox.kjdautils.api.dsl.commands
@@ -21,7 +21,7 @@ private val messages = Messages::class.declaredMemberProperties
 object MessageConfigArg : ChoiceArg("Message Name", *messages.keys.toTypedArray())
 
 @CommandSet("MessageConfiguration")
-fun messageConfiguration(mService: MService) = commands {
+fun messageConfiguration(messageService: MessageService) = commands {
     command("set") {
         description = "Set message for the given key. Available keys: ${messages.keys.joinToString(", ")}"
         expect(MessageConfigArg, SentenceArg("Message"))
@@ -29,7 +29,7 @@ fun messageConfiguration(mService: MService) = commands {
             val key = it.args[0] as String
             val message = it.args[1] as String
 
-            messages[key]!!.setter.call(mService.messages, message)
+            messages[key]!!.setter.call(messageService.messages, message)
 
             it.respond(embed {
                 setTitle("Message configuration changed")
@@ -53,7 +53,7 @@ fun messageConfiguration(mService: MService) = commands {
                 setColor(Color.CYAN)
                 field {
                     name = key
-                    value = messages[key]!!.getter.call(mService.messages) as String
+                    value = messages[key]!!.getter.call(messageService.messages) as String
                 }
             })
         }
