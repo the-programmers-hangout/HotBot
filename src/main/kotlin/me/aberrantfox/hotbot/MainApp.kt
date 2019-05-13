@@ -1,8 +1,6 @@
 package me.aberrantfox.hotbot
 
 import me.aberrantfox.hotbot.arguments.LowerUserArg
-import me.aberrantfox.hotbot.commands.development.EngineContainer
-import me.aberrantfox.hotbot.commands.development.EngineContainer.setupScriptEngine
 import me.aberrantfox.hotbot.commands.utility.*
 import me.aberrantfox.hotbot.database.*
 import me.aberrantfox.hotbot.optionallisteners.MentionListener
@@ -27,7 +25,7 @@ private fun start(config: Configuration) = startBot(config.serverInformation.tok
     val manager = PermissionManager(jda, config)
     val aliasService = AliasService(manager)
 
-    registerInjectionObject(config, logger, manager, this.config, aliasService,
+    registerInjectionObject(config, container, logger, manager, this.config, aliasService,
             MessageTracker(1), MuteService(jda, config, log = logger))
 
     configure {
@@ -47,8 +45,6 @@ private fun start(config: Configuration) = startBot(config.serverInformation.tok
         println("Enabling cleverbot integration.")
         registerListeners(MentionListener(config, jda, manager))
     }
-
-    EngineContainer.engine = setupScriptEngine(jda, container, config, logger)
 
     manager.defaultAndPrunePermissions(container) // call this after loading all commands
 
