@@ -167,11 +167,11 @@ fun setupMacroCommands(container: CommandsContainer, manager: PermissionManager)
 
 fun addMacro(macro: Macro, container: CommandsContainer, manager: PermissionManager) {
     macros[macro.name.toLowerCase()] = macro
-    container.command(macro.name, {
+    container.command(macro.name) {
         category = macroCommandCategory
         expect(arg(SentenceArg, optional = true, default = ""))
         execute { it.respond(macro.message) }
-    })
+    }
     CommandRecommender.addPossibility(macro.name)
     manager.setPermission(macro.name, PermissionLevel.Everyone)
 }

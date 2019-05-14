@@ -1,27 +1,23 @@
 package me.aberrantfox.hotbot.permissions
 
 import com.google.gson.GsonBuilder
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import me.aberrantfox.hotbot.services.Configuration
 import me.aberrantfox.kjdautils.api.dsl.CommandsContainer
 import me.aberrantfox.kjdautils.internal.command.tryRetrieveSnowflake
 import net.dv8tion.jda.core.JDA
-import net.dv8tion.jda.core.entities.Member
-import net.dv8tion.jda.core.entities.Role
-import net.dv8tion.jda.core.entities.User
+import net.dv8tion.jda.core.entities.*
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
 
 enum class PermissionLevel {
     Everyone, Member, JrMod, Moderator, Administrator, Owner;
     companion object {
-        fun isLevel(name: String) = PermissionLevel.values()
+        fun isLevel(name: String) = values()
                 .map { it.name.toLowerCase() }
                 .any { it == name.toLowerCase() }
 
-        fun convertToPermission(level: String) = PermissionLevel.values()
+        fun convertToPermission(level: String) = values()
                 .first { it.name.toLowerCase() == level.toLowerCase() }
     }
 }
@@ -33,7 +29,7 @@ data class PermissionsConfiguration(val permissions: ConcurrentHashMap<String, P
                                     val roleMappings: ConcurrentHashMap<String, PermissionLevel> = ConcurrentHashMap(),
                                     val channelIgnoreLevels: ConcurrentHashMap<String, ChannelPermission> = ConcurrentHashMap())
 
-open class PermissionManager(val jda: JDA, val botConfig: Configuration,
+open class PermissionManager(val jda: JDA, private val botConfig: Configuration,
                              permissionsConfigurationLocation: String = "config/permissions.json") {
 
     private val gson = GsonBuilder().setPrettyPrinting().create()

@@ -14,7 +14,7 @@ import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
-class KarmaListener(val mService: MService, val log: BotLogger, val config: Configuration) {
+class KarmaListener(private val mService: MService, val log: BotLogger, val config: Configuration) {
     private val karmaService = KarmaService()
     private val waitingUsers = ConcurrentHashMap.newKeySet<String>()
 

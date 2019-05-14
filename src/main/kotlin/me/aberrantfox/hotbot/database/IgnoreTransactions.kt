@@ -7,7 +7,7 @@ fun forEachIgnoredID(action: (String) -> Unit) =
         transaction {
             IgnoredIDs.selectAll()
                       .map { it[IgnoredIDs.id] }
-                      .forEach({ action.invoke(it) })
+                      .forEach { action.invoke(it) }
         }
 
 fun insertIgnoredID(id: String) =

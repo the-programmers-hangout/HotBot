@@ -21,11 +21,10 @@ import java.util.concurrent.TimeUnit
 import kotlin.concurrent.schedule
 import me.aberrantfox.hotbot.services.UserID
 import me.aberrantfox.hotbot.utility.handleReJoinMute
-import net.dv8tion.jda.core.audit.ActionType
 
 typealias MessageID = String
 
-class MemberListener(val configuration: Configuration, val logger: BotLogger, val mService: MService) {
+class MemberListener(val configuration: Configuration, private val logger: BotLogger, private val mService: MService) {
     private val welcomeMessages = ConcurrentHashMap<UserID, MessageID>()
 
     @Subscribe
@@ -50,7 +49,7 @@ class MemberListener(val configuration: Configuration, val logger: BotLogger, va
 
             target?.sendMessage(buildJoinMessage(response, userImage, if (rejoin) "Player Resumes!" else "Player Get!"))?.queue { msg ->
                 msg.addReaction("\uD83D\uDC4B").queue {
-                    welcomeMessages.put(event.user.id, msg.id)
+                    welcomeMessages[event.user.id] = msg.id
                     Timer().schedule(1000 * 60 * 60) {
                         welcomeMessages.takeIf { it.containsKey(event.user.id) }?.remove(event.user.id)
                     }

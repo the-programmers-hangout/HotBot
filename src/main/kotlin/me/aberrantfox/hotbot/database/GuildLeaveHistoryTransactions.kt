@@ -29,7 +29,7 @@ fun markLastRecordAsBan(member: String, guildId: String) =
                     .firstOrNull()
                     ?.let { it[GuildLeaveHistory.id] }
                     ?.let { id ->
-                        GuildLeaveHistory.update({ GuildLeaveHistory.id eq id }) { it[GuildLeaveHistory.ban] = true }
+                        GuildLeaveHistory.update({ GuildLeaveHistory.id eq id }) { it[ban] = true }
                     }
         }
 

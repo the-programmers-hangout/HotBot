@@ -13,7 +13,7 @@ private typealias MuteRoleID = String
 
 class MuteService(val jda: JDA,
                   val config: Configuration,
-                  val roleName: String = config.security.mutedRole,
+                  private val roleName: String = config.security.mutedRole,
                   val log: BotLogger) {
     private val muteMap = hashMapOf<GuildID, MuteRoleID>()
 

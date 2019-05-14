@@ -52,7 +52,7 @@ fun dataCommands(config: Configuration) = commands {
                 answers.forEachIndexed { i, _ ->
                     msg.addReaction(numberMap[i + 1]).queue()
                 }
-                Polls.map.put(msg.id, PollContainer(question, answers, it.author.id, it.channel.id))
+                Polls.map[msg.id] = PollContainer(question, answers, it.author.id, it.channel.id)
             }
         }
     }

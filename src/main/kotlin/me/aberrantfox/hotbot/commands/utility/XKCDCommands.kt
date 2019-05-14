@@ -13,7 +13,7 @@ import java.net.URLEncoder
 fun xkcdCommands() = commands {
     command("xkcd") {
         description = "Returns the XKCD comic number specified, or a random comic if you don't supply a number."
-        expect(arg(IntegerArg("Comic Number"), true, { randomInt(1, getAmount()) }))
+        expect(arg(IntegerArg("Comic Number"), true) { randomInt(1, getAmount()) })
         execute {
             val target = it.args.component1() as Int
 

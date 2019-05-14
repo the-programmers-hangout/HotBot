@@ -7,12 +7,11 @@ import me.aberrantfox.hotbot.permissions.PermissionLevel
 import me.aberrantfox.kjdautils.api.dsl.PrefixDeleteMode
 import me.aberrantfox.kjdautils.internal.logging.ChannelIdHolder
 import java.io.File
-import java.util.*
+import java.util.HashMap
 
 open class Configuration(open val serverInformation: ServerInformation = ServerInformation(),
                          val security: Security = Security(),
                          val messageChannels: MessageChannels = MessageChannels(),
-                         val apiConfiguration: ApiConfiguration = ApiConfiguration(),
                          val databaseCredentials: DatabaseCredentials = DatabaseCredentials(),
                          val logChannels: ChannelIdHolder = ChannelIdHolder(),
                          val permissionedActions: PermissionedActions = PermissionedActions(),
@@ -43,11 +42,6 @@ data class MessageChannels(val welcomeChannel: String = "insert-id",
                            val suggestionChannel: String = "insert-id",
                            val suggestionArchive: String = "insert-id",
                            val profileChannel: String = "insert-id")
-
-data class ApiConfiguration(val cleverbotAPIKey: String = "insert-api-key",
-                            val cleverBotApiCallLimit: Int = 10000,
-                            val enableCleverBot: Boolean = false,
-                            val animalAPI: String = "insert-chewey-api-key")
 
 data class PermissionedActions(var sendInvite: PermissionLevel = PermissionLevel.Moderator,
                                var sendURL: PermissionLevel = PermissionLevel.Moderator,
@@ -108,7 +102,7 @@ fun loadConfig(): Configuration? {
         return null
     }
 
-    val json = configFile.readLines().stream().reduce("", { a: String, b: String -> a + b })
+    val json = configFile.readLines().stream().reduce("") { a: String, b: String -> a + b }
 
     return gson.fromJson(json)
 }

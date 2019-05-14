@@ -16,7 +16,7 @@ object MutedRaiders {
 
 class DuplicateMessageListener (val config: Configuration,
                                 val log: BotLogger,
-                                val tracker: MessageTracker) {
+                                private val tracker: MessageTracker) {
 
     @Subscribe
     fun onGuildMessageReceived(event: GuildMessageReceivedEvent) {
