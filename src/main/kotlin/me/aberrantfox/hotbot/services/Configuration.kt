@@ -3,11 +3,10 @@ package me.aberrantfox.hotbot.services
 import com.github.salomonbrys.kotson.fromJson
 import com.google.gson.GsonBuilder
 import com.google.gson.typeadapters.RuntimeTypeAdapterFactory
-import me.aberrantfox.hotbot.permissions.PermissionLevel
 import me.aberrantfox.kjdautils.api.dsl.PrefixDeleteMode
 import me.aberrantfox.kjdautils.internal.logging.ChannelIdHolder
 import java.io.File
-import java.util.*
+import java.util.HashMap
 
 open class Configuration(open val serverInformation: ServerInformation = ServerInformation(),
                          val security: Security = Security(),

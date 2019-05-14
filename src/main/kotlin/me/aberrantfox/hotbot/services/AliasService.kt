@@ -2,24 +2,27 @@ package me.aberrantfox.hotbot.services
 
 import com.github.salomonbrys.kotson.fromJson
 import com.google.gson.Gson
-import me.aberrantfox.hotbot.permissions.PermissionManager
+import me.aberrantfox.kjdautils.api.annotation.Service
 import me.aberrantfox.kjdautils.api.dsl.CommandsContainer
 import me.aberrantfox.kjdautils.internal.command.CommandRecommender
 import java.io.File
 
-
-class AliasService(private val manager: PermissionManager,
-                   private val aliasesLocation: String = "config/aliases.json") {
-    lateinit var container: CommandsContainer
+@Service
+class AliasService(private val manager: PermissionService,
+                   private val container: CommandsContainer) {
 
     private val aliases: HashMap<String, String> = hashMapOf()
+    private val aliasesFile = File("config/aliases.json")
 
-    fun loadAliases() {
-        val file = File(aliasesLocation)
-        val json = if (!file.exists()) {
+    init {
+        loadAliases()
+    }
+
+    private fun loadAliases() {
+        val json = if (!aliasesFile.exists()) {
             AliasService::class.java.getResource("/default-aliases.json").readText()
         } else {
-            file.readText()
+            aliasesFile.readText()
         }
 
         val gson = Gson()
@@ -30,10 +33,9 @@ class AliasService(private val manager: PermissionManager,
     private fun saveAliases() {
         val gson = Gson()
         val json = gson.toJson(aliases)
-        val file = File(aliasesLocation)
 
-        file.delete()
-        file.printWriter().use { out -> out.println(json) }
+        aliasesFile.delete()
+        aliasesFile.printWriter().use { out -> out.println(json) }
     }
 
     enum class CreationResult {

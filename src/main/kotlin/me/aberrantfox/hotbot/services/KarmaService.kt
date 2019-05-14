@@ -1,7 +1,7 @@
 package me.aberrantfox.hotbot.services
 
-import net.dv8tion.jda.core.entities.Member
-import net.dv8tion.jda.core.entities.Message
+import me.aberrantfox.kjdautils.api.annotation.Service
+import net.dv8tion.jda.core.entities.*
 
 private val thanks = setOf("thanks", "thank you", "ty")
 
@@ -10,7 +10,7 @@ sealed class KarmaResult
 object Negative : KarmaResult()
 data class Positive(val member: Member) : KarmaResult()
 
-
+@Service
 class KarmaService {
     fun isKarmaMessage(message: Message): KarmaResult {
         val content = message.contentRaw.trim().toLowerCase()

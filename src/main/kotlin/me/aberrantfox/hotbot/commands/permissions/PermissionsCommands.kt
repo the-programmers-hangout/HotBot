@@ -3,8 +3,8 @@ package me.aberrantfox.hotbot.commands.permissions
 import me.aberrantfox.hotbot.arguments.CategoryArg
 import me.aberrantfox.hotbot.arguments.PermissionLevelArg
 import me.aberrantfox.hotbot.commands.utility.macroCommandCategory
-import me.aberrantfox.hotbot.permissions.PermissionLevel
-import me.aberrantfox.hotbot.permissions.PermissionManager
+import me.aberrantfox.hotbot.services.PermissionLevel
+import me.aberrantfox.hotbot.services.PermissionService
 import me.aberrantfox.hotbot.services.Configuration
 import me.aberrantfox.kjdautils.api.dsl.Command
 import me.aberrantfox.kjdautils.api.dsl.CommandSet
@@ -19,7 +19,7 @@ import net.dv8tion.jda.core.entities.TextChannel
 import java.awt.Color
 
 @CommandSet("permissions")
-fun permissionCommands(manager: PermissionManager, config: Configuration) =
+fun permissionCommands(manager: PermissionService, config: Configuration) =
         commands {
             command("setPermission") {
                 description = "Set the permission level of the given command to the given permission level."

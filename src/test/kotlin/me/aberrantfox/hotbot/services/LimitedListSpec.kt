@@ -1,5 +1,6 @@
 package me.aberrantfox.hotbot.services
 
+import me.aberrantfox.hotbot.utility.types.LimitedList
 import org.amshove.kluent.should
 import org.amshove.kluent.shouldContainAll
 import org.jetbrains.spek.api.Spek
