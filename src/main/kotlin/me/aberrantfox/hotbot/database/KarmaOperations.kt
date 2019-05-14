@@ -29,14 +29,12 @@ fun getKarma(user: User) = transaction {
 fun setKarma(user: User, amount: Int): Unit = transaction {
     if( !(hasKarma(user)) ) {
         KarmaTable.insert {
-            it[KarmaTable.member] = user.id
-            it[KarmaTable.karma] = amount
+            it[member] = user.id
+            it[karma] = amount
         }
     } else {
         KarmaTable.update({ KarmaTable.member eq user.id }) {
-            with(SqlExpressionBuilder) {
-                it[KarmaTable.karma] = amount
-            }
+            it[karma] = amount
         }
     }
 

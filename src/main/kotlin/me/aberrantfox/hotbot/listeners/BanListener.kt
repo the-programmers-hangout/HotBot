@@ -6,7 +6,7 @@ import net.dv8tion.jda.core.events.guild.GuildBanEvent
 import java.util.Timer
 import kotlin.concurrent.schedule
 
-class BanListener() {
+class BanListener {
     @Subscribe
     fun onGuildBan(event: GuildBanEvent) {
         Timer().schedule(5 * 1000) {

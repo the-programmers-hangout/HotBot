@@ -9,13 +9,13 @@ fun incrementOrSetHistoryCount(member: String): Boolean =
         if(hasHistoryCount(member)){
             HistoryCount.update({HistoryCount.member eq member}) {
                 with(SqlExpressionBuilder){
-                    it.update(HistoryCount.historyCount, HistoryCount.historyCount+ 1)
+                    it.update(historyCount, historyCount + 1)
                 }
             }
         }else{
             HistoryCount.insert {
                 it[HistoryCount.member] = member
-                it[HistoryCount.historyCount] = 1
+                it[historyCount] = 1
             }
         }
         true
@@ -44,11 +44,11 @@ fun hasHistoryCount(member: String) =
             }.count() > 0
         }
 
-fun resetHistoryCount(member: String): Unit {
+fun resetHistoryCount(member: String) {
     if (hasHistoryCount(member))
         transaction {
             HistoryCount.update({ HistoryCount.member eq member}) {
-                it[HistoryCount.historyCount] = 0
+                it[historyCount] = 0
             }
         }
 }

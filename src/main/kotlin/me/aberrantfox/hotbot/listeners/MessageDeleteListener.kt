@@ -1,8 +1,7 @@
 package me.aberrantfox.hotbot.listeners
 
 import com.google.common.eventbus.Subscribe
-import me.aberrantfox.hotbot.services.PermissionService
-import me.aberrantfox.hotbot.services.Configuration
+import me.aberrantfox.hotbot.services.*
 import me.aberrantfox.hotbot.utility.types.LimitedList
 import me.aberrantfox.kjdautils.api.dsl.embed
 import me.aberrantfox.kjdautils.extensions.jda.fullName
@@ -14,8 +13,7 @@ import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent
 import net.dv8tion.jda.core.events.message.guild.GuildMessageUpdateEvent
 import java.awt.Color
 
-
-class MessageDeleteListener(val logger: BotLogger, val manager: PermissionService, val config: Configuration) {
+class MessageDeleteListener(private val logger: BotLogger, val manager: PermissionService, val config: Configuration) {
     val list = LimitedList<Message>(5000)
 
     @Subscribe

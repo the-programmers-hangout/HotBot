@@ -16,7 +16,7 @@ fun forEachReminder(action: (ReminderRecord) -> Unit) =
                               it[Reminder.member],
                               it[Reminder.message],
                               it[Reminder.remindTime])}
-                      .forEach({ action.invoke(it) })
+                      .forEach { action.invoke(it) }
         }
 
 fun insertReminder(member: String, message: String, remindTime: Long) =

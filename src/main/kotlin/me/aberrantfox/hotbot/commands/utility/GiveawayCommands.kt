@@ -1,18 +1,11 @@
 package me.aberrantfox.hotbot.commands.utility
 
 import me.aberrantfox.hotbot.utility.randomInt
-import me.aberrantfox.kjdautils.api.dsl.CommandSet
-import me.aberrantfox.kjdautils.api.dsl.arg
-import me.aberrantfox.kjdautils.api.dsl.commands
-import me.aberrantfox.kjdautils.api.dsl.embed
+import me.aberrantfox.kjdautils.api.dsl.*
 import me.aberrantfox.kjdautils.extensions.stdlib.convertToTimeString
-import me.aberrantfox.kjdautils.internal.command.arguments.MessageArg
-import me.aberrantfox.kjdautils.internal.command.arguments.SentenceArg
-import me.aberrantfox.kjdautils.internal.command.arguments.TextChannelArg
-import me.aberrantfox.kjdautils.internal.command.arguments.TimeStringArg
+import me.aberrantfox.kjdautils.internal.command.arguments.*
 import me.aberrantfox.kjdautils.internal.logging.BotLogger
-import net.dv8tion.jda.core.entities.Message
-import net.dv8tion.jda.core.entities.User
+import net.dv8tion.jda.core.entities.*
 import java.awt.Color
 import kotlin.concurrent.timer
 import kotlin.math.roundToLong
@@ -51,7 +44,7 @@ fun giveawayCommands(log: BotLogger) = commands {
 
     command("giveawayend") {
         description = "Force end a giveaway"
-        expect(arg(MessageArg("Embed Message ID")), arg(TextChannelArg, true, { it.channel }))
+        expect(arg(MessageArg("Embed Message ID")), arg(TextChannelArg, true) { it.channel })
         execute {
             val message = it.args.component1() as Message
             if (!message.isGiveaway()) {
@@ -71,7 +64,7 @@ fun giveawayCommands(log: BotLogger) = commands {
 
     command("giveawayreroll") {
         description = "Reroll an ended giveaway to get a new winner"
-        expect(arg(MessageArg("Embed Message ID")), arg(TextChannelArg, true, { it.channel }))
+        expect(arg(MessageArg("Embed Message ID")), arg(TextChannelArg, true) { it.channel })
         execute {
             val message = it.args.component1() as Message
             if (!message.isGiveaway()) {
@@ -138,14 +131,12 @@ private fun Message.isGiveaway(): Boolean =
 private fun retrievePrize(message: Message): String {
     val giveawayEmbed = message.embeds.firstOrNull()
 
-    val prize = Giveaways.giveaways[message.id]?.prize
+    return Giveaways.giveaways[message.id]?.prize
             ?: if (giveawayEmbed?.title == giveawayEmbedTitle) {
                    giveawayEmbed
                            .fields
                            .firstOrNull { it.name == prizeFieldTitle }?.value ?: "prize"
                } else "prize"
-
-    return prize
 }
 
 private fun buildGiveawayEmbed(timeMilliSecs: Long, prize: String) =

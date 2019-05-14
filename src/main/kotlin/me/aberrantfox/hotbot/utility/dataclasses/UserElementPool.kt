@@ -37,11 +37,10 @@ enum class AddResponse {
     Accepted, UserFull, PoolFull
 }
 
-class UserElementPool(val userLimit: Int = 3, val poolLimit: Int = 20, val poolName: String) {
+class UserElementPool(private val userLimit: Int = 3, private val poolLimit: Int = 20, val poolName: String) {
     private val saveLocation = File(configPath("pools/$poolName.json"))
     private val pool: Queue<PoolRecord> = LinkedList<PoolRecord>()
     private val gson = Converters.registerDateTime(GsonBuilder()).create()
-
 
     init {
         if(saveLocation.exists()) {
