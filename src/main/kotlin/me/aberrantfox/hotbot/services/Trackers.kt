@@ -13,7 +13,7 @@ const val secondUnit = 1000
 const val minuteUnit = 60 * secondUnit
 const val hourUnit = 60 * minuteUnit
 
-open class IdTracker<T>(val trackTime: Int, val timeUnit: Int = hourUnit) {
+open class IdTracker<T>(private val trackTime: Int, private val timeUnit: Int = hourUnit) {
     val map: ConcurrentHashMap<String, T> = ConcurrentHashMap()
 
     fun clear() = map.clear()
@@ -21,7 +21,7 @@ open class IdTracker<T>(val trackTime: Int, val timeUnit: Int = hourUnit) {
     fun keyList() = map.keys().toList()
 
     fun put(key: String, value: T) {
-        this.map.put(key, value)
+        this.map[key] = value
         this.scheduleExit(key)
     }
 
@@ -42,7 +42,7 @@ class WeightTracker(trackTime: Int) : IdTracker<Int>(trackTime) {
     fun addOrUpdate(id: String) {
         map.putIfAbsent(id, 0)
         val get = this.map[id]!!
-        map.put(id, get + 1)
+        map[id] = get + 1
     }
 }
 

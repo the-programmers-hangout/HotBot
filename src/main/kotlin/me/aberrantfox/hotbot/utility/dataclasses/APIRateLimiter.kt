@@ -37,9 +37,10 @@ data class APIRateLimiter(private val limit: Int, private var current: Int, val 
 
     fun canCall() = limit != current && limit > current
 
-    private fun checkReset() =
+    private fun checkReset() {
         if(DateTime.now().toLocalDate().dayOfMonth == 25) {
             file.writeText(gson.toJson(Datum(0)))
             current = 0
-        } else { Unit }
+        }
+    }
 }

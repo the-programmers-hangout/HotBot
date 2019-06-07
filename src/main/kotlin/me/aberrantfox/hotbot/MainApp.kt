@@ -1,11 +1,11 @@
 package me.aberrantfox.hotbot
 
-import me.aberrantfox.hotbot.database.setupDatabaseSchema
+import me.aberrantfox.hotbot.database.*
 import me.aberrantfox.hotbot.services.*
 import me.aberrantfox.kjdautils.api.startBot
-import me.aberrantfox.kjdautils.internal.logging.convertChannels
+import me.aberrantfox.kjdautils.internal.logging.*
 
-fun main(args: Array<String>) {
+fun main() {
     val config = loadConfig() ?: return
     saveConfig(config)
     start(config)

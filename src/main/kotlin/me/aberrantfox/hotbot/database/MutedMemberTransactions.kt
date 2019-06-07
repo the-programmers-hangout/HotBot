@@ -8,11 +8,11 @@ import org.jetbrains.exposed.sql.transactions.transaction
 fun insertMutedMember(record: MuteRecord) =
     transaction {
         MutedMember.insert {
-            it[MutedMember.unmuteTime] = record.unmuteTime
-            it[MutedMember.reason] = record.reason
-            it[MutedMember.moderator] = record.moderator
-            it[MutedMember.member] = record.user
-            it[MutedMember.guildId] = record.guildId
+            it[unmuteTime] = record.unmuteTime
+            it[reason] = record.reason
+            it[moderator] = record.moderator
+            it[member] = record.user
+            it[guildId] = record.guildId
         }
     }
 

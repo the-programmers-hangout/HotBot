@@ -13,11 +13,11 @@ import java.util.concurrent.ConcurrentHashMap
 enum class PermissionLevel {
     Everyone, Member, JrMod, Moderator, Administrator, Owner;
     companion object {
-        fun isLevel(name: String) = PermissionLevel.values()
+        fun isLevel(name: String) = values()
                 .map { it.name.toLowerCase() }
                 .any { it == name.toLowerCase() }
 
-        fun convertToPermission(level: String) = PermissionLevel.values()
+        fun convertToPermission(level: String) = values()
                 .first { it.name.toLowerCase() == level.toLowerCase() }
     }
 }
@@ -30,8 +30,7 @@ data class PermissionsConfiguration(val permissions: ConcurrentHashMap<String, P
                                     val channelIgnoreLevels: ConcurrentHashMap<String, ChannelPermission> = ConcurrentHashMap())
 
 @Service
-open class PermissionService(val jda: JDA, val botConfig: Configuration) {
-
+open class PermissionService(val jda: JDA, private val botConfig: Configuration) {
     private val gson = GsonBuilder().setPrettyPrinting().create()
     private val permissionsFile = File("config/permissions.json")
     private val permissionsConfig: PermissionsConfiguration
