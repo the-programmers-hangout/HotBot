@@ -1,21 +1,21 @@
 package me.aberrantfox.hotbot.services
 
 import me.aberrantfox.hotbot.database.getAllMutedMembers
-import me.aberrantfox.hotbot.utility.scheduleUnmute
-import me.aberrantfox.hotbot.utility.timeToDifference
+import me.aberrantfox.hotbot.utility.*
+import me.aberrantfox.kjdautils.api.annotation.Service
 import me.aberrantfox.kjdautils.internal.logging.BotLogger
-import net.dv8tion.jda.core.JDA
-import net.dv8tion.jda.core.Permission
+import net.dv8tion.jda.core.*
 import net.dv8tion.jda.core.entities.Guild
 
 private typealias GuildID = String
 private typealias MuteRoleID = String
 
+@Service
 class MuteService(val jda: JDA,
                   val config: Configuration,
-                  private val roleName: String = config.security.mutedRole,
                   val log: BotLogger) {
     private val muteMap = hashMapOf<GuildID, MuteRoleID>()
+    private val roleName = config.security.mutedRole
 
     init {
         jda.guilds.forEach { setupMutedRole(it) }

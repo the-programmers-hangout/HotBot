@@ -16,7 +16,7 @@ fun funCommands(config: Configuration) =
             expect(arg(SplitterArg("Choice 1 | Choice 2 | ..."), true, listOf("Heads", "Tails")))
             execute {
                 val options = it.args[0] as List<String>
-                var choice = options[Random().nextInt(options.size)]
+                val choice = options[Random().nextInt(options.size)]
                 val response = if (options.size == 1) "Yeah, I don't know what you are expecting by only giving one choice."
                                       else "Flipping amongst (${options.joinToString(", ")}) got you...\n$choice!"
 

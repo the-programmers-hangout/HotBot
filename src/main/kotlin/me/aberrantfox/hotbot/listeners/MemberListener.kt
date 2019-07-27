@@ -5,7 +5,7 @@ import me.aberrantfox.hotbot.commands.administration.sendWelcome
 import me.aberrantfox.hotbot.database.hasLeaveHistory
 import me.aberrantfox.hotbot.database.insertLeave
 import me.aberrantfox.hotbot.services.Configuration
-import me.aberrantfox.hotbot.services.MService
+import me.aberrantfox.hotbot.services.MessageService
 import me.aberrantfox.kjdautils.extensions.jda.fullName
 import me.aberrantfox.kjdautils.extensions.stdlib.formatJdaDate
 import me.aberrantfox.kjdautils.extensions.stdlib.randomListItem
@@ -19,12 +19,12 @@ import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
 import kotlin.concurrent.schedule
-import me.aberrantfox.hotbot.services.UserID
 import me.aberrantfox.hotbot.utility.handleReJoinMute
 
 typealias MessageID = String
+typealias UserID = String
 
-class MemberListener(val configuration: Configuration, private val logger: BotLogger, private val mService: MService) {
+class MemberListener(val configuration: Configuration, private val logger: BotLogger, private val messageService: MessageService) {
     private val welcomeMessages = ConcurrentHashMap<UserID, MessageID>()
 
     @Subscribe
@@ -44,7 +44,7 @@ class MemberListener(val configuration: Configuration, private val logger: BotLo
         if(sendWelcome){
             //Build welcome message
             val target = event.guild.textChannels.findLast { it.id == configuration.messageChannels.welcomeChannel }
-            val response = mService.messages.onJoin.randomListItem().replace("%name%", "${event.user.asMention}(${event.user.fullName()})")
+            val response = messageService.messages.onJoin.randomListItem().replace("%name%", "${event.user.asMention}(${event.user.fullName()})")
             val userImage = event.user.effectiveAvatarUrl
 
             target?.sendMessage(buildJoinMessage(response, userImage, if (rejoin) "Player Resumes!" else "Player Get!"))?.queue { msg ->
@@ -81,7 +81,7 @@ class MemberListener(val configuration: Configuration, private val logger: BotLo
             .setDescription(response)
             .setColor(Color.red)
             .setThumbnail(image)
-            .addField("How do I start?", mService.messages.welcomeDescription, false)
+            .addField("How do I start?", messageService.messages.welcomeDescription, false)
             .build()
 }
 

@@ -1,8 +1,8 @@
-package me.aberrantfox.hotbot.permissions
+package me.aberrantfox.hotbot.services
 
 import com.google.gson.GsonBuilder
 import kotlinx.coroutines.*
-import me.aberrantfox.hotbot.services.Configuration
+import me.aberrantfox.kjdautils.api.annotation.Service
 import me.aberrantfox.kjdautils.api.dsl.CommandsContainer
 import me.aberrantfox.kjdautils.internal.command.tryRetrieveSnowflake
 import net.dv8tion.jda.core.JDA
@@ -29,11 +29,10 @@ data class PermissionsConfiguration(val permissions: ConcurrentHashMap<String, P
                                     val roleMappings: ConcurrentHashMap<String, PermissionLevel> = ConcurrentHashMap(),
                                     val channelIgnoreLevels: ConcurrentHashMap<String, ChannelPermission> = ConcurrentHashMap())
 
-open class PermissionManager(val jda: JDA, private val botConfig: Configuration,
-                             permissionsConfigurationLocation: String = "config/permissions.json") {
-
+@Service
+open class PermissionService(val jda: JDA, private val botConfig: Configuration) {
     private val gson = GsonBuilder().setPrettyPrinting().create()
-    private val permissionsFile = File(permissionsConfigurationLocation)
+    private val permissionsFile = File("config/permissions.json")
     private val permissionsConfig: PermissionsConfiguration
 
     init {

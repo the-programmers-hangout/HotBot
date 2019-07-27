@@ -1,13 +1,10 @@
 package me.aberrantfox.hotbot.commands.utility
 
+import me.aberrantfox.hotbot.listeners.UserID
 import me.aberrantfox.hotbot.services.Configuration
-import me.aberrantfox.hotbot.services.UserID
-import me.aberrantfox.kjdautils.api.dsl.CommandSet
-import me.aberrantfox.kjdautils.api.dsl.commands
-import me.aberrantfox.kjdautils.api.dsl.embed
+import me.aberrantfox.kjdautils.api.dsl.*
 import me.aberrantfox.kjdautils.extensions.jda.fullName
-import me.aberrantfox.kjdautils.internal.command.arguments.SplitterArg
-import me.aberrantfox.kjdautils.internal.command.arguments.WordArg
+import me.aberrantfox.kjdautils.internal.command.arguments.*
 import java.awt.Color
 
 data class PollContainer(val question: String, val answers: List<String>, val creator: UserID, val channel: String)

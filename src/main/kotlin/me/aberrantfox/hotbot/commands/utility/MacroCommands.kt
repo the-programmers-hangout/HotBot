@@ -4,8 +4,8 @@ import com.github.salomonbrys.kotson.fromJson
 import com.google.gson.Gson
 import me.aberrantfox.hotbot.arguments.MacroArg
 import me.aberrantfox.hotbot.arguments.MultipleArg
-import me.aberrantfox.hotbot.permissions.PermissionLevel
-import me.aberrantfox.hotbot.permissions.PermissionManager
+import me.aberrantfox.hotbot.services.PermissionLevel
+import me.aberrantfox.hotbot.services.PermissionService
 import me.aberrantfox.hotbot.services.configPath
 import me.aberrantfox.hotbot.utility.timeToDifference
 import me.aberrantfox.kjdautils.api.dsl.*
@@ -32,7 +32,7 @@ val macros = hashMapOf<String, Macro>()
 const val macroCommandCategory = ""
 
 @CommandSet("macros")
-fun macroCommands(permManager: PermissionManager) =
+fun macroCommands(permService: PermissionService) =
     commands {
         command("addmacro") {
             description = "Add a macro which will respond with the given message when invoked by the given name."
@@ -52,7 +52,7 @@ fun macroCommands(permManager: PermissionManager) =
                     return@execute
                 }
 
-                addMacro(Macro(name, message, category), it.container, permManager)
+                addMacro(Macro(name, message, category), it.container, permService)
                 saveMacroList(macros.values)
 
                 it.respond("**$name** (category: **$category**) will now respond with: **$message**")
@@ -68,8 +68,8 @@ fun macroCommands(permManager: PermissionManager) =
                 val name = macro.name.toLowerCase()
                 val message = it.args.component2() as String
 
-                removeMacro(macro, it.container, permManager)
-                addMacro(macro.copy(message=message), it.container, permManager)
+                removeMacro(macro, it.container, permService)
+                addMacro(macro.copy(message=message), it.container, permService)
 
                 saveMacroList(macros.values)
 
@@ -85,8 +85,8 @@ fun macroCommands(permManager: PermissionManager) =
                 val newCategory = it.args.component2() as String
 
                 macroArgs.forEach { macro ->
-                             removeMacro(macro, it.container, permManager)
-                             addMacro(macro.copy(category=newCategory), it.container, permManager)
+                             removeMacro(macro, it.container, permService)
+                             addMacro(macro.copy(category=newCategory), it.container, permService)
                          }
 
                 saveMacroList(macros.values)
@@ -109,8 +109,8 @@ fun macroCommands(permManager: PermissionManager) =
                 if (newName in macros)
                     return@execute it.respond("The macro $newName already exists.")
 
-                removeMacro(oldMacro, it.container, permManager)
-                addMacro(oldMacro.copy(name=newName), it.container, permManager)
+                removeMacro(oldMacro, it.container, permService)
+                addMacro(oldMacro.copy(name=newName), it.container, permService)
 
                 saveMacroList(macros.values)
 
@@ -124,7 +124,7 @@ fun macroCommands(permManager: PermissionManager) =
             execute {
                 val macro = it.args.component1() as Macro
 
-                removeMacro(macro, it.container, permManager)
+                removeMacro(macro, it.container, permService)
 
                 it.respond("${macro.name} - this macro is now gone.")
             }
@@ -143,7 +143,7 @@ fun macroCommands(permManager: PermissionManager) =
                     return@execute
                 }
 
-                toRemove.values.forEach { macro -> removeMacro(macro, it.container, permManager) }
+                toRemove.values.forEach { macro -> removeMacro(macro, it.container, permService) }
 
                 saveMacroList(macros.values)
 
@@ -163,9 +163,9 @@ fun macroCommands(permManager: PermissionManager) =
         }
     }
 
-fun setupMacroCommands(container: CommandsContainer, manager: PermissionManager) = loadMacroList().forEach { addMacro(it, container, manager) }
+fun setupMacroCommands(container: CommandsContainer, manager: PermissionService) = loadMacroList().forEach { addMacro(it, container, manager) }
 
-fun addMacro(macro: Macro, container: CommandsContainer, manager: PermissionManager) {
+fun addMacro(macro: Macro, container: CommandsContainer, manager: PermissionService) {
     macros[macro.name.toLowerCase()] = macro
     container.command(macro.name) {
         category = macroCommandCategory
@@ -176,7 +176,7 @@ fun addMacro(macro: Macro, container: CommandsContainer, manager: PermissionMana
     manager.setPermission(macro.name, PermissionLevel.Everyone)
 }
 
-fun removeMacro(macro: Macro, container: CommandsContainer, manager: PermissionManager) {
+fun removeMacro(macro: Macro, container: CommandsContainer, manager: PermissionService) {
     macros.remove(macro.name)
     container.commands.remove(macro.name)
     manager.removePermissions(macro.name)

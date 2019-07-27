@@ -2,9 +2,9 @@ package me.aberrantfox.hotbot.commands.administration
 
 import me.aberrantfox.hotbot.arguments.LowerUserArg
 import me.aberrantfox.hotbot.database.*
+import me.aberrantfox.hotbot.listeners.UserID
 import me.aberrantfox.hotbot.services.Configuration
 import me.aberrantfox.hotbot.services.InfractionAction
-import me.aberrantfox.hotbot.services.UserID
 import me.aberrantfox.hotbot.utility.muteMember
 import me.aberrantfox.kjdautils.api.dsl.*
 import me.aberrantfox.kjdautils.extensions.jda.fullName

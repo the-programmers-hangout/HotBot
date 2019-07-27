@@ -1,10 +1,10 @@
-package me.aberrantfox.hotbot.services
+package me.aberrantfox.hotbot.utility.dataclasses
 
 import com.fatboyindustrial.gsonjodatime.Converters
 import com.google.common.reflect.TypeToken
 import com.google.gson.GsonBuilder
-import net.dv8tion.jda.core.EmbedBuilder
-import net.dv8tion.jda.core.JDA
+import me.aberrantfox.hotbot.services.configPath
+import net.dv8tion.jda.core.*
 import net.dv8tion.jda.core.entities.MessageEmbed
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
@@ -41,7 +41,6 @@ class UserElementPool(private val userLimit: Int = 3, private val poolLimit: Int
     private val saveLocation = File(configPath("pools/$poolName.json"))
     private val pool: Queue<PoolRecord> = LinkedList<PoolRecord>()
     private val gson = Converters.registerDateTime(GsonBuilder()).create()
-
 
     init {
         if(saveLocation.exists()) {

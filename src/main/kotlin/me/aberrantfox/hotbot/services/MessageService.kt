@@ -1,6 +1,7 @@
 package me.aberrantfox.hotbot.services
 
 import com.google.gson.Gson
+import me.aberrantfox.kjdautils.api.annotation.Service
 import java.io.File
 
 data class Messages(var onJoin: ArrayList<String> = ArrayList(),
@@ -14,7 +15,8 @@ data class Messages(var onJoin: ArrayList<String> = ArrayList(),
 
 private val messageFileLocation = configPath("responses.json")
 
-class MService {
+@Service
+class MessageService {
     private val messageFile: File = File(messageFileLocation)
     var messages = Messages()
 

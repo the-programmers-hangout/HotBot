@@ -1,6 +1,7 @@
-package me.aberrantfox.hotbot.services
+package me.aberrantfox.hotbot.utility.dataclasses
 
 import com.google.gson.Gson
+import me.aberrantfox.hotbot.services.configPath
 import org.joda.time.DateTime
 import java.io.File
 import kotlin.concurrent.timer

@@ -5,7 +5,6 @@ import khttp.post
 import me.aberrantfox.hotbot.arguments.HexColourArg
 import me.aberrantfox.hotbot.database.*
 import me.aberrantfox.hotbot.javautilities.UrlUtilities.sendImageToChannel
-import me.aberrantfox.hotbot.permissions.PermissionManager
 import me.aberrantfox.hotbot.services.*
 import me.aberrantfox.hotbot.utility.*
 import me.aberrantfox.kjdautils.api.dsl.*
@@ -37,7 +36,7 @@ object Project {
 val startTime = Date()
 
 @CommandSet("utility")
-fun utilCommands(mService: MService, manager: PermissionManager, config: Configuration, log: BotLogger) = commands {
+fun utilCommands(messageService: MessageService, manager: PermissionService, config: Configuration, log: BotLogger) = commands {
     command("ping") {
         description = "Pong!"
         execute {
@@ -50,7 +49,7 @@ fun utilCommands(mService: MService, manager: PermissionManager, config: Configu
         execute {
             it.respond(embed {
                 title(it.jda.selfUser.fullName())
-                description(mService.messages.botDescription)
+                description(messageService.messages.botDescription)
                 setColor(Color.red)
                 setThumbnail(it.jda.selfUser.effectiveAvatarUrl)
 
@@ -81,7 +80,7 @@ fun utilCommands(mService: MService, manager: PermissionManager, config: Configu
         description = "Display a message giving basic server information"
         execute {
             val guild = it.jda.getGuildById(config.serverInformation.guildid)
-            val embed = produceServerInfoEmbed(guild, mService)
+            val embed = produceServerInfoEmbed(guild, messageService)
             it.respond(embed)
         }
     }
@@ -252,7 +251,7 @@ fun utilCommands(mService: MService, manager: PermissionManager, config: Configu
         description="Return the remaining time of a mute"
         execute {
             try{
-                val unmuteTime = getUnmuteRecord(it.author.id, config.serverInformation.guildid)-DateTime().millis
+                val unmuteTime = getUnmuteRecord(it.author.id, config.serverInformation.guildid)- DateTime().millis
                 it.respond(timeToString(unmuteTime))
             }catch (e: NoSuchElementException){
                 it.respond("You aren't currently muted...")
@@ -262,11 +261,11 @@ fun utilCommands(mService: MService, manager: PermissionManager, config: Configu
     }
 }
 
-fun produceServerInfoEmbed(guild: Guild, mService: MService) =
+fun produceServerInfoEmbed(guild: Guild, messageService: MessageService) =
     embed {
         title(guild.name)
         setColor(Color.MAGENTA)
-        description(mService.messages.serverDescription)
+        description(messageService.messages.serverDescription)
         setFooter("Guild creation date: ${guild.creationTime.format(DateTimeFormatter.RFC_1123_DATE_TIME)}", "http://i.imgur.com/iwwEprG.png")
         setThumbnail("http://i.imgur.com/DFoaG7k.png")
 

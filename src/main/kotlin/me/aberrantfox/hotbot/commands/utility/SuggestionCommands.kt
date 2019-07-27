@@ -1,17 +1,11 @@
 package me.aberrantfox.hotbot.commands.utility
 
 import me.aberrantfox.hotbot.database.*
-import me.aberrantfox.hotbot.services.AddResponse
-import me.aberrantfox.hotbot.services.Configuration
-import me.aberrantfox.hotbot.services.PoolRecord
-import me.aberrantfox.hotbot.services.UserElementPool
-import me.aberrantfox.kjdautils.api.dsl.CommandSet
-import me.aberrantfox.kjdautils.api.dsl.commands
-import me.aberrantfox.kjdautils.api.dsl.embed
+import me.aberrantfox.hotbot.services.*
+import me.aberrantfox.hotbot.utility.dataclasses.*
+import me.aberrantfox.kjdautils.api.dsl.*
 import me.aberrantfox.kjdautils.extensions.jda.*
-import me.aberrantfox.kjdautils.internal.command.arguments.ChoiceArg
-import me.aberrantfox.kjdautils.internal.command.arguments.SentenceArg
-import me.aberrantfox.kjdautils.internal.command.arguments.WordArg
+import me.aberrantfox.kjdautils.internal.command.arguments.*
 import me.aberrantfox.kjdautils.internal.logging.BotLogger
 import net.dv8tion.jda.core.*
 import net.dv8tion.jda.core.entities.*
