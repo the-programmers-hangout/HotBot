@@ -51,6 +51,7 @@ fun karmaCommands() = commands {
             }
 
             setKarma(user, amount)
+            it.respond("Updated the karma value for ${user.fullName()}.")
         }
     }
 }
