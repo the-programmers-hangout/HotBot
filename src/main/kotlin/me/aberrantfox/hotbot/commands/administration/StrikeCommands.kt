@@ -355,7 +355,7 @@ private fun buildHistoryEmbed(target: User, includeModerator: Boolean, records: 
                     inline = false
 
                     if(includeModerator) {
-                        value += "\nIssued by **${it.jda.retrieveUserById(record.moderator).complete().name}** on **${record.dateTime.toString(DateTimeFormat.forPattern("dd/MM/yyyy"))}**"
+                        value += "\nIssued by **${it.jda.retrieveUserById(record.moderator).complete().name}** on **${record.dateTime.toString(DateTimeFormat.forPattern("yyyy-MM-dd"))}**"
                     }
                 }
 
