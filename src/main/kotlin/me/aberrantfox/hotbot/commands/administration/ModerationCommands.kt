@@ -171,6 +171,14 @@ fun moderationCommands(kConfig: KJDAConfiguration,
         }
     }
 
+    command("verboselogging") {
+        description = "Begins logging more detailed information about the actions of users."
+        execute {
+            config.security.verboseLogging = !config.security.verboseLogging
+            it.respond("Verbose logging mode is now set to: ${config.security.verboseLogging}.")
+        }
+    }
+
     command("prefix") {
         description = "Set the bot prefix to the specified string (Cannot be a space)"
         category = "management"
