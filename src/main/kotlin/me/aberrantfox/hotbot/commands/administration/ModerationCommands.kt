@@ -2,9 +2,7 @@ package me.aberrantfox.hotbot.commands.administration
 
 import me.aberrantfox.hotbot.arguments.*
 import me.aberrantfox.hotbot.database.*
-import me.aberrantfox.hotbot.permissions.PermissionManager
-import me.aberrantfox.hotbot.services.Configuration
-import me.aberrantfox.hotbot.services.MService
+import me.aberrantfox.hotbot.services.*
 import me.aberrantfox.hotbot.utility.muteMember
 import me.aberrantfox.hotbot.utility.muteVoiceChannel
 import me.aberrantfox.hotbot.utility.removeMuteRole
@@ -30,8 +28,8 @@ class ModerationCommands
 @CommandSet("moderation")
 fun moderationCommands(kConfig: KJDAConfiguration,
                        config: Configuration,
-                       mService: MService,
-                       manager: PermissionManager,
+                       messageService: MessageService,
+                       manager: PermissionService,
                        logger: BotLogger) = commands {
     command("ban") {
         description = "Bans a member for the passed reason, deleting a given number of days messages."
@@ -67,7 +65,7 @@ fun moderationCommands(kConfig: KJDAConfiguration,
             }
 
             val sameChannel = it.channel.id == channel.id
-            val singlePrefixInvocationDeleted = !it.commandStruct.doubleInvocation && kConfig.deleteOnInvocation
+            val singlePrefixInvocationDeleted = it.stealthInvocation
 
             channel.history.retrievePast(amount + if (sameChannel) 1 else 0).queue { past ->
 
@@ -120,7 +118,7 @@ fun moderationCommands(kConfig: KJDAConfiguration,
                 return@execute
             }
 
-            muteMember(guild, user, 5 * 1000 * 60, mService.messages.gagResponse, config, it.author, logger)
+            muteMember(guild, user, 5 * 1000 * 60, messageService.messages.gagResponse, config, it.author, logger)
         }
     }
 
@@ -173,6 +171,14 @@ fun moderationCommands(kConfig: KJDAConfiguration,
         }
     }
 
+    command("verboselogging") {
+        description = "Begins logging more detailed information about the actions of users."
+        execute {
+            config.security.verboseLogging = !config.security.verboseLogging
+            it.respond("Verbose logging mode is now set to: ${config.security.verboseLogging}.")
+        }
+    }
+
     command("prefix") {
         description = "Set the bot prefix to the specified string (Cannot be a space)"
         category = "management"
@@ -191,7 +197,7 @@ fun moderationCommands(kConfig: KJDAConfiguration,
         category = "management"
         expect(PermissionLevelArg)
         execute {
-            val level = it.args.component1() as me.aberrantfox.hotbot.permissions.PermissionLevel
+            val level = it.args.component1() as PermissionLevel
             config.permissionedActions.commandMention = level
             it.respond("Permission level now set to: ${level.name} ; be sure to save configurations.")
         }
@@ -238,7 +244,7 @@ fun moderationCommands(kConfig: KJDAConfiguration,
 
             val targetMember = guild.getMember(target)
 
-            guild.controller.setNickname(targetMember, mService.messages.names.randomListItem()).queue {
+            guild.controller.setNickname(targetMember, messageService.messages.names.randomListItem()).queue {
                 target.sendPrivateMessage("Your name has been changed forcefully by a member of staff for reason: $reason", logger)
             }
         }

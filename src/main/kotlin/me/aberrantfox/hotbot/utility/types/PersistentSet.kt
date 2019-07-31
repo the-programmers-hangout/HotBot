@@ -1,9 +1,8 @@
-package me.aberrantfox.hotbot.services
+package me.aberrantfox.hotbot.utility.types
 
 import com.google.common.reflect.TypeToken
 import com.google.gson.Gson
 import java.io.File
-
 
 class PersistentSet(location: String) : HashSet<String>() {
     private val gson = Gson()

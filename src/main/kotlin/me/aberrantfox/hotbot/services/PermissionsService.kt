@@ -1,27 +1,23 @@
-package me.aberrantfox.hotbot.permissions
+package me.aberrantfox.hotbot.services
 
 import com.google.gson.GsonBuilder
-import kotlinx.coroutines.experimental.CommonPool
-import kotlinx.coroutines.experimental.Job
-import kotlinx.coroutines.experimental.launch
-import me.aberrantfox.hotbot.services.Configuration
+import kotlinx.coroutines.*
+import me.aberrantfox.kjdautils.api.annotation.Service
 import me.aberrantfox.kjdautils.api.dsl.CommandsContainer
 import me.aberrantfox.kjdautils.internal.command.tryRetrieveSnowflake
 import net.dv8tion.jda.core.JDA
-import net.dv8tion.jda.core.entities.Member
-import net.dv8tion.jda.core.entities.Role
-import net.dv8tion.jda.core.entities.User
+import net.dv8tion.jda.core.entities.*
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
 
 enum class PermissionLevel {
     Everyone, Member, JrMod, Moderator, Administrator, Owner;
     companion object {
-        fun isLevel(name: String) = PermissionLevel.values()
+        fun isLevel(name: String) = values()
                 .map { it.name.toLowerCase() }
                 .any { it == name.toLowerCase() }
 
-        fun convertToPermission(level: String) = PermissionLevel.values()
+        fun convertToPermission(level: String) = values()
                 .first { it.name.toLowerCase() == level.toLowerCase() }
     }
 }
@@ -33,11 +29,10 @@ data class PermissionsConfiguration(val permissions: ConcurrentHashMap<String, P
                                     val roleMappings: ConcurrentHashMap<String, PermissionLevel> = ConcurrentHashMap(),
                                     val channelIgnoreLevels: ConcurrentHashMap<String, ChannelPermission> = ConcurrentHashMap())
 
-open class PermissionManager(val jda: JDA, val botConfig: Configuration,
-                             permissionsConfigurationLocation: String = "config/permissions.json") {
-
+@Service
+open class PermissionService(val jda: JDA, private val botConfig: Configuration) {
     private val gson = GsonBuilder().setPrettyPrinting().create()
-    private val permissionsFile = File(permissionsConfigurationLocation)
+    private val permissionsFile = File("config/permissions.json")
     private val permissionsConfig: PermissionsConfiguration
 
     init {
@@ -47,7 +42,7 @@ open class PermissionManager(val jda: JDA, val botConfig: Configuration,
             PermissionsConfiguration()
         }
 
-        launch(CommonPool) { save() }
+        save()
     }
 
     fun defaultAndPrunePermissions(container: CommandsContainer): Job {
@@ -60,19 +55,19 @@ open class PermissionManager(val jda: JDA, val botConfig: Configuration,
                 .filterKeys { it !in commandNames }
                 .forEach { permissionsConfig.permissions.remove(it.key) }
 
-        return launch(CommonPool) { save() }
+        return GlobalScope.launch { save() }
     }
 
     fun removePermissions(command: String) {
         permissionsConfig.permissions.remove(command)
-        launch(CommonPool) { save() }
+        GlobalScope.launch { save() }
     }
 
     fun save() = synchronized(permissionsFile) { permissionsFile.writeText(gson.toJson(permissionsConfig)) }
 
     fun setPermission(command: String, level: PermissionLevel): Job {
         permissionsConfig.permissions[command.toLowerCase()] = level
-        return launch(CommonPool) { save() }
+        return GlobalScope.launch { save() }
     }
 
     fun roleRequired(name: String) =  permissionsConfig.permissions[name.toLowerCase()] ?: PermissionLevel.Owner
@@ -85,14 +80,14 @@ open class PermissionManager(val jda: JDA, val botConfig: Configuration,
         val channelPerm = permissionsConfig.channelIgnoreLevels[channelId] ?: ChannelPermission()
         channelPerm.command = level
         permissionsConfig.channelIgnoreLevels[channelId] = channelPerm
-        return launch(CommonPool) { save() }
+        return GlobalScope.launch { save() }
     }
 
     fun setChannelMentionIgnore(channelId: String, level: PermissionLevel): Job {
         val channelPerm = permissionsConfig.channelIgnoreLevels[channelId] ?: ChannelPermission()
         channelPerm.mention = level
         permissionsConfig.channelIgnoreLevels[channelId] = channelPerm
-        return launch(CommonPool) { save() }
+        return GlobalScope.launch { save() }
     }
 
     fun allChannelIgnoreLevels() = permissionsConfig.channelIgnoreLevels.toMap()
@@ -110,7 +105,7 @@ open class PermissionManager(val jda: JDA, val botConfig: Configuration,
 
     fun assignRoleLevel(role: Role, level: PermissionLevel): Job {
         permissionsConfig.roleMappings[role.id] = level
-        return launch(CommonPool) { save() }
+        return GlobalScope.launch { save() }
     }
 
     fun roleAssignments() = permissionsConfig.roleMappings.entries

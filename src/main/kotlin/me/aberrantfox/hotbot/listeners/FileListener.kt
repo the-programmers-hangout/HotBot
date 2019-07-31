@@ -1,7 +1,8 @@
 package me.aberrantfox.hotbot.listeners
 
 import com.google.common.eventbus.Subscribe
-import me.aberrantfox.hotbot.permissions.PermissionManager
+import me.aberrantfox.kjdautils.internal.logging.BotLogger
+import me.aberrantfox.hotbot.services.PermissionService
 import me.aberrantfox.hotbot.services.Configuration
 import me.aberrantfox.kjdautils.internal.logging.BotLogger
 import net.dv8tion.jda.core.entities.Message
@@ -14,7 +15,7 @@ data class FileMetadata(val name: String,
                         val isAllowed: Boolean,
                         val onlineAlternative: String?)
 
-class FileListener (val config: Configuration, val manager: PermissionManager, val log: BotLogger){
+class FileListener (val config: Configuration, val manager: PermissionService, val log: BotLogger){
     @Subscribe fun onMessageReceived(event: GuildMessageReceivedEvent) {
         val message = event.message
 

@@ -1,7 +1,7 @@
 package me.aberrantfox.hotbot.database
 
 import me.aberrantfox.hotbot.commands.utility.SuggestionStatus
-import me.aberrantfox.hotbot.services.PoolRecord
+import me.aberrantfox.hotbot.utility.dataclasses.PoolRecord
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.joda.time.DateTime
@@ -14,12 +14,12 @@ data class SuggestionRecord(val messageID: String, val status: SuggestionStatus,
 fun trackSuggestion(suggestion: SuggestionRecord) =
         transaction {
             Suggestions.insert {
-                it[Suggestions.id] = suggestion.messageID
-                it[Suggestions.date] = suggestion.date
-                it[Suggestions.idea] = suggestion.idea
-                it[Suggestions.member] = suggestion.member
-                it[Suggestions.status] = suggestion.status
-                it[Suggestions.avatarURL] = suggestion.avatarURL
+                it[id] = suggestion.messageID
+                it[date] = suggestion.date
+                it[idea] = suggestion.idea
+                it[member] = suggestion.member
+                it[status] = suggestion.status
+                it[avatarURL] = suggestion.avatarURL
             }
         }
 

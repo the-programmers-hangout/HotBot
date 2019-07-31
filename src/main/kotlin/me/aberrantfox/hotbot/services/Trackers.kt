@@ -1,10 +1,11 @@
 package me.aberrantfox.hotbot.services
 
+import me.aberrantfox.hotbot.utility.types.LimitedList
+import me.aberrantfox.kjdautils.api.annotation.Service
 import net.dv8tion.jda.core.entities.Message
 import org.apache.commons.text.similarity.LevenshteinDistance
-import org.joda.time.DateTime
-import org.joda.time.Minutes
-import java.util.*
+import org.joda.time.*
+import java.util.Timer
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.concurrent.timerTask
 
@@ -12,7 +13,7 @@ const val secondUnit = 1000
 const val minuteUnit = 60 * secondUnit
 const val hourUnit = 60 * minuteUnit
 
-open class IdTracker<T>(val trackTime: Int, val timeUnit: Int = hourUnit) {
+open class IdTracker<T>(private val trackTime: Int, private val timeUnit: Int = hourUnit) {
     val map: ConcurrentHashMap<String, T> = ConcurrentHashMap()
 
     fun clear() = map.clear()
@@ -20,7 +21,7 @@ open class IdTracker<T>(val trackTime: Int, val timeUnit: Int = hourUnit) {
     fun keyList() = map.keys().toList()
 
     fun put(key: String, value: T) {
-        this.map.put(key, value)
+        this.map[key] = value
         this.scheduleExit(key)
     }
 
@@ -41,11 +42,12 @@ class WeightTracker(trackTime: Int) : IdTracker<Int>(trackTime) {
     fun addOrUpdate(id: String) {
         map.putIfAbsent(id, 0)
         val get = this.map[id]!!
-        map.put(id, get + 1)
+        map[id] = get + 1
     }
 }
 
-class MessageTracker(trackTime: Int) : IdTracker<LimitedList<AccurateMessage>>(trackTime) {
+@Service
+class MessageTracker : IdTracker<LimitedList<AccurateMessage>>(1) {
     private val calc = LevenshteinDistance()
 
     fun addMessage(acMsg: AccurateMessage): Int {

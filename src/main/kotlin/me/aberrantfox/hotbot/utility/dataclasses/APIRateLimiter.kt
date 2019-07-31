@@ -1,6 +1,7 @@
-package me.aberrantfox.hotbot.services
+package me.aberrantfox.hotbot.utility.dataclasses
 
 import com.google.gson.Gson
+import me.aberrantfox.hotbot.services.configPath
 import org.joda.time.DateTime
 import java.io.File
 import kotlin.concurrent.timer
@@ -36,9 +37,10 @@ data class APIRateLimiter(private val limit: Int, private var current: Int, val 
 
     fun canCall() = limit != current && limit > current
 
-    private fun checkReset() =
+    private fun checkReset() {
         if(DateTime.now().toLocalDate().dayOfMonth == 25) {
             file.writeText(gson.toJson(Datum(0)))
             current = 0
-        } else { Unit }
+        }
+    }
 }

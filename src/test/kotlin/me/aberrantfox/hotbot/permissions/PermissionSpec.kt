@@ -1,23 +1,14 @@
 package me.aberrantfox.hotbot.permissions
 
-import com.nhaarman.mockito_kotlin.doReturn
-import com.nhaarman.mockito_kotlin.mock
-import kotlinx.coroutines.experimental.runBlocking
-import me.aberrantfox.hotbot.services.Configuration
-import me.aberrantfox.hotbot.services.ServerInformation
-import me.aberrantfox.kjdautils.api.dsl.Command
-import me.aberrantfox.kjdautils.api.dsl.CommandsContainer
+import com.nhaarman.mockito_kotlin.*
+import kotlinx.coroutines.runBlocking
+import me.aberrantfox.hotbot.services.*
+import me.aberrantfox.kjdautils.api.dsl.*
 import net.dv8tion.jda.core.JDA
-import net.dv8tion.jda.core.entities.Guild
-import net.dv8tion.jda.core.entities.Member
-import net.dv8tion.jda.core.entities.Role
-import net.dv8tion.jda.core.entities.User
-import org.amshove.kluent.shouldBe
-import org.amshove.kluent.shouldBeGreaterThan
+import net.dv8tion.jda.core.entities.*
+import org.amshove.kluent.*
 import org.jetbrains.spek.api.Spek
-import org.jetbrains.spek.api.dsl.describe
-import org.jetbrains.spek.api.dsl.it
-import org.jetbrains.spek.api.dsl.on
+import org.jetbrains.spek.api.dsl.*
 import java.io.File
 import java.nio.file.Files
 
@@ -59,7 +50,7 @@ private object TestData {
 
 object PermissionSpec : Spek({
     describe("Permission Manager") {
-        val manager = PermissionManager(TestData.jdaMock, TestData.config, TestData.permsFilePath)
+        val manager = PermissionService(TestData.jdaMock, TestData.config)
         beforeGroup {
             manager.defaultAndPrunePermissions(TestData.container)
             runBlocking { manager.setPermission(TestData.commandName, PermissionLevel.JrMod).join() }

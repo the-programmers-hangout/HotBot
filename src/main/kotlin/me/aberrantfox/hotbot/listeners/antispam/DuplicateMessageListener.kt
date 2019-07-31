@@ -4,6 +4,7 @@ import com.google.common.eventbus.Subscribe
 import me.aberrantfox.hotbot.commands.administration.SecurityLevelState
 import me.aberrantfox.hotbot.services.*
 import me.aberrantfox.hotbot.utility.permMuteMember
+import me.aberrantfox.hotbot.utility.types.PersistentSet
 import me.aberrantfox.kjdautils.extensions.jda.descriptor
 import me.aberrantfox.kjdautils.extensions.jda.isImagePost
 import me.aberrantfox.kjdautils.internal.logging.BotLogger
@@ -16,7 +17,7 @@ object MutedRaiders {
 
 class DuplicateMessageListener (val config: Configuration,
                                 val log: BotLogger,
-                                val tracker: MessageTracker) {
+                                private val tracker: MessageTracker) {
 
     @Subscribe
     fun onGuildMessageReceived(event: GuildMessageReceivedEvent) {

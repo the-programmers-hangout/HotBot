@@ -2,9 +2,9 @@ package me.aberrantfox.hotbot.commands.administration
 
 import me.aberrantfox.hotbot.arguments.LowerUserArg
 import me.aberrantfox.hotbot.database.*
+import me.aberrantfox.hotbot.listeners.UserID
 import me.aberrantfox.hotbot.services.Configuration
 import me.aberrantfox.hotbot.services.InfractionAction
-import me.aberrantfox.hotbot.services.UserID
 import me.aberrantfox.hotbot.utility.muteMember
 import me.aberrantfox.kjdautils.api.dsl.*
 import me.aberrantfox.kjdautils.extensions.jda.fullName
@@ -69,7 +69,7 @@ fun strikeCommands(config: Configuration, log: BotLogger) =
 
                 val request = StrikeRequest(target, reason, amount, it.author)
 
-                StrikeRequests.map.put(target.id, request)
+                StrikeRequests.map[target.id] = request
                 it.respond("This has been logged and will be accepted or declined, thank you.")
                 log.info("${it.author.fullName()} has a new strike request. Use viewRequest ${target.asMention} to see it.")
             }
@@ -253,7 +253,7 @@ private fun infract(event: CommandEvent, guild: Guild, config: Configuration, lo
 
     insertInfraction(target.id, event.author.id, strikeQuantity, reason)
 
-    event.safeRespond("User ${target.asMention} has been infracted with weight: $strikeQuantity, with reason:\n$reason")
+    event.respond("User ${target.asMention} has been infracted with weight: $strikeQuantity, with reason:\n$reason")
 
     var totalStrikes = getMaxStrikes(target.id)
 

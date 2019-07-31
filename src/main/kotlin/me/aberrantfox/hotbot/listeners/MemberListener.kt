@@ -5,7 +5,7 @@ import me.aberrantfox.hotbot.commands.administration.sendWelcome
 import me.aberrantfox.hotbot.database.hasLeaveHistory
 import me.aberrantfox.hotbot.database.insertLeave
 import me.aberrantfox.hotbot.services.Configuration
-import me.aberrantfox.hotbot.services.MService
+import me.aberrantfox.hotbot.services.MessageService
 import me.aberrantfox.kjdautils.extensions.jda.fullName
 import me.aberrantfox.kjdautils.extensions.stdlib.formatJdaDate
 import me.aberrantfox.kjdautils.extensions.stdlib.randomListItem
@@ -19,13 +19,12 @@ import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
 import kotlin.concurrent.schedule
-import me.aberrantfox.hotbot.services.UserID
 import me.aberrantfox.hotbot.utility.handleReJoinMute
-import net.dv8tion.jda.core.audit.ActionType
 
 typealias MessageID = String
+typealias UserID = String
 
-class MemberListener(val configuration: Configuration, val logger: BotLogger, val mService: MService) {
+class MemberListener(val configuration: Configuration, private val logger: BotLogger, private val messageService: MessageService) {
     private val welcomeMessages = ConcurrentHashMap<UserID, MessageID>()
 
     @Subscribe
@@ -45,12 +44,12 @@ class MemberListener(val configuration: Configuration, val logger: BotLogger, va
         if(sendWelcome){
             //Build welcome message
             val target = event.guild.textChannels.findLast { it.id == configuration.messageChannels.welcomeChannel }
-            val response = mService.messages.onJoin.randomListItem().replace("%name%", "${event.user.asMention}(${event.user.fullName()})")
+            val response = messageService.messages.onJoin.randomListItem().replace("%name%", "${event.user.asMention}(${event.user.fullName()})")
             val userImage = event.user.effectiveAvatarUrl
 
             target?.sendMessage(buildJoinMessage(response, userImage, if (rejoin) "Player Resumes!" else "Player Get!"))?.queue { msg ->
                 msg.addReaction("\uD83D\uDC4B").queue {
-                    welcomeMessages.put(event.user.id, msg.id)
+                    welcomeMessages[event.user.id] = msg.id
                     Timer().schedule(1000 * 60 * 60) {
                         welcomeMessages.takeIf { it.containsKey(event.user.id) }?.remove(event.user.id)
                     }
@@ -82,7 +81,7 @@ class MemberListener(val configuration: Configuration, val logger: BotLogger, va
             .setDescription(response)
             .setColor(Color.red)
             .setThumbnail(image)
-            .addField("How do I start?", mService.messages.welcomeDescription, false)
+            .addField("How do I start?", messageService.messages.welcomeDescription, false)
             .build()
 }
 

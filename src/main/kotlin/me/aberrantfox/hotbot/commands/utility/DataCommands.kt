@@ -1,13 +1,10 @@
 package me.aberrantfox.hotbot.commands.utility
 
+import me.aberrantfox.hotbot.listeners.UserID
 import me.aberrantfox.hotbot.services.Configuration
-import me.aberrantfox.hotbot.services.UserID
-import me.aberrantfox.kjdautils.api.dsl.CommandSet
-import me.aberrantfox.kjdautils.api.dsl.commands
-import me.aberrantfox.kjdautils.api.dsl.embed
+import me.aberrantfox.kjdautils.api.dsl.*
 import me.aberrantfox.kjdautils.extensions.jda.fullName
-import me.aberrantfox.kjdautils.internal.command.arguments.SplitterArg
-import me.aberrantfox.kjdautils.internal.command.arguments.WordArg
+import me.aberrantfox.kjdautils.internal.command.arguments.*
 import java.awt.Color
 
 data class PollContainer(val question: String, val answers: List<String>, val creator: UserID, val channel: String)
@@ -52,7 +49,7 @@ fun dataCommands(config: Configuration) = commands {
                 answers.forEachIndexed { i, _ ->
                     msg.addReaction(numberMap[i + 1]).queue()
                 }
-                Polls.map.put(msg.id, PollContainer(question, answers, it.author.id, it.channel.id))
+                Polls.map[msg.id] = PollContainer(question, answers, it.author.id, it.channel.id)
             }
         }
     }
@@ -85,7 +82,6 @@ fun dataCommands(config: Configuration) = commands {
                     .reduceRight { a, b -> "$a, $b"}
 
                 it.respond("The highest rated answers were: $answerString")
-                println("test")
             }
         }
     }
