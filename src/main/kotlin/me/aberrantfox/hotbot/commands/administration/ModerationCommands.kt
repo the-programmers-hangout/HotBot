@@ -264,7 +264,7 @@ fun moderationCommands(kConfig: KJDAConfiguration,
         execute {
             val target = it.args[0] as User
             val guild = it.jda.getGuildById(config.serverInformation.guildid)
-            val member = guild.getMember(target)
+            val member = guild.getMember(target) ?: return@execute it.respond("That user isn't in the guild!")
 
             val dateFormat = SimpleDateFormat("yyyy-MM-dd")
             val joinDateParsed = dateFormat.parse(member.joinDate.toString())
