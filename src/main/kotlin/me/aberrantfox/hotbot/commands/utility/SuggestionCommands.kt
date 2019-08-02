@@ -140,7 +140,7 @@ fun suggestionCommands(config: Configuration, log: BotLogger) = commands {
 
                     val archiveChannel = fetchArchiveChannel(guild, config)
 
-                    if (suggestionChannel.id != archiveChannel.id) {
+                    if (suggestionChannel.id != archiveChannel.id && response != "review") {
                         archiveChannel.sendMessage(message.build()).queue()
                         msg.deleteIfExists()
                     }
