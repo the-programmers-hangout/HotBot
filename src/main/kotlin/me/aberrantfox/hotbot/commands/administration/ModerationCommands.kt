@@ -155,7 +155,15 @@ fun moderationCommands(kConfig: KJDAConfiguration,
             val user = it.args.component1() as User
             val guild = it.jda.getGuildById(config.serverInformation.guildid)
 
-            if(!isMemberMuted(user.id, guild.id)){ it.respond("${user.descriptor()} isn't muted")}
+            val member = guild.getMember(user)
+                    ?: return@execute it.respond("That user isn't a part of the guild!")
+
+            val mutedRole = guild.getRolesByName(config.security.mutedRole, true).firstOrNull()
+                    ?: return@execute it.respond("Couldn't retrieve the muted role! Check that the name matches the config value.")
+
+            if (!member.roles.contains(mutedRole)) {
+                return@execute it.respond("${user.descriptor()} isn't muted")
+            }
 
             removeMuteRole(guild, user, config, logger)
             deleteMutedMember(user.id, guild.id)
