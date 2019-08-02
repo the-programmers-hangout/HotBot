@@ -117,12 +117,12 @@ fun suggestionCommands(config: Configuration, log: BotLogger) = commands {
 
             val suggestionChannel = fetchSuggestionChannel(guild, config)
 
-            if (!(isTracked(target)) || suggestionChannel.getMessageById(target) == null) {
+            if (!isTracked(target)) {
                 it.respond("That is not a valid message or a suggestion by the ID.")
                 return@execute
             }
 
-            suggestionChannel.getMessageById(target).queue { msg ->
+            suggestionChannel.getMessageById(target).queue({ msg ->
                 val suggestion = obtainSuggestion(target)
                 val message = buildArchiveMessage(suggestion.poolInfo, it.jda, status, msg.reactions)
                 val reasonTitle = "Reason for Status"
@@ -154,7 +154,9 @@ fun suggestionCommands(config: Configuration, log: BotLogger) = commands {
                         setColor(status.colour)
                     })
                 }
-            }
+            }, { error ->
+                it.respond("Couldn't retrieve the message with the given ID. Does the message/channel exist and does the bot have sufficient permissions?")
+            })
         }
     }
 }
