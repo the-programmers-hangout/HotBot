@@ -4,7 +4,6 @@ import com.google.common.eventbus.Subscribe
 import me.aberrantfox.kjdautils.internal.logging.BotLogger
 import me.aberrantfox.hotbot.services.PermissionService
 import me.aberrantfox.hotbot.services.Configuration
-import me.aberrantfox.kjdautils.internal.logging.BotLogger
 import net.dv8tion.jda.core.entities.Message
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent
 import org.apache.tika.Tika
