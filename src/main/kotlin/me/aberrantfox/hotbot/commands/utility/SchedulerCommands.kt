@@ -8,6 +8,7 @@ import me.aberrantfox.kjdautils.api.dsl.commands
 import me.aberrantfox.kjdautils.extensions.jda.fullName
 import me.aberrantfox.kjdautils.extensions.jda.sendPrivateMessage
 import me.aberrantfox.kjdautils.extensions.stdlib.convertToTimeString
+import me.aberrantfox.kjdautils.extensions.stdlib.sanitiseMentions
 import me.aberrantfox.kjdautils.internal.command.arguments.SentenceArg
 import me.aberrantfox.kjdautils.internal.command.arguments.TimeStringArg
 import me.aberrantfox.kjdautils.internal.logging.BotLogger
@@ -36,7 +37,7 @@ fun schedulerCommands(log: BotLogger) = commands {
 fun scheduleReminder(user: User, message: String, timeMilli: Long, log: BotLogger) {
     fun remindTask() {
         deleteReminder(user.id, message)
-        log.info("${user.fullName()} reminded themselves about: $message")
+        log.info("${user.fullName()} reminded themselves about: ${message.sanitiseMentions()}")
         user.sendPrivateMessage("Hi, you asked me to remind you about: $message", log)
     }
 
