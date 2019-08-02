@@ -8,6 +8,7 @@ import me.aberrantfox.kjdautils.api.annotation.Service
 import me.aberrantfox.kjdautils.api.dsl.*
 import me.aberrantfox.kjdautils.internal.logging.BotLogger
 import net.dv8tion.jda.core.JDA
+import net.dv8tion.jda.core.exceptions.ErrorResponseException
 
 @Service
 class InitializerService(manager: PermissionService, container: CommandsContainer, kjdaConfiguration: KJDAConfiguration,
@@ -29,8 +30,14 @@ class InitializerService(manager: PermissionService, container: CommandsContaine
 
         forEachReminder {
             val difference = timeToDifference(it.remindTime)
-            val user = jda.getUserById(it.member)
-            scheduleReminder(user, it.message, difference, logger)
+
+            jda.retrieveUserById(it.member).queue(
+                    { user ->
+                        scheduleReminder(user, it.message, difference, logger)
+                    },
+                    { error ->
+                        deleteReminder(it.member, it.message)
+                    })
         }
     }
 }
