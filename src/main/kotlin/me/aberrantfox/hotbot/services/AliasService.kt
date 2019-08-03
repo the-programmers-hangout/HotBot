@@ -43,7 +43,8 @@ class AliasService(private val manager: PermissionService,
     }
 
     fun add(pair: Pair<String, String>): CreationResult {
-        val (alias, target) = pair
+        val alias = pair.first.toLowerCase()
+        val target = pair.second.toLowerCase()
 
         val targetCommand = container[target] ?: return CreationResult.InvalidCommand
         if (container.has(alias)) return CreationResult.UnavailableName
@@ -68,6 +69,7 @@ class AliasService(private val manager: PermissionService,
             aliases.remove(alias)
             manager.removePermissions(alias)
             CommandRecommender.removePossibility(alias)
+            container.commands.remove(alias)
             saveAliases()
             true
         }
