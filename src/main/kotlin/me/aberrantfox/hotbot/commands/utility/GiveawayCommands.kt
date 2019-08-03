@@ -117,12 +117,14 @@ private fun runGiveaway(message: Message) {
 private fun announceWinner(message: Message, prize: String) {
     val reaction = message.reactions.first { it.reactionEmote.name == "\uD83C\uDF89" }
 
-    reaction.users.queue { allUsers ->
+    val total = reaction.count
+
+    reaction.users.takeAsync(total).thenAcceptAsync { allUsers ->
         val entered = allUsers.filterNot(User::isBot)
 
         if (entered.isEmpty()) {
             message.editMessage(buildWinnerEmbed(null, prize)).queue()
-            return@queue
+            return@thenAcceptAsync
         }
 
         val winner = entered[randomInt(0, entered.size - 1)]
