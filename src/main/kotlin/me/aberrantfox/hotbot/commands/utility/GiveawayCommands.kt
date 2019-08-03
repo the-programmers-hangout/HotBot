@@ -6,6 +6,7 @@ import me.aberrantfox.kjdautils.extensions.stdlib.convertToTimeString
 import me.aberrantfox.kjdautils.internal.command.arguments.*
 import me.aberrantfox.kjdautils.internal.logging.BotLogger
 import net.dv8tion.jda.core.entities.*
+import net.dv8tion.jda.core.requests.RestAction
 import java.awt.Color
 import kotlin.concurrent.timer
 import kotlin.math.roundToLong
@@ -94,17 +95,22 @@ private fun runGiveaway(message: Message) {
         val newTimeLeftMs = timeLeft - timeUpdatePeriod
 
         if (newTimeLeftMs <= 0) {
-            message.channel.getMessageById(messageID).queue { updatedMessage ->
+            message.channel.getMessageById(messageID).queue({ updatedMessage ->
                 announceWinner(updatedMessage, prize)
                 Giveaways.giveaways.remove(messageID)
-            }
+            }, { error ->
+                Giveaways.giveaways.remove(messageID)
+            })
 
             return@timer
         }
 
         Giveaways.giveaways[messageID] = Giveaway(prize, newTimeLeftMs)
 
-        message.editMessage(buildGiveawayEmbed(newTimeLeftMs, prize)).queue()
+        message.editMessage(buildGiveawayEmbed(newTimeLeftMs, prize)).queue({},
+                { error ->
+                    Giveaways.giveaways.remove(messageID)
+                })
     }
 }
 
