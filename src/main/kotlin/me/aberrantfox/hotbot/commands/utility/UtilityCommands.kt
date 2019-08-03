@@ -35,6 +35,8 @@ object Project {
 
 val startTime = Date()
 
+const val uploadTextBaseUrl: String = "https://hasteb.in"
+
 @CommandSet("utility")
 fun utilCommands(messageService: MessageService, manager: PermissionService, config: Configuration, log: BotLogger) = commands {
     command("ping") {
@@ -170,12 +172,16 @@ fun utilCommands(messageService: MessageService, manager: PermissionService, con
         expect(SentenceArg("Text"))
         execute {
             val text = it.args.component1() as String
-            val response = post("https://hastebin.com/documents", data = text).jsonObject
+            try {
+                val response = post("${uploadTextBaseUrl}/documents", data = text, timeout = 5.0).jsonObject
 
-            if (it.commandStruct.doubleInvocation)
-                it.message.delete().queue()
+                if (it.commandStruct.doubleInvocation)
+                    it.message.delete().queue()
 
-            it.respond("${it.author.fullName()}'s paste: https://hastebin.com/" + response.getString("key"))
+                it.respond("${it.author.fullName()}'s paste: ${uploadTextBaseUrl}/${response.getString("key")}")
+            } catch (exception: Exception) {
+                it.respond("Uploading failed. Please try again or report this to staff.")
+            }
         }
     }
 
