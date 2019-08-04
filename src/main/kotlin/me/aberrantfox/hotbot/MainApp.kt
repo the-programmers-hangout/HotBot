@@ -24,4 +24,6 @@ private fun start(config: Configuration) = startBot(config.serverInformation.tok
         globalPath = "me.aberrantfox.hotbot"
         deleteMode = config.serverInformation.deletionMode
     }
+
+    AliasService.instance.loadAliases()
 }

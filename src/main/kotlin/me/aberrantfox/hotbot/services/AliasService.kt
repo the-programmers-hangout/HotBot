@@ -14,11 +14,16 @@ class AliasService(private val manager: PermissionService,
     private val aliases: HashMap<String, String> = hashMapOf()
     private val aliasesFile = File("config/aliases.json")
 
-    init {
-        loadAliases()
+    // HACK fix this when a new kutils version is released which allows getting the service object
+    companion object {
+        lateinit var instance: AliasService
     }
 
-    private fun loadAliases() {
+    init {
+        instance = this
+    }
+
+    fun loadAliases() {
         val json = if (!aliasesFile.exists()) {
             AliasService::class.java.getResource("/default-aliases.json").readText()
         } else {
@@ -44,7 +49,10 @@ class AliasService(private val manager: PermissionService,
 
     fun add(pair: Pair<String, String>): CreationResult {
         val alias = pair.first.toLowerCase()
-        val target = pair.second.toLowerCase()
+        var target = pair.second.toLowerCase()
+
+        // if target itself is an alias, make the aliased command the new target
+        aliases[target]?.let { target = it }
 
         val targetCommand = container[target] ?: return CreationResult.InvalidCommand
         if (container.has(alias)) return CreationResult.UnavailableName
