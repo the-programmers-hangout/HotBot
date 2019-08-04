@@ -19,7 +19,6 @@ import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
 import kotlin.concurrent.schedule
-import me.aberrantfox.hotbot.utility.handleReJoinMute
 
 typealias MessageID = String
 typealias UserID = String
@@ -57,7 +56,6 @@ class MemberListener(val configuration: Configuration, private val logger: BotLo
             }
         }
 
-        handleReJoinMute(event.guild, event.user, configuration, logger)
     }
 
     @Subscribe

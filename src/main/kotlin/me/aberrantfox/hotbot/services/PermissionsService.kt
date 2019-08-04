@@ -47,6 +47,7 @@ open class PermissionService(val jda: JDA, private val botConfig: Configuration)
 
     fun defaultAndPrunePermissions(container: CommandsContainer): Job {
         val commandNames = container.commands.map { it.key.toLowerCase() }
+        print(commandNames)
 
         commandNames.filter { !(permissionsConfig.permissions.containsKey(it)) }
                 .forEach { permissionsConfig.permissions[it] = PermissionLevel.Administrator }

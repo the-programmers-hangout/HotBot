@@ -9,6 +9,7 @@ import me.aberrantfox.hotbot.services.*
 import me.aberrantfox.hotbot.utility.*
 import me.aberrantfox.kjdautils.api.dsl.*
 import me.aberrantfox.kjdautils.extensions.jda.fullName
+import me.aberrantfox.kjdautils.extensions.jda.toMember
 import me.aberrantfox.kjdautils.extensions.stdlib.sanitiseMentions
 import me.aberrantfox.kjdautils.internal.command.arguments.*
 import me.aberrantfox.kjdautils.internal.logging.BotLogger
@@ -36,7 +37,8 @@ object Project {
 val startTime = Date()
 
 @CommandSet("utility")
-fun utilCommands(messageService: MessageService, manager: PermissionService, config: Configuration, log: BotLogger) = commands {
+fun utilCommands(messageService: MessageService, manager: PermissionService, config: Configuration,
+                 log: BotLogger, muteService: MuteService) = commands {
     command("ping") {
         description = "Pong!"
         execute {
@@ -232,18 +234,26 @@ fun utilCommands(messageService: MessageService, manager: PermissionService, con
         execute {
             val time = (it.args.component1() as Double).roundToLong() * 1000
             val guild = it.jda.getGuildById(config.serverInformation.guildid)
+            val member = it.author.toMember(guild)
 
-            if(isMemberMuted(it.author.id, guild.id)) {
+            if(muteService.checkMuteState(member) != MuteService.MuteState.None) {
                 it.respond("Nice try but you're already muted")
                 return@execute
             }
 
-            if(time > 1000*60*config.serverInformation.maxSelfmuteMinutes){
+            if(time > 1000*60*config.serverInformation.maxSelfmuteMinutes) {
                 it.respond("Sorry but you can't mute yourself for that long")
+                return@execute
+            } else if (time <= 0) {
+                it.respond("Sorry, the laws of physics disallow muting for non-positive durations.")
                 return@execute
             }
 
-            muteMember(guild, it.author, time, "No distractions for a while? Got it", config, it.author, log)
+            if (member != null) {
+                muteService.muteMember(member, time, "No distractions for a while? Got it", it.author)
+            } else {
+                it.respond(":thinking: You are not a member of the server")
+            }
         }
     }
 

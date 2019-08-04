@@ -3,15 +3,11 @@ package me.aberrantfox.hotbot.commands.administration
 import me.aberrantfox.hotbot.arguments.*
 import me.aberrantfox.hotbot.database.*
 import me.aberrantfox.hotbot.services.*
-import me.aberrantfox.hotbot.utility.muteMember
 import me.aberrantfox.hotbot.utility.muteVoiceChannel
 import me.aberrantfox.hotbot.utility.removeMuteRole
 import me.aberrantfox.hotbot.utility.unmuteVoiceChannel
 import me.aberrantfox.kjdautils.api.dsl.*
-import me.aberrantfox.kjdautils.extensions.jda.descriptor
-import me.aberrantfox.kjdautils.extensions.jda.fullName
-import me.aberrantfox.kjdautils.extensions.jda.isCommandInvocation
-import me.aberrantfox.kjdautils.extensions.jda.sendPrivateMessage
+import me.aberrantfox.kjdautils.extensions.jda.*
 import me.aberrantfox.kjdautils.extensions.stdlib.randomListItem
 import me.aberrantfox.kjdautils.internal.command.arguments.*
 import me.aberrantfox.kjdautils.internal.logging.BotLogger
@@ -30,7 +26,8 @@ fun moderationCommands(kConfig: KJDAConfiguration,
                        config: Configuration,
                        messageService: MessageService,
                        manager: PermissionService,
-                       logger: BotLogger) = commands {
+                       logger: BotLogger,
+                       muteService: MuteService) = commands {
     command("ban") {
         description = "Bans a member for the passed reason, deleting a given number of days messages."
         expect(arg(LowerUserArg),
@@ -112,13 +109,18 @@ fun moderationCommands(kConfig: KJDAConfiguration,
         execute {
             val user = it.args.component1() as User
             val guild = it.jda.getGuildById(config.serverInformation.guildid)
+            val member = user.toMember(guild)
 
             if(user.id == it.jda.selfUser.id) {
                 it.respond("Nice try but I'm not going to gag myself.")
                 return@execute
             }
 
-            muteMember(guild, user, 5 * 1000 * 60, messageService.messages.gagResponse, config, it.author, logger)
+            if (member != null) {
+                muteService.muteMember(member, 5 * 1000 * 60, messageService.messages.gagResponse, it.author)
+            } else {
+                it.respond("User is not in the guild")
+            }
         }
     }
 
@@ -133,18 +135,33 @@ fun moderationCommands(kConfig: KJDAConfiguration,
             val reason = it.args.component3() as String
 
             val guild = it.jda.getGuildById(config.serverInformation.guildid)
+            val member = user.toMember(guild)
 
             if (user.id == it.jda.selfUser.id) {
                 it.respond("Nice try but I'm not going to mute myself.")
                 return@execute
             }
 
-            if (isMemberMuted(user.id, guild.id)){
-                it.respond("${user.descriptor()} is already muted")
+            if (time <= 0) {
+                it.respond("Sorry, the laws of physics disallow muting for non-positive durations.")
                 return@execute
             }
 
-            muteMember(guild, user, time, reason, config, it.author, logger)
+            if (member != null) {
+                val alreadyMuted = muteService.checkMuteState(member)
+
+                muteService.muteMember(member, time, reason, it.author)
+
+                it.respond(embed {
+                    setColor(Color.RED)
+                    setTitle("${user.descriptor()} has been muted")
+                    if (alreadyMuted != MuteService.MuteState.None) {
+                        setDescription("User was already muted, overriding previous mute.")
+                    }
+                })
+            } else {
+                it.respond("User is not in the guild")
+            }
         }
     }
 
@@ -158,15 +175,16 @@ fun moderationCommands(kConfig: KJDAConfiguration,
             val member = guild.getMember(user)
                     ?: return@execute it.respond("That user isn't a part of the guild!")
 
-            val mutedRole = guild.getRolesByName(config.security.mutedRole, true).firstOrNull()
-                    ?: return@execute it.respond("Couldn't retrieve the muted role! Check that the name matches the config value.")
-
-            if (!member.roles.contains(mutedRole)) {
-                return@execute it.respond("${user.descriptor()} isn't muted")
+            when (muteService.checkMuteState(member)) {
+                MuteService.MuteState.TrackedMute -> muteService.cancelMute(member)
+                MuteService.MuteState.UntrackedMute -> removeMuteRole(guild, user, config, logger)
+                MuteService.MuteState.None -> {
+                    it.respond("${user.descriptor()} isn't muted")
+                    return@execute
+                }
             }
 
-            removeMuteRole(guild, user, config, logger)
-            deleteMutedMember(user.id, guild.id)
+            it.respond("${user.descriptor()} has been unmuted")
         }
     }
 

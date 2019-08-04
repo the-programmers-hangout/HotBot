@@ -5,11 +5,12 @@ import me.aberrantfox.hotbot.database.*
 import me.aberrantfox.hotbot.listeners.UserID
 import me.aberrantfox.hotbot.services.Configuration
 import me.aberrantfox.hotbot.services.InfractionAction
-import me.aberrantfox.hotbot.utility.muteMember
+import me.aberrantfox.hotbot.services.MuteService
 import me.aberrantfox.kjdautils.api.dsl.*
 import me.aberrantfox.kjdautils.extensions.jda.fullName
 import me.aberrantfox.kjdautils.extensions.jda.getMemberJoinString
 import me.aberrantfox.kjdautils.extensions.jda.sendPrivateMessage
+import me.aberrantfox.kjdautils.extensions.jda.toMember
 import me.aberrantfox.kjdautils.extensions.stdlib.formatJdaDate
 import me.aberrantfox.kjdautils.extensions.stdlib.limit
 import me.aberrantfox.kjdautils.internal.command.arguments.IntegerArg
@@ -29,7 +30,7 @@ object StrikeRequests {
 }
 
 @CommandSet("infractions")
-fun strikeCommands(config: Configuration, log: BotLogger) =
+fun strikeCommands(config: Configuration, log: BotLogger, muteService: MuteService) =
     commands {
         command("warn") {
             description = "Warn a member, giving them a 0 strike infraction with the given reason."
@@ -39,7 +40,7 @@ fun strikeCommands(config: Configuration, log: BotLogger) =
                 val e = it.copy(args=newArgs)
                 val guild = it.jda.getGuildById(config.serverInformation.guildid)
 
-                infract(e, guild, config, log)
+                infract(e, guild, config, log, muteService)
             }
         }
 
@@ -50,7 +51,7 @@ fun strikeCommands(config: Configuration, log: BotLogger) =
                    arg(SentenceArg("Infraction Reason")))
             execute {
                 val guild = it.jda.getGuildById(config.serverInformation.guildid)
-                infract(it, guild, config, log)
+                infract(it, guild, config, log, muteService)
             }
         }
 
@@ -120,7 +121,7 @@ fun strikeCommands(config: Configuration, log: BotLogger) =
                 val request = StrikeRequests.map[user.id]!!
                 val newArgs = listOf(request.user, request.amount, request.reason)
                 val guild = it.jda.getGuildById(config.serverInformation.guildid)
-                infract(it.copy(args = newArgs), guild, config, log)
+                infract(it.copy(args = newArgs), guild, config, log, muteService)
 
                 StrikeRequests.map.remove(user.id)
                 it.respond("Strike request on ${user.asMention} was accepted.")
@@ -235,7 +236,7 @@ private fun strikeAgainst(user: User, event: CommandEvent) =
         true
     }
 
-private fun infract(event: CommandEvent, guild: Guild, config: Configuration, log: BotLogger) {
+private fun infract(event: CommandEvent, guild: Guild, config: Configuration, log: BotLogger, muteService: MuteService) {
     val args = event.args
     val target = args[0] as User
     val strikeQuantity = args[1] as Int
@@ -259,11 +260,11 @@ private fun infract(event: CommandEvent, guild: Guild, config: Configuration, lo
 
     if (totalStrikes > config.security.strikeCeil) totalStrikes = config.security.strikeCeil
 
-    administerPunishment(config, log, target, strikeQuantity, reason, guild, event.author, totalStrikes)
+    administerPunishment(config, log, target, strikeQuantity, reason, guild, event.author, totalStrikes, muteService)
 }
 
 private fun administerPunishment(config: Configuration, log: BotLogger, user: User, strikeQuantity: Int,
-                                 reason: String, guild: Guild, moderator: User, totalStrikes: Int) {
+                                 reason: String, guild: Guild, moderator: User, totalStrikes: Int, muteService: MuteService) {
 
     val punishmentAction = config.security.infractionActionMap[totalStrikes]?.toString() ?: "None"
     val infractionEmbed = buildInfractionEmbed(user.asMention, reason, strikeQuantity,
@@ -282,7 +283,7 @@ private fun administerPunishment(config: Configuration, log: BotLogger, user: Us
         }
 
         is InfractionAction.Mute -> {
-            muteMember(guild, user, action.duration * 60L * 1000L, "Infraction punishment.", config, moderator, log)
+            muteService.muteMember(user.toMember(guild), action.duration * 60L * 1000L, "Infraction punishment.", moderator)
         }
 
         is InfractionAction.Ban -> {
