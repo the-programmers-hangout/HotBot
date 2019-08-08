@@ -38,7 +38,7 @@ fun securityCommands() = commands {
     command("viewnewplayers") {
         description = "View what the bot deems as new players"
         execute {
-            it.respond("Current tracked new players: ${NewPlayers.names(it.jda)}")
+            it.respond("Current tracked new players: ${NewPlayers.names(it.discord.jda)}")
         }
     }
 

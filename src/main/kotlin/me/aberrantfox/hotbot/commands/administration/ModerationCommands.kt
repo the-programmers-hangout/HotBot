@@ -10,8 +10,9 @@ import me.aberrantfox.kjdautils.api.dsl.*
 import me.aberrantfox.kjdautils.extensions.jda.*
 import me.aberrantfox.kjdautils.extensions.stdlib.randomListItem
 import me.aberrantfox.kjdautils.internal.command.arguments.*
+import me.aberrantfox.kjdautils.internal.command.arguments.MultipleArg
 import me.aberrantfox.kjdautils.internal.logging.BotLogger
-import net.dv8tion.jda.core.entities.*
+import net.dv8tion.jda.api.entities.*
 import java.awt.Color
 import java.io.File
 import java.text.SimpleDateFormat
@@ -22,7 +23,7 @@ import kotlin.math.roundToLong
 class ModerationCommands
 
 @CommandSet("moderation")
-fun moderationCommands(kConfig: KJDAConfiguration,
+fun moderationCommands(kConfig: KConfiguration,
                        config: Configuration,
                        messageService: MessageService,
                        manager: PermissionService,
@@ -38,9 +39,9 @@ fun moderationCommands(kConfig: KJDAConfiguration,
             val deleteMessageDays = it.args.component2() as Int
             val reason = it.args.component3() as String
 
-            val guild = it.jda.getGuildById(config.serverInformation.guildid)
+            val guild = it.discord.jda.getGuildById(config.serverInformation.guildid)
 
-            guild.controller.ban(target, deleteMessageDays, reason).queue { _ ->
+            guild!!.ban(target, deleteMessageDays, reason).queue { _ ->
                 it.respond("${target.fullName()} was banned.")
             }
         }
@@ -108,10 +109,10 @@ fun moderationCommands(kConfig: KJDAConfiguration,
         expect(LowerUserArg)
         execute {
             val user = it.args.component1() as User
-            val guild = it.jda.getGuildById(config.serverInformation.guildid)
+            val guild = it.discord.jda.getGuildById(config.serverInformation.guildid)!!
             val member = user.toMember(guild)
 
-            if(user.id == it.jda.selfUser.id) {
+            if(user.id == it.discord.jda.selfUser.id) {
                 it.respond("Nice try but I'm not going to gag myself.")
                 return@execute
             }
@@ -134,10 +135,10 @@ fun moderationCommands(kConfig: KJDAConfiguration,
             val time = (it.args.component2() as Double).roundToLong() * 1000
             val reason = it.args.component3() as String
 
-            val guild = it.jda.getGuildById(config.serverInformation.guildid)
+            val guild = it.discord.jda.getGuildById(config.serverInformation.guildid)!!
             val member = user.toMember(guild)
 
-            if (user.id == it.jda.selfUser.id) {
+            if (user.id == it.discord.jda.selfUser.id) {
                 it.respond("Nice try but I'm not going to mute myself.")
                 return@execute
             }
@@ -170,7 +171,7 @@ fun moderationCommands(kConfig: KJDAConfiguration,
         expect(LowerUserArg)
         execute {
             val user = it.args.component1() as User
-            val guild = it.jda.getGuildById(config.serverInformation.guildid)
+            val guild = it.discord.jda.getGuildById(config.serverInformation.guildid)!!
 
             val member = guild.getMember(user)
                     ?: return@execute it.respond("That user isn't a part of the guild!")
@@ -266,11 +267,11 @@ fun moderationCommands(kConfig: KJDAConfiguration,
             val target = it.args[0] as User
             val reason = it.args[1] as String
 
-            val guild = it.jda.getGuildById(config.serverInformation.guildid)
+            val guild = it.discord.jda.getGuildById(config.serverInformation.guildid)
 
-            val targetMember = guild.getMember(target)
+            val targetMember = guild!!.getMember(target)!!
 
-            guild.controller.setNickname(targetMember, messageService.messages.names.randomListItem()).queue {
+            guild.modifyNickname(targetMember, messageService.messages.names.randomListItem()).queue {
                 target.sendPrivateMessage("Your name has been changed forcefully by a member of staff for reason: $reason", logger)
             }
         }
@@ -281,11 +282,11 @@ fun moderationCommands(kConfig: KJDAConfiguration,
         expect(UserArg)
         execute {
             val target = it.args[0] as User
-            val guild = it.jda.getGuildById(config.serverInformation.guildid)
-            val member = guild.getMember(target) ?: return@execute it.respond("That user isn't in the guild!")
+            val guild = it.discord.jda.getGuildById(config.serverInformation.guildid)
+            val member = guild!!.getMember(target) ?: return@execute it.respond("That user isn't in the guild!")
 
             val dateFormat = SimpleDateFormat("yyyy-MM-dd")
-            val joinDateParsed = dateFormat.parse(member.joinDate.toString())
+            val joinDateParsed = dateFormat.parse(member.timeJoined.toString())
             val joinDate = dateFormat.format(joinDateParsed)
 
             it.respond("${member.fullName()}'s join date: $joinDate")
@@ -327,7 +328,7 @@ fun moderationCommands(kConfig: KJDAConfiguration,
             val record = getReason(target.id)
 
             if (record != null) {
-                it.respond("${target.fullName()} was banned by ${it.jda.retrieveUserById(record.mod).complete().fullName()} for reason ${record.reason}")
+                it.respond("${target.fullName()} was banned by ${it.discord.jda.retrieveUserById(record.mod).complete().fullName()} for reason ${record.reason}")
             } else {
                 it.respond("That user does not have a record logged.")
             }
@@ -388,16 +389,16 @@ fun moderationCommands(kConfig: KJDAConfiguration,
             val user = it.args.component1() as User
             val avatar = user.effectiveAvatarUrl
 
-            val guild = it.jda.getGuildById(config.serverInformation.guildid)
+            val guild = it.discord.jda.getGuildById(config.serverInformation.guildid)
 
             user.sendPrivateMessage("We have flagged your profile picture as inappropriate. " +
                 "Please change it within the next 30 minutes or you will be banned.", logger)
 
             Timer().schedule(1000 * 60 * 30) {
-                if(avatar == it.jda.retrieveUserById(user.id).complete().effectiveAvatarUrl) {
+                if(avatar == it.discord.jda.retrieveUserById(user.id).complete().effectiveAvatarUrl) {
                     user.sendPrivateMessage("Hi, since you failed to change your profile picture, you are being banned.", logger)
                     Timer().schedule(1000 * 10) {
-                        guild.controller.ban(user, 1, "Having a bad profile picture and refusing to change it.").queue()
+                        guild!!.ban(user, 1, "Having a bad profile picture and refusing to change it.").queue()
                     }
                 } else {
                     user.sendPrivateMessage("Thank you for changing your avatar. You will not be banned.", logger)
@@ -411,8 +412,8 @@ fun moderationCommands(kConfig: KJDAConfiguration,
         expect(VoiceChannelArg)
         execute {
             val voiceChannel = it.args.component1() as VoiceChannel
-            val guild = it.jda.getGuildById(config.serverInformation.guildid)
-            muteVoiceChannel(guild, voiceChannel, config, manager)
+            val guild = it.discord.jda.getGuildById(config.serverInformation.guildid)
+            muteVoiceChannel(guild!!, voiceChannel, config, manager)
         }
     }
 
@@ -421,8 +422,8 @@ fun moderationCommands(kConfig: KJDAConfiguration,
         expect(VoiceChannelArg)
         execute {
             val voiceChannel = it.args.component1() as VoiceChannel
-            val guild = it.jda.getGuildById(config.serverInformation.guildid)
-            unmuteVoiceChannel(guild, voiceChannel, config)
+            val guild = it.discord.jda.getGuildById(config.serverInformation.guildid)
+            unmuteVoiceChannel(guild!!, voiceChannel, config)
         }
     }
 
@@ -440,17 +441,17 @@ fun moderationCommands(kConfig: KJDAConfiguration,
 
             if (nickname.isEmpty()) nickname = user.name
 
-            val guild = it.jda.getGuildById(config.serverInformation.guildid)
-            val targetMember = guild.getMember(user)
+            val guild = it.discord.jda.getGuildById(config.serverInformation.guildid)
+            val targetMember = guild!!.getMember(user)!!
 
-            guild.controller.setNickname(targetMember, nickname).queue()
+            guild.modifyNickname(targetMember, nickname).queue()
         }
     }
 
 }
 
 private fun handleResponse(past: List<Message>, channel: TextChannel, targets: List<User>, sourceChannel: TextChannel,
-                           source: String, kConfig: KJDAConfiguration, logger: BotLogger) {
+                           source: String, kConfig: KConfiguration, logger: BotLogger) {
 
 
     val targetIDs = targets.map { it.id }

@@ -2,7 +2,7 @@ package me.aberrantfox.hotbot.services
 
 import me.aberrantfox.hotbot.utility.types.LimitedList
 import me.aberrantfox.kjdautils.api.annotation.Service
-import net.dv8tion.jda.core.entities.Message
+import net.dv8tion.jda.api.entities.Message
 import org.apache.commons.text.similarity.LevenshteinDistance
 import org.joda.time.*
 import java.util.Timer

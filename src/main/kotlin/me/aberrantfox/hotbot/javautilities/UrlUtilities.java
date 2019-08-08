@@ -1,7 +1,7 @@
 package me.aberrantfox.hotbot.javautilities;
 
 
-import net.dv8tion.jda.core.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.MessageChannel;
 
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;

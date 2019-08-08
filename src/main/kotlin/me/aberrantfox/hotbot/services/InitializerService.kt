@@ -6,20 +6,21 @@ import me.aberrantfox.hotbot.database.*
 import me.aberrantfox.hotbot.utility.timeToDifference
 import me.aberrantfox.kjdautils.api.annotation.Service
 import me.aberrantfox.kjdautils.api.dsl.*
+import me.aberrantfox.kjdautils.discord.Discord
 import me.aberrantfox.kjdautils.internal.logging.BotLogger
-import net.dv8tion.jda.core.JDA
-import net.dv8tion.jda.core.exceptions.ErrorResponseException
+import net.dv8tion.jda.api.JDA
+import net.dv8tion.jda.api.exceptions.ErrorResponseException
 
 @Service
-class InitializerService(manager: PermissionService, container: CommandsContainer, kjdaConfiguration: KJDAConfiguration,
-                         jda: JDA, logger: BotLogger, config: Configuration) {
+class InitializerService(manager: PermissionService, container: CommandsContainer, kjdaConfiguration: KConfiguration,
+                         discord: Discord, logger: BotLogger, config: Configuration) {
     init {
         kjdaConfiguration.visibilityPredicate = { cmd, user, chan, _ -> manager.canUseCommand(user, cmd) && manager.canUseCommandInChannel(user, chan.id) }
         LowerUserArg.manager = manager
         setupMacroCommands(container, manager)
         manager.defaultAndPrunePermissions(container)
 
-        loadPersistence(jda, logger, config)
+        loadPersistence(discord.jda, logger, config)
         logger.info("Fully setup, now ready for use.")
     }
 

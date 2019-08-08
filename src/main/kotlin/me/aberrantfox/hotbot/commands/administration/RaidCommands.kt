@@ -9,7 +9,7 @@ import me.aberrantfox.kjdautils.extensions.jda.fullName
 import me.aberrantfox.kjdautils.internal.command.arguments.IntegerArg
 import me.aberrantfox.kjdautils.internal.command.arguments.UserArg
 import me.aberrantfox.kjdautils.internal.logging.BotLogger
-import net.dv8tion.jda.core.entities.User
+import net.dv8tion.jda.api.entities.User
 
 @CommandSet("security")
 fun raidCommands(config: Configuration, logger: BotLogger) = commands {
@@ -35,7 +35,7 @@ fun raidCommands(config: Configuration, logger: BotLogger) = commands {
             }
 
             val user = it.args[0] as User
-            val guild = it.jda.getGuildById(config.serverInformation.guildid)
+            val guild = it.discord.jda.getGuildById(config.serverInformation.guildid)
 
             if (!(MutedRaiders.set.contains(user.id))) {
                 it.respond("That user is not a raider.")
@@ -43,7 +43,7 @@ fun raidCommands(config: Configuration, logger: BotLogger) = commands {
             }
 
             MutedRaiders.set.remove(user.id)
-            removeMuteRole(guild, user, config, logger)
+            removeMuteRole(guild!!, user, config, logger)
 
             it.respond("Removed ${user.fullName()} from the queue, and has been unmuted.")
         }
@@ -57,11 +57,11 @@ fun raidCommands(config: Configuration, logger: BotLogger) = commands {
                 return@execute
             }
 
-            val guild = it.jda.getGuildById(config.serverInformation.guildid)
+            val guild = it.discord.jda.getGuildById(config.serverInformation.guildid)
 
             MutedRaiders.set
-                    .mapNotNull { id -> it.jda.retrieveUserById(id).complete() }
-                    .forEach { user -> removeMuteRole(guild, user, config, logger) }
+                    .mapNotNull { id -> it.discord.jda.retrieveUserById(id).complete() }
+                    .forEach { user -> removeMuteRole(guild!!, user, config, logger) }
 
             MutedRaiders.set.clear()
             it.respond("Raiders unmuted, be nice bois!")
@@ -80,10 +80,10 @@ fun raidCommands(config: Configuration, logger: BotLogger) = commands {
                 return@execute
             }
 
-            val guild = it.jda.getGuildById(config.serverInformation.guildid)
+            val guild = it.discord.jda.getGuildById(config.serverInformation.guildid)
 
             MutedRaiders.set.remove(user.id)
-            guild.controller.ban(user, delDays).queue()
+            guild!!.ban(user, delDays).queue()
         }
     }
 
@@ -98,11 +98,11 @@ fun raidCommands(config: Configuration, logger: BotLogger) = commands {
                 return@execute
             }
 
-            val guild = it.jda.getGuildById(config.serverInformation.guildid)
+            val guild = it.discord.jda.getGuildById(config.serverInformation.guildid)
 
             MutedRaiders.set
-                    .map { id -> it.jda.retrieveUserById(id).complete() }
-                    .forEach { user -> guild.controller.ban(user, delDays).queue() }
+                    .map { id -> it.discord.jda.retrieveUserById(id).complete() }
+                    .forEach { user -> guild!!.ban(user, delDays).queue() }
 
             MutedRaiders.set.clear()
 

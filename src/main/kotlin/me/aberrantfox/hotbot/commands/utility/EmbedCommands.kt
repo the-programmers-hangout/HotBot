@@ -8,8 +8,8 @@ import me.aberrantfox.kjdautils.extensions.jda.fullName
 import me.aberrantfox.kjdautils.extensions.stdlib.isBooleanValue
 import me.aberrantfox.kjdautils.extensions.stdlib.toBooleanValue
 import me.aberrantfox.kjdautils.internal.command.arguments.*
-import net.dv8tion.jda.core.EmbedBuilder
-import net.dv8tion.jda.core.entities.*
+import net.dv8tion.jda.api.EmbedBuilder
+import net.dv8tion.jda.api.entities.*
 import java.time.Instant
 import java.util.function.Consumer
 
@@ -60,7 +60,7 @@ fun embedCommands() =
                     return@execute
                 }
 
-                if (message.author != it.jda.selfUser) {
+                if (message.author != it.discord.jda.selfUser) {
                     it.respond("You can only edit messages sent by the bot.")
                     return@execute
                 }
@@ -98,7 +98,7 @@ fun embedCommands() =
                 val failure = Consumer<Throwable> { _ -> it.respond("Couldn't find message with that ID in the given channel.") }
 
                 try {
-                    channel.getMessageById(messageID).queue(success, failure)
+                    channel.retrieveMessageById(messageID).queue(success, failure)
                 } catch (e: IllegalArgumentException) {
                     it.respond("Invalid message ID given.")
                 }

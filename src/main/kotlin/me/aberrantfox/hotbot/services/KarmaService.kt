@@ -1,7 +1,7 @@
 package me.aberrantfox.hotbot.services
 
 import me.aberrantfox.kjdautils.api.annotation.Service
-import net.dv8tion.jda.core.entities.*
+import net.dv8tion.jda.api.entities.*
 
 private val thanks = setOf("thanks", "thank you", "ty")
 

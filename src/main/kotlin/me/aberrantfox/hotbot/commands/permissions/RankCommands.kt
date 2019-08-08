@@ -10,9 +10,9 @@ import me.aberrantfox.kjdautils.api.dsl.commands
 import me.aberrantfox.kjdautils.extensions.jda.fullName
 import me.aberrantfox.kjdautils.internal.command.arguments.RoleArg
 import me.aberrantfox.kjdautils.internal.command.arguments.WordArg
-import net.dv8tion.jda.core.entities.Guild
-import net.dv8tion.jda.core.entities.Role
-import net.dv8tion.jda.core.entities.User
+import net.dv8tion.jda.api.entities.Guild
+import net.dv8tion.jda.api.entities.Role
+import net.dv8tion.jda.api.entities.User
 import java.io.File
 
 private val rankConfigPath = configPath("rankconfig.json")
@@ -62,9 +62,9 @@ fun rankCommands(config: Configuration) = commands {
         description = "Grant a role to a user."
         expect(RoleArg, LowerUserArg)
         execute {
-            val guild = it.jda.getGuildById(config.serverInformation.guildid)
+            val guild = it.discord.jda.getGuildById(config.serverInformation.guildid)
 
-            handleGrant(it, guild, true)
+            handleGrant(it, guild!!, true)
         }
     }
 
@@ -72,9 +72,9 @@ fun rankCommands(config: Configuration) = commands {
         description = "Revoke a role from a user"
         expect(RoleArg, LowerUserArg)
         execute {
-            val guild = it.jda.getGuildById(config.serverInformation.guildid)
+            val guild = it.discord.jda.getGuildById(config.serverInformation.guildid)
 
-            handleGrant(it, guild, false)
+            handleGrant(it, guild!!, false)
         }
     }
 
@@ -131,10 +131,10 @@ private fun handleGrant(event: CommandEvent, guild: Guild, grant: Boolean) {
     }
 
     if (grant) {
-        guild.controller.addRolesToMember(member, role).queue()
+        guild.addRoleToMember(member!!, role).queue()
         event.respond("$roleName assigned to ${target.fullName()}")
     } else {
-        guild.controller.removeRolesFromMember(member, role).queue()
+        guild.removeRoleFromMember(member!!, role).queue()
         event.respond("$roleName removed from ${target.fullName()}")
     }
 }

@@ -4,8 +4,8 @@ import com.fatboyindustrial.gsonjodatime.Converters
 import com.google.common.reflect.TypeToken
 import com.google.gson.GsonBuilder
 import me.aberrantfox.hotbot.services.configPath
-import net.dv8tion.jda.core.*
-import net.dv8tion.jda.core.entities.MessageEmbed
+import net.dv8tion.jda.api.*
+import net.dv8tion.jda.api.entities.MessageEmbed
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
 import java.io.File

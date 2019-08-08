@@ -3,7 +3,7 @@ package me.aberrantfox.hotbot.listeners
 import com.google.common.eventbus.Subscribe
 import me.aberrantfox.hotbot.commands.permissions.RankContainer
 import me.aberrantfox.hotbot.services.Configuration
-import net.dv8tion.jda.core.events.role.update.RoleUpdateNameEvent
+import net.dv8tion.jda.api.events.role.update.RoleUpdateNameEvent
 
 class RoleListener(val configuration: Configuration) {
     @Subscribe

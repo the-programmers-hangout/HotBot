@@ -47,7 +47,7 @@ fun dataCommands(config: Configuration) = commands {
                 }
             }).queue { msg ->
                 answers.forEachIndexed { i, _ ->
-                    msg.addReaction(numberMap[i + 1]).queue()
+                    msg.addReaction(numberMap[i + 1]!!).queue()
                 }
                 Polls.map[msg.id] = PollContainer(question, answers, it.author.id, it.channel.id)
             }
@@ -65,9 +65,9 @@ fun dataCommands(config: Configuration) = commands {
             }
 
             val poll = Polls.map[pollID]!!
-            val guild = it.jda.getGuildById(config.serverInformation.guildid)
+            val guild = it.discord.jda.getGuildById(config.serverInformation.guildid)
 
-            guild.getTextChannelById(poll.channel).getMessageById(pollID).queue { msg ->
+            guild!!.getTextChannelById(poll.channel)!!.retrieveMessageById(pollID).queue { msg ->
                 val highestAnswersSize = msg.reactions.maxBy { it.count }!!.count
 
                 if(msg.reactions.all { it.count == highestAnswersSize }) {

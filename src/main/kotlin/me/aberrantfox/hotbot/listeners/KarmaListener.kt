@@ -5,8 +5,8 @@ import me.aberrantfox.hotbot.database.*
 import me.aberrantfox.hotbot.services.*
 import me.aberrantfox.kjdautils.extensions.jda.fullName
 import me.aberrantfox.kjdautils.internal.logging.BotLogger
-import net.dv8tion.jda.core.events.guild.member.GuildMemberLeaveEvent
-import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent
+import net.dv8tion.jda.api.events.guild.member.GuildMemberLeaveEvent
+import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
@@ -30,11 +30,11 @@ class KarmaListener(private val messageService: MessageService, private val karm
             log.info("${message.author.fullName()} gave ${karmaResult.member.fullName()} 1 karma")
 
             event.channel.sendMessage(messageService.messages.karmaMessage.replace("%mention%", karmaResult.member.asMention)).queue()
-            waitingUsers.add(event.member.user.id)
+            waitingUsers.add(event.member!!.user.id)
 
             Timer().schedule(object : TimerTask(){
                 override fun run() {
-                    waitingUsers.remove(event.member.user.id)
+                    waitingUsers.remove(event.member!!.user.id)
                 }
             }, config.serverInformation.karmaGiveDelay.toLong())
         }

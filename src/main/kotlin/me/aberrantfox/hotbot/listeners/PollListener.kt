@@ -3,7 +3,7 @@ package me.aberrantfox.hotbot.listeners
 import com.google.common.eventbus.Subscribe
 import me.aberrantfox.hotbot.commands.utility.Polls
 import me.aberrantfox.hotbot.commands.utility.emoteMap
-import net.dv8tion.jda.core.events.message.react.MessageReactionAddEvent
+import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent
 
 
 class PollListener {
@@ -23,7 +23,7 @@ class PollListener {
             return
         }
 
-        e.textChannel.getMessageById(e.messageId).queue {
+        e.textChannel.retrieveMessageById(e.messageId).queue {
             it.reactions
                 .filter { it.reactionEmote.name != emote }
                 .forEach { it.removeReaction(e.user).queue() }

@@ -14,7 +14,7 @@ fun main() {
 private fun start(config: Configuration) = startBot(config.serverInformation.token) {
     setupDatabaseSchema(config)
 
-    this.logger = convertChannels(config.logChannels, jda)
+    this.logger = convertChannels(config.logChannels, this.discord.jda)
 
     registerInjectionObject(config, container, logger, this.config)
 

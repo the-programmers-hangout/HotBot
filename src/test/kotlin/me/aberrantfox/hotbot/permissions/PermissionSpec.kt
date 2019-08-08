@@ -4,8 +4,10 @@ import com.nhaarman.mockito_kotlin.*
 import kotlinx.coroutines.runBlocking
 import me.aberrantfox.hotbot.services.*
 import me.aberrantfox.kjdautils.api.dsl.*
-import net.dv8tion.jda.core.JDA
-import net.dv8tion.jda.core.entities.*
+import me.aberrantfox.kjdautils.discord.Discord
+import me.aberrantfox.kjdautils.internal.event.EventRegister
+import net.dv8tion.jda.api.JDA
+import net.dv8tion.jda.api.entities.*
 import org.amshove.kluent.*
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.*
@@ -45,12 +47,17 @@ private object TestData {
     val jdaMock = mock<JDA> {
         on { getGuildById(config.serverInformation.guildid) } doReturn guildMock
     }
+
+    val discordMock = mock<Discord> {
+        on { jda } doReturn jdaMock
+    }
+
 }
 
 
 object PermissionSpec : Spek({
     describe("Permission Manager") {
-        val manager = PermissionService(TestData.jdaMock, TestData.config)
+        val manager = PermissionService(TestData.discordMock, TestData.config)
         beforeGroup {
             manager.defaultAndPrunePermissions(TestData.container)
             runBlocking { manager.setPermission(TestData.commandName, PermissionLevel.JrMod).join() }

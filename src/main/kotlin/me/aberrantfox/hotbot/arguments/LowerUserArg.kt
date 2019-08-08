@@ -7,7 +7,7 @@ import me.aberrantfox.kjdautils.internal.command.ArgumentResult
 import me.aberrantfox.kjdautils.internal.command.ArgumentType
 import me.aberrantfox.kjdautils.internal.command.ConsumptionType
 import me.aberrantfox.kjdautils.internal.command.tryRetrieveSnowflake
-import net.dv8tion.jda.core.entities.User
+import net.dv8tion.jda.api.entities.User
 
 open class LowerUserArg(override val name : String = "Lower Ranked User") : ArgumentType {
     companion object : LowerUserArg()
@@ -18,7 +18,7 @@ open class LowerUserArg(override val name : String = "Lower Ranked User") : Argu
     override val consumptionType = ConsumptionType.Single
 
     override fun convert(arg: String, args: List<String>, event: CommandEvent): ArgumentResult {
-        val retrieved = tryRetrieveSnowflake(event.jda) { it.retrieveUserById(arg.trimToID()).complete() }
+        val retrieved = tryRetrieveSnowflake(event.discord.jda) { it.retrieveUserById(arg.trimToID()).complete() }
 
         return when {
             retrieved == null -> ArgumentResult.Error("Couldn't retrieve user: $arg")

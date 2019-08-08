@@ -3,14 +3,15 @@ package me.aberrantfox.hotbot.services
 import jdk.nashorn.api.scripting.NashornScriptEngineFactory
 import me.aberrantfox.kjdautils.api.annotation.Service
 import me.aberrantfox.kjdautils.api.dsl.CommandsContainer
+import me.aberrantfox.kjdautils.discord.Discord
 import me.aberrantfox.kjdautils.internal.logging.BotLogger
-import net.dv8tion.jda.core.JDA
+import net.dv8tion.jda.api.JDA
 import java.io.File
 import javax.script.ScriptEngine
 
 @Service
-class ScriptEngineService(jda: JDA, commandsContainer: CommandsContainer, config: Configuration, logger: BotLogger) {
-    val engine: ScriptEngine = setupScriptEngine(jda, commandsContainer, config, logger)
+class ScriptEngineService(discord: Discord, commandsContainer: CommandsContainer, config: Configuration, logger: BotLogger) {
+    val engine: ScriptEngine = setupScriptEngine(discord.jda, commandsContainer, config, logger)
 
     private fun setupScriptEngine(jda: JDA, container: CommandsContainer, config: Configuration, logger: BotLogger): ScriptEngine {
         val engine = NashornScriptEngineFactory().getScriptEngine("--language=es6", "-scripting")

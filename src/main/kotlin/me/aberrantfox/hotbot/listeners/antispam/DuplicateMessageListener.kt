@@ -8,7 +8,7 @@ import me.aberrantfox.hotbot.utility.types.PersistentSet
 import me.aberrantfox.kjdautils.extensions.jda.descriptor
 import me.aberrantfox.kjdautils.extensions.jda.isImagePost
 import me.aberrantfox.kjdautils.internal.logging.BotLogger
-import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent
+import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent
 import org.joda.time.DateTime
 
 object MutedRaiders {

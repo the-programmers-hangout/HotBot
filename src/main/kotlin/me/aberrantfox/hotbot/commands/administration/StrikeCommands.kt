@@ -17,9 +17,9 @@ import me.aberrantfox.kjdautils.internal.command.arguments.IntegerArg
 import me.aberrantfox.kjdautils.internal.command.arguments.SentenceArg
 import me.aberrantfox.kjdautils.internal.command.arguments.UserArg
 import me.aberrantfox.kjdautils.internal.logging.BotLogger
-import net.dv8tion.jda.core.entities.Guild
-import net.dv8tion.jda.core.entities.MessageEmbed
-import net.dv8tion.jda.core.entities.User
+import net.dv8tion.jda.api.entities.Guild
+import net.dv8tion.jda.api.entities.MessageEmbed
+import net.dv8tion.jda.api.entities.User
 import org.joda.time.format.DateTimeFormat
 import java.awt.Color
 
@@ -38,9 +38,9 @@ fun strikeCommands(config: Configuration, log: BotLogger, muteService: MuteServi
             execute {
                 val newArgs = listOf(it.args[0], 0, it.args[1])
                 val e = it.copy(args=newArgs)
-                val guild = it.jda.getGuildById(config.serverInformation.guildid)
+                val guild = it.discord.jda.getGuildById(config.serverInformation.guildid)
 
-                infract(e, guild, config, log, muteService)
+                infract(e, guild!!, config, log, muteService)
             }
         }
 
@@ -50,8 +50,9 @@ fun strikeCommands(config: Configuration, log: BotLogger, muteService: MuteServi
                    arg(IntegerArg("Weight"), optional = true, default = 1),
                    arg(SentenceArg("Infraction Reason")))
             execute {
-                val guild = it.jda.getGuildById(config.serverInformation.guildid)
-                infract(it, guild, config, log, muteService)
+
+                val guild = it.discord.jda.getGuildById(config.serverInformation.guildid)
+                infract(it, guild!!, config, log, muteService)
             }
         }
 
@@ -120,8 +121,9 @@ fun strikeCommands(config: Configuration, log: BotLogger, muteService: MuteServi
 
                 val request = StrikeRequests.map[user.id]!!
                 val newArgs = listOf(request.user, request.amount, request.reason)
-                val guild = it.jda.getGuildById(config.serverInformation.guildid)
-                infract(it.copy(args = newArgs), guild, config, log, muteService)
+
+                val guild = it.discord.jda.getGuildById(config.serverInformation.guildid)
+                infract(it.copy(args = newArgs), guild!!, config, log, muteService)
 
                 StrikeRequests.map.remove(user.id)
                 it.respond("Strike request on ${user.asMention} was accepted.")
@@ -180,14 +182,14 @@ fun strikeCommands(config: Configuration, log: BotLogger, muteService: MuteServi
             expect(UserArg)
             execute {
                 val target = it.args[0] as User
-                val guild = it.jda.getGuildById(config.serverInformation.guildid)
+                val guild = it.discord.jda.getGuildById(config.serverInformation.guildid)
 
                 incrementOrSetHistoryCount(target.id)
 
                 it.respond(buildHistoryEmbed(target, true, getHistory(target.id),
-                        getHistoryCount(target.id), getNotesByUser(target.id), it, guild, config))
+                        getHistoryCount(target.id), getNotesByUser(target.id), it, guild!!, config))
 
-                val leaveHistory = getLeaveHistory(target.id, guild.id)
+                val leaveHistory = getLeaveHistory(target.id, guild!!.id)
                 if (leaveHistory.isNotEmpty())
                     it.respond(buildleaveHistoryEmbed(target, leaveHistory))
             }
@@ -220,10 +222,10 @@ fun strikeCommands(config: Configuration, log: BotLogger, muteService: MuteServi
             description = "See your own infraction history."
             execute {
                 val target = it.author
-                val guild = it.jda.getGuildById(config.serverInformation.guildid)
+                val guild = it.discord.jda.getGuildById(config.serverInformation.guildid)
 
                 target.sendPrivateMessage(buildHistoryEmbed(target, false, getHistory(target.id),
-                        getHistoryCount(target.id), null, it, guild, config), log)
+                        getHistoryCount(target.id), null, it, guild!!, config), log)
             }
         }
     }
@@ -279,17 +281,17 @@ private fun administerPunishment(config: Configuration, log: BotLogger, user: Us
 
         is InfractionAction.Kick -> {
             user.sendPrivateMessage("You may return via this: https://discord.gg/BQN6BYE - please be mindful of the rules next time.", log)
-            guild.controller.kick(user.id, reason).queue()
+            guild.kick(user.id, reason).queue()
         }
 
         is InfractionAction.Mute -> {
-            muteService.muteMember(user.toMember(guild), action.duration * 60L * 1000L, "Infraction punishment.", moderator)
+            muteService.muteMember(user.toMember(guild)!!, action.duration * 60L * 1000L, "Infraction punishment.", moderator)
         }
 
         is InfractionAction.Ban -> {
             user.sendPrivateMessage("Well... that happened. There may be an appeal system in the future. But for now, you're" +
                     " permanently banned. Sorry about that :) ", log)
-            guild.controller.ban(user.id, 0, reason).queue()
+            guild.ban(user.id, 0, reason).queue()
         }
     }
 }
@@ -335,7 +337,7 @@ private fun buildHistoryEmbed(target: User, includeModerator: Boolean, records: 
                         "**${records.filter { it.isExpired }.size}** are expired and **${records.filter { !it.isExpired }.size}** are still in effect." +
                         "\nCurrent strike value of **${getMaxStrikes(target.id)}/${config.security.strikeCeil}**" +
                         "\nJoin date: **${guild.getMemberJoinString(target)}**" +
-                        "\nCreation date: **${target.creationTime.toString().formatJdaDate()}**"
+                        "\nCreation date: **${target.timeCreated.toString().formatJdaDate()}**"
                 inline = false
                 if(includeModerator){
                     value +="\nHistory has been invoked **$historyCount** times."
@@ -356,7 +358,7 @@ private fun buildHistoryEmbed(target: User, includeModerator: Boolean, records: 
                     inline = false
 
                     if(includeModerator) {
-                        value += "\nIssued by **${it.jda.retrieveUserById(record.moderator).complete().name}** on **${record.dateTime.toString(DateTimeFormat.forPattern("dd/MM/yyyy"))}**"
+                        value += "\nIssued by **${it.discord.jda.retrieveUserById(record.moderator).complete().name}** on **${record.dateTime.toString(DateTimeFormat.forPattern("dd/MM/yyyy"))}**"
                     }
                 }
 
@@ -390,7 +392,7 @@ private fun buildHistoryEmbed(target: User, includeModerator: Boolean, records: 
             }
 
             notes.forEach { note ->
-                val moderator = it.jda.retrieveUserById(note.moderator).complete().name
+                val moderator = it.discord.jda.retrieveUserById(note.moderator).complete().name
 
                 field {
                     name = "ID :: __${note.id}__ :: Staff :: __${moderator}__"

@@ -6,7 +6,7 @@ import me.aberrantfox.kjdautils.api.dsl.*
 import me.aberrantfox.kjdautils.extensions.jda.fullName
 import me.aberrantfox.kjdautils.internal.command.arguments.IntegerArg
 import me.aberrantfox.kjdautils.internal.command.arguments.UserArg
-import net.dv8tion.jda.core.entities.User
+import net.dv8tion.jda.api.entities.User
 
 @CommandSet("karmacmds")
 fun karmaCommands() = commands {
@@ -28,7 +28,7 @@ fun karmaCommands() = commands {
 
                 leaderBoard().forEachIndexed{ index, record ->
                     field {
-                        name = "${index + 1}) ${it.jda.getUserById(record.who).fullName()}"
+                        name = "${index + 1}) ${it.discord.jda.getUserById(record.who)!!.fullName()}"
                         value = "${record.karma} karma"
                         inline = false
                     }

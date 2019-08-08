@@ -1,7 +1,7 @@
 package me.aberrantfox.hotbot.database
 
 
-import net.dv8tion.jda.core.entities.User
+import net.dv8tion.jda.api.entities.User
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 

@@ -14,8 +14,8 @@ import me.aberrantfox.kjdautils.extensions.stdlib.sanitiseMentions
 import me.aberrantfox.kjdautils.internal.command.arguments.CommandArg
 import me.aberrantfox.kjdautils.internal.command.arguments.RoleArg
 import me.aberrantfox.kjdautils.internal.command.arguments.TextChannelArg
-import net.dv8tion.jda.core.entities.Role
-import net.dv8tion.jda.core.entities.TextChannel
+import net.dv8tion.jda.api.entities.Role
+import net.dv8tion.jda.api.entities.TextChannel
 import java.awt.Color
 
 @CommandSet("permissions")
@@ -45,8 +45,8 @@ fun permissionCommands(manager: PermissionService, config: Configuration) =
             command("roleids") {
                 description = "Display each role in the server with its corresponding ID"
                 execute {
-                    val guild = it.jda.getGuildById(config.serverInformation.guildid)
-                    it.respond(guild.roles.joinToString("\n") { role -> "${role.name} :: ${role.id}" })
+                    val guild = it.discord.jda.getGuildById(config.serverInformation.guildid)
+                    it.respond(guild!!.roles.joinToString("\n") { role -> "${role.name} :: ${role.id}" })
                 }
             }
 
@@ -164,13 +164,13 @@ fun permissionCommands(manager: PermissionService, config: Configuration) =
 
                         val assignments = manager.roleAssignments()
 
-                        val guild = it.jda.getGuildById(config.serverInformation.guildid)
+                        val guild = it.discord.jda.getGuildById(config.serverInformation.guildid)
 
                         val assignmentsText = if (assignments.isEmpty()) {
                             "None"
                         } else {
                             assignments.joinToString("\n") { pair ->
-                                val roleName = guild.getRoleById(pair.key).name
+                                val roleName = guild!!.getRoleById(pair.key)!!.name
                                 "$roleName :: PermissionLevel.${pair.value}"
                             }
                         }

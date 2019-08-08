@@ -5,8 +5,8 @@ import me.aberrantfox.kjdautils.api.dsl.*
 import me.aberrantfox.kjdautils.extensions.stdlib.convertToTimeString
 import me.aberrantfox.kjdautils.internal.command.arguments.*
 import me.aberrantfox.kjdautils.internal.logging.BotLogger
-import net.dv8tion.jda.core.entities.*
-import net.dv8tion.jda.core.requests.RestAction
+import net.dv8tion.jda.api.entities.*
+import net.dv8tion.jda.api.requests.RestAction
 import java.awt.Color
 import kotlin.concurrent.timer
 import kotlin.math.roundToLong
@@ -95,7 +95,7 @@ private fun runGiveaway(message: Message) {
         val newTimeLeftMs = timeLeft - timeUpdatePeriod
 
         if (newTimeLeftMs <= 0) {
-            message.channel.getMessageById(messageID).queue({ updatedMessage ->
+            message.channel.retrieveMessageById(messageID).queue({ updatedMessage ->
                 announceWinner(updatedMessage, prize)
                 Giveaways.giveaways.remove(messageID)
             }, { error ->
@@ -119,7 +119,7 @@ private fun announceWinner(message: Message, prize: String) {
 
     val total = reaction.count
 
-    reaction.users.takeAsync(total).thenAcceptAsync { allUsers ->
+    reaction.retrieveUsers().takeAsync(total).thenAcceptAsync { allUsers ->
         val entered = allUsers.filterNot(User::isBot)
 
         if (entered.isEmpty()) {

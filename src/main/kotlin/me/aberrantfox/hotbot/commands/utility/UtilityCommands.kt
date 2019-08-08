@@ -13,8 +13,8 @@ import me.aberrantfox.kjdautils.extensions.jda.toMember
 import me.aberrantfox.kjdautils.extensions.stdlib.sanitiseMentions
 import me.aberrantfox.kjdautils.internal.command.arguments.*
 import me.aberrantfox.kjdautils.internal.logging.BotLogger
-import net.dv8tion.jda.core.OnlineStatus
-import net.dv8tion.jda.core.entities.*
+import net.dv8tion.jda.api.OnlineStatus
+import net.dv8tion.jda.api.entities.*
 import org.joda.time.DateTime
 import java.awt.Color
 import java.net.URLEncoder
@@ -44,7 +44,9 @@ fun utilCommands(messageService: MessageService, manager: PermissionService, con
     command("ping") {
         description = "Pong!"
         execute {
-            it.respond("Responded in ${it.jda.ping}ms")
+            it.discord.jda.restPing.queue { ping ->
+                it.respond("Responded in ${ping}ms")
+            }
         }
     }
 
@@ -52,10 +54,10 @@ fun utilCommands(messageService: MessageService, manager: PermissionService, con
         description = "Display the bot information."
         execute {
             it.respond(embed {
-                title(it.jda.selfUser.fullName())
+                title(it.discord.jda.selfUser.fullName())
                 description(messageService.messages.botDescription)
                 setColor(Color.red)
-                setThumbnail(it.jda.selfUser.effectiveAvatarUrl)
+                setThumbnail(it.discord.jda.selfUser.effectiveAvatarUrl)
 
                 field {
                     name = "Creator"
@@ -83,8 +85,8 @@ fun utilCommands(messageService: MessageService, manager: PermissionService, con
     command("serverinfo") {
         description = "Display a message giving basic server information"
         execute {
-            val guild = it.jda.getGuildById(config.serverInformation.guildid)
-            val embed = produceServerInfoEmbed(guild, messageService)
+            val guild = it.discord.jda.getGuildById(config.serverInformation.guildid)
+            val embed = produceServerInfoEmbed(guild!!, messageService)
             it.respond(embed)
         }
     }
@@ -165,7 +167,7 @@ fun utilCommands(messageService: MessageService, manager: PermissionService, con
         expect(UserArg)
         execute {
             val target = it.args.component1() as User
-            it.respond("${target.fullName()}'s account was made on ${target.creationTime}")
+            it.respond("${target.fullName()}'s account was made on ${target.timeCreated}")
         }
     }
 
@@ -239,8 +241,8 @@ fun utilCommands(messageService: MessageService, manager: PermissionService, con
         expect(arg(TimeStringArg, true, 3600.0))
         execute {
             val time = (it.args.component1() as Double).roundToLong() * 1000
-            val guild = it.jda.getGuildById(config.serverInformation.guildid)
-            val member = it.author.toMember(guild)
+            val guild = it.discord.jda.getGuildById(config.serverInformation.guildid)!!
+            val member = it.author.toMember(guild)!!
 
             if(muteService.checkMuteState(member) != MuteService.MuteState.None) {
                 it.respond("Nice try but you're already muted")
@@ -282,7 +284,7 @@ fun produceServerInfoEmbed(guild: Guild, messageService: MessageService) =
         title(guild.name)
         setColor(Color.MAGENTA)
         description(messageService.messages.serverDescription)
-        setFooter("Guild creation date: ${guild.creationTime.format(DateTimeFormatter.RFC_1123_DATE_TIME)}", "http://i.imgur.com/iwwEprG.png")
+        setFooter("Guild creation date: ${guild.timeCreated.format(DateTimeFormatter.RFC_1123_DATE_TIME)}", "http://i.imgur.com/iwwEprG.png")
         setThumbnail("http://i.imgur.com/DFoaG7k.png")
 
         field {
@@ -297,7 +299,7 @@ fun produceServerInfoEmbed(guild: Guild, messageService: MessageService) =
 
         ifield {
             name = "Owner"
-            value = guild.owner.fullName()
+            value = guild.owner!!.fullName()
         }
 
         ifield {

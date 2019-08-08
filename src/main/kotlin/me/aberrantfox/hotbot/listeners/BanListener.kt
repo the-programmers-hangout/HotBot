@@ -2,7 +2,7 @@ package me.aberrantfox.hotbot.listeners
 
 import com.google.common.eventbus.Subscribe
 import me.aberrantfox.hotbot.database.markLastRecordAsBan
-import net.dv8tion.jda.core.events.guild.GuildBanEvent
+import net.dv8tion.jda.api.events.guild.GuildBanEvent
 import java.util.Timer
 import kotlin.concurrent.schedule
 

@@ -7,15 +7,16 @@ import me.aberrantfox.hotbot.database.insertMutedMember
 import me.aberrantfox.hotbot.database.isMemberMuted
 import me.aberrantfox.hotbot.utility.*
 import me.aberrantfox.kjdautils.api.annotation.Service
+import me.aberrantfox.kjdautils.discord.Discord
 import me.aberrantfox.kjdautils.extensions.jda.fullName
 import me.aberrantfox.kjdautils.extensions.jda.sendPrivateMessage
 import me.aberrantfox.kjdautils.extensions.stdlib.convertToTimeString
 import me.aberrantfox.kjdautils.internal.logging.BotLogger
-import net.dv8tion.jda.core.*
-import net.dv8tion.jda.core.entities.Guild
-import net.dv8tion.jda.core.entities.Member
-import net.dv8tion.jda.core.entities.User
-import net.dv8tion.jda.core.events.guild.member.GuildMemberJoinEvent
+import net.dv8tion.jda.api.*
+import net.dv8tion.jda.api.entities.Guild
+import net.dv8tion.jda.api.entities.Member
+import net.dv8tion.jda.api.entities.User
+import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent
 import java.util.*
 
 private typealias GuildID = String
@@ -23,7 +24,7 @@ private typealias MuteRoleID = String
 private typealias UserId = String
 
 @Service
-class MuteService(val jda: JDA,
+class MuteService(val discord: Discord,
                   val config: Configuration,
                   val log: BotLogger) {
     private val muteMap = hashMapOf<GuildID, MuteRoleID>()
@@ -38,11 +39,11 @@ class MuteService(val jda: JDA,
     }
 
     init {
-        jda.guilds.forEach { setupMutedRole(it) }
+        discord.jda.guilds.forEach { setupMutedRole(it) }
         handleLTSMutes()
     }
 
-    fun getMutedRole(guild: Guild) = jda.getRoleById(muteMap[guild.id])!!
+    fun getMutedRole(guild: Guild) = discord.jda.getRoleById(muteMap[guild.id]!!)!!
 
     fun muteMember(member: Member, time: Long, reason: String, moderator: User) {
         if (time <= 0) {
@@ -65,7 +66,7 @@ class MuteService(val jda: JDA,
                 guild.id)
         val muteEmbed = buildMuteEmbed(user.asMention, timeString, reason)
 
-        guild.controller.addSingleRoleToMember(member, getMutedRole(guild)).queue()
+        guild.addRoleToMember(member, getMutedRole(guild)).queue()
         user.sendPrivateMessage(muteEmbed, log)
         insertMutedMember(record)
         scheduleUnmute(member, time)
@@ -87,14 +88,14 @@ class MuteService(val jda: JDA,
 
     private fun setupMutedRole(guild: Guild) {
         val possibleRole = guild.getRolesByName(roleName, true).firstOrNull()
-        val mutedRole = possibleRole ?: guild.controller.createRole().setName(roleName).complete()
+        val mutedRole = possibleRole ?: guild.createRole().setName(roleName).complete()
 
         muteMap[guild.id] = mutedRole.id
 
         guild.textChannels
                 .filter {
                     it.rolePermissionOverrides.none {
-                        it.role.name.toLowerCase() == roleName.toLowerCase()
+                        it.role!!.name.toLowerCase() == roleName.toLowerCase()
                     }
                 }
                 .forEach {
@@ -105,8 +106,8 @@ class MuteService(val jda: JDA,
     private fun handleLTSMutes() {
         getAllMutedMembers().forEach {
             val difference = timeToDifference(it.unmuteTime)
-            val guild = jda.getGuildById(it.guildId)
-            val member = guild.getMemberById(it.user)
+            val guild = discord.jda.getGuildById(it.guildId)
+            val member = guild!!.getMemberById(it.user)
 
             if (member != null) {
                 scheduleUnmute(member, difference)
@@ -153,7 +154,7 @@ class MuteService(val jda: JDA,
 
         if (checkMuteState(member) == MuteState.TrackedMute) {
             log.alert("${user.fullName()} :: ${user.asMention} rejoined with a mute withstanding")
-            guild.controller.addSingleRoleToMember(member, getMutedRole(guild)).queue()
+            guild.addRoleToMember(member, getMutedRole(guild)).queue()
         }
 
     }
