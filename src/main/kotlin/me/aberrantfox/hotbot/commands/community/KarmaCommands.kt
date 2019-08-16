@@ -1,8 +1,10 @@
 package me.aberrantfox.hotbot.commands.community
 
+import me.aberrantfox.hotbot.arguments.LowerUserArg
 import me.aberrantfox.hotbot.database.*
 import me.aberrantfox.kjdautils.api.dsl.*
 import me.aberrantfox.kjdautils.extensions.jda.fullName
+import me.aberrantfox.kjdautils.internal.command.arguments.IntegerArg
 import me.aberrantfox.kjdautils.internal.command.arguments.UserArg
 import net.dv8tion.jda.core.entities.User
 
@@ -32,6 +34,24 @@ fun karmaCommands() = commands {
                     }
                 }
             })
+        }
+    }
+
+    command("setkarma") {
+        description = "Set the karma of a user to a new amount"
+        expect(LowerUserArg, IntegerArg)
+
+        execute {
+            val user = it.args.component1() as User
+            val amount = it.args.component2() as Int
+
+            if(amount < 0) {
+                it.respond("Woah. this guy can't really be *that* bad.. right?")
+                return@execute
+            }
+
+            setKarma(user, amount)
+            it.respond("Updated the karma value for ${user.fullName()}.")
         }
     }
 }
