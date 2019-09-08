@@ -51,6 +51,7 @@ fun getAllMutedMembers() =
         mutedMembers
     }
 
+// Not to be used directly. Use the wrapper in MuteService
 fun isMemberMuted(user: String, guildId: String) =
         transaction {
             MutedMember.select {(MutedMember.member eq user) and (MutedMember.guildId eq guildId) }

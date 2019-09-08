@@ -2,7 +2,6 @@ package me.aberrantfox.hotbot.utility
 
 import me.aberrantfox.hotbot.database.deleteMutedMember
 import me.aberrantfox.hotbot.database.insertMutedMember
-import me.aberrantfox.hotbot.database.isMemberMuted
 import me.aberrantfox.hotbot.services.PermissionService
 import me.aberrantfox.hotbot.services.Configuration
 import me.aberrantfox.kjdautils.api.dsl.embed
@@ -29,21 +28,6 @@ fun permMuteMember(guild: Guild, user: User, reason: String, config: Configurati
     user.sendPrivateMessage((muteEmbed), log)
 }
 
-fun muteMember(guild: Guild, user: User, time: Long, reason: String, config: Configuration, moderator: User, log: BotLogger) {
-    guild.controller.addRolesToMember(guild.getMemberById(user.id),
-            guild.getRolesByName(config.security.mutedRole, true)).queue()
-    val timeString = time.convertToTimeString()
-    val timeToUnmute = futureTime(time)
-    val record = MuteRecord(timeToUnmute, reason, moderator.id, user.id,
-            guild.id)
-    val muteEmbed = buildMuteEmbed(user.asMention, timeString, reason)
-
-    user.sendPrivateMessage(muteEmbed, log)
-    insertMutedMember(record)
-    scheduleUnmute(guild, user, config, log, time, record)
-    notifyMuteAction(guild, user, timeString, reason, config)
-}
-
 fun muteVoiceChannel(guild: Guild, voiceChannel: VoiceChannel,
                      config: Configuration, manager: PermissionService) {
     voiceChannel.members
@@ -62,7 +46,7 @@ fun unmuteVoiceChannel(guild: Guild, voiceChannel: VoiceChannel, config: Configu
     notifyVoiceUnmuteAction(guild, voiceChannel, config)
 }
 
-private fun buildMuteEmbed(userMention: String, timeString: String, reason: String) = embed {
+fun buildMuteEmbed(userMention: String, timeString: String, reason: String) = embed {
     title("Mute")
     description("""
                     | $userMention, you have been muted. A muted user cannot speak/post in channels.
@@ -83,35 +67,6 @@ private fun buildMuteEmbed(userMention: String, timeString: String, reason: Stri
     setColor(Color.RED)
 }
 
-fun scheduleUnmute(guild: Guild, user: User, config: Configuration, log: BotLogger,
-                   time: Long, muteRecord: MuteRecord) {
-    if (time <= 0) {
-        removeMuteRole(guild, user, config, log, muteRecord)
-        return
-    }
-
-    Timer().schedule(object : TimerTask() {
-        override fun run() {
-            removeMuteRole(guild, user, config, log, muteRecord)
-        }
-    }, time)
-}
-
-fun removeMuteRole(guild: Guild, user: User, config: Configuration,
-                   log: BotLogger, record: MuteRecord) {
-
-    if(!isMemberMuted(user.id, guild.id)){
-        return
-    }
-
-    if (user.mutualGuilds.isEmpty()) {
-        deleteMutedMember(record)
-        return
-    }
-
-    deleteMutedMember(record)
-    removeMuteRole(guild, user, config, log)
-}
 
 fun removeMuteRole(guild: Guild, user: User, config: Configuration, log: BotLogger) {
 
@@ -124,15 +79,6 @@ fun removeMuteRole(guild: Guild, user: User, config: Configuration, log: BotLogg
             guild.getMemberById(user.id),
             guild.getRolesByName(config.security.mutedRole,
                     true)).queue()
-}
-
-fun handleReJoinMute(guild: Guild, user: User, config: Configuration, log: BotLogger) {
-    if (isMemberMuted(user.id, guild.id)) {
-        log.alert("${user.fullName()} :: ${user.asMention} rejoined with a mute withstanding")
-        guild.controller.addRolesToMember(guild.getMemberById(user.id),
-                guild.getRolesByName(config.security.mutedRole, true)).queue()
-    }
-
 }
 
 fun notifyMuteAction(guild: Guild, user: User, time: String, reason: String, config: Configuration) {
