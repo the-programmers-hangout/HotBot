@@ -126,7 +126,7 @@ fun strikeCommands(config: Configuration, log: BotLogger, muteService: MuteServi
                 infract(it.copy(args = newArgs), guild!!, config, log, muteService)
 
                 StrikeRequests.map.remove(user.id)
-                it.respond("Strike request on ${user.asMention} was accepted.")
+                it.respond("Strike request on ${user.descriptor()} was accepted.")
             }
         }
 
@@ -139,7 +139,7 @@ fun strikeCommands(config: Configuration, log: BotLogger, muteService: MuteServi
                 if( !(strikeAgainst(user, it)) ) return@execute
 
                 StrikeRequests.map.remove(user.id)
-                it.respond("Strike request on ${user.asMention} was declined.")
+                it.respond("Strike request on ${user.descriptor()} was declined.")
             }
         }
 
@@ -214,7 +214,7 @@ fun strikeCommands(config: Configuration, log: BotLogger, muteService: MuteServi
                 val amount = removeAllInfractions(user.id)
 
                 resetHistoryCount(user.id)
-                it.respond("Infractions for ${user.asMention} have been wiped. Total removed: $amount")
+                it.respond("Infractions for ${user.descriptor()} have been wiped. Total removed: $amount")
             }
         }
 

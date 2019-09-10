@@ -366,7 +366,7 @@ fun moderationCommands(kConfig: KConfiguration,
             val target = it.args.component1() as User
             val amount = removeAllNotesByUser(target.id)
 
-            it.respond("Notes for ${target.asMention} have been wiped. Total removed: $amount")
+            it.respond("Notes for ${target.descriptor()} have been wiped. Total removed: $amount")
         }
     }
 
