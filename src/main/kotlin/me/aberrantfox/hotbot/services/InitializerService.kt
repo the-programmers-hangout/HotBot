@@ -1,5 +1,6 @@
 package me.aberrantfox.hotbot.services
 
+import me.aberrantfox.hotbot.arguments.LowerMemberArg
 import me.aberrantfox.hotbot.arguments.LowerUserArg
 import me.aberrantfox.hotbot.commands.utility.*
 import me.aberrantfox.hotbot.database.*
@@ -17,6 +18,7 @@ class InitializerService(manager: PermissionService, container: CommandsContaine
     init {
         kjdaConfiguration.visibilityPredicate = { cmd, user, chan, _ -> manager.canUseCommand(user, cmd) && manager.canUseCommandInChannel(user, chan.id) }
         LowerUserArg.manager = manager
+        LowerMemberArg.manager = manager
         setupMacroCommands(container, manager)
         manager.defaultAndPrunePermissions(container)
 
