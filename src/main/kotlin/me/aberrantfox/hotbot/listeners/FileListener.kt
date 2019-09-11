@@ -48,7 +48,9 @@ class FileListener (val config: Configuration, val manager: PermissionService, v
     }
 
     private fun metadataOf(attachment: Message.Attachment): FileMetadata {
-        val type = Tika().detect(attachment.retrieveInputStream().get())
+        val stream = attachment.retrieveInputStream().get()
+        val type = Tika().detect(stream)
+        stream.close()
         return FileMetadata(attachment.fileName, type, commonAliasFor(type), isAllowed(type), onlineAlternativeFor(type))
     }
 
