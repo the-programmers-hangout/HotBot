@@ -20,7 +20,6 @@ class InitializerService(manager: PermissionService, container: CommandsContaine
         LowerUserArg.manager = manager
         LowerMemberArg.manager = manager
         setupMacroCommands(container, manager)
-        manager.defaultAndPrunePermissions(container)
 
         loadPersistence(discord.jda, logger, config)
         logger.info("Fully setup, now ready for use.")

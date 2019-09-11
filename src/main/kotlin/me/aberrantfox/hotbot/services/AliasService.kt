@@ -14,14 +14,6 @@ class AliasService(private val manager: PermissionService,
     private val aliases: HashMap<String, String> = hashMapOf()
     private val aliasesFile = File("config/aliases.json")
 
-    // HACK fix this when a new kutils version is released which allows getting the service object
-    companion object {
-        lateinit var instance: AliasService
-    }
-
-    init {
-        instance = this
-    }
 
     fun loadAliases() {
         val json = if (!aliasesFile.exists()) {

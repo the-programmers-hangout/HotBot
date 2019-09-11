@@ -25,5 +25,9 @@ private fun start(config: Configuration) = startBot(config.serverInformation.tok
         deleteMode = config.serverInformation.deletionMode
     }
 
-    AliasService.instance.loadAliases()
+    val aliasService = getInjectionObject(AliasService::class.java) as AliasService
+    aliasService.loadAliases()
+
+    val permissionService = getInjectionObject(PermissionService::class.java) as PermissionService
+    permissionService.defaultAndPrunePermissions(container)
 }

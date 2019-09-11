@@ -48,7 +48,6 @@ open class PermissionService(val discord: Discord, private val botConfig: Config
 
     fun defaultAndPrunePermissions(container: CommandsContainer): Job {
         val commandNames = container.commands.map { it.key.toLowerCase() }
-        print(commandNames)
 
         commandNames.filter { !(permissionsConfig.permissions.containsKey(it)) }
                 .forEach { permissionsConfig.permissions[it] = PermissionLevel.Administrator }
