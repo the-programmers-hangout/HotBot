@@ -5,8 +5,8 @@ import me.aberrantfox.hotbot.services.Messages
 import me.aberrantfox.kjdautils.api.dsl.CommandSet
 import me.aberrantfox.kjdautils.api.dsl.commands
 import me.aberrantfox.kjdautils.api.dsl.embed
-import me.aberrantfox.kjdautils.internal.command.arguments.ChoiceArg
-import me.aberrantfox.kjdautils.internal.command.arguments.SentenceArg
+import me.aberrantfox.kjdautils.internal.arguments.ChoiceArg
+import me.aberrantfox.kjdautils.internal.arguments.SentenceArg
 import java.awt.Color
 import kotlin.reflect.KMutableProperty
 import kotlin.reflect.full.createType

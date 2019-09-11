@@ -3,7 +3,7 @@ package me.aberrantfox.hotbot.commands.utility
 import me.aberrantfox.hotbot.services.AliasService
 import me.aberrantfox.kjdautils.api.dsl.CommandSet
 import me.aberrantfox.kjdautils.api.dsl.commands
-import me.aberrantfox.kjdautils.internal.command.arguments.WordArg
+import me.aberrantfox.kjdautils.internal.arguments.WordArg
 
 
 @CommandSet("utility")

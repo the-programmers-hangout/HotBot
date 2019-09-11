@@ -11,7 +11,7 @@ import me.aberrantfox.kjdautils.api.dsl.*
 import me.aberrantfox.kjdautils.extensions.jda.*
 import me.aberrantfox.kjdautils.extensions.stdlib.formatJdaDate
 import me.aberrantfox.kjdautils.extensions.stdlib.limit
-import me.aberrantfox.kjdautils.internal.command.arguments.*
+import me.aberrantfox.kjdautils.internal.arguments.*
 import me.aberrantfox.kjdautils.internal.logging.BotLogger
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.Member
@@ -103,7 +103,7 @@ fun strikeCommands(config: Configuration, log: BotLogger, muteService: MuteServi
                         ?: return@execute it.respond("That user does not currently have a strike request.")
 
                 it.respond(embed {
-                    title("${request.moderator.fullName()}'s request")
+                    title = "${request.moderator.fullName()}'s request"
 
                     field {
                         name = "Target"
@@ -295,17 +295,20 @@ private fun buildleaveHistoryEmbed(target: User, leaveHistory: List<LeaveHistory
     setColor(Color.MAGENTA)
 
     leaveHistory.forEachIndexed { num, record ->
-        ifield {
+        field {
             name = "Record"
+            inline = true
             value = "#${num + 1}"
         }
-        ifield {
+        field {
             name = "Joined"
+            inline = true
             value = record.joinDate.toString("yyyy-MM-dd")
         }
 
-        ifield {
+        field {
             name = if (record.ban) "Banned" else "Left"
+            inline = true
             value = record.leaveDate.toString("yyyy-MM-dd")
         }
     }
@@ -315,9 +318,9 @@ private fun buildHistoryEmbed(target: User, includeModerator: Boolean, records: 
                               historyCount: Int, notes: List<NoteRecord>?, it: CommandEvent, guild: Guild,
                               config: Configuration) =
         embed {
-            title("${target.fullName()}'s Record")
-            setColor(Color.MAGENTA)
-            setThumbnail(target.effectiveAvatarUrl)
+            title = "${target.fullName()}'s Record"
+            color = Color.MAGENTA
+            thumbnail = target.effectiveAvatarUrl
 
             field {
                 name = ""
@@ -356,7 +359,7 @@ private fun buildHistoryEmbed(target: User, includeModerator: Boolean, records: 
                     }
                 }
 
-                produceFields("Infraction Reasoning Given", record.reason).forEach { addField(it) }
+                produceFields("Infraction Reasoning Given", record.reason).forEach { addField(it.name, it.value, it.isInline) }
             }
 
             if (records.isEmpty()) {
@@ -394,7 +397,7 @@ private fun buildHistoryEmbed(target: User, includeModerator: Boolean, records: 
                     inline = false
                 }
 
-                produceFields("NoteMessage", note.note).forEach { addField(it) }
+                produceFields("NoteMessage", note.note).forEach { addField(it.name, it.value, it.isInline) }
             }
 
         }
@@ -405,22 +408,25 @@ fun produceFields(title: String, message: String) = message.chunked(1024).mapInd
 
 private fun buildInfractionEmbed(member: Member, reason: String, strikeQuantity: Int, punishmentLevel: Int, config: Configuration) =
         embed {
-            title("Infraction")
-            description("${member.user.name}, you have been infracted.\nInfractions are formal warnings from staff members on TPH.\n" +
-                        "If you think your infraction is undoubtedly unjustified, please **do not** post about it in a public channel but take it up with an administrator.")
+            title = "Infraction"
+            description = "${member.user.name}, you have been infracted.\nInfractions are formal warnings from staff members on TPH.\n" +
+                          "If you think your infraction is undoubtedly unjustified, please **do not** post about it in a public channel but take it up with an administrator."
 
-            ifield {
+            field {
                 name = "Strike Quantity"
+                inline = true
                 value = "$strikeQuantity"
             }
 
-            ifield {
+            field {
                 name = "Strike Count"
+                inline = true
                 value = "${getMaxStrikes(member.id)} / ${config.security.strikeCeil}"
             }
 
-            ifield {
+            field {
                 name = "Punishment"
+                inline = true
                 value = config.security.infractionActionMap[punishmentLevel]?.toString() ?: "None"
             }
 

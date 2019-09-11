@@ -9,9 +9,9 @@ import me.aberrantfox.hotbot.services.configPath
 import me.aberrantfox.hotbot.utility.timeToDifference
 import me.aberrantfox.kjdautils.api.dsl.*
 import me.aberrantfox.kjdautils.internal.command.CommandRecommender
-import me.aberrantfox.kjdautils.internal.command.arguments.MultipleArg
-import me.aberrantfox.kjdautils.internal.command.arguments.SentenceArg
-import me.aberrantfox.kjdautils.internal.command.arguments.WordArg
+import me.aberrantfox.kjdautils.internal.arguments.MultipleArg
+import me.aberrantfox.kjdautils.internal.arguments.SentenceArg
+import me.aberrantfox.kjdautils.internal.arguments.WordArg
 import net.dv8tion.jda.api.entities.MessageChannel
 import org.joda.time.DateTime
 import java.awt.Color
@@ -185,9 +185,9 @@ fun removeMacro(macro: Macro, container: CommandsContainer, manager: PermissionS
 
 private fun buildMacrosEmbed(groupedMacros: Map<String, Collection<Macro>>) =
         embed {
-            title("Currently Available Macros")
+            title = "Currently Available Macros"
 
-            setColor(Color.GREEN)
+            color = Color.GREEN
 
             groupedMacros.toList().sortedByDescending { it.second.size }.forEach { (categoryName, macros) ->
                 field {

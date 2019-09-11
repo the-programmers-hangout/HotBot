@@ -5,7 +5,7 @@ import me.aberrantfox.kjdautils.api.dsl.CommandEvent
 import me.aberrantfox.kjdautils.internal.command.ArgumentResult
 import me.aberrantfox.kjdautils.internal.command.ArgumentType
 import me.aberrantfox.kjdautils.internal.command.ConsumptionType
-import me.aberrantfox.kjdautils.internal.command.arguments.MemberArg
+import me.aberrantfox.kjdautils.internal.arguments.MemberArg
 import me.aberrantfox.kjdautils.internal.command.tryRetrieveSnowflake
 import net.dv8tion.jda.api.entities.Member
 

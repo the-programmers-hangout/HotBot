@@ -4,8 +4,8 @@ import me.aberrantfox.hotbot.arguments.LowerUserArg
 import me.aberrantfox.hotbot.database.*
 import me.aberrantfox.kjdautils.api.dsl.*
 import me.aberrantfox.kjdautils.extensions.jda.fullName
-import me.aberrantfox.kjdautils.internal.command.arguments.IntegerArg
-import me.aberrantfox.kjdautils.internal.command.arguments.UserArg
+import me.aberrantfox.kjdautils.internal.arguments.IntegerArg
+import me.aberrantfox.kjdautils.internal.arguments.UserArg
 import net.dv8tion.jda.api.entities.User
 
 @CommandSet("karmacmds")
@@ -24,7 +24,7 @@ fun karmaCommands() = commands {
         description = "View the users with the most Karma"
         execute {
             it.respond(embed {
-                title("Top 10 most helpful people")
+                title = "Top 10 most helpful people"
 
                 leaderBoard().forEachIndexed{ index, record ->
                     field {

@@ -11,9 +11,9 @@ import me.aberrantfox.kjdautils.api.dsl.CommandSet
 import me.aberrantfox.kjdautils.api.dsl.commands
 import me.aberrantfox.kjdautils.api.dsl.embed
 import me.aberrantfox.kjdautils.extensions.stdlib.sanitiseMentions
-import me.aberrantfox.kjdautils.internal.command.arguments.CommandArg
-import me.aberrantfox.kjdautils.internal.command.arguments.RoleArg
-import me.aberrantfox.kjdautils.internal.command.arguments.TextChannelArg
+import me.aberrantfox.kjdautils.internal.arguments.CommandArg
+import me.aberrantfox.kjdautils.internal.arguments.RoleArg
+import me.aberrantfox.kjdautils.internal.arguments.TextChannelArg
 import net.dv8tion.jda.api.entities.Role
 import net.dv8tion.jda.api.entities.TextChannel
 import java.awt.Color
@@ -90,9 +90,9 @@ fun permissionCommands(manager: PermissionService, config: Configuration) =
                 description = "View all of the commands by category, listed with their associated permission level."
                 execute {
                     it.respond(embed {
-                        title("Command Permissions")
-                        description("Below you can see all of the different command categories, along with all of their " +
-                                "respective commands and the associated permission required to use those commands.")
+                        title = "Command Permissions"
+                        description = "Below you can see all of the different command categories, along with all of their " +
+                                "respective commands and the associated permission required to use those commands."
 
 
                         val grouped = it.container.commands.values
@@ -128,9 +128,9 @@ fun permissionCommands(manager: PermissionService, config: Configuration) =
                             .sortedByDescending { it.second.size }
 
                     it.respond(embed {
-                        title("Commands available to you")
-                        setColor(Color.green)
-                        setThumbnail(it.author.effectiveAvatarUrl)
+                        title = "Commands available to you"
+                        color = Color.green
+                        thumbnail = it.author.effectiveAvatarUrl
                         available.forEach { (category, cmds) ->
                             field {
                                 name = category
@@ -160,8 +160,8 @@ fun permissionCommands(manager: PermissionService, config: Configuration) =
                 requiresGuild = true
                 execute {
                     it.respond(embed {
-                        title("Role Assignments")
-                        description("Below you can see what roles have been assigned what permission levels")
+                        title = "Role Assignments"
+                        description = "Below you can see what roles have been assigned what permission levels"
 
                         val assignments = manager.roleAssignments()
 
@@ -216,16 +216,19 @@ fun permissionCommands(manager: PermissionService, config: Configuration) =
                         setTitle("Channel Ignore Levels")
                         setColor(Color.BLUE)
                         map.forEach {
-                            ifield {
+                            field {
                                 name = "Channel"
+                                inline = true
                                 value = "<#${it.key}>"
                             }
-                            ifield {
+                            field {
                                 name = "Command"
+                                inline = true
                                 value = it.value.command.toString()
                             }
-                            ifield {
+                            field {
                                 name = "Mention"
+                                inline = true
                                 value = it.value.mention.toString()
                             }
                         }

@@ -4,7 +4,7 @@ import me.aberrantfox.hotbot.listeners.UserID
 import me.aberrantfox.hotbot.services.Configuration
 import me.aberrantfox.kjdautils.api.dsl.*
 import me.aberrantfox.kjdautils.extensions.jda.fullName
-import me.aberrantfox.kjdautils.internal.command.arguments.*
+import me.aberrantfox.kjdautils.internal.arguments.*
 import java.awt.Color
 
 data class PollContainer(val question: String, val answers: List<String>, val creator: UserID, val channel: String)
@@ -36,8 +36,8 @@ fun dataCommands(config: Configuration) = commands {
             val answers = splitArgs.subList(1, splitArgs.size)
 
             it.channel.sendMessage(embed {
-                title("${it.author.fullName()}'s poll")
-                description("$question - react with your answer on this embed to submit a response.")
+                title = "${it.author.fullName()}'s poll"
+                description = "$question - react with your answer on this embed to submit a response."
                 setColor(Color.CYAN)
                 answers.forEachIndexed { i, e ->
                     field {

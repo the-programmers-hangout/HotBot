@@ -3,7 +3,7 @@ package me.aberrantfox.hotbot.commands.utility
 import me.aberrantfox.hotbot.utility.randomInt
 import me.aberrantfox.kjdautils.api.dsl.*
 import me.aberrantfox.kjdautils.extensions.stdlib.convertToTimeString
-import me.aberrantfox.kjdautils.internal.command.arguments.*
+import me.aberrantfox.kjdautils.internal.arguments.*
 import me.aberrantfox.kjdautils.internal.logging.BotLogger
 import net.dv8tion.jda.api.entities.*
 import net.dv8tion.jda.api.requests.RestAction
@@ -149,8 +149,8 @@ private fun retrievePrize(message: Message): String {
 
 private fun buildGiveawayEmbed(timeMilliSecs: Long, prize: String) =
         embed {
-            title(giveawayEmbedTitle)
-            setColor(Color.BLUE)
+            title = giveawayEmbedTitle
+            color = Color.BLUE
             field {
                 name = "Giveaway event started."
                 value = "React to this with \uD83C\uDF89 for a chance to win "
@@ -172,8 +172,8 @@ private fun buildGiveawayEmbed(timeMilliSecs: Long, prize: String) =
 
 private fun buildWinnerEmbed(winner: User?, prize: String) =
         embed {
-            title(giveawayEmbedTitle)
-            description("Thank you for participating, better luck next time!")
+            title = giveawayEmbedTitle
+            description = "Thank you for participating, better luck next time!"
             setColor(Color.BLACK)
 
             field {

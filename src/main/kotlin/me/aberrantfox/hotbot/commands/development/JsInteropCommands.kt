@@ -2,7 +2,7 @@ package me.aberrantfox.hotbot.commands.development
 
 import me.aberrantfox.hotbot.services.ScriptEngineService
 import me.aberrantfox.kjdautils.api.dsl.*
-import me.aberrantfox.kjdautils.internal.command.arguments.SentenceArg
+import me.aberrantfox.kjdautils.internal.arguments.SentenceArg
 import javax.script.Invocable
 
 private const val functionName = "functionScope"

@@ -4,7 +4,7 @@ import me.aberrantfox.hotbot.listeners.antispam.RecentInvites
 import me.aberrantfox.kjdautils.api.dsl.CommandSet
 import me.aberrantfox.kjdautils.api.dsl.commands
 import me.aberrantfox.kjdautils.extensions.jda.fullName
-import me.aberrantfox.kjdautils.internal.command.arguments.WordArg
+import me.aberrantfox.kjdautils.internal.arguments.WordArg
 import me.aberrantfox.kjdautils.internal.logging.BotLogger
 
 @CommandSet("invite")

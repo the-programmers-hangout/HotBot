@@ -7,8 +7,8 @@ import me.aberrantfox.kjdautils.api.dsl.CommandSet
 import me.aberrantfox.kjdautils.api.dsl.commands
 import me.aberrantfox.kjdautils.extensions.jda.fullName
 import me.aberrantfox.kjdautils.extensions.jda.toMember
-import me.aberrantfox.kjdautils.internal.command.arguments.IntegerArg
-import me.aberrantfox.kjdautils.internal.command.arguments.UserArg
+import me.aberrantfox.kjdautils.internal.arguments.IntegerArg
+import me.aberrantfox.kjdautils.internal.arguments.UserArg
 import me.aberrantfox.kjdautils.internal.logging.BotLogger
 import net.dv8tion.jda.api.entities.User
 

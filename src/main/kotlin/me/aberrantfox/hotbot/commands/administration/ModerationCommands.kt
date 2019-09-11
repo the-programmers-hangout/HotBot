@@ -9,8 +9,8 @@ import me.aberrantfox.hotbot.utility.unmuteVoiceChannel
 import me.aberrantfox.kjdautils.api.dsl.*
 import me.aberrantfox.kjdautils.extensions.jda.*
 import me.aberrantfox.kjdautils.extensions.stdlib.randomListItem
-import me.aberrantfox.kjdautils.internal.command.arguments.*
-import me.aberrantfox.kjdautils.internal.command.arguments.MultipleArg
+import me.aberrantfox.kjdautils.internal.arguments.*
+import me.aberrantfox.kjdautils.internal.arguments.MultipleArg
 import me.aberrantfox.kjdautils.internal.logging.BotLogger
 import net.dv8tion.jda.api.entities.*
 import java.awt.Color
@@ -467,15 +467,17 @@ private fun handleResponse(past: List<Message>, channel: TextChannel, targets: L
 
 private fun buildResponseEmbed(orig: MessageChannel, sourceMod: String, messages: List<Message>) =
         embed {
-            title("__Moved Messages__")
+            title = "__Moved Messages__"
 
-            ifield {
+            field {
                 name = "Source Channel"
+                inline = true
                 value = "<#${orig.id}>"
             }
 
-            ifield {
+            field {
                 name = "By Staff"
+                inline = true
                 value = sourceMod
             }
 

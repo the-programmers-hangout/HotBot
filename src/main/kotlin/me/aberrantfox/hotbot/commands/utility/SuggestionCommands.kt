@@ -5,7 +5,7 @@ import me.aberrantfox.hotbot.services.*
 import me.aberrantfox.hotbot.utility.dataclasses.*
 import me.aberrantfox.kjdautils.api.dsl.*
 import me.aberrantfox.kjdautils.extensions.jda.*
-import me.aberrantfox.kjdautils.internal.command.arguments.*
+import me.aberrantfox.kjdautils.internal.arguments.*
 import me.aberrantfox.kjdautils.internal.logging.BotLogger
 import net.dv8tion.jda.api.*
 import net.dv8tion.jda.api.entities.*
@@ -173,21 +173,24 @@ private fun inputToStatus(input: String): SuggestionStatus = when(input.toLowerC
 }
 private fun buildSuggestionUpdateEmbed(suggestion: SuggestionRecord, response: String, newStatus: SuggestionStatus) =
         embed {
-            title("Suggestion Status Update")
-            description("A suggestion that you submitted has changed status.")
+            title=  "Suggestion Status Update"
+            description = "A suggestion that you submitted has changed status."
 
-            ifield {
+            field {
                 name = "ID"
+                inline = true
                 value = suggestion.messageID
             }
 
-            ifield {
+            field {
                 name = "Old Status"
+                inline = true
                 value = suggestion.status.toString()
             }
 
-            ifield {
+            field {
                 name = "New Status"
+                inline = true
                 value = newStatus.toString()
             }
 

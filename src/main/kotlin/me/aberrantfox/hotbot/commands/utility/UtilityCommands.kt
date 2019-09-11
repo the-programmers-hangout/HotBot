@@ -11,8 +11,9 @@ import me.aberrantfox.kjdautils.api.dsl.*
 import me.aberrantfox.kjdautils.extensions.jda.fullName
 import me.aberrantfox.kjdautils.extensions.jda.toMember
 import me.aberrantfox.kjdautils.extensions.stdlib.sanitiseMentions
-import me.aberrantfox.kjdautils.internal.command.arguments.*
+import me.aberrantfox.kjdautils.internal.arguments.*
 import me.aberrantfox.kjdautils.internal.logging.BotLogger
+import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.OnlineStatus
 import net.dv8tion.jda.api.entities.*
 import org.joda.time.DateTime
@@ -54,10 +55,10 @@ fun utilCommands(messageService: MessageService, manager: PermissionService, con
         description = "Display the bot information."
         execute {
             it.respond(embed {
-                title(it.discord.jda.selfUser.fullName())
-                description(messageService.messages.botDescription)
-                setColor(Color.red)
-                setThumbnail(it.discord.jda.selfUser.effectiveAvatarUrl)
+                title = it.discord.jda.selfUser.fullName()
+                description = messageService.messages.botDescription
+                color = Color.red
+                thumbnail = it.discord.jda.selfUser.effectiveAvatarUrl
 
                 field {
                     name = "Creator"
@@ -196,10 +197,10 @@ fun utilCommands(messageService: MessageService, manager: PermissionService, con
             val colour = it.args.component1() as Int
             val hex = colour.toString(16).padStart(6, '0')
             val response = embed {
-                setColor(colour)
-                setTitle("Colour")
-                setDescription("#$hex")
-                setThumbnail("http://via.placeholder.com/40/$hex?text=%20&")
+                color = Color.decode("#$hex")
+                title ="Colour"
+                description = "#$hex"
+                thumbnail = "http://via.placeholder.com/40/$hex?text=%20&"
             }
             it.respond(response)
         }
@@ -212,12 +213,11 @@ fun utilCommands(messageService: MessageService, manager: PermissionService, con
             val user = it.args.component1() as User
             val reverseSearchUrl = "<https://www.google.com/searchbyimage?&image_url=${user.effectiveAvatarUrl}>"
 
-            val embed = embed {
-                setTitle("${user.name}'s pfp")
-                setColor(Color.BLUE)
-                setImage(user.effectiveAvatarUrl)
-                setDescription("[Reverse Search]($reverseSearchUrl)")
-            }
+            val embed = EmbedBuilder(embed {
+                title = "${user.name}'s pfp"
+                color = Color.BLUE
+                description = "[Reverse Search]($reverseSearchUrl)"
+            }) .setImage(user.effectiveAvatarUrl).build()
 
             it.respond(embed)
         }
@@ -280,42 +280,47 @@ fun utilCommands(messageService: MessageService, manager: PermissionService, con
 }
 
 fun produceServerInfoEmbed(guild: Guild, messageService: MessageService) =
-    embed {
-        title(guild.name)
-        setColor(Color.MAGENTA)
-        description(messageService.messages.serverDescription)
-        setFooter("Guild creation date: ${guild.timeCreated.format(DateTimeFormatter.RFC_1123_DATE_TIME)}", "http://i.imgur.com/iwwEprG.png")
-        setThumbnail("http://i.imgur.com/DFoaG7k.png")
+    EmbedBuilder(embed {
+        title = guild.name
+        color = Color.MAGENTA
+        description = messageService.messages.serverDescription
+        thumbnail = "http://i.imgur.com/DFoaG7k.png"
 
         field {
             name = "Users"
             value = "${guild.members.filter { it.onlineStatus != OnlineStatus.OFFLINE }.size}/${guild.members.size}"
         }
 
-        ifield {
+        field {
             name = "Total Roles"
+            inline = true
             value = guild.roles.size.toString()
         }
 
         guild.owner?.let {
-            ifield {
+            field {
                 name = "Owner"
+                inline = true
                 value = it.fullName()
             }
         }
 
-        ifield {
+        field {
             name = "Region"
+            inline = true
             value = guild.region.toString()
         }
 
-        ifield {
+        field {
             name = "Text Channels"
+            inline = true
             value = guild.textChannelCache.size().toString()
         }
 
-        ifield {
+        field {
             name = "Voice Channels"
+            inline = true
             value = guild.voiceChannels.size.toString()
         }
-    }
+    }).setFooter("Guild creation date: ${guild.timeCreated.format(DateTimeFormatter.RFC_1123_DATE_TIME)}", "http://i.imgur.com/iwwEprG.png")
+      .build()

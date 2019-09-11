@@ -5,8 +5,8 @@ import me.aberrantfox.hotbot.utility.randomInt
 import me.aberrantfox.kjdautils.api.dsl.CommandSet
 import me.aberrantfox.kjdautils.api.dsl.arg
 import me.aberrantfox.kjdautils.api.dsl.commands
-import me.aberrantfox.kjdautils.internal.command.arguments.IntegerArg
-import me.aberrantfox.kjdautils.internal.command.arguments.SentenceArg
+import me.aberrantfox.kjdautils.internal.arguments.IntegerArg
+import me.aberrantfox.kjdautils.internal.arguments.SentenceArg
 import java.net.URLEncoder
 
 @CommandSet("fun")

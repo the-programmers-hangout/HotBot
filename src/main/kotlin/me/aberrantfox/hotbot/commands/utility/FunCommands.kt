@@ -2,7 +2,7 @@ package me.aberrantfox.hotbot.commands.utility
 
 import me.aberrantfox.hotbot.services.Configuration
 import me.aberrantfox.kjdautils.api.dsl.*
-import me.aberrantfox.kjdautils.internal.command.arguments.*
+import me.aberrantfox.kjdautils.internal.arguments.*
 import org.jsoup.Jsoup
 import java.net.URLEncoder
 import java.util.Random

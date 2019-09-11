@@ -28,9 +28,9 @@ class MessageDeleteListener(private val logger: BotLogger, val manager: Permissi
 
         if(found != null) {
             logger.history(embed {
-                title("Message Edited")
-                description("${event.author.asMention}(${event.author.fullName()}) in ${event.channel.asMention}")
-                setColor(Color.ORANGE)
+                title = "Message Edited"
+                description = "${event.author.asMention}(${event.author.fullName()}) in ${event.channel.asMention}"
+                color = Color.ORANGE
 
                 field {
                     name = "Old"
@@ -65,9 +65,9 @@ class MessageDeleteListener(private val logger: BotLogger, val manager: Permissi
 
         if(found != null) {
             logger.history(embed {
-                title("Message Deleted")
-                description("${found.author.asMention}(${found.author.fullName()}) in ${event.channel.asMention}")
-                setColor(Color.ORANGE)
+                title = "Message Deleted"
+                description = "${found.author.asMention}(${found.author.fullName()}) in ${event.channel.asMention}"
+                color = Color.ORANGE
 
                 field {
                     name = "Deleted Message"

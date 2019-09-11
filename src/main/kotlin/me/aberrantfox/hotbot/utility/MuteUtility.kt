@@ -46,11 +46,11 @@ fun unmuteVoiceChannel(guild: Guild, voiceChannel: VoiceChannel, config: Configu
 }
 
 fun buildMuteEmbed(userMention: String, timeString: String, reason: String) = embed {
-    title("Mute")
-    description("""
+    title = "Mute"
+    description = """
                     | $userMention, you have been muted. A muted user cannot speak/post in channels.
                     | If you believe this to be in error, please contact a staff member.
-                """.trimMargin())
+                """.trimMargin()
 
     field {
         name = "Length"

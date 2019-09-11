@@ -3,7 +3,7 @@ package me.aberrantfox.hotbot.commands.administration
 import me.aberrantfox.hotbot.listeners.antispam.NewPlayers
 import me.aberrantfox.kjdautils.api.dsl.CommandSet
 import me.aberrantfox.kjdautils.api.dsl.commands
-import me.aberrantfox.kjdautils.internal.command.arguments.ChoiceArg
+import me.aberrantfox.kjdautils.internal.arguments.ChoiceArg
 
 enum class SecurityLevel(val matchCount: Int, val waitPeriod: Int, val maxAmount: Int) {
     Normal(6, 10, 5), Elevated(6, 5, 5), High(4, 5, 4), Max(3, 3, 3)
