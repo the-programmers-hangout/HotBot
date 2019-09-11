@@ -27,7 +27,7 @@ open class LowerMemberArg(override val name : String = "Lower Ranked Member") : 
                 }
 
         return when {
-            manager.compareUsers(member.user, event.author) >= 0 -> ArgumentResult.Error("You don't have the permission to use this command on the target member.")
+            Companion.manager.compareUsers(member.user, event.author) >= 0 -> ArgumentResult.Error("You don't have the permission to use this command on the target member.")
             else -> ArgumentResult.Single(member)
         }
     }
