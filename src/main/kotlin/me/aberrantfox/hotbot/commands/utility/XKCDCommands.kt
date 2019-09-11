@@ -40,16 +40,17 @@ fun xkcdCommands() = commands {
         expect(SentenceArg("Query"))
         execute {
             val what = it.args.component1() as String
-            it.respond(produceURL(search(what)))
+            val comicNumber = search(what) ?: return@execute it.respond("Currently unable to query for comics.")
+            it.respond(produceURL(comicNumber))
         }
     }
 }
 
-private fun search(what: String): Int {
+private fun search(what: String): Int? {
     val comicNumberParseRegex = "(?:\\S+\\s+){2}(\\S+)".toRegex()
     return comicNumberParseRegex.find(
             get("https://relevantxkcd.appspot.com/process?action=xkcd&query=" + URLEncoder.encode(
-                    what, "UTF-8")).text)!!.groups[1]?.value!!.toInt()
+                    what, "UTF-8")).text)?.groups?.get(1)?.value?.toInt()
 }
 
 private fun getAmount() =

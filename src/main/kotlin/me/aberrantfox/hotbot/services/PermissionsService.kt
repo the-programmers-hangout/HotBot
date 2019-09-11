@@ -117,7 +117,7 @@ open class PermissionService(val discord: Discord, private val botConfig: Config
     private fun getPermissionLevel(user: User): PermissionLevel {
         if (botConfig.serverInformation.ownerID == user.id) return PermissionLevel.Owner
 
-        val member = tryRetrieveSnowflake(discord.jda) { discord.jda.getGuildById(botConfig.serverInformation.guildid)!!.getMember(user) } as Member?
+        val member = tryRetrieveSnowflake(discord.jda) { discord.jda.getGuildById(botConfig.serverInformation.guildid)?.getMember(user) } as Member?
                 ?: return PermissionLevel.Everyone
 
         if (member.roles.isEmpty()) return PermissionLevel.Everyone

@@ -9,6 +9,7 @@ import me.aberrantfox.hotbot.utility.*
 import me.aberrantfox.kjdautils.api.annotation.Service
 import me.aberrantfox.kjdautils.discord.Discord
 import me.aberrantfox.kjdautils.extensions.jda.fullName
+import me.aberrantfox.kjdautils.extensions.jda.getRoleByName
 import me.aberrantfox.kjdautils.extensions.jda.sendPrivateMessage
 import me.aberrantfox.kjdautils.extensions.stdlib.convertToTimeString
 import me.aberrantfox.kjdautils.internal.logging.BotLogger
@@ -87,15 +88,15 @@ class MuteService(val discord: Discord,
     private fun toKey(member: Member) = member.guild.id to member.user.id
 
     private fun setupMutedRole(guild: Guild) {
-        val possibleRole = guild.getRolesByName(roleName, true).firstOrNull()
+        val possibleRole = guild.getRoleByName(roleName, true)
         val mutedRole = possibleRole ?: guild.createRole().setName(roleName).complete()
 
         muteMap[guild.id] = mutedRole.id
 
         guild.textChannels
                 .filter {
-                    it.rolePermissionOverrides.none {
-                        it.role!!.name.toLowerCase() == roleName.toLowerCase()
+                    it.rolePermissionOverrides.none { override ->
+                        override.role == mutedRole
                     }
                 }
                 .forEach {
@@ -107,7 +108,12 @@ class MuteService(val discord: Discord,
         getAllMutedMembers().forEach {
             val difference = timeToDifference(it.unmuteTime)
             val guild = discord.jda.getGuildById(it.guildId)
-            val member = guild!!.getMemberById(it.user)
+            if (guild == null) {
+                log.error("Couldn't re-add mute to user ${it.user}, because the retrieval of guild ${it.guildId} failed.")
+                return@forEach
+            }
+
+            val member = guild.getMemberById(it.user)
 
             if (member != null) {
                 scheduleUnmute(member, difference)
@@ -139,7 +145,7 @@ class MuteService(val discord: Discord,
         val user = member.user
         val guild = member.guild
         if (user.mutualGuilds.isNotEmpty()) {
-            removeMuteRole(guild, user, config, log)
+            removeMuteRole(member, config, log)
         }
 
         deleteMutedMember(user.id, guild.id)

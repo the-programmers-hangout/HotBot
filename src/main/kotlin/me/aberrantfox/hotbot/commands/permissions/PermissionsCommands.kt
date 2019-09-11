@@ -44,9 +44,9 @@ fun permissionCommands(manager: PermissionService, config: Configuration) =
 
             command("roleids") {
                 description = "Display each role in the server with its corresponding ID"
+                requiresGuild = true
                 execute {
-                    val guild = it.discord.jda.getGuildById(config.serverInformation.guildid)
-                    it.respond(guild!!.roles.joinToString("\n") { role -> "${role.name} :: ${role.id}" })
+                    it.respond(it.guild!!.roles.joinToString("\n") { role -> "${role.name} :: ${role.id}" })
                 }
             }
 
@@ -157,6 +157,7 @@ fun permissionCommands(manager: PermissionService, config: Configuration) =
 
             command("viewRoleAssignments") {
                 description = "View the permission levels any roles have been assigned."
+                requiresGuild = true
                 execute {
                     it.respond(embed {
                         title("Role Assignments")
@@ -164,13 +165,11 @@ fun permissionCommands(manager: PermissionService, config: Configuration) =
 
                         val assignments = manager.roleAssignments()
 
-                        val guild = it.discord.jda.getGuildById(config.serverInformation.guildid)
-
                         val assignmentsText = if (assignments.isEmpty()) {
                             "None"
                         } else {
                             assignments.joinToString("\n") { pair ->
-                                val roleName = guild!!.getRoleById(pair.key)!!.name
+                                val roleName = it.guild!!.getRoleById(pair.key)?.name ?: "${pair.key} (couldn't retrieve)"
                                 "$roleName :: PermissionLevel.${pair.value}"
                             }
                         }

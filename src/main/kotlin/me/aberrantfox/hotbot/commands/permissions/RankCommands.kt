@@ -1,18 +1,21 @@
 package me.aberrantfox.hotbot.commands.permissions
 
 import com.google.gson.Gson
+import me.aberrantfox.hotbot.arguments.LowerMemberArg
 import me.aberrantfox.hotbot.arguments.LowerUserArg
 import me.aberrantfox.hotbot.services.Configuration
 import me.aberrantfox.hotbot.services.configPath
-import me.aberrantfox.kjdautils.api.dsl.CommandEvent
 import me.aberrantfox.kjdautils.api.dsl.CommandSet
 import me.aberrantfox.kjdautils.api.dsl.commands
 import me.aberrantfox.kjdautils.extensions.jda.fullName
+import me.aberrantfox.kjdautils.extensions.jda.toMember
 import me.aberrantfox.kjdautils.internal.command.arguments.RoleArg
 import me.aberrantfox.kjdautils.internal.command.arguments.WordArg
 import net.dv8tion.jda.api.entities.Guild
+import net.dv8tion.jda.api.entities.Member
 import net.dv8tion.jda.api.entities.Role
 import net.dv8tion.jda.api.entities.User
+import net.dv8tion.jda.api.exceptions.PermissionException
 import java.io.File
 
 private val rankConfigPath = configPath("rankconfig.json")
@@ -60,21 +63,29 @@ object RankContainer {
 fun rankCommands(config: Configuration) = commands {
     command("grant") {
         description = "Grant a role to a user."
-        expect(RoleArg, LowerUserArg)
+        requiresGuild = true
+        expect(RoleArg, LowerMemberArg)
         execute {
-            val guild = it.discord.jda.getGuildById(config.serverInformation.guildid)
+            val role = it.args.component1() as Role
+            val member = it.args.component2() as Member
 
-            handleGrant(it, guild!!, true)
+            val result = handleGrant(role, member, true)
+
+            it.respond(result)
         }
     }
 
     command("revoke") {
         description = "Revoke a role from a user"
-        expect(RoleArg, LowerUserArg)
+        requiresGuild = true
+        expect(RoleArg, LowerMemberArg)
         execute {
-            val guild = it.discord.jda.getGuildById(config.serverInformation.guildid)
+            val role = it.args.component1() as Role
+            val member = it.args.component2() as Member
 
-            handleGrant(it, guild!!, false)
+            val result = handleGrant(role, member, false)
+
+            it.respond(result)
         }
     }
 
@@ -119,22 +130,23 @@ fun rankCommands(config: Configuration) = commands {
     }
 }
 
-private fun handleGrant(event: CommandEvent, guild: Guild, grant: Boolean) {
-    val role = event.args.component1() as Role
-    val target = event.args.component2() as User
-    val member = guild.getMember(target)
+private fun handleGrant(role: Role, member: Member, grant: Boolean): String {
+    val guild = member.guild
     val roleName = role.name
 
     if (!RankContainer.canUse(roleName)) {
-        event.respond("That role cannot be granted or revoked.")
-        return
+        return "That role cannot be granted or revoked."
     }
 
-    if (grant) {
-        guild.addRoleToMember(member!!, role).queue()
-        event.respond("$roleName assigned to ${target.fullName()}")
-    } else {
-        guild.removeRoleFromMember(member!!, role).queue()
-        event.respond("$roleName removed from ${target.fullName()}")
+    try {
+        if (grant) {
+            guild.addRoleToMember(member, role).queue()
+        } else {
+            guild.removeRoleFromMember(member, role).queue()
+        }
+    } catch (ex: PermissionException) {
+        return "Bot does not have permission to grant/revoke this role on this member!"
     }
+
+    return "$roleName ${if (grant) "assigned to" else "removed from"} ${member.fullName()}"
 }

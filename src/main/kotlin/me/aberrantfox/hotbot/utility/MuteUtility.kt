@@ -6,6 +6,7 @@ import me.aberrantfox.hotbot.services.PermissionService
 import me.aberrantfox.hotbot.services.Configuration
 import me.aberrantfox.kjdautils.api.dsl.embed
 import me.aberrantfox.kjdautils.extensions.jda.fullName
+import me.aberrantfox.kjdautils.extensions.jda.getRoleByName
 import me.aberrantfox.kjdautils.extensions.jda.sendPrivateMessage
 import me.aberrantfox.kjdautils.extensions.stdlib.convertToTimeString
 import me.aberrantfox.kjdautils.internal.logging.BotLogger
@@ -17,12 +18,13 @@ data class MuteRecord(val unmuteTime: Long, val reason: String,
                       val moderator: String, val user: String,
                       val guildId: String)
 
-fun permMuteMember(guild: Guild, user: User, reason: String, config: Configuration, log: BotLogger) {
+fun permMuteMember(member: Member, reason: String, config: Configuration, log: BotLogger) {
+    val guild = member.guild
     val mutedRole = guild.getRolesByName(config.security.mutedRole, true).firstOrNull()!!
-    guild.addRoleToMember(guild.getMemberById(user.id)!!, mutedRole).queue()
+    guild.addRoleToMember(member, mutedRole).queue()
 
-    val muteEmbed = buildMuteEmbed(user.asMention, "Indefinite", reason)
-    user.sendPrivateMessage((muteEmbed), log)
+    val muteEmbed = buildMuteEmbed(member.asMention, "Indefinite", reason)
+    member.user.sendPrivateMessage((muteEmbed), log)
 }
 
 fun muteVoiceChannel(guild: Guild, voiceChannel: VoiceChannel,
@@ -65,15 +67,19 @@ fun buildMuteEmbed(userMention: String, timeString: String, reason: String) = em
 }
 
 
-fun removeMuteRole(guild: Guild, user: User, config: Configuration, log: BotLogger) {
+fun removeMuteRole(member: Member, config: Configuration, log: BotLogger) {
 
     val embed = embed {
-        setTitle("${user.name} - you have been unmuted.")
+        setTitle("${member.user.name} - you have been unmuted.")
         setColor(Color.RED)
     }
-    user.sendPrivateMessage(embed, log)
-    val mutedRole = guild.getRolesByName(config.security.mutedRole, true).firstOrNull()!!
-    guild.removeRoleFromMember(guild.getMemberById(user.id)!!, mutedRole).queue()
+
+    member.user.sendPrivateMessage(embed, log)
+
+    val guild = member.guild
+
+    val mutedRole = guild.getRoleByName(config.security.mutedRole, true)!!
+    guild.removeRoleFromMember(member, mutedRole).queue()
 }
 
 fun notifyMuteAction(guild: Guild, user: User, time: String, reason: String, config: Configuration) {

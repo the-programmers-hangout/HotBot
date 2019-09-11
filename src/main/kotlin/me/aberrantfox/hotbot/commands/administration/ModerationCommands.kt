@@ -31,6 +31,7 @@ fun moderationCommands(kConfig: KConfiguration,
                        muteService: MuteService) = commands {
     command("ban") {
         description = "Bans a member for the passed reason, deleting a given number of days messages."
+        requiresGuild = true
         expect(arg(LowerUserArg),
                 arg(IntegerArg("Message Deletion Days [Default: 1]"), true, 1),
                 arg(SentenceArg("Ban Reason")))
@@ -39,9 +40,7 @@ fun moderationCommands(kConfig: KConfiguration,
             val deleteMessageDays = it.args.component2() as Int
             val reason = it.args.component3() as String
 
-            val guild = it.discord.jda.getGuildById(config.serverInformation.guildid)
-
-            guild!!.ban(target, deleteMessageDays, reason).queue { _ ->
+            it.guild!!.ban(target, deleteMessageDays, reason).queue { _ ->
                 it.respond("${target.fullName()} was banned.")
             }
         }
@@ -106,39 +105,32 @@ fun moderationCommands(kConfig: KConfiguration,
 
     command("gag") {
         description = "Temporarily mute a user for 5 minutes so that you can deal with something."
-        expect(LowerUserArg)
+        requiresGuild = true
+        expect(LowerMemberArg)
         execute {
-            val user = it.args.component1() as User
-            val guild = it.discord.jda.getGuildById(config.serverInformation.guildid)!!
-            val member = user.toMember(guild)
+            val member = it.args.component1() as Member
 
-            if(user.id == it.discord.jda.selfUser.id) {
+            if(member.id == it.discord.jda.selfUser.id) {
                 it.respond("Nice try but I'm not going to gag myself.")
                 return@execute
             }
 
-            if (member != null) {
-                muteService.muteMember(member, 5 * 1000 * 60, messageService.messages.gagResponse, it.author)
-            } else {
-                it.respond("User is not in the guild")
-            }
+            muteService.muteMember(member, 5 * 1000 * 60, messageService.messages.gagResponse, it.author)
         }
     }
 
     command("mute") {
         description = "Mute a member for a specified amount of time with the given reason."
-        expect(LowerUserArg,
+        requiresGuild = true
+        expect(LowerMemberArg,
                 TimeStringArg,
                 SentenceArg("Mute Reason"))
         execute {
-            val user = it.args.component1() as User
+            val member = it.args.component1() as Member
             val time = (it.args.component2() as Double).roundToLong() * 1000
             val reason = it.args.component3() as String
 
-            val guild = it.discord.jda.getGuildById(config.serverInformation.guildid)!!
-            val member = user.toMember(guild)
-
-            if (user.id == it.discord.jda.selfUser.id) {
+            if (member.id == it.discord.jda.selfUser.id) {
                 it.respond("Nice try but I'm not going to mute myself.")
                 return@execute
             }
@@ -148,44 +140,37 @@ fun moderationCommands(kConfig: KConfiguration,
                 return@execute
             }
 
-            if (member != null) {
-                val alreadyMuted = muteService.checkMuteState(member)
+            val alreadyMuted = muteService.checkMuteState(member)
 
-                muteService.muteMember(member, time, reason, it.author)
+            muteService.muteMember(member, time, reason, it.author)
 
-                it.respond(embed {
-                    setColor(Color.RED)
-                    setTitle("${user.descriptor()} has been muted")
-                    if (alreadyMuted != MuteService.MuteState.None) {
-                        setDescription("User was already muted, overriding previous mute.")
-                    }
-                })
-            } else {
-                it.respond("User is not in the guild")
-            }
+            it.respond(embed {
+                setColor(Color.RED)
+                setTitle("${member.descriptor()} has been muted")
+                if (alreadyMuted != MuteService.MuteState.None) {
+                    setDescription("User was already muted, overriding previous mute.")
+                }
+            })
         }
     }
 
     command("unmute") {
         description = "Unmute a previously muted member"
-        expect(LowerUserArg)
+        requiresGuild = true
+        expect(LowerMemberArg)
         execute {
-            val user = it.args.component1() as User
-            val guild = it.discord.jda.getGuildById(config.serverInformation.guildid)!!
-
-            val member = guild.getMember(user)
-                    ?: return@execute it.respond("That user isn't a part of the guild!")
+            val member = it.args.component1() as Member
 
             when (muteService.checkMuteState(member)) {
                 MuteService.MuteState.TrackedMute -> muteService.cancelMute(member)
-                MuteService.MuteState.UntrackedMute -> removeMuteRole(guild, user, config, logger)
+                MuteService.MuteState.UntrackedMute -> removeMuteRole(member, config, logger)
                 MuteService.MuteState.None -> {
-                    it.respond("${user.descriptor()} isn't muted")
+                    it.respond("${member.descriptor()} isn't muted")
                     return@execute
                 }
             }
 
-            it.respond("${user.descriptor()} has been unmuted")
+            it.respond("${member.descriptor()} has been unmuted")
         }
     }
 
@@ -261,29 +246,25 @@ fun moderationCommands(kConfig: KConfiguration,
 
     command("badname") {
         description = "Auto-nick a user with a bad name, for the given reason."
-        expect(LowerUserArg,
+        requiresGuild = true
+        expect(LowerMemberArg,
                 SentenceArg("Rename Reason"))
         execute {
-            val target = it.args[0] as User
+            val targetMember = it.args[0] as Member
             val reason = it.args[1] as String
 
-            val guild = it.discord.jda.getGuildById(config.serverInformation.guildid)
-
-            val targetMember = guild!!.getMember(target)!!
-
-            guild.modifyNickname(targetMember, messageService.messages.names.randomListItem()).queue {
-                target.sendPrivateMessage("Your name has been changed forcefully by a member of staff for reason: $reason", logger)
+            it.guild!!.modifyNickname(targetMember, messageService.messages.names.randomListItem()).queue {
+                targetMember.user.sendPrivateMessage("Your name has been changed forcefully by a member of staff for reason: $reason", logger)
             }
         }
     }
 
     command("joindate") {
         description = "See when a member joined the guild."
-        expect(UserArg)
+        requiresGuild = true
+        expect(MemberArg)
         execute {
-            val target = it.args[0] as User
-            val guild = it.discord.jda.getGuildById(config.serverInformation.guildid)
-            val member = guild!!.getMember(target) ?: return@execute it.respond("That user isn't in the guild!")
+            val member = it.args[0] as Member
 
             val dateFormat = SimpleDateFormat("yyyy-MM-dd")
             val joinDateParsed = dateFormat.parse(member.timeJoined.toString())
@@ -384,24 +365,23 @@ fun moderationCommands(kConfig: KConfiguration,
 
     command("badpfp") {
         description = "Notifies the user that they should change their profile pic. If they don't do that within 30 minutes, they will be automatically banned."
-        expect(LowerUserArg)
+        requiresGuild = true
+        expect(LowerMemberArg)
         execute {
-            val user = it.args.component1() as User
-            val avatar = user.effectiveAvatarUrl
+            val member = it.args.component1() as Member
+            val avatar = member.user.effectiveAvatarUrl
 
-            val guild = it.discord.jda.getGuildById(config.serverInformation.guildid)
-
-            user.sendPrivateMessage("We have flagged your profile picture as inappropriate. " +
-                "Please change it within the next 30 minutes or you will be banned.", logger)
+            member.user.sendPrivateMessage("We have flagged your profile picture as inappropriate. " +
+                    "Please change it within the next 30 minutes or you will be banned.", logger)
 
             Timer().schedule(1000 * 60 * 30) {
-                if(avatar == it.discord.jda.retrieveUserById(user.id).complete().effectiveAvatarUrl) {
-                    user.sendPrivateMessage("Hi, since you failed to change your profile picture, you are being banned.", logger)
+                if(avatar == it.discord.jda.retrieveUserById(member.id).complete().effectiveAvatarUrl) {
+                    member.user.sendPrivateMessage("Hi, since you failed to change your profile picture, you are being banned.", logger)
                     Timer().schedule(1000 * 10) {
-                        guild!!.ban(user, 1, "Having a bad profile picture and refusing to change it.").queue()
+                        it.guild!!.ban(member, 1, "Having a bad profile picture and refusing to change it.").queue()
                     }
                 } else {
-                    user.sendPrivateMessage("Thank you for changing your avatar. You will not be banned.", logger)
+                    member.user.sendPrivateMessage("Thank you for changing your avatar. You will not be banned.", logger)
                 }
             }
         }
@@ -409,29 +389,30 @@ fun moderationCommands(kConfig: KConfiguration,
 
     command("mutevoicechannel") {
         description = "Mute all non-moderators in a voice channel."
+        requiresGuild = true
         expect(VoiceChannelArg)
         execute {
             val voiceChannel = it.args.component1() as VoiceChannel
-            val guild = it.discord.jda.getGuildById(config.serverInformation.guildid)
-            muteVoiceChannel(guild!!, voiceChannel, config, manager)
+            muteVoiceChannel(it.guild!!, voiceChannel, config, manager)
         }
     }
 
     command("unmutevoicechannel") {
         description = "Unmute all users in a voice channel."
+        requiresGuild = true
         expect(VoiceChannelArg)
         execute {
             val voiceChannel = it.args.component1() as VoiceChannel
-            val guild = it.discord.jda.getGuildById(config.serverInformation.guildid)
-            unmuteVoiceChannel(guild!!, voiceChannel, config)
+            unmuteVoiceChannel(it.guild!!, voiceChannel, config)
         }
     }
 
     command("nick"){
         description = "Nickname a user. If no name is specified, reset the nickname."
-        expect(arg(LowerUserArg),arg(SentenceArg("New Nickname"),true,""))
+        requiresGuild = true
+        expect(arg(LowerMemberArg),arg(SentenceArg("New Nickname"),true,""))
         execute{
-            val user = it.args.component1() as User
+            val member = it.args.component1() as Member
             var nickname = it.args.component2() as String
 
             if (nickname.length>32){
@@ -439,12 +420,9 @@ fun moderationCommands(kConfig: KConfiguration,
                 return@execute
             }
 
-            if (nickname.isEmpty()) nickname = user.name
+            if (nickname.isEmpty()) nickname = member.user.name
 
-            val guild = it.discord.jda.getGuildById(config.serverInformation.guildid)
-            val targetMember = guild!!.getMember(user)!!
-
-            guild.modifyNickname(targetMember, nickname).queue()
+            it.guild!!.modifyNickname(member, nickname).queue()
         }
     }
 

@@ -1,5 +1,6 @@
 package me.aberrantfox.hotbot.commands.administration
 
+import me.aberrantfox.hotbot.arguments.LowerMemberArg
 import me.aberrantfox.hotbot.arguments.LowerUserArg
 import me.aberrantfox.hotbot.database.*
 import me.aberrantfox.hotbot.listeners.UserID
@@ -7,23 +8,19 @@ import me.aberrantfox.hotbot.services.Configuration
 import me.aberrantfox.hotbot.services.InfractionAction
 import me.aberrantfox.hotbot.services.MuteService
 import me.aberrantfox.kjdautils.api.dsl.*
-import me.aberrantfox.kjdautils.extensions.jda.fullName
-import me.aberrantfox.kjdautils.extensions.jda.getMemberJoinString
-import me.aberrantfox.kjdautils.extensions.jda.sendPrivateMessage
-import me.aberrantfox.kjdautils.extensions.jda.toMember
+import me.aberrantfox.kjdautils.extensions.jda.*
 import me.aberrantfox.kjdautils.extensions.stdlib.formatJdaDate
 import me.aberrantfox.kjdautils.extensions.stdlib.limit
-import me.aberrantfox.kjdautils.internal.command.arguments.IntegerArg
-import me.aberrantfox.kjdautils.internal.command.arguments.SentenceArg
-import me.aberrantfox.kjdautils.internal.command.arguments.UserArg
+import me.aberrantfox.kjdautils.internal.command.arguments.*
 import me.aberrantfox.kjdautils.internal.logging.BotLogger
 import net.dv8tion.jda.api.entities.Guild
+import net.dv8tion.jda.api.entities.Member
 import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.entities.User
 import org.joda.time.format.DateTimeFormat
 import java.awt.Color
 
-data class StrikeRequest(val user: User, val reason: String, val amount: Int, val moderator: User)
+data class StrikeRequest(val target: Member, val reason: String, val amount: Int, val moderator: User)
 
 object StrikeRequests {
     val map = HashMap<UserID, StrikeRequest>()
@@ -34,44 +31,63 @@ fun strikeCommands(config: Configuration, log: BotLogger, muteService: MuteServi
     commands {
         command("warn") {
             description = "Warn a member, giving them a 0 strike infraction with the given reason."
-            expect(LowerUserArg, SentenceArg("Warn Reason"))
+            requiresGuild = true
+            expect(LowerMemberArg, SentenceArg("Warn Reason"))
             execute {
-                val newArgs = listOf(it.args[0], 0, it.args[1])
-                val e = it.copy(args=newArgs)
-                val guild = it.discord.jda.getGuildById(config.serverInformation.guildid)
+                val target = it.args.component1() as Member
+                val reason = it.args.component2() as String
 
-                infract(e, guild!!, config, log, muteService)
+                infract(StrikeRequest(target, reason, 0, it.author), config, log, muteService)
+
+                it.respond("User ${target.descriptor()} has been warned, with reason:\n$reason")
             }
         }
 
         command("strike") {
             description = "Give a member a weighted infraction for the given reason, defaulting to a weight of 1."
-            expect(arg(LowerUserArg),
+            requiresGuild = true
+            expect(arg(LowerMemberArg),
                    arg(IntegerArg("Weight"), optional = true, default = 1),
                    arg(SentenceArg("Infraction Reason")))
             execute {
+                val target = it.args.component1() as Member
+                val weight = it.args.component2() as Int
+                val reason = it.args.component3() as String
 
-                val guild = it.discord.jda.getGuildById(config.serverInformation.guildid)
-                infract(it, guild!!, config, log, muteService)
+                // Not an IntegerRangeArg, because otherwise an invalid value is just absorbed by SentenceArg
+                // and so "strike @person 4 blah blah" would default to a strike weight of 1 with message "4 blah blah"z
+                val weightRange = 0..config.security.strikeCeil
+                if (weight !in weightRange) return@execute it.respond("The weight must be in the range $weightRange")
+
+                infract(StrikeRequest(target, reason, weight, it.author), config, log, muteService)
+
+                it.respond("User ${target.descriptor()} has been infracted with weight: $weight, with reason:\n$reason")
             }
         }
 
         command("strikerequest") {
             description = "Like the strike command, except another moderator reviews it before it is accepted."
-            expect(LowerUserArg, IntegerArg("Weight"), SentenceArg("Infraction Reason"))
+            requiresGuild = true
+            expect(LowerMemberArg,
+                   IntegerArg("Weight"),
+                   SentenceArg("Infraction Reason"))
             execute {
-                val target = it.args.component1() as User
-                val amount = it.args.component2() as Int
+                val target = it.args.component1() as Member
+                val weight = it.args.component2() as Int
                 val reason = it.args.component3() as String
 
-                if(amount > config.security.strikeCeil) {
-                    it.respond("Error, strike quantity above strike ceiling. ")
+                val weightRange = 0..config.security.strikeCeil
+                if (weight !in weightRange) return@execute it.respond("The weight must be in the range $weightRange")
+
+                val request = StrikeRequest(target, reason, weight, it.author)
+
+                if (StrikeRequests.map.containsKey(target.id)) {
+                    it.respond("There already exists a strike request for this user. Use viewrequest to see it.")
                     return@execute
                 }
 
-                val request = StrikeRequest(target, reason, amount, it.author)
-
                 StrikeRequests.map[target.id] = request
+
                 it.respond("This has been logged and will be accepted or declined, thank you.")
                 log.info("${it.author.fullName()} has a new strike request. Use viewRequest ${target.asMention} to see it.")
             }
@@ -83,16 +99,15 @@ fun strikeCommands(config: Configuration, log: BotLogger, muteService: MuteServi
             execute {
                 val user = it.args.component1() as User
 
-                if( !(strikeAgainst(user, it)) ) return@execute
-
-                val request = StrikeRequests.map[user.id]!!
+                val request = StrikeRequests.map[user.id]
+                        ?: return@execute it.respond("That user does not currently have a strike request.")
 
                 it.respond(embed {
                     title("${request.moderator.fullName()}'s request")
 
                     field {
                         name = "Target"
-                        value = "${request.user.asMention}(${request.user.fullName()})"
+                        value = "${request.target.asMention}(${request.target.fullName()})"
                         inline = false
                     }
 
@@ -113,17 +128,19 @@ fun strikeCommands(config: Configuration, log: BotLogger, muteService: MuteServi
 
         command("acceptrequest") {
             description = "Accept a request for striking the given user by another moderator."
+            requiresGuild = true
             expect(LowerUserArg("User Receiving Infraction"))
             execute {
                 val user = it.args.component1() as User
 
-                if( !(strikeAgainst(user, it)) ) return@execute
+                val request = StrikeRequests.map[user.id]
+                        ?: return@execute it.respond("That member does not currently have a strike request.")
 
-                val request = StrikeRequests.map[user.id]!!
-                val newArgs = listOf(request.user, request.amount, request.reason)
+                if (user.toMember(it.guild!!) == null) {
+                    return@execute it.respond("User is not a guild member. Use (delete/decline)request to remove the request if necessary.")
+                }
 
-                val guild = it.discord.jda.getGuildById(config.serverInformation.guildid)
-                infract(it.copy(args = newArgs), guild!!, config, log, muteService)
+                infract(request, config, log, muteService)
 
                 StrikeRequests.map.remove(user.id)
                 it.respond("Strike request on ${user.descriptor()} was accepted.")
@@ -136,9 +153,8 @@ fun strikeCommands(config: Configuration, log: BotLogger, muteService: MuteServi
             execute {
                 val user = it.args.component1() as User
 
-                if( !(strikeAgainst(user, it)) ) return@execute
+                StrikeRequests.map.remove(user.id) ?: return@execute it.respond("No request exists for that user.")
 
-                StrikeRequests.map.remove(user.id)
                 it.respond("Strike request on ${user.descriptor()} was declined.")
             }
         }
@@ -149,9 +165,10 @@ fun strikeCommands(config: Configuration, log: BotLogger, muteService: MuteServi
             execute {
                 val user = it.args.component1() as User
 
-                if( !(strikeAgainst(user, it)) ) return@execute
+                val request = StrikeRequests.map[user.id]
+                        ?: return@execute it.respond("That user does not currently have a strike request.")
 
-                val byInvoker = StrikeRequests.map[user.id]!!.moderator.id == it.author.id
+                val byInvoker = request.moderator.id == it.author.id
 
                 if(byInvoker) {
                     StrikeRequests.map.remove(user.id)
@@ -169,8 +186,9 @@ fun strikeCommands(config: Configuration, log: BotLogger, muteService: MuteServi
                     it.respond("No requests currently in place.")
                     return@execute
                 }
+
                 val response = StrikeRequests.map.values
-                    .map { "${it.user.asMention }, requested by ${it.moderator.fullName()}" }
+                    .map { "${it.target.descriptor() }, requested by ${it.moderator.fullName()}" }
                     .reduce {a, b -> "$a \n$b" }
 
                 it.respond(response)
@@ -179,17 +197,17 @@ fun strikeCommands(config: Configuration, log: BotLogger, muteService: MuteServi
 
         command("history") {
             description = "Display a user's infraction history."
+            requiresGuild = true
             expect(UserArg)
             execute {
                 val target = it.args[0] as User
-                val guild = it.discord.jda.getGuildById(config.serverInformation.guildid)
 
                 incrementOrSetHistoryCount(target.id)
 
                 it.respond(buildHistoryEmbed(target, true, getHistory(target.id),
-                        getHistoryCount(target.id), getNotesByUser(target.id), it, guild!!, config))
+                        getHistoryCount(target.id), getNotesByUser(target.id), it, it.guild!!, config))
 
-                val leaveHistory = getLeaveHistory(target.id, guild!!.id)
+                val leaveHistory = getLeaveHistory(target.id, it.guild!!.id)
                 if (leaveHistory.isNotEmpty())
                     it.respond(buildleaveHistoryEmbed(target, leaveHistory))
             }
@@ -220,81 +238,57 @@ fun strikeCommands(config: Configuration, log: BotLogger, muteService: MuteServi
 
         command("selfhistory") {
             description = "See your own infraction history."
+            requiresGuild = true
             execute {
                 val target = it.author
-                val guild = it.discord.jda.getGuildById(config.serverInformation.guildid)
 
                 target.sendPrivateMessage(buildHistoryEmbed(target, false, getHistory(target.id),
-                        getHistoryCount(target.id), null, it, guild!!, config), log)
+                        getHistoryCount(target.id), null, it, it.guild!!, config), log)
             }
         }
     }
 
-private fun strikeAgainst(user: User, event: CommandEvent) =
-    if( !(StrikeRequests.map.containsKey(user.id)) ) {
-        event.respond("That user does not currently have a strike request.")
-        false
-    } else {
-        true
-    }
+private fun infract(strike: StrikeRequest, config: Configuration, log: BotLogger, muteService: MuteService) {
+    insertInfraction(strike)
 
-private fun infract(event: CommandEvent, guild: Guild, config: Configuration, log: BotLogger, muteService: MuteService) {
-    val args = event.args
-    val target = args[0] as User
-    val strikeQuantity = args[1] as Int
-    val reason = args[2] as String
+    val (target, reason, weight, moderator) = strike
+    val totalStrikes = getMaxStrikes(target.id)
 
-    if (strikeQuantity < 0 || strikeQuantity > 3) {
-        event.respond("Strike weight should be between 0 and 3")
-        return
-    }
+    val punishmentLevel =
+            if (totalStrikes > config.security.strikeCeil) {
+                config.security.strikeCeil
+            } else {
+                totalStrikes
+            }
 
-    if (!(guild.isMember(target))) {
-        event.respond("Cannot find the member by the id: ${target.id}")
-        return
-    }
+    val infractionEmbed = buildInfractionEmbed(target, reason, weight, punishmentLevel, config)
+    target.user.sendPrivateMessage(infractionEmbed, log)
 
-    insertInfraction(target.id, event.author.id, strikeQuantity, reason)
+    val action = config.security.infractionActionMap[punishmentLevel] ?: return
 
-    event.respond("User ${target.asMention} has been infracted with weight: $strikeQuantity, with reason:\n$reason")
-
-    var totalStrikes = getMaxStrikes(target.id)
-
-    if (totalStrikes > config.security.strikeCeil) totalStrikes = config.security.strikeCeil
-
-    administerPunishment(config, log, target, strikeQuantity, reason, guild, event.author, totalStrikes, muteService)
+    administerPunishment(action, reason, target, moderator, log, muteService)
 }
 
-private fun administerPunishment(config: Configuration, log: BotLogger, user: User, strikeQuantity: Int,
-                                 reason: String, guild: Guild, moderator: User, totalStrikes: Int, muteService: MuteService) {
+private fun administerPunishment(action: InfractionAction, reason: String, target: Member, moderator: User, log: BotLogger, muteService: MuteService) =
+        when (action) {
+            is InfractionAction.Warn -> {
+                target.user.sendPrivateMessage("This is your warning - Do not break the rules again.", log)
+            }
 
-    val punishmentAction = config.security.infractionActionMap[totalStrikes]?.toString() ?: "None"
-    val infractionEmbed = buildInfractionEmbed(user.asMention, reason, strikeQuantity,
-            totalStrikes, config.security.strikeCeil, punishmentAction)
-    val action = config.security.infractionActionMap[totalStrikes]
+            is InfractionAction.Kick -> {
+                target.user.sendPrivateMessage("You may return via this: https://discord.gg/BQN6BYE - please be mindful of the rules next time.", log)
+                target.guild.kick(target.id, reason).queue()
+            }
 
-    user.sendPrivateMessage(infractionEmbed, log)
-    when (action) {
-        is InfractionAction.Warn -> {
-            user.sendPrivateMessage("This is your warning - Do not break the rules again.", log)
+            is InfractionAction.Mute -> {
+                muteService.muteMember(target, action.duration * 60L * 1000L, "Infraction punishment.", moderator)
+            }
+
+            is InfractionAction.Ban -> {
+                target.user.sendPrivateMessage("Well... that happened. There may be an appeal system in the future. But for now, you're permanently banned. Sorry about that :) ", log)
+                target.guild.ban(target.id, 0, reason).queue()
+            }
         }
-
-        is InfractionAction.Kick -> {
-            user.sendPrivateMessage("You may return via this: https://discord.gg/BQN6BYE - please be mindful of the rules next time.", log)
-            guild.kick(user.id, reason).queue()
-        }
-
-        is InfractionAction.Mute -> {
-            muteService.muteMember(user.toMember(guild)!!, action.duration * 60L * 1000L, "Infraction punishment.", moderator)
-        }
-
-        is InfractionAction.Ban -> {
-            user.sendPrivateMessage("Well... that happened. There may be an appeal system in the future. But for now, you're" +
-                    " permanently banned. Sorry about that :) ", log)
-            guild.ban(user.id, 0, reason).queue()
-        }
-    }
-}
 
 private fun buildleaveHistoryEmbed(target: User, leaveHistory: List<LeaveHistoryRecord>) = embed {
     setTitle("${target.fullName()}'s Guild Leave History")
@@ -409,11 +403,10 @@ fun produceFields(title: String, message: String) = message.chunked(1024).mapInd
     MessageEmbed.Field("$title -- $index", chunk, false)
 }
 
-private fun buildInfractionEmbed(userMention: String, reason: String, strikeQuantity: Int, totalStrikes: Int,
-                                 strikeCeil: Int, punishmentAction: String) =
+private fun buildInfractionEmbed(member: Member, reason: String, strikeQuantity: Int, punishmentLevel: Int, config: Configuration) =
         embed {
             title("Infraction")
-            description("$userMention, you have been infracted.\nInfractions are formal warnings from staff members on TPH.\n" +
+            description("${member.user.name}, you have been infracted.\nInfractions are formal warnings from staff members on TPH.\n" +
                         "If you think your infraction is undoubtedly unjustified, please **do not** post about it in a public channel but take it up with an administrator.")
 
             ifield {
@@ -423,12 +416,12 @@ private fun buildInfractionEmbed(userMention: String, reason: String, strikeQuan
 
             ifield {
                 name = "Strike Count"
-                value = "$totalStrikes / $strikeCeil"
+                value = "${getMaxStrikes(member.id)} / ${config.security.strikeCeil}"
             }
 
             ifield {
                 name = "Punishment"
-                value = punishmentAction
+                value = config.security.infractionActionMap[punishmentLevel]?.toString() ?: "None"
             }
 
             field {

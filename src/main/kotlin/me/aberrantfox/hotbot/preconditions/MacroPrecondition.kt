@@ -10,9 +10,9 @@ import me.aberrantfox.kjdautils.internal.command.Pass
 
 @Precondition
 fun produceMacroPrecondition(config: Configuration) = exit@{ event: CommandEvent ->
+    val macro = macros[event.commandStruct.commandName] ?: return@exit Pass
 
-    if (event.commandStruct.commandName !in macros)  return@exit Pass
-    if (canUseMacro(macros[event.commandStruct.commandName]!!, event.channel, config.serverInformation.macroDelay)) return@exit Pass
+    if (canUseMacro(macro, event.channel, config.serverInformation.macroDelay)) return@exit Pass
 
     return@exit Fail()
 }

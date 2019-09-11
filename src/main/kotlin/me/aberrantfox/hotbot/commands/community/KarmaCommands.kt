@@ -28,7 +28,7 @@ fun karmaCommands() = commands {
 
                 leaderBoard().forEachIndexed{ index, record ->
                     field {
-                        name = "${index + 1}) ${it.discord.jda.getUserById(record.who)!!.fullName()}"
+                        name = "${index + 1}) ${it.discord.jda.getUserById(record.who)?.fullName() ?: record.who}"
                         value = "${record.karma} karma"
                         inline = false
                     }

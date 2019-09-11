@@ -84,9 +84,9 @@ fun utilCommands(messageService: MessageService, manager: PermissionService, con
 
     command("serverinfo") {
         description = "Display a message giving basic server information"
+        requiresGuild = true
         execute {
-            val guild = it.discord.jda.getGuildById(config.serverInformation.guildid)
-            val embed = produceServerInfoEmbed(guild!!, messageService)
+            val embed = produceServerInfoEmbed(it.guild!!, messageService)
             it.respond(embed)
         }
     }
@@ -238,11 +238,11 @@ fun utilCommands(messageService: MessageService, manager: PermissionService, con
 
     command("selfmute") {
         description = "Need to study and want no distractions? Mute yourself! (Length defaults to 1 hour)"
+        requiresGuild = true
         expect(arg(TimeStringArg, true, 3600.0))
         execute {
             val time = (it.args.component1() as Double).roundToLong() * 1000
-            val guild = it.discord.jda.getGuildById(config.serverInformation.guildid)!!
-            val member = it.author.toMember(guild)!!
+            val member = it.author.toMember(it.guild!!)!!
 
             if(muteService.checkMuteState(member) != MuteService.MuteState.None) {
                 it.respond("Nice try but you're already muted")
@@ -297,9 +297,11 @@ fun produceServerInfoEmbed(guild: Guild, messageService: MessageService) =
             value = guild.roles.size.toString()
         }
 
-        ifield {
-            name = "Owner"
-            value = guild.owner!!.fullName()
+        guild.owner?.let {
+            ifield {
+                name = "Owner"
+                value = it.fullName()
+            }
         }
 
         ifield {

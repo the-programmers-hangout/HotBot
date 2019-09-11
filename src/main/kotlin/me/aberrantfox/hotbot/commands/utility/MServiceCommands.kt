@@ -29,7 +29,7 @@ fun messageConfiguration(messageService: MessageService) = commands {
             val key = it.args[0] as String
             val message = it.args[1] as String
 
-            messages[key]!!.setter.call(messageService.messages, message)
+            messages.getValue(key).setter.call(messageService.messages, message)
 
             it.respond(embed {
                 setTitle("Message configuration changed")
@@ -53,7 +53,7 @@ fun messageConfiguration(messageService: MessageService) = commands {
                 setColor(Color.CYAN)
                 field {
                     name = key
-                    value = messages[key]!!.getter.call(messageService.messages) as String
+                    value = messages.getValue(key).getter.call(messageService.messages) as String
                 }
             })
         }

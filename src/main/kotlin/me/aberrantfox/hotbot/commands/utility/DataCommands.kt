@@ -47,7 +47,7 @@ fun dataCommands(config: Configuration) = commands {
                 }
             }).queue { msg ->
                 answers.forEachIndexed { i, _ ->
-                    msg.addReaction(numberMap[i + 1]!!).queue()
+                    msg.addReaction(numberMap.getValue(i + 1)).queue()
                 }
                 Polls.map[msg.id] = PollContainer(question, answers, it.author.id, it.channel.id)
             }
@@ -55,20 +55,22 @@ fun dataCommands(config: Configuration) = commands {
     }
     command("finishpoll") {
         description = "Conclude a poll, based on the embed message ID."
+        requiresGuild = true
         expect(WordArg("Message ID"))
         execute {
             val pollID = it.args.component1() as String
 
-            if( !(Polls.map.containsKey(pollID)) ) {
+            val poll = Polls.map[pollID]
+            if (poll == null) {
                 it.respond("Error, unknown poll ID: $pollID")
                 return@execute
             }
 
-            val poll = Polls.map[pollID]!!
-            val guild = it.discord.jda.getGuildById(config.serverInformation.guildid)
+            val pollChannel = it.guild!!.getTextChannelById(poll.channel)
+                    ?: return@execute it.respond("Couldn't retrieve the poll channel! Does it still exist?")
 
-            guild!!.getTextChannelById(poll.channel)!!.retrieveMessageById(pollID).queue { msg ->
-                val highestAnswersSize = msg.reactions.maxBy { it.count }!!.count
+            pollChannel.retrieveMessageById(pollID).queue { msg ->
+                val highestAnswersSize = msg.reactions.maxBy { it.count }?.count ?: return@queue
 
                 if(msg.reactions.all { it.count == highestAnswersSize }) {
                     it.respond("Poll inconclusive.")

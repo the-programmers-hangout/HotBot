@@ -62,11 +62,12 @@ class MemberListener(val configuration: Configuration, private val logger: BotLo
     fun onGuildMemberLeave(e: GuildMemberLeaveEvent) {
         logger.info("${e.user.fullName()} :: ${e.user.asMention} left the server")
 
-        if(configuration.serverInformation.deleteWelcomeOnLeave && welcomeMessages.containsKey(e.user.id)) {
-            val messageID = welcomeMessages[e.user.id]
-            e.jda.getTextChannelById(configuration.messageChannels.welcomeChannel)!!.retrieveMessageById(messageID!!).queue {
+        val welcomeMessageID = welcomeMessages[e.user.id]
+
+        if(configuration.serverInformation.deleteWelcomeOnLeave && welcomeMessageID != null) {
+            e.jda.getTextChannelById(configuration.messageChannels.welcomeChannel)?.retrieveMessageById(welcomeMessageID)?.queue {
                 it.delete().queue()
-            }
+            } ?: logger.error("Couldn't retrieve welcome channel to delete welcome embed because of member leave.")
         }
 
         val now = DateTime.now()
