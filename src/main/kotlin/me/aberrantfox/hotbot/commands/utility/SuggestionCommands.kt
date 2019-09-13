@@ -1,7 +1,7 @@
 package me.aberrantfox.hotbot.commands.utility
 
 import me.aberrantfox.hotbot.database.*
-import me.aberrantfox.hotbot.services.*
+import me.aberrantfox.hotbot.services.Configuration
 import me.aberrantfox.hotbot.utility.dataclasses.*
 import me.aberrantfox.kjdautils.api.dsl.*
 import me.aberrantfox.kjdautils.extensions.jda.*
@@ -93,9 +93,9 @@ fun suggestionCommands(config: Configuration, log: BotLogger) = commands {
             }
 
             it.respond(embed {
-                setTitle("${status.message} suggestion")
-                setDescription(suggestion.message)
-                setColor(status.colour)
+                title = "${status.message} suggestion"
+                description = suggestion.message
+                color = status.colour
             })
         }
     }
@@ -149,9 +149,9 @@ fun suggestionCommands(config: Configuration, log: BotLogger) = commands {
                     }
 
                     it.respond(embed {
-                        setTitle("$status suggestion")
-                        setDescription(suggestion.idea)
-                        setColor(status.colour)
+                        title = "$status suggestion"
+                        description = suggestion.idea
+                        color = status.colour
                     })
                 }
             }, { error ->
@@ -206,7 +206,7 @@ private fun buildSuggestionUpdateEmbed(suggestion: SuggestionRecord, response: S
                 inline = false
             }
 
-            setColor(newStatus.colour)
+            color = newStatus.colour
         }
 
 private fun buildSuggestionMessage(suggestion: PoolRecord, jda: JDA, status: SuggestionStatus) =

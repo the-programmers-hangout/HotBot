@@ -3,20 +3,17 @@ package me.aberrantfox.hotbot.commands.administration
 import me.aberrantfox.hotbot.arguments.*
 import me.aberrantfox.hotbot.database.*
 import me.aberrantfox.hotbot.services.*
-import me.aberrantfox.hotbot.utility.muteVoiceChannel
-import me.aberrantfox.hotbot.utility.removeMuteRole
-import me.aberrantfox.hotbot.utility.unmuteVoiceChannel
+import me.aberrantfox.hotbot.utility.*
 import me.aberrantfox.kjdautils.api.dsl.*
 import me.aberrantfox.kjdautils.extensions.jda.*
 import me.aberrantfox.kjdautils.extensions.stdlib.randomListItem
 import me.aberrantfox.kjdautils.internal.arguments.*
-import me.aberrantfox.kjdautils.internal.arguments.MultipleArg
 import me.aberrantfox.kjdautils.internal.logging.BotLogger
 import net.dv8tion.jda.api.entities.*
 import java.awt.Color
 import java.io.File
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Timer
 import kotlin.concurrent.schedule
 import kotlin.math.roundToLong
 
@@ -145,10 +142,10 @@ fun moderationCommands(kConfig: KConfiguration,
             muteService.muteMember(member, time, reason, it.author)
 
             it.respond(embed {
-                setColor(Color.RED)
-                setTitle("${member.descriptor()} has been muted")
+                color = Color.RED
+                title = "${member.descriptor()} has been muted"
                 if (alreadyMuted != MuteService.MuteState.None) {
-                    setDescription("User was already muted, overriding previous mute.")
+                    description = "User was already muted, overriding previous mute."
                 }
             })
         }
@@ -490,7 +487,7 @@ private fun buildResponseEmbed(orig: MessageChannel, sourceMod: String, messages
                 }
             }
 
-            setColor(Color.CYAN)
+            color = Color.CYAN
         }
 
 fun safeDeleteMessages(channel: TextChannel,

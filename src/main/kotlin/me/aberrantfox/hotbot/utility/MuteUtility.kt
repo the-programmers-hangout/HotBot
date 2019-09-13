@@ -1,18 +1,11 @@
 package me.aberrantfox.hotbot.utility
 
-import me.aberrantfox.hotbot.database.deleteMutedMember
-import me.aberrantfox.hotbot.database.insertMutedMember
-import me.aberrantfox.hotbot.services.PermissionService
-import me.aberrantfox.hotbot.services.Configuration
+import me.aberrantfox.hotbot.services.*
 import me.aberrantfox.kjdautils.api.dsl.embed
-import me.aberrantfox.kjdautils.extensions.jda.fullName
-import me.aberrantfox.kjdautils.extensions.jda.getRoleByName
-import me.aberrantfox.kjdautils.extensions.jda.sendPrivateMessage
-import me.aberrantfox.kjdautils.extensions.stdlib.convertToTimeString
+import me.aberrantfox.kjdautils.extensions.jda.*
 import me.aberrantfox.kjdautils.internal.logging.BotLogger
 import net.dv8tion.jda.api.entities.*
 import java.awt.Color
-import java.util.*
 
 data class MuteRecord(val unmuteTime: Long, val reason: String,
                       val moderator: String, val user: String,
@@ -63,15 +56,15 @@ fun buildMuteEmbed(userMention: String, timeString: String, reason: String) = em
         value = reason
         inline = false
     }
-    setColor(Color.RED)
+    color = Color.RED
 }
 
 
 fun removeMuteRole(member: Member, config: Configuration, log: BotLogger) {
 
     val embed = embed {
-        setTitle("${member.user.name} - you have been unmuted.")
-        setColor(Color.RED)
+        title = "${member.user.name} - you have been unmuted."
+        color = Color.RED
     }
 
     member.user.sendPrivateMessage(embed, log)

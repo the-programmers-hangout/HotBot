@@ -3,18 +3,16 @@ package me.aberrantfox.hotbot.commands.utility
 import com.google.gson.Gson
 import khttp.post
 import me.aberrantfox.hotbot.arguments.HexColourArg
-import me.aberrantfox.hotbot.database.*
+import me.aberrantfox.hotbot.database.getUnmuteRecord
 import me.aberrantfox.hotbot.javautilities.UrlUtilities.sendImageToChannel
 import me.aberrantfox.hotbot.services.*
-import me.aberrantfox.hotbot.utility.*
+import me.aberrantfox.hotbot.utility.timeToString
 import me.aberrantfox.kjdautils.api.dsl.*
-import me.aberrantfox.kjdautils.extensions.jda.fullName
-import me.aberrantfox.kjdautils.extensions.jda.toMember
+import me.aberrantfox.kjdautils.extensions.jda.*
 import me.aberrantfox.kjdautils.extensions.stdlib.sanitiseMentions
 import me.aberrantfox.kjdautils.internal.arguments.*
 import me.aberrantfox.kjdautils.internal.logging.BotLogger
-import net.dv8tion.jda.api.EmbedBuilder
-import net.dv8tion.jda.api.OnlineStatus
+import net.dv8tion.jda.api.*
 import net.dv8tion.jda.api.entities.*
 import org.joda.time.DateTime
 import java.awt.Color
@@ -98,9 +96,9 @@ fun utilCommands(messageService: MessageService, manager: PermissionService, con
             val milliseconds = Date().time - startTime.time
 
             it.respond(embed {
-                setColor(Color.WHITE)
-                setTitle("I have been running since")
-                setDescription(startTime.toString())
+                color = Color.WHITE
+                title = "I have been running since"
+                description = startTime.toString()
 
                 field {
                     name = "That's been"

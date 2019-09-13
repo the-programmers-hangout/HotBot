@@ -1,22 +1,15 @@
 package me.aberrantfox.hotbot.commands.administration
 
-import me.aberrantfox.hotbot.arguments.LowerMemberArg
-import me.aberrantfox.hotbot.arguments.LowerUserArg
+import me.aberrantfox.hotbot.arguments.*
 import me.aberrantfox.hotbot.database.*
 import me.aberrantfox.hotbot.listeners.UserID
-import me.aberrantfox.hotbot.services.Configuration
-import me.aberrantfox.hotbot.services.InfractionAction
-import me.aberrantfox.hotbot.services.MuteService
+import me.aberrantfox.hotbot.services.*
 import me.aberrantfox.kjdautils.api.dsl.*
 import me.aberrantfox.kjdautils.extensions.jda.*
-import me.aberrantfox.kjdautils.extensions.stdlib.formatJdaDate
-import me.aberrantfox.kjdautils.extensions.stdlib.limit
+import me.aberrantfox.kjdautils.extensions.stdlib.*
 import me.aberrantfox.kjdautils.internal.arguments.*
 import me.aberrantfox.kjdautils.internal.logging.BotLogger
-import net.dv8tion.jda.api.entities.Guild
-import net.dv8tion.jda.api.entities.Member
-import net.dv8tion.jda.api.entities.MessageEmbed
-import net.dv8tion.jda.api.entities.User
+import net.dv8tion.jda.api.entities.*
 import org.joda.time.format.DateTimeFormat
 import java.awt.Color
 
@@ -291,8 +284,8 @@ private fun administerPunishment(action: InfractionAction, reason: String, targe
         }
 
 private fun buildleaveHistoryEmbed(target: User, leaveHistory: List<LeaveHistoryRecord>) = embed {
-    setTitle("${target.fullName()}'s Guild Leave History")
-    setColor(Color.MAGENTA)
+    title = "${target.fullName()}'s Guild Leave History"
+    color = Color.MAGENTA
 
     leaveHistory.forEachIndexed { num, record ->
         field {
@@ -436,7 +429,7 @@ private fun buildInfractionEmbed(member: Member, reason: String, strikeQuantity:
                 inline = false
             }
 
-            setColor(Color.RED)
+            color = Color.RED
         }
 
 

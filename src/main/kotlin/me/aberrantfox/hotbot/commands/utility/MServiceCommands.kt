@@ -1,16 +1,11 @@
 package me.aberrantfox.hotbot.commands.utility
 
-import me.aberrantfox.hotbot.services.MessageService
-import me.aberrantfox.hotbot.services.Messages
-import me.aberrantfox.kjdautils.api.dsl.CommandSet
-import me.aberrantfox.kjdautils.api.dsl.commands
-import me.aberrantfox.kjdautils.api.dsl.embed
-import me.aberrantfox.kjdautils.internal.arguments.ChoiceArg
-import me.aberrantfox.kjdautils.internal.arguments.SentenceArg
+import me.aberrantfox.hotbot.services.*
+import me.aberrantfox.kjdautils.api.dsl.*
+import me.aberrantfox.kjdautils.internal.arguments.*
 import java.awt.Color
 import kotlin.reflect.KMutableProperty
-import kotlin.reflect.full.createType
-import kotlin.reflect.full.declaredMemberProperties
+import kotlin.reflect.full.*
 
 private val messages = Messages::class.declaredMemberProperties
         .filter { it.returnType == String::class.createType() }
@@ -32,8 +27,8 @@ fun messageConfiguration(messageService: MessageService) = commands {
             messages.getValue(key).setter.call(messageService.messages, message)
 
             it.respond(embed {
-                setTitle("Message configuration changed")
-                setColor(Color.CYAN)
+                title = "Message configuration changed"
+                color = Color.CYAN
                 field {
                     name = key
                     value = message
@@ -49,8 +44,8 @@ fun messageConfiguration(messageService: MessageService) = commands {
             val key = it.args[0] as String
 
             it.respond(embed {
-                setTitle("Message configuration")
-                setColor(Color.CYAN)
+                title = "Message configuration"
+                color = Color.CYAN
                 field {
                     name = key
                     value = messages.getValue(key).getter.call(messageService.messages) as String

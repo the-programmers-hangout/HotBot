@@ -1,21 +1,13 @@
 package me.aberrantfox.hotbot.commands.permissions
 
+import me.aberrantfox.hotbot.arguments.*
 import me.aberrantfox.hotbot.arguments.CategoryArg
-import me.aberrantfox.hotbot.arguments.PermissionLevelArg
 import me.aberrantfox.hotbot.commands.utility.macroCommandCategory
-import me.aberrantfox.hotbot.services.PermissionLevel
-import me.aberrantfox.hotbot.services.PermissionService
-import me.aberrantfox.hotbot.services.Configuration
-import me.aberrantfox.kjdautils.api.dsl.Command
-import me.aberrantfox.kjdautils.api.dsl.CommandSet
-import me.aberrantfox.kjdautils.api.dsl.commands
-import me.aberrantfox.kjdautils.api.dsl.embed
+import me.aberrantfox.hotbot.services.*
+import me.aberrantfox.kjdautils.api.dsl.*
 import me.aberrantfox.kjdautils.extensions.stdlib.sanitiseMentions
-import me.aberrantfox.kjdautils.internal.arguments.CommandArg
-import me.aberrantfox.kjdautils.internal.arguments.RoleArg
-import me.aberrantfox.kjdautils.internal.arguments.TextChannelArg
-import net.dv8tion.jda.api.entities.Role
-import net.dv8tion.jda.api.entities.TextChannel
+import me.aberrantfox.kjdautils.internal.arguments.*
+import net.dv8tion.jda.api.entities.*
 import java.awt.Color
 
 @CommandSet("permissions")
@@ -213,8 +205,9 @@ fun permissionCommands(manager: PermissionService, config: Configuration) =
                     val map = manager.allChannelIgnoreLevels()
 
                     event.respond(embed {
-                        setTitle("Channel Ignore Levels")
-                        setColor(Color.BLUE)
+                        title = "Channel Ignore Levels"
+                        color = Color.BLUE
+
                         map.forEach {
                             field {
                                 name = "Channel"

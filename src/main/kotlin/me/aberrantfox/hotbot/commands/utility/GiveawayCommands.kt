@@ -6,7 +6,6 @@ import me.aberrantfox.kjdautils.extensions.stdlib.convertToTimeString
 import me.aberrantfox.kjdautils.internal.arguments.*
 import me.aberrantfox.kjdautils.internal.logging.BotLogger
 import net.dv8tion.jda.api.entities.*
-import net.dv8tion.jda.api.requests.RestAction
 import java.awt.Color
 import kotlin.concurrent.timer
 import kotlin.math.roundToLong
@@ -174,7 +173,7 @@ private fun buildWinnerEmbed(winner: User?, prize: String) =
         embed {
             title = giveawayEmbedTitle
             description = "Thank you for participating, better luck next time!"
-            setColor(Color.BLACK)
+            color = Color.BLACK
 
             field {
                 name = "Winner"

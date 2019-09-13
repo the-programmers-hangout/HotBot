@@ -38,7 +38,7 @@ fun dataCommands(config: Configuration) = commands {
             it.channel.sendMessage(embed {
                 title = "${it.author.fullName()}'s poll"
                 description = "$question - react with your answer on this embed to submit a response."
-                setColor(Color.CYAN)
+                color = Color.CYAN
                 answers.forEachIndexed { i, e ->
                     field {
                         name = "${numberMap[i + 1]} $e"
