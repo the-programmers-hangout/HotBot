@@ -282,7 +282,7 @@ fun produceServerInfoEmbed(guild: Guild, messageService: MessageService) =
         title = guild.name
         color = Color.MAGENTA
         description = messageService.messages.serverDescription
-        thumbnail = "http://i.imgur.com/DFoaG7k.png"
+        thumbnail = guild.jda.selfUser.effectiveAvatarUrl
 
         field {
             name = "Users"
