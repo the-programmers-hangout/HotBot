@@ -319,10 +319,9 @@ fun moderationCommands(kConfig: KConfiguration,
         execute {
             val target = it.args.component1() as User
             val note = it.args.component2() as String
+            val noteId = insertNote(target.id, it.author.id, note)
 
-            insertNote(target.id, it.author.id, note)
-
-            it.respond("Note added.")
+            it.respond("Note added. ID: $noteId")
         }
     }
 
