@@ -6,7 +6,6 @@ import me.aberrantfox.kjdautils.internal.arguments.*
 import org.jsoup.Jsoup
 import java.net.URLEncoder
 import java.util.Random
-import khttp.get as kget
 
 @CommandSet("fun")
 fun funCommands(config: Configuration) =

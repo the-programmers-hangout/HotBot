@@ -5,7 +5,6 @@ import kotlinx.coroutines.runBlocking
 import me.aberrantfox.hotbot.services.*
 import me.aberrantfox.kjdautils.api.dsl.*
 import me.aberrantfox.kjdautils.discord.Discord
-import me.aberrantfox.kjdautils.internal.event.EventRegister
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.entities.*
 import org.amshove.kluent.*

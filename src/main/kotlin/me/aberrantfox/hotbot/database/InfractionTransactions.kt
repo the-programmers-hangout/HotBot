@@ -1,10 +1,7 @@
 package me.aberrantfox.hotbot.database
 
 import me.aberrantfox.hotbot.commands.administration.StrikeRequest
-import org.jetbrains.exposed.sql.Op
-import org.jetbrains.exposed.sql.deleteWhere
-import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.joda.time.DateTime
 
@@ -19,10 +16,10 @@ data class StrikeRecord(val id: Int,
 fun insertInfraction(strike: StrikeRequest) =
         transaction {
             Strikes.insert {
-                it[Strikes.member] = strike.target.id
-                it[Strikes.moderator] = strike.moderator.id
-                it[Strikes.strikes] = strike.amount
-                it[Strikes.reason] = strike.reason
+                it[member] = strike.target.id
+                it[moderator] = strike.moderator.id
+                it[strikes] = strike.amount
+                it[reason] = strike.reason
                 it[date] = DateTime.now()
             }
         }

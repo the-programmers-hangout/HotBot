@@ -2,19 +2,11 @@ package me.aberrantfox.hotbot.commands.permissions
 
 import com.google.gson.Gson
 import me.aberrantfox.hotbot.arguments.LowerMemberArg
-import me.aberrantfox.hotbot.arguments.LowerUserArg
-import me.aberrantfox.hotbot.services.Configuration
-import me.aberrantfox.hotbot.services.configPath
-import me.aberrantfox.kjdautils.api.dsl.CommandSet
-import me.aberrantfox.kjdautils.api.dsl.commands
+import me.aberrantfox.hotbot.services.*
+import me.aberrantfox.kjdautils.api.dsl.*
 import me.aberrantfox.kjdautils.extensions.jda.fullName
-import me.aberrantfox.kjdautils.extensions.jda.toMember
-import me.aberrantfox.kjdautils.internal.arguments.RoleArg
-import me.aberrantfox.kjdautils.internal.arguments.WordArg
-import net.dv8tion.jda.api.entities.Guild
-import net.dv8tion.jda.api.entities.Member
-import net.dv8tion.jda.api.entities.Role
-import net.dv8tion.jda.api.entities.User
+import me.aberrantfox.kjdautils.internal.arguments.*
+import net.dv8tion.jda.api.entities.*
 import net.dv8tion.jda.api.exceptions.PermissionException
 import java.io.File
 

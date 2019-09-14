@@ -9,8 +9,7 @@ import kotlin.reflect.full.*
 
 private val messages = Messages::class.declaredMemberProperties
         .filter { it.returnType == String::class.createType() }
-        .filter { it is KMutableProperty<*> }
-        .map { it as KMutableProperty<*> }
+        .filterIsInstance<KMutableProperty<*>>()
         .associateBy { it.name.toLowerCase() }
 
 object MessageConfigArg : ChoiceArg("Message Name", *messages.keys.toTypedArray())

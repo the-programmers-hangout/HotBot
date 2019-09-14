@@ -19,6 +19,7 @@ import java.net.URLEncoder
 import java.time.format.DateTimeFormatter
 import java.util.Date
 import kotlin.math.roundToLong
+import kotlin.system.exitProcess
 
 data class Properties(val version: String, val author: String)
 
@@ -115,7 +116,7 @@ fun utilCommands(messageService: MessageService, manager: PermissionService, con
             log.info("saved configurations")
             manager.save()
             log.info("saved permissions to database prior to shut down.")
-            System.exit(0)
+            exitProcess(0)
         }
     }
 
@@ -123,7 +124,7 @@ fun utilCommands(messageService: MessageService, manager: PermissionService, con
         description = "Exit, without saving configurations."
         execute {
             it.respond("Killing process, configurations will not be saved.")
-            System.exit(0)
+            exitProcess(0)
         }
     }
 

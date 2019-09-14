@@ -6,7 +6,6 @@ import me.aberrantfox.kjdautils.api.annotation.Service
 import me.aberrantfox.kjdautils.api.dsl.CommandsContainer
 import me.aberrantfox.kjdautils.discord.Discord
 import me.aberrantfox.kjdautils.internal.command.tryRetrieveSnowflake
-import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.entities.*
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap

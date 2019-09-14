@@ -16,6 +16,7 @@ import java.text.SimpleDateFormat
 import java.util.Timer
 import kotlin.concurrent.schedule
 import kotlin.math.roundToLong
+import kotlin.system.exitProcess
 
 class ModerationCommands
 
@@ -66,7 +67,7 @@ fun moderationCommands(kConfig: KConfiguration,
                 val noSinglePrefixMsg = past.drop(if (sameChannel && singlePrefixInvocationDeleted) 1 else 0)
 
                 val userFiltered =
-                        if (!users.isEmpty()) {
+                        if (users.isNotEmpty()) {
                             noSinglePrefixMsg.filter { it.author.id in users }
                         } else {
                             noSinglePrefixMsg
@@ -285,7 +286,7 @@ fun moderationCommands(kConfig: KConfiguration,
             if (!currentJar.name.endsWith(".jar")) return@execute
 
             ProcessBuilder(arrayListOf(javaBin, "-jar", currentJar.path)).start()
-            System.exit(0)
+            exitProcess(0)
         }
     }
 

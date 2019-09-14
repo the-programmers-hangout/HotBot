@@ -47,9 +47,7 @@ class MuteService(val discord: Discord,
     fun getMutedRole(guild: Guild) = discord.jda.getRoleById(muteMap[guild.id]!!)!!
 
     fun muteMember(member: Member, time: Long, reason: String, moderator: User) {
-        if (time <= 0) {
-            throw IllegalArgumentException("time must be non-zero")
-        }
+        require(time > 0) { "time must be non-zero" }
         val guild = member.guild
         val user = member.user
 
