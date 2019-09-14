@@ -1,16 +1,14 @@
 package me.aberrantfox.hotbot.listeners
 
 import com.google.common.eventbus.Subscribe
+import me.aberrantfox.hotbot.extensions.createContinuableField
 import me.aberrantfox.hotbot.services.*
 import me.aberrantfox.hotbot.utility.types.LimitedList
 import me.aberrantfox.kjdautils.api.dsl.embed
 import me.aberrantfox.kjdautils.extensions.jda.fullName
 import me.aberrantfox.kjdautils.internal.logging.BotLogger
-import net.dv8tion.jda.api.entities.Message
-import net.dv8tion.jda.api.entities.User
-import net.dv8tion.jda.api.events.message.guild.GuildMessageDeleteEvent
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent
-import net.dv8tion.jda.api.events.message.guild.GuildMessageUpdateEvent
+import net.dv8tion.jda.api.entities.*
+import net.dv8tion.jda.api.events.message.guild.*
 import java.awt.Color
 
 class MessageDeleteListener(private val logger: BotLogger, val manager: PermissionService, val config: Configuration) {
@@ -24,30 +22,19 @@ class MessageDeleteListener(private val logger: BotLogger, val manager: Permissi
 
         if(event.message.contentRaw.startsWith(config.serverInformation.prefix)) return
 
-        val found = list.find { it == event.message }
+        val found = list.find { it == event.message } ?: return
 
-        if(found != null) {
-            logger.history(embed {
-                title = "Message Edited"
-                description = "${event.author.asMention}(${event.author.fullName()}) in ${event.channel.asMention}"
-                color = Color.ORANGE
+        logger.history(embed {
+            title = "Message Edited"
+            description = "${event.author.asMention}(${event.author.fullName()}) in ${event.channel.asMention}"
+            color = Color.ORANGE
 
-                field {
-                    name = "Old"
-                    value = found.contentRaw
-                    inline = false
-                }
+            createContinuableField("Old", found.contentRaw)
+            createContinuableField("New", event.message.contentRaw)
+        })
 
-                field {
-                    name = "New"
-                    value = event.message.contentRaw
-                    inline = false
-                }
-            })
-
-            list.remove(found)
-            list.add(event.message)
-        }
+        list.remove(found)
+        list.add(event.message)
     }
 
     @Subscribe
@@ -69,11 +56,7 @@ class MessageDeleteListener(private val logger: BotLogger, val manager: Permissi
                 description = "${found.author.asMention}(${found.author.fullName()}) in ${event.channel.asMention}"
                 color = Color.ORANGE
 
-                field {
-                    name = "Deleted Message"
-                    value = found.contentRaw
-                    inline = false
-                }
+                createContinuableField("Deleted Message", found.contentRaw)
             })
             list.remove(found)
         }
