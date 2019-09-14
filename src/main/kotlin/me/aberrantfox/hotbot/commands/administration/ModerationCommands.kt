@@ -83,19 +83,22 @@ fun moderationCommands(kConfig: KConfiguration,
 
     command("ignore") {
         description = "Drop and don't respond to anything from the given id (user or channel)"
-        expect(WordArg("User or Channel ID"))
+        expect(UserArg or TextChannelArg)
         execute {
-            val target = it.args.component1() as String
+            val targetArg = it.args.component1() as Either<User, TextChannel>
+            val (target, name) = when (targetArg) {
+                is Either.Left -> targetArg.left.id to targetArg.left.name
+                is Either.Right -> targetArg.right.id to targetArg.right.name
+            }
 
             val removed = config.security.ignoredIDs.remove(target)
-
             if (removed) {
                 deleteIgnoredID(target)
-                it.respond("Unignored $target")
+                it.respond("Unignored $name")
             } else {
                 config.security.ignoredIDs.add(target)
                 insertIgnoredID(target)
-                it.respond("$target? Who? What? Don't know what that is. ;)")
+                it.respond("$name? Who? What? Don't know what that is. ;)")
             }
         }
     }
