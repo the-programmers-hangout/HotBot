@@ -2,7 +2,6 @@ package me.aberrantfox.hotbot.commands.utility
 
 import com.google.gson.Gson
 import khttp.post
-import me.aberrantfox.hotbot.arguments.HexColourArg
 import me.aberrantfox.hotbot.database.getUnmuteRecord
 import me.aberrantfox.hotbot.javautilities.UrlUtilities.sendImageToChannel
 import me.aberrantfox.hotbot.services.*
@@ -190,7 +189,7 @@ fun utilCommands(messageService: MessageService, manager: PermissionService, con
 
     command("colour") {
         description = "Shows an embed with the given hex colour code"
-        expect(HexColourArg)
+        expect(HexColorArg)
         execute {
             val colour = it.args.component1() as Int
             val hex = colour.toString(16).padStart(6, '0')
