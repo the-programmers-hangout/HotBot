@@ -233,7 +233,6 @@ fun utilCommands(messageService: MessageService, manager: PermissionService, con
         }
     }
 
-
     command("selfmute") {
         description = "Need to study and want no distractions? Mute yourself! (Length defaults to 1 hour)"
         requiresGuild = true
@@ -255,11 +254,7 @@ fun utilCommands(messageService: MessageService, manager: PermissionService, con
                 return@execute
             }
 
-            if (member != null) {
-                muteService.muteMember(member, time, "No distractions for a while? Got it", it.author)
-            } else {
-                it.respond(":thinking: You are not a member of the server")
-            }
+            muteService.muteMember(member, time, "No distractions for a while? Got it", it.author)
         }
     }
 
@@ -272,53 +267,25 @@ fun utilCommands(messageService: MessageService, manager: PermissionService, con
             }catch (e: NoSuchElementException){
                 it.respond("You aren't currently muted...")
             }
-
         }
     }
 }
 
-fun produceServerInfoEmbed(guild: Guild, messageService: MessageService) =
+fun produceServerInfoEmbed(guild: Guild, messageService: MessageService) = with(guild) {
     EmbedBuilder(embed {
-        title = guild.name
-        color = Color.MAGENTA
+        title = name
         description = messageService.messages.serverDescription
-        thumbnail = guild.jda.selfUser.effectiveAvatarUrl
+        thumbnail = jda.selfUser.effectiveAvatarUrl
+        color = Color.MAGENTA
 
-        field {
-            name = "Users"
-            value = "${guild.members.filter { it.onlineStatus != OnlineStatus.OFFLINE }.size}/${guild.members.size}"
-        }
+        val onlineMembers = members.filter { it.onlineStatus != OnlineStatus.OFFLINE }.size
 
-        field {
-            name = "Total Roles"
-            inline = true
-            value = guild.roles.size.toString()
-        }
+        addField("Users", "$onlineMembers/${members.size}")
+        addInlineField("Total Roles", roles.size.toString())
+        addInlineField("Owner", owner?.fullName())
+        addInlineField("Region", region.toString())
+        addInlineField("Text Channels", textChannelCache.size().toString())
+        addInlineField("Voice Channels", voiceChannels.size.toString())
 
-        guild.owner?.let {
-            field {
-                name = "Owner"
-                inline = true
-                value = it.fullName()
-            }
-        }
-
-        field {
-            name = "Region"
-            inline = true
-            value = guild.region.toString()
-        }
-
-        field {
-            name = "Text Channels"
-            inline = true
-            value = guild.textChannelCache.size().toString()
-        }
-
-        field {
-            name = "Voice Channels"
-            inline = true
-            value = guild.voiceChannels.size.toString()
-        }
-    }).setFooter("Guild creation date: ${guild.timeCreated.format(DateTimeFormatter.RFC_1123_DATE_TIME)}", "http://i.imgur.com/iwwEprG.png")
-      .build()
+    }).setFooter("Guild creation date: ${timeCreated.format(DateTimeFormatter.RFC_1123_DATE_TIME)}", iconUrl).build()
+}
