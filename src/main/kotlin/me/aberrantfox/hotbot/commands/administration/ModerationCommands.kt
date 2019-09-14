@@ -366,14 +366,19 @@ fun moderationCommands(kConfig: KConfiguration,
         execute {
             val member = it.args.component1() as Member
             val avatar = member.user.effectiveAvatarUrl
+            val minutesUntilBan = 30L
+            val timeLimit = 1000 * 60 * minutesUntilBan
 
-            member.user.sendPrivateMessage("We have flagged your profile picture as inappropriate. " +
-                    "Please change it within the next 30 minutes or you will be banned.", logger)
+            val warningMessage = "We have flagged your profile picture as inappropriate. " +
+                    "Please change it within the next $minutesUntilBan minutes or you will be banned."
 
-            Timer().schedule(1000 * 60 * 30) {
+            muteService.muteMember(member, timeLimit, warningMessage, it.author)
+            it.respond("${member.asMention} has been flagged for having a bad pfp and muted for $minutesUntilBan minutes.")
+
+            Timer().schedule(timeLimit) {
                 if(avatar == it.discord.jda.retrieveUserById(member.id).complete().effectiveAvatarUrl) {
                     member.user.sendPrivateMessage("Hi, since you failed to change your profile picture, you are being banned.", logger)
-                    Timer().schedule(1000 * 10) {
+                    Timer().schedule(delay = 1000 * 10) {
                         it.guild!!.ban(member, 1, "Having a bad profile picture and refusing to change it.").queue()
                     }
                 } else {
