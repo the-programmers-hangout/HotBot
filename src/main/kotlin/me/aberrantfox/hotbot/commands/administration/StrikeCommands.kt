@@ -2,6 +2,7 @@ package me.aberrantfox.hotbot.commands.administration
 
 import me.aberrantfox.hotbot.arguments.*
 import me.aberrantfox.hotbot.database.*
+import me.aberrantfox.hotbot.extensions.createContinuableField
 import me.aberrantfox.hotbot.listeners.UserID
 import me.aberrantfox.hotbot.services.*
 import me.aberrantfox.kjdautils.api.dsl.*
@@ -352,7 +353,7 @@ private fun buildHistoryEmbed(target: User, includeModerator: Boolean, records: 
                     }
                 }
 
-                produceFields("Infraction Reasoning Given", record.reason).forEach { addField(it.name, it.value, it.isInline) }
+                createContinuableField("Infraction Reasoning Given", record.reason)
             }
 
             if (records.isEmpty()) {
@@ -390,14 +391,9 @@ private fun buildHistoryEmbed(target: User, includeModerator: Boolean, records: 
                     inline = false
                 }
 
-                produceFields("NoteMessage", note.note).forEach { addField(it.name, it.value, it.isInline) }
+                createContinuableField("NoteMessage", note.note)
             }
-
         }
-
-fun produceFields(title: String, message: String) = message.chunked(1024).mapIndexed { index, chunk ->
-    MessageEmbed.Field("$title -- $index", chunk, false)
-}
 
 private fun buildInfractionEmbed(member: Member, reason: String, strikeQuantity: Int, punishmentLevel: Int, config: Configuration) =
         embed {

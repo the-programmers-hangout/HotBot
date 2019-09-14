@@ -280,7 +280,7 @@ fun produceServerInfoEmbed(guild: Guild, messageService: MessageService) = with(
 
         val onlineMembers = members.filter { it.onlineStatus != OnlineStatus.OFFLINE }.size
 
-        addField("Users", "$onlineMembers/${members.size}")
+        addInlineField("Users", "$onlineMembers/${members.size}")
         addInlineField("Total Roles", roles.size.toString())
         addInlineField("Owner", owner?.fullName())
         addInlineField("Region", region.toString())
