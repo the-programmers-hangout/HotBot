@@ -3,7 +3,7 @@ package me.aberrantfox.hotbot.commands.administration
 import me.aberrantfox.hotbot.arguments.*
 import me.aberrantfox.hotbot.database.*
 import me.aberrantfox.hotbot.services.*
-import me.aberrantfox.hotbot.utility.*
+import me.aberrantfox.hotbot.utility.removeMuteRole
 import me.aberrantfox.kjdautils.api.dsl.*
 import me.aberrantfox.kjdautils.extensions.jda.*
 import me.aberrantfox.kjdautils.extensions.stdlib.randomListItem
@@ -389,26 +389,6 @@ fun moderationCommands(kConfig: KConfiguration,
                     member.user.sendPrivateMessage("Thank you for changing your avatar. You will not be banned.", logger)
                 }
             }
-        }
-    }
-
-    command("mutevoicechannel") {
-        description = "Mute all non-moderators in a voice channel."
-        requiresGuild = true
-        expect(VoiceChannelArg)
-        execute {
-            val voiceChannel = it.args.component1() as VoiceChannel
-            muteVoiceChannel(it.guild!!, voiceChannel, config, manager)
-        }
-    }
-
-    command("unmutevoicechannel") {
-        description = "Unmute all users in a voice channel."
-        requiresGuild = true
-        expect(VoiceChannelArg)
-        execute {
-            val voiceChannel = it.args.component1() as VoiceChannel
-            unmuteVoiceChannel(it.guild!!, voiceChannel, config)
         }
     }
 

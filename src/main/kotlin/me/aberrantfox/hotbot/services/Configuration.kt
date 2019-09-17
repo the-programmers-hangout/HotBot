@@ -47,7 +47,6 @@ data class PermissionedActions(var sendInvite: PermissionLevel = PermissionLevel
                                var sendURL: PermissionLevel = PermissionLevel.Moderator,
                                var commandMention: PermissionLevel = PermissionLevel.Moderator,
                                val ignoreLogging: PermissionLevel = PermissionLevel.Moderator,
-                               var voiceChannelMuteThreshold: PermissionLevel = PermissionLevel.Moderator,
                                var sendUnfilteredFiles: PermissionLevel = PermissionLevel.Moderator)
 
 
