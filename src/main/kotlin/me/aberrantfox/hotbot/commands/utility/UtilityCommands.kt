@@ -40,15 +40,6 @@ const val uploadTextBaseUrl: String = "https://hasteb.in"
 @CommandSet("utility")
 fun utilCommands(messageService: MessageService, manager: PermissionService, config: Configuration,
                  log: BotLogger, muteService: MuteService) = commands {
-    command("ping") {
-        description = "Pong!"
-        execute {
-            it.discord.jda.restPing.queue { ping ->
-                it.respond("Responded in ${ping}ms")
-            }
-        }
-    }
-
     command("botinfo") {
         description = "Display the bot information."
         execute {
@@ -233,42 +224,7 @@ fun utilCommands(messageService: MessageService, manager: PermissionService, con
         }
     }
 
-    command("selfmute") {
-        description = "Need to study and want no distractions? Mute yourself! (Length defaults to 1 hour)"
-        requiresGuild = true
-        expect(arg(TimeStringArg, true, 3600.0))
-        execute {
-            val time = (it.args.component1() as Double).roundToLong() * 1000
-            val member = it.author.toMember(it.guild!!)!!
 
-            if(muteService.checkMuteState(member) != MuteService.MuteState.None) {
-                it.respond("Nice try but you're already muted")
-                return@execute
-            }
-
-            if(time > 1000*60*config.serverInformation.maxSelfmuteMinutes) {
-                it.respond("Sorry but you can't mute yourself for that long")
-                return@execute
-            } else if (time <= 0) {
-                it.respond("Sorry, the laws of physics disallow muting for non-positive durations.")
-                return@execute
-            }
-
-            muteService.muteMember(member, time, "No distractions for a while? Got it", it.author)
-        }
-    }
-
-    command("remainingmute") {
-        description="Return the remaining time of a mute"
-        execute {
-            try{
-                val unmuteTime = getUnmuteRecord(it.author.id, config.serverInformation.guildid)- DateTime().millis
-                it.respond(timeToString(unmuteTime))
-            }catch (e: NoSuchElementException){
-                it.respond("You aren't currently muted...")
-            }
-        }
-    }
 }
 
 fun produceServerInfoEmbed(guild: Guild, messageService: MessageService) = with(guild) {

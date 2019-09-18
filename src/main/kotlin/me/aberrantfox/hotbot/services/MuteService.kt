@@ -149,17 +149,4 @@ class MuteService(val discord: Discord,
         deleteMutedMember(user.id, guild.id)
         unmuteTimerTaskMap.remove(toKey(member))
     }
-
-    @Subscribe
-    fun handleReJoinMute(event: GuildMemberJoinEvent) {
-        val member = event.member
-        val user = event.user
-        val guild = event.guild
-
-        if (checkMuteState(member) == MuteState.TrackedMute) {
-            log.alert("${user.fullName()} :: ${user.asMention} rejoined with a mute withstanding")
-            guild.addRoleToMember(member, getMutedRole(guild)).queue()
-        }
-
-    }
 }

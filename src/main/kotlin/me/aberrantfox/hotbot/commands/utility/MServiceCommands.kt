@@ -7,15 +7,17 @@ import java.awt.Color
 import kotlin.reflect.KMutableProperty
 import kotlin.reflect.full.*
 
-private val messages = Messages::class.declaredMemberProperties
-        .filter { it.returnType == String::class.createType() }
-        .filterIsInstance<KMutableProperty<*>>()
-        .associateBy { it.name.toLowerCase() }
-
 object MessageConfigArg : ChoiceArg("Message Name", *messages.keys.toTypedArray())
 
 @CommandSet("MessageConfiguration")
 fun messageConfiguration(messageService: MessageService) = commands {
+    command("messagekeys") {
+        description = "List message keys."
+        execute {
+            it.respond("Available keys: ${messages.keys.joinToString(", ")}")
+        }
+    }
+
     command("set") {
         description = "Set message for the given key. Available keys: ${messages.keys.joinToString(", ")}"
         expect(MessageConfigArg, SentenceArg("Message"))
@@ -53,3 +55,8 @@ fun messageConfiguration(messageService: MessageService) = commands {
         }
     }
 }
+
+private val messages = Messages::class.declaredMemberProperties
+        .filter { it.returnType == String::class.createType() }
+        .filterIsInstance<KMutableProperty<*>>()
+        .associateBy { it.name.toLowerCase() }

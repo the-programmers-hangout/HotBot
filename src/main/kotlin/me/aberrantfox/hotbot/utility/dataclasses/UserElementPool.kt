@@ -22,14 +22,6 @@ data class PoolRecord(val sender: String, val dateTime: DateTime, val message: S
             .addField("Member ID", sender, false)
             .build()
 
-    fun prettyPrint(jda: JDA, datumName: String): EmbedBuilder =
-        EmbedBuilder()
-            .setTitle("${jda.retrieveUserById(sender).complete().name}'s $datumName")
-            .addField("Time of Creation", formatConstructionDate(), false)
-            .addField("Content", message, false)
-            .setThumbnail(avatarURL)
-            .setTimestamp(LocalDateTime.now())
-
     private fun formatConstructionDate() = dateTime.toString(DateTimeFormat.forPattern("dd/MM/yyyy"))
 }
 
@@ -72,8 +64,6 @@ class UserElementPool(private val userLimit: Int = 3, private val poolLimit: Int
     }
 
     fun entries() = pool.size
-
-    fun isEmpty() = pool.isEmpty()
 
     fun peek(): PoolRecord? = pool.peek()
 

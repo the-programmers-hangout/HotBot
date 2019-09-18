@@ -68,44 +68,4 @@ fun raidCommands(config: Configuration, logger: BotLogger) = commands {
             it.respond("Raiders unmuted, be nice bois!")
         }
     }
-
-    command("banraider") {
-        description = "Ban a raider by ID, deleting a given number of days messages"
-        requiresGuild = true
-        expect(UserArg, IntegerArg("Message Deletion Days"))
-        execute {
-            val user = it.args[0] as User
-            val delDays = (it.args[1] as Int)
-
-            if (!(MutedRaiders.set.contains(user.id))) {
-                it.respond("That user is not a raider.")
-                return@execute
-            }
-
-            MutedRaiders.set.remove(user.id)
-            it.guild!!.ban(user, delDays).queue()
-        }
-    }
-
-    command("banautodetectedraid") {
-        description = "Ban all of the raiders in the raidview, deleting a given number of days messages"
-        requiresGuild = true
-        expect(IntegerArg("Message Deletion Days"))
-        execute {
-            val delDays = (it.args[0]) as Int
-
-            if (MutedRaiders.set.size == 0) {
-                it.respond("There are currently no automatically detected raiders... ")
-                return@execute
-            }
-
-            MutedRaiders.set
-                    .map { id -> it.discord.jda.retrieveUserById(id).complete() }
-                    .forEach { user -> it.guild!!.ban(user, delDays).queue() }
-
-            MutedRaiders.set.clear()
-
-            it.respond("Performing raid ban.")
-        }
-    }
 }
