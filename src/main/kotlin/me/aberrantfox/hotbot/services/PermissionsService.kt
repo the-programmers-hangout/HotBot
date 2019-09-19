@@ -12,14 +12,6 @@ import java.util.concurrent.ConcurrentHashMap
 
 enum class PermissionLevel {
     Everyone, Member, JrMod, Moderator, Administrator, Owner;
-    companion object {
-        fun isLevel(name: String) = values()
-                .map { it.name.toLowerCase() }
-                .any { it == name.toLowerCase() }
-
-        fun convertToPermission(level: String) = values()
-                .first { it.name.toLowerCase() == level.toLowerCase() }
-    }
 }
 
 data class PermissionsConfiguration(val permissions: ConcurrentHashMap<String, PermissionLevel> = ConcurrentHashMap(),
@@ -70,11 +62,6 @@ open class PermissionService(val discord: Discord, private val botConfig: Config
     fun canPerformAction(user: User, actionLevel: PermissionLevel) = getPermissionLevel(user) >= actionLevel
 
     fun canUseCommand(user: User, command: String) = getPermissionLevel(user) >= permissionsConfig.permissions[command.toLowerCase()] ?: PermissionLevel.Owner
-
-    fun listAvailableCommands(user: User) = permissionsConfig.permissions
-            .filter { it.value <= getPermissionLevel(user) }
-            .map { it.key }
-            .joinToString()
 
     fun assignRoleLevel(role: Role, level: PermissionLevel): Job {
         permissionsConfig.roleMappings[role.id] = level

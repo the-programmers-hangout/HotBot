@@ -16,10 +16,6 @@ import java.awt.Color
 
 data class StrikeRequest(val target: Member, val reason: String, val amount: Int, val moderator: User)
 
-object StrikeRequests {
-    val map = HashMap<UserID, StrikeRequest>()
-}
-
 @CommandSet("infractions")
 fun strikeCommands(config: Configuration, log: BotLogger, muteService: MuteService) =
     commands {

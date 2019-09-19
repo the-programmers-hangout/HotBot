@@ -13,15 +13,13 @@ open class Configuration(open val serverInformation: ServerInformation = ServerI
                          val messageChannels: MessageChannels = MessageChannels(),
                          val databaseCredentials: DatabaseCredentials = DatabaseCredentials(),
                          val logChannels: ChannelIdHolder = ChannelIdHolder(),
-                         val permissionedActions: PermissionedActions = PermissionedActions(),
-                         val botInformation: BotInformation = BotInformation())
+                         val permissionedActions: PermissionedActions = PermissionedActions())
 
 class ServerInformation(val token: String = "insert-token",
                         val ownerID: String = "insert-id",
                         var prefix: String = "insert-prefix",
                         val guildid: String = "insert-guild-id",
                         val macroDelay: Int = 30,
-                        val suggestionPoolLimit: Int = 20,
                         val deleteWelcomeOnLeave: Boolean = true,
                         val maxSelfmuteMinutes: Int = 60,
                         val karmaGiveDelay: Int = 1000 * 60 * 60,
@@ -53,9 +51,6 @@ data class DatabaseCredentials(val username: String = "root",
                                val password: String = "",
                                val hostname: String = "hotbotdb",
                                val database: String = "hotbot")
-
-data class BotInformation(val developmentMode: Boolean = true)
-
 
 sealed class InfractionAction {
     object Warn : InfractionAction()
