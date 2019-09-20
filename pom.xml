@@ -18,7 +18,7 @@
 
         <!-- Kotlin/Discord Dependency versions -->
         <kotlin.version>1.3.10</kotlin.version>
-        <kutils.version>0.9.17</kutils.version>
+        <kutils.version>0.10.1</kutils.version>
 
         <!-- Other Dependencies -->
         <jsoup.version>1.11.1</jsoup.version>
@@ -119,7 +119,7 @@
         </dependency>
         <dependency>
             <groupId>com.gitlab.aberrantfox</groupId>
-            <artifactId>Kutils</artifactId>
+            <artifactId>KUtils</artifactId>
             <version>${kutils.version}</version>
         </dependency>
         <dependency>

@@ -4,9 +4,9 @@ import me.aberrantfox.hotbot.arguments.LowerUserArg
 import me.aberrantfox.hotbot.database.*
 import me.aberrantfox.kjdautils.api.dsl.*
 import me.aberrantfox.kjdautils.extensions.jda.fullName
-import me.aberrantfox.kjdautils.internal.command.arguments.IntegerArg
-import me.aberrantfox.kjdautils.internal.command.arguments.UserArg
-import net.dv8tion.jda.core.entities.User
+import me.aberrantfox.kjdautils.internal.arguments.IntegerArg
+import me.aberrantfox.kjdautils.internal.arguments.UserArg
+import net.dv8tion.jda.api.entities.User
 
 @CommandSet("karmacmds")
 fun karmaCommands() = commands {
@@ -24,11 +24,11 @@ fun karmaCommands() = commands {
         description = "View the users with the most Karma"
         execute {
             it.respond(embed {
-                title("Top 10 most helpful people")
+                title = "Top 10 most helpful people"
 
                 leaderBoard().forEachIndexed{ index, record ->
                     field {
-                        name = "${index + 1}) ${it.jda.getUserById(record.who).fullName()}"
+                        name = "${index + 1}) ${it.discord.jda.getUserById(record.who)?.fullName() ?: record.who}"
                         value = "${record.karma} karma"
                         inline = false
                     }

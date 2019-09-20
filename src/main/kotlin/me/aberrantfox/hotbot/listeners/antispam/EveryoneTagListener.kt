@@ -1,12 +1,12 @@
-package me.aberrantfox.hotbot.listeners
+package me.aberrantfox.hotbot.listeners.antispam
 
 import com.google.common.eventbus.Subscribe
 import me.aberrantfox.kjdautils.internal.logging.BotLogger
-import net.dv8tion.jda.core.entities.Member
-import net.dv8tion.jda.core.entities.Message
-import net.dv8tion.jda.core.entities.TextChannel
-import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent
-import net.dv8tion.jda.core.events.message.guild.GuildMessageUpdateEvent
+import net.dv8tion.jda.api.entities.Member
+import net.dv8tion.jda.api.entities.Message
+import net.dv8tion.jda.api.entities.TextChannel
+import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent
+import net.dv8tion.jda.api.events.message.guild.GuildMessageUpdateEvent
 
 
 class EveryoneTagListener(val log: BotLogger) {

@@ -1,14 +1,11 @@
-package me.aberrantfox.hotbot.listeners.antispam
+package me.aberrantfox.hotbot.listeners.moderation
 
 import com.google.common.eventbus.Subscribe
 import me.aberrantfox.hotbot.services.Configuration
 import me.aberrantfox.kjdautils.extensions.jda.fullName
 import me.aberrantfox.kjdautils.internal.logging.BotLogger
-import net.dv8tion.jda.core.entities.Member
-import net.dv8tion.jda.core.entities.MessageChannel
-import net.dv8tion.jda.core.entities.MessageReaction
-import net.dv8tion.jda.core.events.message.react.MessageReactionAddEvent
-import net.dv8tion.jda.core.events.message.react.MessageReactionRemoveEvent
+import net.dv8tion.jda.api.entities.*
+import net.dv8tion.jda.api.events.message.react.*
 
 class ReactionListener(val config: Configuration, val log: BotLogger) {
     @Subscribe
@@ -29,10 +26,6 @@ class ReactionListener(val config: Configuration, val log: BotLogger) {
         if (author.roles.map { it.name }.contains(config.security.mutedRole)) {
             reaction.removeReaction(author.user).queue()
             log.alert("${author.fullName()} reacted using ${emote.name} while muted and it has been removed.")
-        }
-
-        if (config.security.verboseLogging) {
-            log.alert("${author.fullName()} (id: $id) $verb the emote \"${emote.name}\" in #${channel.name} (message: ${reaction.messageId}).")
         }
     }
 }

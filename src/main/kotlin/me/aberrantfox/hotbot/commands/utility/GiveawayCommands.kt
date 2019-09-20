@@ -3,10 +3,9 @@ package me.aberrantfox.hotbot.commands.utility
 import me.aberrantfox.hotbot.utility.randomInt
 import me.aberrantfox.kjdautils.api.dsl.*
 import me.aberrantfox.kjdautils.extensions.stdlib.convertToTimeString
-import me.aberrantfox.kjdautils.internal.command.arguments.*
+import me.aberrantfox.kjdautils.internal.arguments.*
 import me.aberrantfox.kjdautils.internal.logging.BotLogger
-import net.dv8tion.jda.core.entities.*
-import net.dv8tion.jda.core.requests.RestAction
+import net.dv8tion.jda.api.entities.*
 import java.awt.Color
 import kotlin.concurrent.timer
 import kotlin.math.roundToLong
@@ -19,7 +18,6 @@ object Giveaways {
 }
 
 private const val timeUpdatePeriod = 5000L
-
 private const val giveawayEmbedTitle = "\uD83C\uDF89 GIVEAWAY! \uD83C\uDF89"
 private const val prizeFieldTitle = "Prize"
 
@@ -95,7 +93,7 @@ private fun runGiveaway(message: Message) {
         val newTimeLeftMs = timeLeft - timeUpdatePeriod
 
         if (newTimeLeftMs <= 0) {
-            message.channel.getMessageById(messageID).queue({ updatedMessage ->
+            message.channel.retrieveMessageById(messageID).queue({ updatedMessage ->
                 announceWinner(updatedMessage, prize)
                 Giveaways.giveaways.remove(messageID)
             }, { error ->
@@ -119,7 +117,7 @@ private fun announceWinner(message: Message, prize: String) {
 
     val total = reaction.count
 
-    reaction.users.takeAsync(total).thenAcceptAsync { allUsers ->
+    reaction.retrieveUsers().takeAsync(total).thenAcceptAsync { allUsers ->
         val entered = allUsers.filterNot(User::isBot)
 
         if (entered.isEmpty()) {
@@ -149,8 +147,8 @@ private fun retrievePrize(message: Message): String {
 
 private fun buildGiveawayEmbed(timeMilliSecs: Long, prize: String) =
         embed {
-            title(giveawayEmbedTitle)
-            setColor(Color.BLUE)
+            title = giveawayEmbedTitle
+            color = Color.BLUE
             field {
                 name = "Giveaway event started."
                 value = "React to this with \uD83C\uDF89 for a chance to win "
@@ -172,9 +170,9 @@ private fun buildGiveawayEmbed(timeMilliSecs: Long, prize: String) =
 
 private fun buildWinnerEmbed(winner: User?, prize: String) =
         embed {
-            title(giveawayEmbedTitle)
-            description("Thank you for participating, better luck next time!")
-            setColor(Color.BLACK)
+            title = giveawayEmbedTitle
+            description = "Thank you for participating, better luck next time!"
+            color = Color.BLACK
 
             field {
                 name = "Winner"

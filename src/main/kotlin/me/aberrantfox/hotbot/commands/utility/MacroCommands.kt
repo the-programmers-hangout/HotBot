@@ -3,16 +3,13 @@ package me.aberrantfox.hotbot.commands.utility
 import com.github.salomonbrys.kotson.fromJson
 import com.google.gson.Gson
 import me.aberrantfox.hotbot.arguments.MacroArg
-import me.aberrantfox.hotbot.arguments.MultipleArg
-import me.aberrantfox.hotbot.services.PermissionLevel
-import me.aberrantfox.hotbot.services.PermissionService
-import me.aberrantfox.hotbot.services.configPath
+import me.aberrantfox.hotbot.extensions.createContinuableField
+import me.aberrantfox.hotbot.services.*
 import me.aberrantfox.hotbot.utility.timeToDifference
 import me.aberrantfox.kjdautils.api.dsl.*
+import me.aberrantfox.kjdautils.internal.arguments.*
 import me.aberrantfox.kjdautils.internal.command.CommandRecommender
-import me.aberrantfox.kjdautils.internal.command.arguments.SentenceArg
-import me.aberrantfox.kjdautils.internal.command.arguments.WordArg
-import net.dv8tion.jda.core.entities.MessageChannel
+import net.dv8tion.jda.api.entities.MessageChannel
 import org.joda.time.DateTime
 import java.awt.Color
 import java.io.File
@@ -185,17 +182,15 @@ fun removeMacro(macro: Macro, container: CommandsContainer, manager: PermissionS
 
 private fun buildMacrosEmbed(groupedMacros: Map<String, Collection<Macro>>) =
         embed {
-            title("Currently Available Macros")
+            title = "Currently Available Macros"
+            color = Color.GREEN
 
-            setColor(Color.GREEN)
-
-            groupedMacros.toList().sortedByDescending { it.second.size }.forEach { (categoryName, macros) ->
-                field {
-                    name = categoryName.capitalize()
-                    value = macros.map { it.name }.sorted().joinToString(", ")
-                    inline = false
+            groupedMacros.toList()
+                .sortedByDescending { it.second.size }
+                .forEach { (categoryName, macros) ->
+                    val categoryList = macros.map { it.name }.sorted().joinToString(", ")
+                    createContinuableField(categoryName.capitalize(), categoryList)
                 }
-            }
         }
 
 private fun loadMacroList(): List<Macro> {

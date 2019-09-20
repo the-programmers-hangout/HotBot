@@ -1,6 +1,6 @@
 package me.aberrantfox.hotbot
 
-import me.aberrantfox.hotbot.database.*
+import me.aberrantfox.hotbot.database.setupDatabaseSchema
 import me.aberrantfox.hotbot.services.*
 import me.aberrantfox.kjdautils.api.startBot
 import me.aberrantfox.kjdautils.internal.logging.convertChannels
@@ -14,7 +14,7 @@ fun main() {
 private fun start(config: Configuration) = startBot(config.serverInformation.token) {
     setupDatabaseSchema(config)
 
-    this.logger = convertChannels(config.logChannels, jda)
+    this.logger = convertChannels(config.logChannels, this.discord.jda)
 
     registerInjectionObject(config, container, logger, this.config)
 
@@ -24,4 +24,10 @@ private fun start(config: Configuration) = startBot(config.serverInformation.tok
         globalPath = "me.aberrantfox.hotbot"
         deleteMode = config.serverInformation.deletionMode
     }
+
+    val aliasService = getInjectionObject(AliasService::class.java) as AliasService
+    aliasService.loadAliases()
+
+    val permissionService = getInjectionObject(PermissionService::class.java) as PermissionService
+    permissionService.defaultAndPrunePermissions(container)
 }

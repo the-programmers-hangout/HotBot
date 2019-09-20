@@ -28,8 +28,8 @@ fun setupDatabaseSchema(config: Configuration) {
     )
 
     transaction {
-        SchemaUtils.create(Strikes, HistoryCount, Suggestions, BanRecords, CommandPermissions,
-                ChannelResources, Notes, MutedMember, IgnoredIDs, Reminder, GuildLeaveHistory, KarmaTable)
+        SchemaUtils.create(Strikes, HistoryCount, Suggestions, BanRecords,
+                Notes, MutedMember, IgnoredIDs, Reminder, GuildLeaveHistory, KarmaTable)
         logger.addLogger(StdOutSqlLogger)
     }
 }
@@ -69,19 +69,6 @@ object BanRecords : Table() {
     val id = varchar("id", 18).primaryKey()
     val reason = text("reason")
     val moderator = varchar("moderator", 18)
-}
-
-object CommandPermissions : Table() {
-    val id = integer("id").autoIncrement().primaryKey()
-    val roleID = varchar("roleID", 18)
-    val commandName = varchar("name", 256)
-}
-
-object ChannelResources : Table() {
-    val id = integer("id").autoIncrement().primaryKey()
-    val channel = varchar("channel", 18)
-    val section = varchar("section", 64)
-    val info = varchar("info", 255)
 }
 
 object MutedMember : Table() {

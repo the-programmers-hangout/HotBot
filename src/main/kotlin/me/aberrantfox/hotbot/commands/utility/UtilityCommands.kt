@@ -2,25 +2,24 @@ package me.aberrantfox.hotbot.commands.utility
 
 import com.google.gson.Gson
 import khttp.post
-import me.aberrantfox.hotbot.arguments.HexColourArg
-import me.aberrantfox.hotbot.database.*
+import me.aberrantfox.hotbot.database.getUnmuteRecord
 import me.aberrantfox.hotbot.javautilities.UrlUtilities.sendImageToChannel
 import me.aberrantfox.hotbot.services.*
-import me.aberrantfox.hotbot.utility.*
+import me.aberrantfox.hotbot.utility.timeToString
 import me.aberrantfox.kjdautils.api.dsl.*
-import me.aberrantfox.kjdautils.extensions.jda.fullName
-import me.aberrantfox.kjdautils.extensions.jda.toMember
+import me.aberrantfox.kjdautils.extensions.jda.*
 import me.aberrantfox.kjdautils.extensions.stdlib.sanitiseMentions
-import me.aberrantfox.kjdautils.internal.command.arguments.*
+import me.aberrantfox.kjdautils.internal.arguments.*
 import me.aberrantfox.kjdautils.internal.logging.BotLogger
-import net.dv8tion.jda.core.OnlineStatus
-import net.dv8tion.jda.core.entities.*
+import net.dv8tion.jda.api.*
+import net.dv8tion.jda.api.entities.*
 import org.joda.time.DateTime
 import java.awt.Color
 import java.net.URLEncoder
 import java.time.format.DateTimeFormatter
 import java.util.Date
 import kotlin.math.roundToLong
+import kotlin.system.exitProcess
 
 data class Properties(val version: String, val author: String)
 
@@ -41,21 +40,14 @@ const val uploadTextBaseUrl: String = "https://hasteb.in"
 @CommandSet("utility")
 fun utilCommands(messageService: MessageService, manager: PermissionService, config: Configuration,
                  log: BotLogger, muteService: MuteService) = commands {
-    command("ping") {
-        description = "Pong!"
-        execute {
-            it.respond("Responded in ${it.jda.ping}ms")
-        }
-    }
-
     command("botinfo") {
         description = "Display the bot information."
         execute {
             it.respond(embed {
-                title(it.jda.selfUser.fullName())
-                description(messageService.messages.botDescription)
-                setColor(Color.red)
-                setThumbnail(it.jda.selfUser.effectiveAvatarUrl)
+                title = it.discord.jda.selfUser.fullName()
+                description = messageService.messages.botDescription
+                color = Color.red
+                thumbnail = it.discord.jda.selfUser.effectiveAvatarUrl
 
                 field {
                     name = "Creator"
@@ -82,9 +74,9 @@ fun utilCommands(messageService: MessageService, manager: PermissionService, con
 
     command("serverinfo") {
         description = "Display a message giving basic server information"
+        requiresGuild = true
         execute {
-            val guild = it.jda.getGuildById(config.serverInformation.guildid)
-            val embed = produceServerInfoEmbed(guild, messageService)
+            val embed = produceServerInfoEmbed(it.guild!!, messageService)
             it.respond(embed)
         }
     }
@@ -95,9 +87,9 @@ fun utilCommands(messageService: MessageService, manager: PermissionService, con
             val milliseconds = Date().time - startTime.time
 
             it.respond(embed {
-                setColor(Color.WHITE)
-                setTitle("I have been running since")
-                setDescription(startTime.toString())
+                color = Color.WHITE
+                title = "I have been running since"
+                description = startTime.toString()
 
                 field {
                     name = "That's been"
@@ -115,7 +107,7 @@ fun utilCommands(messageService: MessageService, manager: PermissionService, con
             log.info("saved configurations")
             manager.save()
             log.info("saved permissions to database prior to shut down.")
-            System.exit(0)
+            exitProcess(0)
         }
     }
 
@@ -123,7 +115,7 @@ fun utilCommands(messageService: MessageService, manager: PermissionService, con
         description = "Exit, without saving configurations."
         execute {
             it.respond("Killing process, configurations will not be saved.")
-            System.exit(0)
+            exitProcess(0)
         }
     }
 
@@ -165,7 +157,7 @@ fun utilCommands(messageService: MessageService, manager: PermissionService, con
         expect(UserArg)
         execute {
             val target = it.args.component1() as User
-            it.respond("${target.fullName()}'s account was made on ${target.creationTime}")
+            it.respond("${target.fullName()}'s account was made on ${target.timeCreated}")
         }
     }
 
@@ -189,15 +181,15 @@ fun utilCommands(messageService: MessageService, manager: PermissionService, con
 
     command("colour") {
         description = "Shows an embed with the given hex colour code"
-        expect(HexColourArg)
+        expect(HexColorArg)
         execute {
             val colour = it.args.component1() as Int
             val hex = colour.toString(16).padStart(6, '0')
             val response = embed {
-                setColor(colour)
-                setTitle("Colour")
-                setDescription("#$hex")
-                setThumbnail("http://via.placeholder.com/40/$hex?text=%20&")
+                color = Color.decode("#$hex")
+                title ="Colour"
+                description = "#$hex"
+                thumbnail = "http://via.placeholder.com/40/$hex?text=%20&"
             }
             it.respond(response)
         }
@@ -210,12 +202,11 @@ fun utilCommands(messageService: MessageService, manager: PermissionService, con
             val user = it.args.component1() as User
             val reverseSearchUrl = "<https://www.google.com/searchbyimage?&image_url=${user.effectiveAvatarUrl}>"
 
-            val embed = embed {
-                setTitle("${user.name}'s pfp")
-                setColor(Color.BLUE)
-                setImage(user.effectiveAvatarUrl)
-                setDescription("[Reverse Search]($reverseSearchUrl)")
-            }
+            val embed = EmbedBuilder(embed {
+                title = "${user.name}'s pfp"
+                color = Color.BLUE
+                description = "[Reverse Search]($reverseSearchUrl)"
+            }) .setImage(user.effectiveAvatarUrl).build()
 
             it.respond(embed)
         }
@@ -234,84 +225,23 @@ fun utilCommands(messageService: MessageService, manager: PermissionService, con
     }
 
 
-    command("selfmute") {
-        description = "Need to study and want no distractions? Mute yourself! (Length defaults to 1 hour)"
-        expect(arg(TimeStringArg, true, 3600.0))
-        execute {
-            val time = (it.args.component1() as Double).roundToLong() * 1000
-            val guild = it.jda.getGuildById(config.serverInformation.guildid)
-            val member = it.author.toMember(guild)
-
-            if(muteService.checkMuteState(member) != MuteService.MuteState.None) {
-                it.respond("Nice try but you're already muted")
-                return@execute
-            }
-
-            if(time > 1000*60*config.serverInformation.maxSelfmuteMinutes) {
-                it.respond("Sorry but you can't mute yourself for that long")
-                return@execute
-            } else if (time <= 0) {
-                it.respond("Sorry, the laws of physics disallow muting for non-positive durations.")
-                return@execute
-            }
-
-            if (member != null) {
-                muteService.muteMember(member, time, "No distractions for a while? Got it", it.author)
-            } else {
-                it.respond(":thinking: You are not a member of the server")
-            }
-        }
-    }
-
-    command("remainingmute") {
-        description="Return the remaining time of a mute"
-        execute {
-            try{
-                val unmuteTime = getUnmuteRecord(it.author.id, config.serverInformation.guildid)- DateTime().millis
-                it.respond(timeToString(unmuteTime))
-            }catch (e: NoSuchElementException){
-                it.respond("You aren't currently muted...")
-            }
-
-        }
-    }
 }
 
-fun produceServerInfoEmbed(guild: Guild, messageService: MessageService) =
-    embed {
-        title(guild.name)
-        setColor(Color.MAGENTA)
-        description(messageService.messages.serverDescription)
-        setFooter("Guild creation date: ${guild.creationTime.format(DateTimeFormatter.RFC_1123_DATE_TIME)}", "http://i.imgur.com/iwwEprG.png")
-        setThumbnail("http://i.imgur.com/DFoaG7k.png")
+fun produceServerInfoEmbed(guild: Guild, messageService: MessageService) = with(guild) {
+    EmbedBuilder(embed {
+        title = name
+        description = messageService.messages.serverDescription
+        thumbnail = jda.selfUser.effectiveAvatarUrl
+        color = Color.MAGENTA
 
-        field {
-            name = "Users"
-            value = "${guild.members.filter { it.onlineStatus != OnlineStatus.OFFLINE }.size}/${guild.members.size}"
-        }
+        val onlineMembers = members.filter { it.onlineStatus != OnlineStatus.OFFLINE }.size
 
-        ifield {
-            name = "Total Roles"
-            value = guild.roles.size.toString()
-        }
+        addInlineField("Users", "$onlineMembers/${members.size}")
+        addInlineField("Total Roles", roles.size.toString())
+        addInlineField("Owner", owner?.fullName())
+        addInlineField("Region", region.toString())
+        addInlineField("Text Channels", textChannelCache.size().toString())
+        addInlineField("Voice Channels", voiceChannels.size.toString())
 
-        ifield {
-            name = "Owner"
-            value = guild.owner.fullName()
-        }
-
-        ifield {
-            name = "Region"
-            value = guild.region.toString()
-        }
-
-        ifield {
-            name = "Text Channels"
-            value = guild.textChannelCache.size().toString()
-        }
-
-        ifield {
-            name = "Voice Channels"
-            value = guild.voiceChannels.size.toString()
-        }
-    }
+    }).setFooter("Guild creation date: ${timeCreated.format(DateTimeFormatter.RFC_1123_DATE_TIME)}", iconUrl).build()
+}

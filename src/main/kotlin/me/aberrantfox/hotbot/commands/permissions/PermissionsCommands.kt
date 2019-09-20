@@ -1,21 +1,13 @@
 package me.aberrantfox.hotbot.commands.permissions
 
+import me.aberrantfox.hotbot.arguments.*
 import me.aberrantfox.hotbot.arguments.CategoryArg
-import me.aberrantfox.hotbot.arguments.PermissionLevelArg
 import me.aberrantfox.hotbot.commands.utility.macroCommandCategory
-import me.aberrantfox.hotbot.services.PermissionLevel
-import me.aberrantfox.hotbot.services.PermissionService
-import me.aberrantfox.hotbot.services.Configuration
-import me.aberrantfox.kjdautils.api.dsl.Command
-import me.aberrantfox.kjdautils.api.dsl.CommandSet
-import me.aberrantfox.kjdautils.api.dsl.commands
-import me.aberrantfox.kjdautils.api.dsl.embed
+import me.aberrantfox.hotbot.services.*
+import me.aberrantfox.kjdautils.api.dsl.*
 import me.aberrantfox.kjdautils.extensions.stdlib.sanitiseMentions
-import me.aberrantfox.kjdautils.internal.command.arguments.CommandArg
-import me.aberrantfox.kjdautils.internal.command.arguments.RoleArg
-import me.aberrantfox.kjdautils.internal.command.arguments.TextChannelArg
-import net.dv8tion.jda.core.entities.Role
-import net.dv8tion.jda.core.entities.TextChannel
+import me.aberrantfox.kjdautils.internal.arguments.*
+import net.dv8tion.jda.api.entities.*
 import java.awt.Color
 
 @CommandSet("permissions")
@@ -44,9 +36,9 @@ fun permissionCommands(manager: PermissionService, config: Configuration) =
 
             command("roleids") {
                 description = "Display each role in the server with its corresponding ID"
+                requiresGuild = true
                 execute {
-                    val guild = it.jda.getGuildById(config.serverInformation.guildid)
-                    it.respond(guild.roles.joinToString("\n") { role -> "${role.name} :: ${role.id}" })
+                    it.respond(it.guild!!.roles.joinToString("\n") { role -> "${role.name} :: ${role.id}" })
                 }
             }
 
@@ -90,9 +82,9 @@ fun permissionCommands(manager: PermissionService, config: Configuration) =
                 description = "View all of the commands by category, listed with their associated permission level."
                 execute {
                     it.respond(embed {
-                        title("Command Permissions")
-                        description("Below you can see all of the different command categories, along with all of their " +
-                                "respective commands and the associated permission required to use those commands.")
+                        title = "Command Permissions"
+                        description = "Below you can see all of the different command categories, along with all of their " +
+                                "respective commands and the associated permission required to use those commands."
 
 
                         val grouped = it.container.commands.values
@@ -128,9 +120,9 @@ fun permissionCommands(manager: PermissionService, config: Configuration) =
                             .sortedByDescending { it.second.size }
 
                     it.respond(embed {
-                        title("Commands available to you")
-                        setColor(Color.green)
-                        setThumbnail(it.author.effectiveAvatarUrl)
+                        title = "Commands available to you"
+                        color = Color.green
+                        thumbnail = it.author.effectiveAvatarUrl
                         available.forEach { (category, cmds) ->
                             field {
                                 name = category
@@ -157,20 +149,19 @@ fun permissionCommands(manager: PermissionService, config: Configuration) =
 
             command("viewRoleAssignments") {
                 description = "View the permission levels any roles have been assigned."
+                requiresGuild = true
                 execute {
                     it.respond(embed {
-                        title("Role Assignments")
-                        description("Below you can see what roles have been assigned what permission levels")
+                        title = "Role Assignments"
+                        description = "Below you can see what roles have been assigned what permission levels"
 
                         val assignments = manager.roleAssignments()
-
-                        val guild = it.jda.getGuildById(config.serverInformation.guildid)
 
                         val assignmentsText = if (assignments.isEmpty()) {
                             "None"
                         } else {
                             assignments.joinToString("\n") { pair ->
-                                val roleName = guild.getRoleById(pair.key).name
+                                val roleName = it.guild!!.getRoleById(pair.key)?.name ?: "${pair.key} (couldn't retrieve)"
                                 "$roleName :: PermissionLevel.${pair.value}"
                             }
                         }
@@ -179,56 +170,6 @@ fun permissionCommands(manager: PermissionService, config: Configuration) =
                             this.name = "Assignments"
                             this.value = assignmentsText
                             inline = false
-                        }
-                    })
-                }
-            }
-
-            command("setChannelCommandIgnore") {
-                description = "Set the minimum role required to invoke a command in the given channel"
-                expect(TextChannelArg, PermissionLevelArg)
-                execute {
-                    val channel = it.args.component1() as TextChannel
-                    val level = it.args.component2() as PermissionLevel
-                    manager.setChannelCommandIgnore(channel.id, level)
-
-                    it.respond("Commands in ${channel.name} now require a minimum role of $level")
-                }
-            }
-
-            command("setChannelMentionIgnore") {
-                description = "Set the minimum role required for the bot to reply to a mention, if mentions are enabled"
-                expect(TextChannelArg, PermissionLevelArg)
-                execute {
-                    val channel = it.args.component1() as TextChannel
-                    val level = it.args.component2() as PermissionLevel
-                    manager.setChannelMentionIgnore(channel.id, level)
-
-                    it.respond("Mentions in ${channel.name} now require a minimum role of $level")
-                }
-            }
-
-            command("viewChannelIgnoreLevels") {
-                description = "Display the required roles to invoke/mention in the overridden channels"
-                execute { event ->
-                    val map = manager.allChannelIgnoreLevels()
-
-                    event.respond(embed {
-                        setTitle("Channel Ignore Levels")
-                        setColor(Color.BLUE)
-                        map.forEach {
-                            ifield {
-                                name = "Channel"
-                                value = "<#${it.key}>"
-                            }
-                            ifield {
-                                name = "Command"
-                                value = it.value.command.toString()
-                            }
-                            ifield {
-                                name = "Mention"
-                                value = it.value.mention.toString()
-                            }
                         }
                     })
                 }

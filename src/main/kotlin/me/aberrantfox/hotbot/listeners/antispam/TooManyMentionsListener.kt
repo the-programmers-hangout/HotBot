@@ -4,7 +4,7 @@ import com.google.common.eventbus.Subscribe
 import me.aberrantfox.hotbot.services.MuteService
 import me.aberrantfox.kjdautils.extensions.jda.fullName
 import me.aberrantfox.kjdautils.internal.logging.BotLogger
-import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent
+import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent
 
 
 class TooManyMentionsListener(val log: BotLogger, private val muteService: MuteService) {
@@ -17,7 +17,7 @@ class TooManyMentionsListener(val log: BotLogger, private val muteService: MuteS
         if (event.message.mentionedUsers.size >= 7) {
             event.message.delete().queue()
             log.alert("${event.author.fullName()} sent a message with ${event.message.mentionedUsers.size} mentions, and it was deleted.")
-            member.guild.controller.addRolesToMember(member, muteService.getMutedRole(event.guild)).queue()
+            member.guild.addRoleToMember(member, muteService.getMutedRole(event.guild)).queue()
         }
     }
 }

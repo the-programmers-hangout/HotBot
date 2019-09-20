@@ -14,11 +14,8 @@ class AliasService(private val manager: PermissionService,
     private val aliases: HashMap<String, String> = hashMapOf()
     private val aliasesFile = File("config/aliases.json")
 
-    init {
-        loadAliases()
-    }
 
-    private fun loadAliases() {
+    fun loadAliases() {
         val json = if (!aliasesFile.exists()) {
             AliasService::class.java.getResource("/default-aliases.json").readText()
         } else {
@@ -43,7 +40,11 @@ class AliasService(private val manager: PermissionService,
     }
 
     fun add(pair: Pair<String, String>): CreationResult {
-        val (alias, target) = pair
+        val alias = pair.first.toLowerCase()
+        var target = pair.second.toLowerCase()
+
+        // if target itself is an alias, make the aliased command the new target
+        aliases[target]?.let { target = it }
 
         val targetCommand = container[target] ?: return CreationResult.InvalidCommand
         if (container.has(alias)) return CreationResult.UnavailableName
@@ -68,6 +69,7 @@ class AliasService(private val manager: PermissionService,
             aliases.remove(alias)
             manager.removePermissions(alias)
             CommandRecommender.removePossibility(alias)
+            container.commands.remove(alias)
             saveAliases()
             true
         }

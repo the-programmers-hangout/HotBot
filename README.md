@@ -16,49 +16,6 @@ This is TBD, since currently the only user of it (really) is the creator of this
 - In order to build the project, you will need maven installed. You can view more about maven [here](https://maven.apache.org/)
 - Full documentation will be available later of the DSL's created and some of the other features seperated from the commands. Commands are   by in large self-documenting. 
 
-
-##### Using the JavaScript API
-
-You can add new commands and features to this bot yourself without recompiling. You can do this by writing some
-simple JavaScript; this should be quite easy to do if you know how to code. 
-
-###### Requirements
- - A text editor
- - Ability to read this: https://www.n-k.de/riding-the-nashorn/ (This JavaScript syntax is *slightly* different to regular Js.)
-
-###### What the API exposes
-The api exposes a few things:
- - The JDA object. You can use it like the JDA object found here https://github.com/DV8FromTheWorld/JDA
- - The commands container (Useful for implementing commands)
- - The configuration object (For grabbing any configuration information)
-
-###### A basic command
-Read the JavaScript code below (Please note, ES 5.1 syntax for now):
-```js
-//create a command object. The command will be invoked by typing (prefix)jsecho
-const command = createCommand("jsecho")
-
-//state that in order to use the command, the user must provide some arguments, e.g. ++jsecho Hi there, this is a test!
-command.expect(SentenceArg)
-
-//Provide a function that is called when the command is executed (It is passed a CommandEvent)
-command.execute((event) => {
-    //Get the first argument out of the argument array.
-    const arg1 = event.args[0]
-    //respond to the channel that this command was called in with what they said
-    event.respond(arg1)
-});
-```
-
-Sample output:
-```txt
-++jsecho test
-Bot: test
-```
-
-###### Where do I put the code?
-In config/scripts/custom. This directory may not exist, create it.
-
 More documentation to come!
 
 ##### Contributing

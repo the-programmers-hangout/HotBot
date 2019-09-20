@@ -9,10 +9,10 @@ import me.aberrantfox.kjdautils.extensions.jda.fullName
 import me.aberrantfox.kjdautils.extensions.jda.sendPrivateMessage
 import me.aberrantfox.kjdautils.extensions.stdlib.convertToTimeString
 import me.aberrantfox.kjdautils.extensions.stdlib.sanitiseMentions
-import me.aberrantfox.kjdautils.internal.command.arguments.SentenceArg
-import me.aberrantfox.kjdautils.internal.command.arguments.TimeStringArg
+import me.aberrantfox.kjdautils.internal.arguments.SentenceArg
+import me.aberrantfox.kjdautils.internal.arguments.TimeStringArg
 import me.aberrantfox.kjdautils.internal.logging.BotLogger
-import net.dv8tion.jda.core.entities.User
+import net.dv8tion.jda.api.entities.User
 import java.util.*
 import kotlin.concurrent.schedule
 import kotlin.math.roundToLong

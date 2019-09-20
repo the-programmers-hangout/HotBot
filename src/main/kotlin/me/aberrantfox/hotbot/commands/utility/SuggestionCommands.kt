@@ -1,14 +1,14 @@
 package me.aberrantfox.hotbot.commands.utility
 
 import me.aberrantfox.hotbot.database.*
-import me.aberrantfox.hotbot.services.*
+import me.aberrantfox.hotbot.services.Configuration
 import me.aberrantfox.hotbot.utility.dataclasses.*
 import me.aberrantfox.kjdautils.api.dsl.*
 import me.aberrantfox.kjdautils.extensions.jda.*
-import me.aberrantfox.kjdautils.internal.command.arguments.*
+import me.aberrantfox.kjdautils.internal.arguments.*
 import me.aberrantfox.kjdautils.internal.logging.BotLogger
-import net.dv8tion.jda.core.*
-import net.dv8tion.jda.core.entities.*
+import net.dv8tion.jda.api.*
+import net.dv8tion.jda.api.entities.*
 import java.awt.Color
 
 
@@ -59,12 +59,13 @@ fun suggestionCommands(config: Configuration, log: BotLogger) = commands {
                 return@execute
             }
 
-            it.respond(suggestion.describe(it.jda, "Suggestion"))
+            it.respond(suggestion.describe(it.discord.jda, "Suggestion"))
         }
     }
 
     command("pool") {
         description = "Accept or deny the suggestion at the top of the pool. If accepted, move to the community review stage"
+        requiresGuild = true
         expect(ChoiceArg(name="Response", choices=*arrayOf("accept", "deny")))
         execute {
             val response = it.args.component1() as String
@@ -77,13 +78,11 @@ fun suggestionCommands(config: Configuration, log: BotLogger) = commands {
             var status = SuggestionStatus.Denied
 
             if (response == "accept") {
-                val guild = it.jda.getGuildById(config.serverInformation.guildid)
-
-                val channel = guild.textChannels.findLast { channel ->
+                val channel = it.guild!!.textChannels.findLast { channel ->
                     channel.id == config.messageChannels.suggestionChannel
                 }
 
-                channel?.sendMessage(buildSuggestionMessage(suggestion, it.jda, SuggestionStatus.Review).build())?.queue {
+                channel?.sendMessage(buildSuggestionMessage(suggestion, it.discord.jda, SuggestionStatus.Review).build())?.queue {
                     trackSuggestion(SuggestionRecord(it.id, SuggestionStatus.Review, suggestion))
 
                     it.addReaction("⬆").queue()
@@ -94,15 +93,16 @@ fun suggestionCommands(config: Configuration, log: BotLogger) = commands {
             }
 
             it.respond(embed {
-                setTitle("${status.message} suggestion")
-                setDescription(suggestion.message)
-                setColor(status.colour)
+                title = "${status.message} suggestion"
+                description = suggestion.message
+                color = status.colour
             })
         }
     }
 
     command("respond") {
         description = "Respond to a suggestion in the review stage, given the target id, response (accepted, denied, review), and reason."
+        requiresGuild = true
         expect(WordArg("Message ID"),
                 ChoiceArg(name="Status", choices=*arrayOf("accepted", "denied", "review")),
                 SentenceArg("Response Message"))
@@ -111,20 +111,19 @@ fun suggestionCommands(config: Configuration, log: BotLogger) = commands {
             val target = args[0] as String
             val response = args[1] as String
             val reason = args[2] as String
-            val status = inputToStatus(response)!!
+            val status = inputToStatus(response)
 
-            val guild = it.jda.getGuildById(config.serverInformation.guildid)
-
-            val suggestionChannel = fetchSuggestionChannel(guild, config)
+            val suggestionChannel = fetchSuggestionChannel(it.guild!!, config)
+                    ?: return@execute it.respond("Couldn't retrieve the suggestion channel!")
 
             if (!isTracked(target)) {
                 it.respond("That is not a valid message or a suggestion by the ID.")
                 return@execute
             }
 
-            suggestionChannel.getMessageById(target).queue({ msg ->
+            suggestionChannel.retrieveMessageById(target).queue({ msg ->
                 val suggestion = obtainSuggestion(target)
-                val message = buildArchiveMessage(suggestion.poolInfo, it.jda, status, msg.reactions)
+                val message = buildArchiveMessage(suggestion.poolInfo, it.discord.jda, status, msg.reactions)
                 val reasonTitle = "Reason for Status"
 
                 val suggestionUpdateMessage = buildSuggestionUpdateEmbed(suggestion, reason, status)
@@ -138,7 +137,8 @@ fun suggestionCommands(config: Configuration, log: BotLogger) = commands {
                     message.addField(reasonTitle, reason, false)
                     updateSuggestion(target, status)
 
-                    val archiveChannel = fetchArchiveChannel(guild, config)
+                    val archiveChannel = fetchArchiveChannel(it.guild!!, config)
+                            ?: return@queue it.respond("Couldn't retrieve the archive channel!")
 
                     if (suggestionChannel.id != archiveChannel.id && response != "review") {
                         archiveChannel.sendMessage(message.build()).queue()
@@ -149,9 +149,9 @@ fun suggestionCommands(config: Configuration, log: BotLogger) = commands {
                     }
 
                     it.respond(embed {
-                        setTitle("$status suggestion")
-                        setDescription(suggestion.idea)
-                        setColor(status.colour)
+                        title = "$status suggestion"
+                        description = suggestion.idea
+                        color = status.colour
                     })
                 }
             }, { error ->
@@ -165,25 +165,32 @@ private fun fetchSuggestionChannel(guild: Guild, config: Configuration) = guild.
 
 private fun fetchArchiveChannel(guild: Guild, config: Configuration) = guild.getTextChannelById(config.messageChannels.suggestionArchive)
 
-private fun inputToStatus(input: String): SuggestionStatus? = SuggestionStatus.values().findLast { it.name.toLowerCase() == input.toLowerCase() }
-
+private fun inputToStatus(input: String): SuggestionStatus = when(input.toLowerCase()) {
+    "accepted" -> SuggestionStatus.Accepted
+    "denied" -> SuggestionStatus.Denied
+    "review" -> SuggestionStatus.Review
+    else -> throw IllegalArgumentException("Invalid status input given.")
+}
 private fun buildSuggestionUpdateEmbed(suggestion: SuggestionRecord, response: String, newStatus: SuggestionStatus) =
         embed {
-            title("Suggestion Status Update")
-            description("A suggestion that you submitted has changed status.")
+            title=  "Suggestion Status Update"
+            description = "A suggestion that you submitted has changed status."
 
-            ifield {
+            field {
                 name = "ID"
+                inline = true
                 value = suggestion.messageID
             }
 
-            ifield {
+            field {
                 name = "Old Status"
+                inline = true
                 value = suggestion.status.toString()
             }
 
-            ifield {
+            field {
                 name = "New Status"
+                inline = true
                 value = newStatus.toString()
             }
 
@@ -199,7 +206,7 @@ private fun buildSuggestionUpdateEmbed(suggestion: SuggestionRecord, response: S
                 inline = false
             }
 
-            setColor(newStatus.colour)
+            color = newStatus.colour
         }
 
 private fun buildSuggestionMessage(suggestion: PoolRecord, jda: JDA, status: SuggestionStatus) =

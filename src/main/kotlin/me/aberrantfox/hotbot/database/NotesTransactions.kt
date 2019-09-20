@@ -1,10 +1,7 @@
 package me.aberrantfox.hotbot.database
 
-import org.jetbrains.exposed.sql.deleteWhere
-import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
-import org.jetbrains.exposed.sql.update
 import org.joda.time.DateTime
 
 data class NoteRecord(val id: Int,
@@ -20,7 +17,7 @@ fun insertNote(member: String, moderator: String, note: String) =
                 it[Notes.moderator] = moderator
                 it[Notes.note] = note
                 it[date] = DateTime.now()
-            }
+            } get Notes.id
         }
 
 fun replaceNote(id: Int, note: String, moderator: String) =

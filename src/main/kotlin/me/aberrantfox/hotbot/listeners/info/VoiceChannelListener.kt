@@ -1,11 +1,11 @@
-package me.aberrantfox.hotbot.listeners
+package me.aberrantfox.hotbot.listeners.info
 
 import com.google.common.eventbus.Subscribe
 import me.aberrantfox.kjdautils.extensions.jda.descriptor
 import me.aberrantfox.kjdautils.internal.logging.BotLogger
-import net.dv8tion.jda.core.events.guild.voice.GuildVoiceJoinEvent
-import net.dv8tion.jda.core.events.guild.voice.GuildVoiceLeaveEvent
-import net.dv8tion.jda.core.events.guild.voice.GuildVoiceMoveEvent
+import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent
+import net.dv8tion.jda.api.events.guild.voice.GuildVoiceLeaveEvent
+import net.dv8tion.jda.api.events.guild.voice.GuildVoiceMoveEvent
 
 
 class VoiceChannelListener (val log: BotLogger) {

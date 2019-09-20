@@ -2,11 +2,10 @@ package me.aberrantfox.hotbot.commands.utility
 
 import me.aberrantfox.hotbot.services.Configuration
 import me.aberrantfox.kjdautils.api.dsl.*
-import me.aberrantfox.kjdautils.internal.command.arguments.*
+import me.aberrantfox.kjdautils.internal.arguments.*
 import org.jsoup.Jsoup
 import java.net.URLEncoder
 import java.util.Random
-import khttp.get as kget
 
 @CommandSet("fun")
 fun funCommands(config: Configuration) =
@@ -21,21 +20,6 @@ fun funCommands(config: Configuration) =
                                       else "Flipping amongst (${options.joinToString(", ")}) got you...\n$choice!"
 
                 it.respond(response)
-            }
-        }
-
-        command("google") {
-            description = "google a thing"
-            expect(SentenceArg("Query"))
-            execute {
-                val google = "http://www.google.com/search?q="
-                val search = it.args[0] as String
-                val charset = "UTF-8"
-                val userAgent = "Mozilla/5.0"
-
-                val links = Jsoup.connect(google + URLEncoder.encode(search, charset)).userAgent(userAgent).get().select(".g>.r>a")
-
-                it.respond(links.first().absUrl("href"))
             }
         }
     }

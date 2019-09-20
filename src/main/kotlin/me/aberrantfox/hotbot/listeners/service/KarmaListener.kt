@@ -1,12 +1,12 @@
-package me.aberrantfox.hotbot.listeners
+package me.aberrantfox.hotbot.listeners.service
 
 import com.google.common.eventbus.Subscribe
 import me.aberrantfox.hotbot.database.*
 import me.aberrantfox.hotbot.services.*
 import me.aberrantfox.kjdautils.extensions.jda.fullName
 import me.aberrantfox.kjdautils.internal.logging.BotLogger
-import net.dv8tion.jda.core.events.guild.member.GuildMemberLeaveEvent
-import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent
+import net.dv8tion.jda.api.events.guild.member.GuildMemberLeaveEvent
+import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
@@ -21,6 +21,8 @@ class KarmaListener(private val messageService: MessageService, private val karm
 
         if(config.security.ignoredIDs.contains(event.author.id)) return
 
+        val member = event.member ?: return
+
         val message = event.message
         val karmaResult = karmaService.isKarmaMessage(message)
 
@@ -30,11 +32,11 @@ class KarmaListener(private val messageService: MessageService, private val karm
             log.info("${message.author.fullName()} gave ${karmaResult.member.fullName()} 1 karma")
 
             event.channel.sendMessage(messageService.messages.karmaMessage.replace("%mention%", karmaResult.member.asMention)).queue()
-            waitingUsers.add(event.member.user.id)
+            waitingUsers.add(member.user.id)
 
             Timer().schedule(object : TimerTask(){
                 override fun run() {
-                    waitingUsers.remove(event.member.user.id)
+                    waitingUsers.remove(member.user.id)
                 }
             }, config.serverInformation.karmaGiveDelay.toLong())
         }

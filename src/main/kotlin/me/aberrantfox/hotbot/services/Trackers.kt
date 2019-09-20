@@ -2,7 +2,7 @@ package me.aberrantfox.hotbot.services
 
 import me.aberrantfox.hotbot.utility.types.LimitedList
 import me.aberrantfox.kjdautils.api.annotation.Service
-import net.dv8tion.jda.core.entities.Message
+import net.dv8tion.jda.api.entities.Message
 import org.apache.commons.text.similarity.LevenshteinDistance
 import org.joda.time.*
 import java.util.Timer
@@ -33,15 +33,14 @@ open class IdTracker<T>(private val trackTime: Int, private val timeUnit: Int = 
 
 class DateTracker(trackTime: Int, timeUnit: Int = hourUnit) : IdTracker<DateTime>(trackTime, timeUnit) {
     fun pastMins(min: Int) =
-        map.filterKeys {
-            map[it]!!.isAfter(DateTime.now().minus(Minutes.minutes(min)))
+        map.filterValues {
+            it.isAfter(DateTime.now().minus(Minutes.minutes(min)))
         }
 }
 
 class WeightTracker(trackTime: Int) : IdTracker<Int>(trackTime) {
     fun addOrUpdate(id: String) {
-        map.putIfAbsent(id, 0)
-        val get = this.map[id]!!
+        val get = this.map.getOrPut(id) { 0 }
         map[id] = get + 1
     }
 }
@@ -53,13 +52,13 @@ class MessageTracker : IdTracker<LimitedList<AccurateMessage>>(1) {
     fun addMessage(acMsg: AccurateMessage): Int {
         val who = acMsg.message.author.id
 
-        map.putIfAbsent(who, LimitedList(20))
+        val msgs = map.getOrPut(who) { LimitedList(20) }
 
-        val matches = map[who]!!.map { calc.apply(it.message.contentRaw, acMsg.message.contentRaw) }
+        val matches = msgs.map { calc.apply(it.message.contentRaw, acMsg.message.contentRaw) }
             .filter { it <=  2 }
             .count()
 
-        map[who]!!.add(acMsg)
+        msgs.add(acMsg)
 
         return matches
     }

@@ -1,11 +1,11 @@
-package me.aberrantfox.hotbot.listeners
+package me.aberrantfox.hotbot.listeners.moderation
 
 import com.google.common.eventbus.Subscribe
 import me.aberrantfox.kjdautils.internal.logging.BotLogger
 import me.aberrantfox.hotbot.services.PermissionService
 import me.aberrantfox.hotbot.services.Configuration
-import net.dv8tion.jda.core.entities.Message
-import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent
+import net.dv8tion.jda.api.entities.Message
+import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent
 import org.apache.tika.Tika
 
 data class FileMetadata(val name: String,
@@ -48,7 +48,9 @@ class FileListener (val config: Configuration, val manager: PermissionService, v
     }
 
     private fun metadataOf(attachment: Message.Attachment): FileMetadata {
-        val type = Tika().detect(attachment.inputStream)
+        val stream = attachment.retrieveInputStream().get()
+        val type = Tika().detect(stream)
+        stream.close()
         return FileMetadata(attachment.fileName, type, commonAliasFor(type), isAllowed(type), onlineAlternativeFor(type))
     }
 

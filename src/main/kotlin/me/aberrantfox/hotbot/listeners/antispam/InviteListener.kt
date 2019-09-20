@@ -9,9 +9,9 @@ import me.aberrantfox.hotbot.services.configPath
 import me.aberrantfox.kjdautils.extensions.jda.*
 import me.aberrantfox.kjdautils.extensions.stdlib.containsInvite
 import me.aberrantfox.kjdautils.internal.logging.BotLogger
-import net.dv8tion.jda.core.JDA
-import net.dv8tion.jda.core.entities.*
-import net.dv8tion.jda.core.events.message.guild.*
+import net.dv8tion.jda.api.JDA
+import net.dv8tion.jda.api.entities.*
+import net.dv8tion.jda.api.events.message.guild.*
 
 object RecentInvites {
     val cache = WeightTracker(6)
@@ -52,7 +52,7 @@ class InviteListener(val config: Configuration, private val logger: BotLogger, v
 
             RecentInvites.cache.addOrUpdate(id)
             if(RecentInvites.value(id) >= 5) {
-                guild.controller.ban(author, 0, "You've been automatically banned for linking invitations. Advertising is not allowed, sorry.").queue {
+                guild.ban(author, 0, "You've been automatically banned for linking invitations. Advertising is not allowed, sorry.").queue {
                     logger.alert("Banned user: ${author.fullName()} ($id for advertising automatically.")
                 }
 
