@@ -164,20 +164,20 @@ fun setupMacroCommands(container: CommandsContainer, manager: PermissionService)
 
 fun addMacro(macro: Macro, container: CommandsContainer, manager: PermissionService) {
     macros[macro.name.toLowerCase()] = macro
-    container.command(macro.name) {
+    val command = container.command(macro.name) {
         category = macroCommandCategory
         expect(arg(SentenceArg, optional = true, default = ""))
         execute { it.respond(macro.message) }
     }
-    CommandRecommender.addPossibility(macro.name)
+    CommandRecommender.addPossibility(command!!)
     manager.setPermission(macro.name, PermissionLevel.Everyone)
 }
 
 fun removeMacro(macro: Macro, container: CommandsContainer, manager: PermissionService) {
     macros.remove(macro.name)
-    container.commands.remove(macro.name)
+    val command = container.commands.remove(macro.name)
     manager.removePermissions(macro.name)
-    CommandRecommender.removePossibility(macro.name)
+    CommandRecommender.removePossibility(command!!)
 }
 
 private fun buildMacrosEmbed(groupedMacros: Map<String, Collection<Macro>>) =

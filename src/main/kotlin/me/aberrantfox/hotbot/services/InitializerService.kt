@@ -14,7 +14,7 @@ import net.dv8tion.jda.api.JDA
 class InitializerService(manager: PermissionService, container: CommandsContainer, kjdaConfiguration: KConfiguration,
                          discord: Discord, logger: BotLogger, config: Configuration) {
     init {
-        kjdaConfiguration.visibilityPredicate = { cmd, user, chan, _ -> manager.canUseCommand(user, cmd) }
+        kjdaConfiguration.visibilityPredicate = { cmd, user, chan, _ -> manager.canUseCommand(user, cmd.name) }
         LowerUserArg.manager = manager
         LowerMemberArg.manager = manager
         setupMacroCommands(container, manager)

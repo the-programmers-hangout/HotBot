@@ -49,7 +49,7 @@ class AliasService(private val manager: PermissionService,
         val targetCommand = container[target] ?: return CreationResult.InvalidCommand
         if (container.has(alias)) return CreationResult.UnavailableName
 
-        container.command(alias) {
+        val command = container.command(alias) {
             description = "Alias of $target\n${targetCommand.description}"
             category = "aliases"
             expectedArgs = targetCommand.expectedArgs
@@ -59,7 +59,7 @@ class AliasService(private val manager: PermissionService,
 
         manager.setPermission(alias, manager.roleRequired(target))
         aliases[alias] = target
-        CommandRecommender.addPossibility(alias)
+        CommandRecommender.addPossibility(command!!)
         saveAliases()
         return CreationResult.Success
     }
@@ -68,8 +68,8 @@ class AliasService(private val manager: PermissionService,
         return if (alias in aliases) {
             aliases.remove(alias)
             manager.removePermissions(alias)
-            CommandRecommender.removePossibility(alias)
-            container.commands.remove(alias)
+            val command = container.commands.remove(alias)
+            CommandRecommender.removePossibility(command!!)
             saveAliases()
             true
         }
