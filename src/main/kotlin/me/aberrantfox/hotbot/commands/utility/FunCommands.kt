@@ -22,19 +22,4 @@ fun funCommands(config: Configuration) =
                 it.respond(response)
             }
         }
-
-        command("google") {
-            description = "google a thing"
-            expect(SentenceArg("Query"))
-            execute {
-                val google = "http://www.google.com/search?q="
-                val search = it.args[0] as String
-                val charset = "UTF-8"
-                val userAgent = "Mozilla/5.0"
-
-                val links = Jsoup.connect(google + URLEncoder.encode(search, charset)).userAgent(userAgent).get().select(".g>.r>a")
-
-                it.respond(links.first().absUrl("href"))
-            }
-        }
     }

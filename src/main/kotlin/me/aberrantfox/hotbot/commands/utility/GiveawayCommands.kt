@@ -18,7 +18,6 @@ object Giveaways {
 }
 
 private const val timeUpdatePeriod = 5000L
-
 private const val giveawayEmbedTitle = "\uD83C\uDF89 GIVEAWAY! \uD83C\uDF89"
 private const val prizeFieldTitle = "Prize"
 

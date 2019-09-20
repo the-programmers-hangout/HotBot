@@ -12,23 +12,10 @@ import java.util.concurrent.ConcurrentHashMap
 
 enum class PermissionLevel {
     Everyone, Member, JrMod, Moderator, Administrator, Owner;
-    companion object {
-        fun isLevel(name: String) = values()
-                .map { it.name.toLowerCase() }
-                .any { it == name.toLowerCase() }
-
-        fun convertToPermission(level: String) = values()
-                .first { it.name.toLowerCase() == level.toLowerCase() }
-    }
 }
 
-data class ChannelPermission (var command: PermissionLevel = PermissionLevel.Everyone,
-                              var mention: PermissionLevel = PermissionLevel.Everyone)
-
 data class PermissionsConfiguration(val permissions: ConcurrentHashMap<String, PermissionLevel> = ConcurrentHashMap(),
-                                    val roleMappings: ConcurrentHashMap<String, PermissionLevel> = ConcurrentHashMap(),
-                                    val channelIgnoreLevels: ConcurrentHashMap<String, ChannelPermission> = ConcurrentHashMap())
-
+                                    val roleMappings: ConcurrentHashMap<String, PermissionLevel> = ConcurrentHashMap())
 @Service
 open class PermissionService(val discord: Discord, private val botConfig: Configuration) {
     private val gson = GsonBuilder().setPrettyPrinting().create()
@@ -75,33 +62,6 @@ open class PermissionService(val discord: Discord, private val botConfig: Config
     fun canPerformAction(user: User, actionLevel: PermissionLevel) = getPermissionLevel(user) >= actionLevel
 
     fun canUseCommand(user: User, command: String) = getPermissionLevel(user) >= permissionsConfig.permissions[command.toLowerCase()] ?: PermissionLevel.Owner
-
-    fun setChannelCommandIgnore(channelId: String, level: PermissionLevel): Job {
-        val channelPerm = permissionsConfig.channelIgnoreLevels[channelId] ?: ChannelPermission()
-        channelPerm.command = level
-        permissionsConfig.channelIgnoreLevels[channelId] = channelPerm
-        return GlobalScope.launch { save() }
-    }
-
-    fun setChannelMentionIgnore(channelId: String, level: PermissionLevel): Job {
-        val channelPerm = permissionsConfig.channelIgnoreLevels[channelId] ?: ChannelPermission()
-        channelPerm.mention = level
-        permissionsConfig.channelIgnoreLevels[channelId] = channelPerm
-        return GlobalScope.launch { save() }
-    }
-
-    fun allChannelIgnoreLevels() = permissionsConfig.channelIgnoreLevels.toMap()
-
-    fun canUseCommandInChannel(user: User, channelId: String)
-            = getPermissionLevel(user) >= permissionsConfig.channelIgnoreLevels[channelId]?.command ?: PermissionLevel.Everyone
-
-    fun canUseCleverbotInChannel(user: User, channelId: String)
-            = getPermissionLevel(user) >= permissionsConfig.channelIgnoreLevels[channelId]?.mention ?: PermissionLevel.Everyone
-
-    fun listAvailableCommands(user: User) = permissionsConfig.permissions
-            .filter { it.value <= getPermissionLevel(user) }
-            .map { it.key }
-            .joinToString()
 
     fun assignRoleLevel(role: Role, level: PermissionLevel): Job {
         permissionsConfig.roleMappings[role.id] = level

@@ -1,4 +1,4 @@
-package me.aberrantfox.hotbot.listeners
+package me.aberrantfox.hotbot.listeners.antispam
 
 import com.google.common.eventbus.Subscribe
 import me.aberrantfox.kjdautils.internal.logging.BotLogger

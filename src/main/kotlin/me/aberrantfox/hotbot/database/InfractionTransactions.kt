@@ -24,17 +24,6 @@ fun insertInfraction(strike: StrikeRequest) =
             }
         }
 
-fun insertInfraction(member: String, moderator: String, strikes: Int, reason: String) =
-        transaction {
-            Strikes.insert {
-                it[Strikes.member] = member
-                it[Strikes.moderator] = moderator
-                it[Strikes.strikes] = strikes
-                it[Strikes.reason] = reason
-                it[date] = DateTime.now()
-            }
-        }
-
 fun getHistory(userId: String): List<StrikeRecord> =
         transaction {
             val select = Strikes.select {

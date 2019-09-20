@@ -3,7 +3,7 @@ package me.aberrantfox.hotbot.commands.administration
 import me.aberrantfox.hotbot.arguments.*
 import me.aberrantfox.hotbot.database.*
 import me.aberrantfox.hotbot.extensions.createContinuableField
-import me.aberrantfox.hotbot.listeners.UserID
+import me.aberrantfox.hotbot.listeners.info.UserID
 import me.aberrantfox.hotbot.services.*
 import me.aberrantfox.kjdautils.api.dsl.*
 import me.aberrantfox.kjdautils.extensions.jda.*
@@ -15,10 +15,6 @@ import org.joda.time.format.DateTimeFormat
 import java.awt.Color
 
 data class StrikeRequest(val target: Member, val reason: String, val amount: Int, val moderator: User)
-
-object StrikeRequests {
-    val map = HashMap<UserID, StrikeRequest>()
-}
 
 @CommandSet("infractions")
 fun strikeCommands(config: Configuration, log: BotLogger, muteService: MuteService) =
@@ -56,136 +52,6 @@ fun strikeCommands(config: Configuration, log: BotLogger, muteService: MuteServi
                 infract(StrikeRequest(target, reason, weight, it.author), config, log, muteService)
 
                 it.respond("User ${target.descriptor()} has been infracted with weight: $weight, with reason:\n$reason")
-            }
-        }
-
-        command("strikerequest") {
-            description = "Like the strike command, except another moderator reviews it before it is accepted."
-            requiresGuild = true
-            expect(LowerMemberArg,
-                   IntegerArg("Weight"),
-                   SentenceArg("Infraction Reason"))
-            execute {
-                val target = it.args.component1() as Member
-                val weight = it.args.component2() as Int
-                val reason = it.args.component3() as String
-
-                val weightRange = 0..config.security.strikeCeil
-                if (weight !in weightRange) return@execute it.respond("The weight must be in the range $weightRange")
-
-                val request = StrikeRequest(target, reason, weight, it.author)
-
-                if (StrikeRequests.map.containsKey(target.id)) {
-                    it.respond("There already exists a strike request for this user. Use viewrequest to see it.")
-                    return@execute
-                }
-
-                StrikeRequests.map[target.id] = request
-
-                it.respond("This has been logged and will be accepted or declined, thank you.")
-                log.info("${it.author.fullName()} has a new strike request. Use viewRequest ${target.asMention} to see it.")
-            }
-        }
-
-        command("viewRequest") {
-            description = "View the current strike request, if any, on the given user."
-            expect(LowerUserArg("User Receiving Infraction"))
-            execute {
-                val user = it.args.component1() as User
-
-                val request = StrikeRequests.map[user.id]
-                        ?: return@execute it.respond("That user does not currently have a strike request.")
-
-                it.respond(embed {
-                    title = "${request.moderator.fullName()}'s request"
-
-                    field {
-                        name = "Target"
-                        value = "${request.target.asMention}(${request.target.fullName()})"
-                        inline = false
-                    }
-
-                    field {
-                        name = "Reasoning"
-                        value = request.reason
-                        inline = false
-                    }
-
-                    field {
-                        name =  "Amount"
-                        value = "${request.amount}"
-                        inline = false
-                    }
-                })
-            }
-        }
-
-        command("acceptrequest") {
-            description = "Accept a request for striking the given user by another moderator."
-            requiresGuild = true
-            expect(LowerUserArg("User Receiving Infraction"))
-            execute {
-                val user = it.args.component1() as User
-
-                val request = StrikeRequests.map[user.id]
-                        ?: return@execute it.respond("That member does not currently have a strike request.")
-
-                if (user.toMember(it.guild!!) == null) {
-                    return@execute it.respond("User is not a guild member. Use (delete/decline)request to remove the request if necessary.")
-                }
-
-                infract(request, config, log, muteService)
-
-                StrikeRequests.map.remove(user.id)
-                it.respond("Strike request on ${user.descriptor()} was accepted.")
-            }
-        }
-
-        command("declinerequest") {
-            description = "Reject a request for a strike on the given user."
-            expect(LowerUserArg("User Receiving Infraction"))
-            execute {
-                val user = it.args.component1() as User
-
-                StrikeRequests.map.remove(user.id) ?: return@execute it.respond("No request exists for that user.")
-
-                it.respond("Strike request on ${user.descriptor()} was declined.")
-            }
-        }
-
-        command("deleteRequest") {
-            description = "Delete a strike request made by yourself on the given user."
-            expect(LowerUserArg("User Receiving Infraction"))
-            execute {
-                val user = it.args.component1() as User
-
-                val request = StrikeRequests.map[user.id]
-                        ?: return@execute it.respond("That user does not currently have a strike request.")
-
-                val byInvoker = request.moderator.id == it.author.id
-
-                if(byInvoker) {
-                    StrikeRequests.map.remove(user.id)
-                    it.respond("Request removed.")
-                } else {
-                    it.respond("You did not make that request and as such cannot delete it.")
-                }
-            }
-        }
-
-        command("listrequests") {
-            description = "List all current strike requests"
-            execute {
-                if(StrikeRequests.map.isEmpty()) {
-                    it.respond("No requests currently in place.")
-                    return@execute
-                }
-
-                val response = StrikeRequests.map.values
-                    .map { "${it.target.descriptor() }, requested by ${it.moderator.fullName()}" }
-                    .reduce {a, b -> "$a \n$b" }
-
-                it.respond(response)
             }
         }
 

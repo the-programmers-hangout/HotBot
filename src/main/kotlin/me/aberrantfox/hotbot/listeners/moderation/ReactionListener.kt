@@ -1,4 +1,4 @@
-package me.aberrantfox.hotbot.listeners
+package me.aberrantfox.hotbot.listeners.moderation
 
 import com.google.common.eventbus.Subscribe
 import me.aberrantfox.hotbot.services.Configuration
@@ -26,10 +26,6 @@ class ReactionListener(val config: Configuration, val log: BotLogger) {
         if (author.roles.map { it.name }.contains(config.security.mutedRole)) {
             reaction.removeReaction(author.user).queue()
             log.alert("${author.fullName()} reacted using ${emote.name} while muted and it has been removed.")
-        }
-
-        if (config.security.verboseLogging) {
-            log.alert("${author.fullName()} (id: $id) $verb the emote \"${emote.name}\" in #${channel.name} (message: ${reaction.messageId}).")
         }
     }
 }
