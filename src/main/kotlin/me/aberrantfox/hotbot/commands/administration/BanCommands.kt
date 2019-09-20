@@ -12,19 +12,21 @@ import me.aberrantfox.kjdautils.internal.arguments.SentenceArg
 import me.aberrantfox.kjdautils.internal.arguments.UserArg
 import net.dv8tion.jda.api.entities.User
 
+private val DeletionDaysArg = arg(IntegerArg("Message Deletion Days [Default: 1]"), true, 1)
+private val BanReasonArg = arg(SentenceArg("Ban Reason"))
+
 @CommandSet("BanCommands")
 fun createBanCommands() = commands {
-    command("ban") {
+    command("Ban") {
         description = "Bans a member for the passed reason, deleting a given number of days messages."
         requiresGuild = true
-        expect(
-                arg(LowerUserArg),
-                arg(IntegerArg("Message Deletion Days [Default: 1]"), true, 1),
-                arg(SentenceArg("Ban Reason")))
+        expect(arg(LowerUserArg), DeletionDaysArg, BanReasonArg)
         execute {
             val target = it.args.component1() as User
             val deleteMessageDays = it.args.component2() as Int
             val reason = it.args.component3() as String
+
+            updateOrSetReason(target.id, reason, it.author.id)
 
             it.guild!!.ban(target, deleteMessageDays, reason).queue { _ ->
                 it.respond("${target.fullName()} was banned.")
@@ -32,7 +34,7 @@ fun createBanCommands() = commands {
         }
     }
 
-    command("setbanreason") {
+    command("SetBanReason") {
         description = "Set the ban reason of someone logged who does not have a ban reason in the audit log."
         expect(UserArg, SentenceArg("Ban Reason"))
         execute {
@@ -44,7 +46,7 @@ fun createBanCommands() = commands {
         }
     }
 
-    command("getbanreason") {
+    command("GetBanReason") {
         description = "Get the ban reason of someone logged who does not have a ban reason in the audit log."
         expect(UserArg)
         execute {
