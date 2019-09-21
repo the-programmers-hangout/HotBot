@@ -14,15 +14,13 @@ open class Configuration(open val serverInformation: ServerInformation = ServerI
                          val logChannels: ChannelIdHolder = ChannelIdHolder(),
                          val permissionedActions: PermissionedActions = PermissionedActions())
 
-class ServerInformation(val token: String = "insert-token",
-                        val ownerID: String = "insert-id",
+class ServerInformation(val ownerID: String = "insert-id",
                         var prefix: String = "insert-prefix",
                         val guildid: String = "insert-guild-id",
                         val macroDelay: Int = 30,
                         val deleteWelcomeOnLeave: Boolean = true,
-                        val maxSelfmuteMinutes: Int = 60,
-                        val karmaGiveDelay: Int = 1000 * 60 * 60,
-                        val deletionMode: PrefixDeleteMode = PrefixDeleteMode.Single)
+                        val maxSelfmuteMinutes: Int = 60 * 24,
+                        val karmaGiveDelay: Int = 1000 * 60 * 60)
 
 data class Security(@Transient val ignoredIDs: MutableSet<String> = mutableSetOf(),
                     var lockDownMode: Boolean = false,
