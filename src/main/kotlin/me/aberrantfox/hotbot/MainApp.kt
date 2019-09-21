@@ -1,33 +1,22 @@
 package me.aberrantfox.hotbot
 
-import me.aberrantfox.hotbot.database.setupDatabaseSchema
-import me.aberrantfox.hotbot.services.*
 import me.aberrantfox.kjdautils.api.startBot
-import me.aberrantfox.kjdautils.internal.logging.convertChannels
+import kotlin.system.exitProcess
 
-fun main() {
-    val config = loadConfig() ?: return
-    saveConfig(config)
-    start(config)
-}
+fun main(args: Array<String>) {
+    val token = args.firstOrNull()
 
-private fun start(config: Configuration) = startBot(config.serverInformation.token) {
-    setupDatabaseSchema(config)
-
-    this.logger = convertChannels(config.logChannels, this.discord.jda)
-
-    registerInjectionObject(config, container, logger, this.config)
-
-    configure {
-        registerInjectionObject(this)
-        prefix = config.serverInformation.prefix
-        globalPath = "me.aberrantfox.hotbot"
-        deleteMode = config.serverInformation.deletionMode
+    if(token == null || token == "UNSET") {
+        println("You must specify the token with the -e flag when running via docker, or as the first command line param.")
+        exitProcess(-1)
     }
 
-    val aliasService = getInjectionObject(AliasService::class.java) as AliasService
-    aliasService.loadAliases()
+    start(token)
+}
 
-    val permissionService = getInjectionObject(PermissionService::class.java) as PermissionService
-    permissionService.defaultAndPrunePermissions(container)
+fun start(token: String) = startBot(token) {
+    configure {
+        prefix = "+"
+        globalPath = "me.aberrantfox.hotbot"
+    }
 }

@@ -10,7 +10,7 @@ import kotlin.reflect.full.*
 object MessageConfigArg : ChoiceArg("Message Name", *messages.keys.toTypedArray())
 
 @CommandSet("MessageConfiguration")
-fun messageConfiguration(messageService: MessageService) = commands {
+fun messageConfiguration(messageService: Messages) = commands {
     command("messagekeys") {
         description = "List message keys."
         execute {
@@ -25,7 +25,7 @@ fun messageConfiguration(messageService: MessageService) = commands {
             val key = it.args[0] as String
             val message = it.args[1] as String
 
-            messages.getValue(key).setter.call(messageService.messages, message)
+            messages.getValue(key).setter.call(messages, message)
 
             it.respond(embed {
                 title = "Message configuration changed"
@@ -49,7 +49,7 @@ fun messageConfiguration(messageService: MessageService) = commands {
                 color = Color.CYAN
                 field {
                     name = key
-                    value = messages.getValue(key).getter.call(messageService.messages) as String
+                    value = messages.getValue(key).getter.call(messages) as String
                 }
             })
         }

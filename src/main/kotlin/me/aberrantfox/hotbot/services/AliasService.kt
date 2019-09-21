@@ -14,6 +14,9 @@ class AliasService(private val manager: PermissionService,
     private val aliases: HashMap<String, String> = hashMapOf()
     private val aliasesFile = File("config/aliases.json")
 
+    init {
+        loadAliases()
+    }
 
     fun loadAliases() {
         val json = if (!aliasesFile.exists()) {

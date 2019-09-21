@@ -3,7 +3,6 @@ package me.aberrantfox.hotbot.commands.administration
 import me.aberrantfox.hotbot.arguments.*
 import me.aberrantfox.hotbot.database.*
 import me.aberrantfox.hotbot.extensions.createContinuableField
-import me.aberrantfox.hotbot.listeners.info.UserID
 import me.aberrantfox.hotbot.services.*
 import me.aberrantfox.kjdautils.api.dsl.*
 import me.aberrantfox.kjdautils.extensions.jda.*
@@ -130,23 +129,28 @@ private fun infract(strike: StrikeRequest, config: Configuration, log: BotLogger
 }
 
 private fun administerPunishment(action: InfractionAction, reason: String, target: Member, moderator: User, log: BotLogger, muteService: MuteService) =
-        when (action) {
-            is InfractionAction.Warn -> {
+        when (action.punishment.toInfractionAction()) {
+            InfractionActionType.Warn -> {
                 target.user.sendPrivateMessage("This is your warning - Do not break the rules again.", log)
             }
 
-            is InfractionAction.Kick -> {
+            InfractionActionType.Kick -> {
                 target.user.sendPrivateMessage("You may return via this: https://discord.gg/BQN6BYE - please be mindful of the rules next time.", log)
                 target.guild.kick(target.id, reason).queue()
             }
 
-            is InfractionAction.Mute -> {
-                muteService.muteMember(target, action.duration * 60L * 1000L, "Infraction punishment.", moderator)
+            InfractionActionType.Mute -> {
+                muteService.muteMember(target, action.time!! * 60L * 1000L, "Infraction punishment.", moderator)
             }
 
-            is InfractionAction.Ban -> {
+            InfractionActionType.Ban -> {
                 target.user.sendPrivateMessage("Well... that happened. There may be an appeal system in the future. But for now, you're permanently banned. Sorry about that :) ", log)
                 target.guild.ban(target.id, 0, reason).queue()
+            }
+
+            InfractionActionType.Error -> {
+                println("Error, invalid infraction action detected: ${action.punishment}, muting member instead.")
+                muteService.muteMember(target, action.time!! * 60L * 1000L, "Infraction punishment.", moderator)
             }
         }
 
@@ -296,3 +300,16 @@ private fun buildInfractionEmbed(member: Member, reason: String, strikeQuantity:
 
 
 private fun expired(boolean: Boolean) = if (boolean) "expired" else "not expired"
+
+enum class InfractionActionType {
+    Warn, Mute, Kick, Ban, Error
+}
+
+fun String.toInfractionAction() =
+    when(this.toLowerCase()) {
+    "warn" -> InfractionActionType.Warn
+    "mute" -> InfractionActionType.Mute
+    "kick" -> InfractionActionType.Kick
+    "ban" -> InfractionActionType.Ban
+    else -> InfractionActionType.Error
+}

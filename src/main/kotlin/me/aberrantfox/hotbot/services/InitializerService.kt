@@ -11,13 +11,18 @@ import me.aberrantfox.kjdautils.internal.logging.BotLogger
 import net.dv8tion.jda.api.JDA
 
 @Service
-class InitializerService(manager: PermissionService, container: CommandsContainer, kjdaConfiguration: KConfiguration,
-                         discord: Discord, logger: BotLogger, config: Configuration) {
+class InitializerService(manager: PermissionService,
+                         kjdaConfiguration: KConfiguration,
+                         discord: Discord,
+                         logger: BotLogger,
+                         config: Configuration,
+                         macros: Macros) {
     init {
+        setupDatabaseSchema(config)
         kjdaConfiguration.visibilityPredicate = { cmd, user, chan, _ -> manager.canUseCommand(user, cmd.name) }
         LowerUserArg.manager = manager
         LowerMemberArg.manager = manager
-        setupMacroCommands(container, manager)
+        MacroInstanceCopy.macros = macros
 
         loadPersistence(discord.jda, logger, config)
         logger.info("Fully setup, now ready for use.")

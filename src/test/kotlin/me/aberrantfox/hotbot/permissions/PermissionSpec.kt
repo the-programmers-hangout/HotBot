@@ -56,7 +56,7 @@ private object TestData {
 
 object PermissionSpec : Spek({
     describe("Permission Manager") {
-        val manager = PermissionService(TestData.discordMock, TestData.config)
+        val manager = PermissionService(TestData.discordMock, TestData.config, CommandsContainer())
         beforeGroup {
             manager.defaultAndPrunePermissions(TestData.container)
             runBlocking { manager.setPermission(TestData.commandName, PermissionLevel.JrMod).join() }

@@ -3,7 +3,7 @@ package me.aberrantfox.hotbot.commands.administration
 import me.aberrantfox.hotbot.arguments.LowerMemberArg
 import me.aberrantfox.hotbot.database.getUnmuteRecord
 import me.aberrantfox.hotbot.services.Configuration
-import me.aberrantfox.hotbot.services.MessageService
+import me.aberrantfox.hotbot.services.Messages
 import me.aberrantfox.hotbot.services.MuteService
 import me.aberrantfox.hotbot.utility.removeMuteRole
 import me.aberrantfox.hotbot.utility.timeToString
@@ -28,7 +28,7 @@ import kotlin.math.roundToLong
 fun createMuteCommands(config: Configuration,
                        logger: BotLogger,
                        muteService: MuteService,
-                       messageService: MessageService) = commands {
+                       messages: Messages) = commands {
     command("gag") {
         description = "Temporarily mute a user for 5 minutes so that you can deal with something."
         requiresGuild = true
@@ -41,7 +41,7 @@ fun createMuteCommands(config: Configuration,
                 return@execute
             }
 
-            muteService.muteMember(member, 5 * 1000 * 60, messageService.messages.gagResponse, it.author)
+            muteService.muteMember(member, 5 * 1000 * 60, messages.gagResponse, it.author)
         }
     }
 

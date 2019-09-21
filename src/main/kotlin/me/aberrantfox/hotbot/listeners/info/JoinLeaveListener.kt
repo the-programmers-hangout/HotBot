@@ -5,7 +5,7 @@ import me.aberrantfox.hotbot.commands.administration.sendWelcome
 import me.aberrantfox.hotbot.database.hasLeaveHistory
 import me.aberrantfox.hotbot.database.insertLeave
 import me.aberrantfox.hotbot.services.Configuration
-import me.aberrantfox.hotbot.services.MessageService
+import me.aberrantfox.hotbot.services.Messages
 import me.aberrantfox.kjdautils.extensions.jda.fullName
 import me.aberrantfox.kjdautils.extensions.stdlib.formatJdaDate
 import me.aberrantfox.kjdautils.extensions.stdlib.randomListItem
@@ -23,7 +23,9 @@ import kotlin.concurrent.schedule
 typealias MessageID = String
 typealias UserID = String
 
-class MemberListener(val configuration: Configuration, private val logger: BotLogger, private val messageService: MessageService) {
+class MemberListener(val configuration: Configuration,
+                     private val logger: BotLogger,
+                     private val messages: Messages) {
     private val welcomeMessages = ConcurrentHashMap<UserID, MessageID>()
 
     @Subscribe
@@ -43,7 +45,7 @@ class MemberListener(val configuration: Configuration, private val logger: BotLo
         if(sendWelcome){
             //Build welcome message
             val target = event.guild.textChannels.findLast { it.id == configuration.messageChannels.welcomeChannel }
-            val response = messageService.messages.onJoin.randomListItem().replace("%name%", "${event.user.asMention}(${event.user.fullName()})")
+            val response = messages.onJoin.randomListItem().replace("%name%", "${event.user.asMention}(${event.user.fullName()})")
             val userImage = event.user.effectiveAvatarUrl
 
             target?.sendMessage(buildJoinMessage(response, userImage, if (rejoin) "Player Resumes!" else "Player Get!"))?.queue { msg ->
@@ -57,7 +59,6 @@ class MemberListener(val configuration: Configuration, private val logger: BotLo
         }
 
     }
-
     @Subscribe
     fun onGuildMemberLeave(e: GuildMemberLeaveEvent) {
         logger.info("${e.user.fullName()} :: ${e.user.asMention} left the server")
@@ -80,7 +81,7 @@ class MemberListener(val configuration: Configuration, private val logger: BotLo
             .setDescription(response)
             .setColor(Color.red)
             .setThumbnail(image)
-            .addField("How do I start?", messageService.messages.welcomeDescription, false)
+            .addField("How do I start?", messages.welcomeDescription, false)
             .build()
 }
 

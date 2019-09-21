@@ -2,7 +2,6 @@ package me.aberrantfox.hotbot.commands.utility
 
 import com.google.gson.Gson
 import khttp.post
-import me.aberrantfox.hotbot.database.getUnmuteRecord
 import me.aberrantfox.hotbot.javautilities.UrlUtilities.sendImageToChannel
 import me.aberrantfox.hotbot.services.*
 import me.aberrantfox.hotbot.utility.timeToString
@@ -10,15 +9,14 @@ import me.aberrantfox.kjdautils.api.dsl.*
 import me.aberrantfox.kjdautils.extensions.jda.*
 import me.aberrantfox.kjdautils.extensions.stdlib.sanitiseMentions
 import me.aberrantfox.kjdautils.internal.arguments.*
+import me.aberrantfox.kjdautils.internal.di.PersistenceService
 import me.aberrantfox.kjdautils.internal.logging.BotLogger
 import net.dv8tion.jda.api.*
 import net.dv8tion.jda.api.entities.*
-import org.joda.time.DateTime
 import java.awt.Color
 import java.net.URLEncoder
 import java.time.format.DateTimeFormatter
 import java.util.Date
-import kotlin.math.roundToLong
 import kotlin.system.exitProcess
 
 data class Properties(val version: String, val author: String)
@@ -38,14 +36,17 @@ val startTime = Date()
 const val uploadTextBaseUrl: String = "https://hasteb.in"
 
 @CommandSet("utility")
-fun utilCommands(messageService: MessageService, manager: PermissionService, config: Configuration,
-                 log: BotLogger, muteService: MuteService) = commands {
+fun utilCommands(messages: Messages,
+                 manager: PermissionService,
+                 config: Configuration,
+                 log: BotLogger,
+                 persistenceService: PersistenceService) = commands {
     command("botinfo") {
         description = "Display the bot information."
         execute {
             it.respond(embed {
                 title = it.discord.jda.selfUser.fullName()
-                description = messageService.messages.botDescription
+                description = messages.botDescription
                 color = Color.red
                 thumbnail = it.discord.jda.selfUser.effectiveAvatarUrl
 
@@ -76,7 +77,7 @@ fun utilCommands(messageService: MessageService, manager: PermissionService, con
         description = "Display a message giving basic server information"
         requiresGuild = true
         execute {
-            val embed = produceServerInfoEmbed(it.guild!!, messageService)
+            val embed = produceServerInfoEmbed(it.guild!!, messages)
             it.respond(embed)
         }
     }
@@ -103,7 +104,7 @@ fun utilCommands(messageService: MessageService, manager: PermissionService, con
         description = "Exit, saving configurations."
         execute {
             it.respond("Exiting")
-            saveConfig(config)
+            persistenceService.save(config)
             log.info("saved configurations")
             manager.save()
             log.info("saved permissions to database prior to shut down.")
@@ -122,7 +123,7 @@ fun utilCommands(messageService: MessageService, manager: PermissionService, con
     command("saveconfigurations") {
         description = "Save the configuration of the bot. You may want to do this if you change the prefix."
         execute {
-            saveConfig(config)
+            persistenceService.save(config)
             it.respond("Configurations saved. I hope you know what you are doing...")
         }
     }
@@ -227,10 +228,10 @@ fun utilCommands(messageService: MessageService, manager: PermissionService, con
 
 }
 
-fun produceServerInfoEmbed(guild: Guild, messageService: MessageService) = with(guild) {
+fun produceServerInfoEmbed(guild: Guild, messages: Messages) = with(guild) {
     EmbedBuilder(embed {
         title = name
-        description = messageService.messages.serverDescription
+        description = messages.serverDescription
         thumbnail = jda.selfUser.effectiveAvatarUrl
         color = Color.MAGENTA
 
