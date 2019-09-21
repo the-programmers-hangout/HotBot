@@ -23,7 +23,7 @@ data class Macro(val name: String,
                  @Transient val lastUseTimestamp: MutableMap<ChannelId, Timestamp> = hashMapOf())
 
 @Data("config/macros.json")
-data class Macros(val map: HashMap<String, Macro>)
+data class Macros(val map: HashMap<String, Macro> = HashMap())
 
 const val macroCommandCategory = ""
 
