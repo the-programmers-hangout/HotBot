@@ -16,7 +16,7 @@ import java.awt.Color
 data class StrikeRequest(val target: Member, val reason: String, val amount: Int, val moderator: User)
 
 @CommandSet("infractions")
-fun strikeCommands(config: Configuration, log: BotLogger, muteService: MuteService) =
+fun strikeCommands(config: Configuration, loggingService: LoggingService, muteService: MuteService) =
     commands {
         command("warn") {
             description = "Warn a member, giving them a 0 strike infraction with the given reason."
@@ -26,7 +26,7 @@ fun strikeCommands(config: Configuration, log: BotLogger, muteService: MuteServi
                 val target = it.args.component1() as Member
                 val reason = it.args.component2() as String
 
-                infract(StrikeRequest(target, reason, 0, it.author), config, log, muteService)
+                infract(StrikeRequest(target, reason, 0, it.author), config, loggingService.logInstance, muteService)
 
                 it.respond("User ${target.descriptor()} has been warned, with reason:\n$reason")
             }
@@ -48,7 +48,7 @@ fun strikeCommands(config: Configuration, log: BotLogger, muteService: MuteServi
                 val weightRange = 0..config.security.strikeCeil
                 if (weight !in weightRange) return@execute it.respond("The weight must be in the range $weightRange")
 
-                infract(StrikeRequest(target, reason, weight, it.author), config, log, muteService)
+                infract(StrikeRequest(target, reason, weight, it.author), config, loggingService.logInstance, muteService)
 
                 it.respond("User ${target.descriptor()} has been infracted with weight: $weight, with reason:\n$reason")
             }
@@ -102,7 +102,7 @@ fun strikeCommands(config: Configuration, log: BotLogger, muteService: MuteServi
                 val target = it.author
 
                 target.sendPrivateMessage(buildHistoryEmbed(target, false, getHistory(target.id),
-                        getHistoryCount(target.id), null, it, it.guild!!, config), log)
+                        getHistoryCount(target.id), null, it, it.guild!!, config), loggingService.logInstance)
             }
         }
     }

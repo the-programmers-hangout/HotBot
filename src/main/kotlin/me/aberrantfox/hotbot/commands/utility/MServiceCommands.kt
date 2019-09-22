@@ -10,7 +10,7 @@ import kotlin.reflect.full.*
 object MessageConfigArg : ChoiceArg("Message Name", *messages.keys.toTypedArray())
 
 @CommandSet("MessageConfiguration")
-fun messageConfiguration(messageService: Messages) = commands {
+fun messageConfiguration() = commands {
     command("messagekeys") {
         description = "List message keys."
         execute {

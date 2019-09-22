@@ -3,17 +3,17 @@ package me.aberrantfox.hotbot.commands.administration
 
 import me.aberrantfox.hotbot.listeners.antispam.Raiders
 import me.aberrantfox.hotbot.services.Configuration
+import me.aberrantfox.hotbot.services.LoggingService
 import me.aberrantfox.hotbot.utility.removeMuteRole
 import me.aberrantfox.kjdautils.api.dsl.CommandSet
 import me.aberrantfox.kjdautils.api.dsl.commands
 import me.aberrantfox.kjdautils.extensions.jda.fullName
 import me.aberrantfox.kjdautils.extensions.jda.toMember
 import me.aberrantfox.kjdautils.internal.arguments.UserArg
-import me.aberrantfox.kjdautils.internal.logging.BotLogger
 import net.dv8tion.jda.api.entities.User
 
 @CommandSet("security")
-fun raidCommands(config: Configuration, logger: BotLogger, raiders: Raiders) = commands {
+fun raidCommands(config: Configuration, loggingService: LoggingService, raiders: Raiders) = commands {
     command("viewRaiders") {
         description = "See what raiders are in the raidView"
         execute {
@@ -45,7 +45,7 @@ fun raidCommands(config: Configuration, logger: BotLogger, raiders: Raiders) = c
 
             raiders.set.remove(user.id)
 
-            user.toMember(it.guild!!)?.let { member -> removeMuteRole(member, config, logger) }
+            user.toMember(it.guild!!)?.let { member -> removeMuteRole(member, config, loggingService.logInstance) }
 
             it.respond("Removed ${user.fullName()} from the queue, and has been unmuted.")
         }
@@ -62,7 +62,7 @@ fun raidCommands(config: Configuration, logger: BotLogger, raiders: Raiders) = c
 
             raiders.set
                     .mapNotNull { id -> it.discord.jda.retrieveUserById(id).complete()?.toMember(it.guild!!) }
-                    .forEach { member -> removeMuteRole(member, config, logger) }
+                    .forEach { member -> removeMuteRole(member, config, loggingService.logInstance) }
 
             raiders.set.clear()
             it.respond("Raiders unmuted, be nice bois!")

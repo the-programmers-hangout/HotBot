@@ -17,8 +17,7 @@ import java.text.SimpleDateFormat
 fun moderationCommands(kConfig: KConfiguration,
                        config: Configuration,
                        messages: Messages,
-                       manager: PermissionService,
-                       logger: BotLogger) = commands {
+                       loggingService: LoggingService) = commands {
     command("nuke") {
         description = "Delete 2 - 99 past messages in the given channel (default is the invoked channel). If users are given, only messages from those will be deleted."
         expect(arg(TextChannelArg, optional = true, default = { it.channel }),
@@ -110,7 +109,7 @@ fun moderationCommands(kConfig: KConfiguration,
             val reason = it.args[1] as String
 
             it.guild!!.modifyNickname(targetMember, messages.names.randomListItem()).queue {
-                targetMember.user.sendPrivateMessage("Your name has been changed forcefully by a member of staff for reason: $reason", logger)
+                targetMember.user.sendPrivateMessage("Your name has been changed forcefully by a member of staff for reason: $reason", loggingService.logInstance)
             }
         }
     }

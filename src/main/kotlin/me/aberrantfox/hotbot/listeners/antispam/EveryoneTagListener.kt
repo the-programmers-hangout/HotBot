@@ -1,6 +1,7 @@
 package me.aberrantfox.hotbot.listeners.antispam
 
 import com.google.common.eventbus.Subscribe
+import me.aberrantfox.hotbot.services.LoggingService
 import me.aberrantfox.kjdautils.internal.logging.BotLogger
 import net.dv8tion.jda.api.entities.Member
 import net.dv8tion.jda.api.entities.Message
@@ -9,7 +10,7 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent
 import net.dv8tion.jda.api.events.message.guild.GuildMessageUpdateEvent
 
 
-class EveryoneTagListener(val log: BotLogger) {
+class EveryoneTagListener(val loggingService: LoggingService) {
     @Subscribe fun onMessageReceived(event: GuildMessageReceivedEvent) =
             handleEveryoneTag(event.member, event.message, event.channel)
 
@@ -23,7 +24,7 @@ class EveryoneTagListener(val log: BotLogger) {
 
         // mentionsEveryone only works if the message actually pings, so search for the tag manually
         if (listOf("@here", "@everyone").any { message.contentRaw.contains(it) }) {
-            log.alert("everyone mention in ${channel.asMention} by ${message.author.asMention}")
+            loggingService.logInstance.alert("everyone mention in ${channel.asMention} by ${message.author.asMention}")
 
             message.delete().queue()
             val response = "Your message has been deleted. ${message.author.asMention}\n" +

@@ -1,11 +1,8 @@
 package me.aberrantfox.hotbot.listeners.antispam
 
 import com.google.common.eventbus.Subscribe
-import me.aberrantfox.hotbot.services.PermissionService
-import me.aberrantfox.hotbot.services.Configuration
-import me.aberrantfox.hotbot.services.RecentInviteService
+import me.aberrantfox.hotbot.services.*
 import me.aberrantfox.hotbot.utility.types.PersistentSet
-import me.aberrantfox.hotbot.services.WeightTracker
 import me.aberrantfox.kjdautils.api.annotation.Data
 import me.aberrantfox.kjdautils.extensions.jda.*
 import me.aberrantfox.kjdautils.extensions.stdlib.containsInvite
@@ -21,7 +18,7 @@ class InviteListener(val config: Configuration,
                      val inviteWhitelist: InviteWhitelist,
                      val recentInviteService: RecentInviteService,
                      val manager: PermissionService,
-                     private val logger: BotLogger) {
+                     val loggingService: LoggingService) {
     @Subscribe
     fun onGuildMessageUpdate(event: GuildMessageUpdateEvent) =
             handlePossibleInviteMessage(event.member, event.message, event.guild, event.channel, event.author.isBot, event.jda)
@@ -46,15 +43,15 @@ class InviteListener(val config: Configuration,
             recentInviteService.cache.addOrUpdate(id)
             if(recentInviteService.value(id) >= 5) {
                 guild.ban(author, 0, "You've been automatically banned for linking invitations. Advertising is not allowed, sorry.").queue {
-                    logger.alert("Banned user: ${author.fullName()} ($id for advertising automatically.")
+                    loggingService.logInstance.alert("Banned user: ${author.fullName()} ($id for advertising automatically.")
                 }
 
-                logger.alert("Banned: ${author.fullName()} for ${recentInviteService.value(id)} invites.")
+                loggingService.logInstance.alert("Banned: ${author.fullName()} for ${recentInviteService.value(id)} invites.")
                 recentInviteService.cache.map.remove(id)
             }
 
             message.deleteIfExists {
-                logger.alert("Deleted message: $messageContent by ${author.asMention} in ${channel.asMention}")
+                loggingService.logInstance.alert("Deleted message: $messageContent by ${author.asMention} in ${channel.asMention}")
             }
         }
     }

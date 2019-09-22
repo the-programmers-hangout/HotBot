@@ -39,7 +39,7 @@ const val uploadTextBaseUrl: String = "https://hasteb.in"
 fun utilCommands(messages: Messages,
                  manager: PermissionService,
                  config: Configuration,
-                 log: BotLogger,
+                 loggingService: LoggingService,
                  persistenceService: PersistenceService) = commands {
     command("botinfo") {
         description = "Display the bot information."
@@ -105,9 +105,9 @@ fun utilCommands(messages: Messages,
         execute {
             it.respond("Exiting")
             persistenceService.save(config)
-            log.info("saved configurations")
+            loggingService.logInstance.info("saved configurations")
             manager.save()
-            log.info("saved permissions to database prior to shut down.")
+            loggingService.logInstance.info("saved permissions to database prior to shut down.")
             exitProcess(0)
         }
     }

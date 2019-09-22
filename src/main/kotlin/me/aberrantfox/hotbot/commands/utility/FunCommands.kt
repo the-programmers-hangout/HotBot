@@ -1,14 +1,12 @@
 package me.aberrantfox.hotbot.commands.utility
 
-import me.aberrantfox.hotbot.services.Configuration
+
 import me.aberrantfox.kjdautils.api.dsl.*
 import me.aberrantfox.kjdautils.internal.arguments.*
-import org.jsoup.Jsoup
-import java.net.URLEncoder
 import java.util.Random
 
 @CommandSet("fun")
-fun funCommands(config: Configuration) =
+fun funCommands() =
     commands {
         command("flip") {
             description = "Flips a coin. Optionally, print one of the choices given."

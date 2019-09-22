@@ -27,7 +27,7 @@ private typealias UserId = String
 @Service
 class MuteService(val discord: Discord,
                   val config: Configuration,
-                  val log: BotLogger) {
+                  val loggingService: LoggingService) {
     private val muteMap = hashMapOf<GuildID, MuteRoleID>()
     private val roleName = config.security.mutedRole
     private val timer = Timer()
@@ -66,7 +66,7 @@ class MuteService(val discord: Discord,
         val muteEmbed = buildMuteEmbed(user.asMention, timeString, reason)
 
         guild.addRoleToMember(member, getMutedRole(guild)).queue()
-        user.sendPrivateMessage(muteEmbed, log)
+        user.sendPrivateMessage(muteEmbed, loggingService.logInstance)
         insertMutedMember(record)
         scheduleUnmute(member, time)
         notifyMuteAction(guild, user, timeString, reason, config)
@@ -107,7 +107,7 @@ class MuteService(val discord: Discord,
             val difference = timeToDifference(it.unmuteTime)
             val guild = discord.jda.getGuildById(it.guildId)
             if (guild == null) {
-                log.error("Couldn't re-add mute to user ${it.user}, because the retrieval of guild ${it.guildId} failed.")
+                loggingService.logInstance.error("Couldn't re-add mute to user ${it.user}, because the retrieval of guild ${it.guildId} failed.")
                 return@forEach
             }
 
@@ -143,7 +143,7 @@ class MuteService(val discord: Discord,
         val user = member.user
         val guild = member.guild
         if (user.mutualGuilds.isNotEmpty()) {
-            removeMuteRole(member, config, log)
+            removeMuteRole(member, config, loggingService.logInstance)
         }
 
         deleteMutedMember(user.id, guild.id)

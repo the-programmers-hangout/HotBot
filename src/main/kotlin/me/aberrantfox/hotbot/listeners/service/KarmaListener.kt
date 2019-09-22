@@ -10,7 +10,7 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
-class KarmaListener(val log: BotLogger,
+class KarmaListener(val loggingService: LoggingService,
                     val config: Configuration,
                     private val messages: Messages,
                     private val karmaService: KarmaService) {
@@ -32,7 +32,7 @@ class KarmaListener(val log: BotLogger,
 
         if(karmaResult is Positive) {
             addKarma(karmaResult.member.user, 1)
-            log.info("${message.author.fullName()} gave ${karmaResult.member.fullName()} 1 karma")
+            loggingService.logInstance.info("${message.author.fullName()} gave ${karmaResult.member.fullName()} 1 karma")
 
             event.channel.sendMessage(messages.karmaMessage.replace("%mention%", karmaResult.member.asMention)).queue()
             waitingUsers.add(member.user.id)

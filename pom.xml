@@ -18,7 +18,7 @@
 
         <!-- Kotlin/Discord Dependency versions -->
         <kotlin.version>1.3.10</kotlin.version>
-        <kutils.version>0.11.0</kutils.version>
+        <kutils.version>0.11.1</kutils.version>
 
         <!-- Other Dependencies -->
         <jsoup.version>1.11.1</jsoup.version>

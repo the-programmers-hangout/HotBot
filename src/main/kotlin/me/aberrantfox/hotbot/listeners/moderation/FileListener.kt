@@ -4,6 +4,7 @@ import com.google.common.eventbus.Subscribe
 import me.aberrantfox.kjdautils.internal.logging.BotLogger
 import me.aberrantfox.hotbot.services.PermissionService
 import me.aberrantfox.hotbot.services.Configuration
+import me.aberrantfox.hotbot.services.LoggingService
 import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent
 import org.apache.tika.Tika
@@ -14,7 +15,7 @@ data class FileMetadata(val name: String,
                         val isAllowed: Boolean,
                         val onlineAlternative: String?)
 
-class FileListener (val config: Configuration, val manager: PermissionService, val log: BotLogger){
+class FileListener (val config: Configuration, val manager: PermissionService, val loggingService: LoggingService){
     @Subscribe fun onMessageReceived(event: GuildMessageReceivedEvent) {
         val message = event.message
 
@@ -32,7 +33,7 @@ class FileListener (val config: Configuration, val manager: PermissionService, v
             val user = event.author.asMention
             event.channel.sendMessage(responseFor(user, metadata)).queue()
             val files = formatList(metadata.map { "${it.name} (${it.type})" })
-            log.alert("$user attempted to send the illegal file(s) $files in ${event.channel.asMention}")
+            loggingService.logInstance.alert("$user attempted to send the illegal file(s) $files in ${event.channel.asMention}")
         }
     }
 

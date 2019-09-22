@@ -3,6 +3,7 @@ package me.aberrantfox.hotbot.commands.administration
 import me.aberrantfox.hotbot.arguments.LowerMemberArg
 import me.aberrantfox.hotbot.database.getUnmuteRecord
 import me.aberrantfox.hotbot.services.Configuration
+import me.aberrantfox.hotbot.services.LoggingService
 import me.aberrantfox.hotbot.services.Messages
 import me.aberrantfox.hotbot.services.MuteService
 import me.aberrantfox.hotbot.utility.removeMuteRole
@@ -16,7 +17,6 @@ import me.aberrantfox.kjdautils.extensions.jda.sendPrivateMessage
 import me.aberrantfox.kjdautils.extensions.jda.toMember
 import me.aberrantfox.kjdautils.internal.arguments.SentenceArg
 import me.aberrantfox.kjdautils.internal.arguments.TimeStringArg
-import me.aberrantfox.kjdautils.internal.logging.BotLogger
 import net.dv8tion.jda.api.entities.Member
 import org.joda.time.DateTime
 import java.awt.Color
@@ -26,7 +26,7 @@ import kotlin.math.roundToLong
 
 @CommandSet("MuteCommands")
 fun createMuteCommands(config: Configuration,
-                       logger: BotLogger,
+                       loggingService: LoggingService,
                        muteService: MuteService,
                        messages: Messages) = commands {
     command("gag") {
@@ -89,7 +89,7 @@ fun createMuteCommands(config: Configuration,
 
             when (muteService.checkMuteState(member)) {
                 MuteService.MuteState.TrackedMute -> muteService.cancelMute(member)
-                MuteService.MuteState.UntrackedMute -> removeMuteRole(member, config, logger)
+                MuteService.MuteState.UntrackedMute -> removeMuteRole(member, config, loggingService.logInstance)
                 MuteService.MuteState.None -> {
                     it.respond("${member.descriptor()} isn't muted")
                     return@execute
@@ -118,12 +118,12 @@ fun createMuteCommands(config: Configuration,
 
             Timer().schedule(timeLimit) {
                 if(avatar == it.discord.jda.retrieveUserById(member.id).complete().effectiveAvatarUrl) {
-                    member.user.sendPrivateMessage("Hi, since you failed to change your profile picture, you are being banned.", logger)
+                    member.user.sendPrivateMessage("Hi, since you failed to change your profile picture, you are being banned.", loggingService.logInstance)
                     Timer().schedule(delay = 1000 * 10) {
                         it.guild!!.ban(member, 1, "Having a bad profile picture and refusing to change it.").queue()
                     }
                 } else {
-                    member.user.sendPrivateMessage("Thank you for changing your avatar. You will not be banned.", logger)
+                    member.user.sendPrivateMessage("Thank you for changing your avatar. You will not be banned.", loggingService.logInstance)
                 }
             }
         }

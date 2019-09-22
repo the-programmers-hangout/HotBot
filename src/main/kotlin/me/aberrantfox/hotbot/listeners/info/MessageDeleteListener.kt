@@ -11,7 +11,9 @@ import net.dv8tion.jda.api.entities.*
 import net.dv8tion.jda.api.events.message.guild.*
 import java.awt.Color
 
-class MessageDeleteListener(private val logger: BotLogger, val manager: PermissionService, val config: Configuration) {
+class MessageDeleteListener(val loggingService: LoggingService,
+                            val manager: PermissionService,
+                            val config: Configuration) {
     val list = LimitedList<Message>(5000)
 
     @Subscribe
@@ -24,7 +26,7 @@ class MessageDeleteListener(private val logger: BotLogger, val manager: Permissi
 
         val found = list.find { it == event.message } ?: return
 
-        logger.history(embed {
+        loggingService.logInstance.history(embed {
             title = "Message Edited"
             description = "${event.author.asMention}(${event.author.fullName()}) in ${event.channel.asMention}"
             color = Color.ORANGE
@@ -51,7 +53,7 @@ class MessageDeleteListener(private val logger: BotLogger, val manager: Permissi
         val found = list.find { it.id == event.messageId }
 
         if(found != null) {
-            logger.history(embed {
+            loggingService.logInstance.history(embed {
                 title = "Message Deleted"
                 description = "${found.author.asMention}(${found.author.fullName()}) in ${event.channel.asMention}"
                 color = Color.ORANGE

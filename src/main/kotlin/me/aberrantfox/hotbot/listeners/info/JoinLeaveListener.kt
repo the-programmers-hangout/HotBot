@@ -5,6 +5,7 @@ import me.aberrantfox.hotbot.commands.administration.sendWelcome
 import me.aberrantfox.hotbot.database.hasLeaveHistory
 import me.aberrantfox.hotbot.database.insertLeave
 import me.aberrantfox.hotbot.services.Configuration
+import me.aberrantfox.hotbot.services.LoggingService
 import me.aberrantfox.hotbot.services.Messages
 import me.aberrantfox.kjdautils.extensions.jda.fullName
 import me.aberrantfox.kjdautils.extensions.stdlib.formatJdaDate
@@ -24,7 +25,7 @@ typealias MessageID = String
 typealias UserID = String
 
 class MemberListener(val configuration: Configuration,
-                     private val logger: BotLogger,
+                     val loggingService: LoggingService,
                      private val messages: Messages) {
     private val welcomeMessages = ConcurrentHashMap<UserID, MessageID>()
 
@@ -38,10 +39,10 @@ class MemberListener(val configuration: Configuration,
         val rejoin = hasLeaveHistory(event.user.id, event.guild.id)
         val newUserThreshold = 5
 
-        logger.info("$user created $numOfDays days ago ($date) -- ${if (rejoin) "re" else ""}joined the server")
+        loggingService.logInstance.info("$user created $numOfDays days ago ($date) -- ${if (rejoin) "re" else ""}joined the server")
 
         if (numOfDays <= newUserThreshold)
-            logger.alert("$user has joined the server but the account has only existed for $numOfDays day${if (numOfDays == 1) "" else "s"}. Potential action required.")
+            loggingService.logInstance.alert("$user has joined the server but the account has only existed for $numOfDays day${if (numOfDays == 1) "" else "s"}. Potential action required.")
         if(sendWelcome){
             //Build welcome message
             val target = event.guild.textChannels.findLast { it.id == configuration.messageChannels.welcomeChannel }
@@ -61,14 +62,14 @@ class MemberListener(val configuration: Configuration,
     }
     @Subscribe
     fun onGuildMemberLeave(e: GuildMemberLeaveEvent) {
-        logger.info("${e.user.fullName()} :: ${e.user.asMention} left the server")
+        loggingService.logInstance.info("${e.user.fullName()} :: ${e.user.asMention} left the server")
 
         val welcomeMessageID = welcomeMessages[e.user.id]
 
         if(configuration.serverInformation.deleteWelcomeOnLeave && welcomeMessageID != null) {
             e.jda.getTextChannelById(configuration.messageChannels.welcomeChannel)?.retrieveMessageById(welcomeMessageID)?.queue {
                 it.delete().queue()
-            } ?: logger.error("Couldn't retrieve welcome channel to delete welcome embed because of member leave.")
+            } ?: loggingService.logInstance.error("Couldn't retrieve welcome channel to delete welcome embed because of member leave.")
         }
 
         val now = DateTime.now()

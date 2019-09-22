@@ -14,7 +14,7 @@ import net.dv8tion.jda.api.JDA
 class InitializerService(manager: PermissionService,
                          kjdaConfiguration: KConfiguration,
                          discord: Discord,
-                         logger: BotLogger,
+                         loggingService: LoggingService,
                          config: Configuration,
                          macros: Macros) {
     init {
@@ -24,8 +24,8 @@ class InitializerService(manager: PermissionService,
         LowerMemberArg.manager = manager
         MacroInstanceCopy.macros = macros
 
-        loadPersistence(discord.jda, logger, config)
-        logger.info("Fully setup, now ready for use.")
+        loadPersistence(discord.jda, loggingService.logInstance, config)
+        loggingService.logInstance.info("Fully setup, now ready for use.")
     }
 
     private fun loadPersistence(jda: JDA, logger: BotLogger, config: Configuration) {

@@ -3,10 +3,8 @@ package me.aberrantfox.hotbot.listeners.antispam
 import com.google.common.eventbus.Subscribe
 import me.aberrantfox.hotbot.services.*
 import me.aberrantfox.hotbot.utility.permMuteMember
-import me.aberrantfox.hotbot.utility.types.PersistentSet
 import me.aberrantfox.kjdautils.api.annotation.Data
 import me.aberrantfox.kjdautils.extensions.jda.*
-import me.aberrantfox.kjdautils.internal.logging.BotLogger
 import net.dv8tion.jda.api.entities.Member
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent
 import org.joda.time.DateTime
@@ -22,7 +20,7 @@ object SecuritySettings {
 }
 
 class DuplicateMessageListener (val config: Configuration,
-                                val log: BotLogger,
+                                val loggingService: LoggingService,
                                 val raiders: Raiders,
                                 private val tracker: MessageTracker) {
     @Subscribe
@@ -68,11 +66,11 @@ class DuplicateMessageListener (val config: Configuration,
     }
 
     private fun punish(member: Member, reason: String, id: String) {
-        permMuteMember(member, reason, config, log)
+        permMuteMember(member, reason, config, loggingService.logInstance)
 
         tracker.list(id)?.forEach { it.message.delete().queue() }
 
-        log.alert("${member.descriptor()} was muted for $reason")
+        loggingService.logInstance.alert("${member.descriptor()} was muted for $reason")
         tracker.removeUser(id)
     }
 }

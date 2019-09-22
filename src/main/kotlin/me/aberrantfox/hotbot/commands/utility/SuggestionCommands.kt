@@ -2,6 +2,7 @@ package me.aberrantfox.hotbot.commands.utility
 
 import me.aberrantfox.hotbot.database.*
 import me.aberrantfox.hotbot.services.Configuration
+import me.aberrantfox.hotbot.services.LoggingService
 import me.aberrantfox.hotbot.utility.dataclasses.*
 import me.aberrantfox.kjdautils.api.dsl.*
 import me.aberrantfox.kjdautils.extensions.jda.*
@@ -23,7 +24,7 @@ object Suggestions {
 }
 
 @CommandSet("suggestions")
-fun suggestionCommands(config: Configuration, log: BotLogger) = commands {
+fun suggestionCommands(config: Configuration, loggingService: LoggingService) = commands {
     command("suggest") {
         description = "Send a suggestion to the pre-lim pool. Suggestions are reviewed by a mod before they are reviewed by the community."
         expect(SentenceArg("Suggestion Message"))
@@ -130,7 +131,7 @@ fun suggestionCommands(config: Configuration, log: BotLogger) = commands {
 
                 try {
                     msg.jda.retrieveUserById(suggestion.member).complete()
-                            .sendPrivateMessage(suggestionUpdateMessage, log)
+                            .sendPrivateMessage(suggestionUpdateMessage, loggingService.logInstance)
                 }
                 finally {
                     message.fields.removeIf { it.name == reasonTitle }
