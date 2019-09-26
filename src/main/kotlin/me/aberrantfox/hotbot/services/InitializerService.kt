@@ -18,7 +18,6 @@ class InitializerService(manager: PermissionService,
                          config: Configuration,
                          macros: Macros) {
     init {
-        setupDatabaseSchema(config)
         kjdaConfiguration.visibilityPredicate = { cmd, user, chan, _ -> manager.canUseCommand(user, cmd.name) }
         LowerUserArg.manager = manager
         LowerMemberArg.manager = manager
