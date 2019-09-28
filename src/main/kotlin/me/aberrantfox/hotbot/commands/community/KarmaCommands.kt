@@ -1,7 +1,7 @@
 package me.aberrantfox.hotbot.commands.community
 
 import me.aberrantfox.hotbot.arguments.LowerUserArg
-import me.aberrantfox.hotbot.database.*
+import me.aberrantfox.hotbot.services.DatabaseService
 import me.aberrantfox.kjdautils.api.dsl.*
 import me.aberrantfox.kjdautils.extensions.jda.fullName
 import me.aberrantfox.kjdautils.internal.arguments.IntegerArg
@@ -9,13 +9,13 @@ import me.aberrantfox.kjdautils.internal.arguments.UserArg
 import net.dv8tion.jda.api.entities.User
 
 @CommandSet("karmacmds")
-fun karmaCommands() = commands {
+fun karmaCommands(databaseService: DatabaseService) = commands {
     command("viewkarma") {
         description = "View the karma of a specified user. Defaults to the user who invokes the command."
         expect(arg(UserArg, optional = true, default = {it.author}))
         execute{
             val user = it.args.component1() as User
-            val karma = getKarma(user)
+            val karma = databaseService.karma.getKarma(user)
             it.respond("${user.fullName()}'s karma is $karma")
         }
     }
@@ -26,7 +26,7 @@ fun karmaCommands() = commands {
             it.respond(embed {
                 title = "Top 10 most helpful people"
 
-                leaderBoard().forEachIndexed{ index, record ->
+                databaseService.karma.leaderBoard().forEachIndexed{ index, record ->
                     field {
                         name = "${index + 1}) ${it.discord.jda.getUserById(record.who)?.fullName() ?: record.who}"
                         value = "${record.karma} karma"
@@ -50,7 +50,7 @@ fun karmaCommands() = commands {
                 return@execute
             }
 
-            setKarma(user, amount)
+            databaseService.karma.setKarma(user, amount)
             it.respond("Updated the karma value for ${user.fullName()}.")
         }
     }

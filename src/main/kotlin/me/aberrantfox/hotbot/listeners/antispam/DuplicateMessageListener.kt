@@ -22,7 +22,7 @@ object SecuritySettings {
 class DuplicateMessageListener (val config: Configuration,
                                 val loggingService: LoggingService,
                                 val raiders: Raiders,
-                                private val tracker: MessageTracker) {
+                                private val tracker: MessageCache) {
     @Subscribe
     fun onGuildMessageReceived(event: GuildMessageReceivedEvent) {
         if(event.message.isImagePost()) return

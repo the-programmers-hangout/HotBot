@@ -2,15 +2,13 @@ package me.aberrantfox.hotbot.listeners.info
 
 import com.google.common.eventbus.Subscribe
 import me.aberrantfox.hotbot.commands.administration.sendWelcome
-import me.aberrantfox.hotbot.database.hasLeaveHistory
-import me.aberrantfox.hotbot.database.insertLeave
 import me.aberrantfox.hotbot.services.Configuration
+import me.aberrantfox.hotbot.services.DatabaseService
 import me.aberrantfox.hotbot.services.LoggingService
 import me.aberrantfox.hotbot.services.Messages
 import me.aberrantfox.kjdautils.extensions.jda.fullName
 import me.aberrantfox.kjdautils.extensions.stdlib.formatJdaDate
 import me.aberrantfox.kjdautils.extensions.stdlib.randomListItem
-import me.aberrantfox.kjdautils.internal.logging.BotLogger
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent
 import net.dv8tion.jda.api.events.guild.member.GuildMemberLeaveEvent
@@ -26,7 +24,8 @@ typealias UserID = String
 
 class MemberListener(val configuration: Configuration,
                      val loggingService: LoggingService,
-                     private val messages: Messages) {
+                     val databaseService: DatabaseService,
+                     val messages: Messages) {
     private val welcomeMessages = ConcurrentHashMap<UserID, MessageID>()
 
     @Subscribe
@@ -36,7 +35,7 @@ class MemberListener(val configuration: Configuration,
         val numOfDays = TimeUnit.DAYS.convert(secsSinceCreation, TimeUnit.SECONDS).toInt()
         val user = "${event.user.fullName()} :: ${event.user.asMention}"
         val date = event.user.timeCreated.toString().formatJdaDate()
-        val rejoin = hasLeaveHistory(event.user.id, event.guild.id)
+        val rejoin = databaseService.guildLeaves.hasLeaveHistory(event.user.id, event.guild.id)
         val newUserThreshold = 5
 
         loggingService.logInstance.info("$user created $numOfDays days ago ($date) -- ${if (rejoin) "re" else ""}joined the server")
@@ -73,7 +72,7 @@ class MemberListener(val configuration: Configuration,
         }
 
         val now = DateTime.now()
-        insertLeave(e.user.id, DateTime(1000 * e.member.timeJoined.toEpochSecond()), now, e.guild.id)
+        databaseService.guildLeaves.insertLeave(e.user.id, DateTime(1000 * e.member.timeJoined.toEpochSecond()), now, e.guild.id)
     }
 
     private fun buildJoinMessage(response: String, image: String, title: String) =

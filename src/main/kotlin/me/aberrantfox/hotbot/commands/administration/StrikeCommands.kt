@@ -1,7 +1,7 @@
 package me.aberrantfox.hotbot.commands.administration
 
 import me.aberrantfox.hotbot.arguments.*
-import me.aberrantfox.hotbot.database.*
+import me.aberrantfox.hotbot.services.database.*
 import me.aberrantfox.hotbot.extensions.createContinuableField
 import me.aberrantfox.hotbot.services.*
 import me.aberrantfox.kjdautils.api.dsl.*
@@ -16,7 +16,10 @@ import java.awt.Color
 data class StrikeRequest(val target: Member, val reason: String, val amount: Int, val moderator: User)
 
 @CommandSet("infractions")
-fun strikeCommands(config: Configuration, loggingService: LoggingService, muteService: MuteService) =
+fun strikeCommands(config: Configuration,
+                   loggingService: LoggingService,
+                   muteService: MuteService,
+                   databaseService: DatabaseService) =
     commands {
         command("warn") {
             description = "Warn a member, giving them a 0 strike infraction with the given reason."
@@ -26,7 +29,7 @@ fun strikeCommands(config: Configuration, loggingService: LoggingService, muteSe
                 val target = it.args.component1() as Member
                 val reason = it.args.component2() as String
 
-                infract(StrikeRequest(target, reason, 0, it.author), config, loggingService.logInstance, muteService)
+                infract(StrikeRequest(target, reason, 0, it.author), config, loggingService.logInstance, muteService, databaseService)
 
                 it.respond("User ${target.descriptor()} has been warned, with reason:\n$reason")
             }
@@ -48,7 +51,7 @@ fun strikeCommands(config: Configuration, loggingService: LoggingService, muteSe
                 val weightRange = 0..config.security.strikeCeil
                 if (weight !in weightRange) return@execute it.respond("The weight must be in the range $weightRange")
 
-                infract(StrikeRequest(target, reason, weight, it.author), config, loggingService.logInstance, muteService)
+                infract(StrikeRequest(target, reason, weight, it.author), config, loggingService.logInstance, muteService, databaseService)
 
                 it.respond("User ${target.descriptor()} has been infracted with weight: $weight, with reason:\n$reason")
             }
@@ -61,12 +64,16 @@ fun strikeCommands(config: Configuration, loggingService: LoggingService, muteSe
             execute {
                 val target = it.args[0] as User
 
-                incrementOrSetHistoryCount(target.id)
+                databaseService.historyCount.incrementOrSetHistoryCount(target.id)
 
-                it.respond(buildHistoryEmbed(target, true, getHistory(target.id),
-                        getHistoryCount(target.id), getNotesByUser(target.id), it, it.guild!!, config))
+                val strikes = databaseService.infractions.getHistory(target.id)
+                val count = databaseService.historyCount.getHistoryCount(target.id)
+                val notes = databaseService.notes.getNotesByUser(target.id)
 
-                val leaveHistory = getLeaveHistory(target.id, it.guild!!.id)
+                it.respond(buildHistoryEmbed(target, true, strikes, count, notes, it, it.guild!!, config, databaseService))
+
+                val leaveHistory = databaseService.guildLeaves.getLeaveHistory(target.id, it.guild!!.id)
+
                 if (leaveHistory.isNotEmpty())
                     it.respond(buildleaveHistoryEmbed(target, leaveHistory))
             }
@@ -77,7 +84,7 @@ fun strikeCommands(config: Configuration, loggingService: LoggingService, muteSe
             expect(IntegerArg("Infraction ID"))
             execute {
                 val strikeID = it.args[0] as Int
-                val amountRemoved = removeInfraction(strikeID)
+                val amountRemoved = databaseService.infractions.removeInfraction(strikeID)
 
                 it.respond("Deleted $amountRemoved strike records.")
             }
@@ -88,9 +95,9 @@ fun strikeCommands(config: Configuration, loggingService: LoggingService, muteSe
             expect(LowerUserArg)
             execute {
                 val user = it.args[0] as User
-                val amount = removeAllInfractions(user.id)
+                val amount = databaseService.infractions.removeAllInfractions(user.id)
 
-                resetHistoryCount(user.id)
+                databaseService.historyCount.resetHistoryCount(user.id)
                 it.respond("Infractions for ${user.descriptor()} have been wiped. Total removed: $amount")
             }
         }
@@ -101,17 +108,24 @@ fun strikeCommands(config: Configuration, loggingService: LoggingService, muteSe
             execute {
                 val target = it.author
 
-                target.sendPrivateMessage(buildHistoryEmbed(target, false, getHistory(target.id),
-                        getHistoryCount(target.id), null, it, it.guild!!, config), loggingService.logInstance)
+                val history = databaseService.infractions.getHistory(target.id)
+                val count = databaseService.historyCount.getHistoryCount(target.id)
+                val embed = buildHistoryEmbed(target, false, history, count,null, it, it.guild!!, config, databaseService)
+
+                target.sendPrivateMessage(embed, loggingService.logInstance)
             }
         }
     }
 
-private fun infract(strike: StrikeRequest, config: Configuration, log: BotLogger, muteService: MuteService) {
-    insertInfraction(strike)
+private fun infract(strike: StrikeRequest,
+                    config: Configuration,
+                    log: BotLogger,
+                    muteService: MuteService,
+                    databaseService: DatabaseService) {
+    databaseService.infractions.insertInfraction(strike)
 
     val (target, reason, weight, moderator) = strike
-    val totalStrikes = getMaxStrikes(target.id)
+    val totalStrikes = databaseService.infractions.getMaxStrikes(target.id)
 
     val punishmentLevel =
             if (totalStrikes > config.security.strikeCeil) {
@@ -120,7 +134,7 @@ private fun infract(strike: StrikeRequest, config: Configuration, log: BotLogger
                 totalStrikes
             }
 
-    val infractionEmbed = buildInfractionEmbed(target, reason, weight, punishmentLevel, config)
+    val infractionEmbed = buildInfractionEmbed(target, reason, weight, punishmentLevel, config, databaseService)
     target.user.sendPrivateMessage(infractionEmbed, log)
 
     val action = config.security.infractionActionMap[punishmentLevel] ?: return
@@ -178,9 +192,15 @@ private fun buildleaveHistoryEmbed(target: User, leaveHistory: List<LeaveHistory
     }
 }
 
-private fun buildHistoryEmbed(target: User, includeModerator: Boolean, records: List<StrikeRecord>,
-                              historyCount: Int, notes: List<NoteRecord>?, it: CommandEvent, guild: Guild,
-                              config: Configuration) =
+private fun buildHistoryEmbed(target: User,
+                              includeModerator: Boolean,
+                              records: List<StrikeRecord>,
+                              historyCount: Int,
+                              notes: List<NoteRecord>?,
+                              it: CommandEvent,
+                              guild: Guild,
+                              config: Configuration,
+                              databaseService: DatabaseService) =
         embed {
             title = "${target.fullName()}'s Record"
             color = Color.MAGENTA
@@ -196,7 +216,7 @@ private fun buildHistoryEmbed(target: User, includeModerator: Boolean, records: 
                 name = "Information"
                 value = "${target.fullName()} has **${records.size}** infractions(s).\nOf these infractions, " +
                         "**${records.filter { it.isExpired }.size}** are expired and **${records.filter { !it.isExpired }.size}** are still in effect." +
-                        "\nCurrent strike value of **${getMaxStrikes(target.id)}/${config.security.strikeCeil}**" +
+                        "\nCurrent strike value of **${databaseService.infractions.getMaxStrikes(target.id)}/${config.security.strikeCeil}**" +
                         "\nJoin date: **${guild.getMemberJoinString(target)}**" +
                         "\nCreation date: **${target.timeCreated.toString().formatJdaDate()}**"
                 inline = false
@@ -265,7 +285,12 @@ private fun buildHistoryEmbed(target: User, includeModerator: Boolean, records: 
             }
         }
 
-private fun buildInfractionEmbed(member: Member, reason: String, strikeQuantity: Int, punishmentLevel: Int, config: Configuration) =
+private fun buildInfractionEmbed(member: Member,
+                                 reason: String,
+                                 strikeQuantity: Int,
+                                 punishmentLevel: Int,
+                                 config: Configuration,
+                                 databaseService: DatabaseService) =
         embed {
             title = "Infraction"
             description = "${member.user.name}, you have been infracted.\nInfractions are formal warnings from staff members on TPH.\n" +
@@ -280,7 +305,7 @@ private fun buildInfractionEmbed(member: Member, reason: String, strikeQuantity:
             field {
                 name = "Strike Count"
                 inline = true
-                value = "${getMaxStrikes(member.id)} / ${config.security.strikeCeil}"
+                value = "${databaseService.infractions.getMaxStrikes(member.id)} / ${config.security.strikeCeil}"
             }
 
             field {

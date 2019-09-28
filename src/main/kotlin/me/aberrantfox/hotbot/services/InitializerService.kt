@@ -2,7 +2,7 @@ package me.aberrantfox.hotbot.services
 
 import me.aberrantfox.hotbot.arguments.*
 import me.aberrantfox.hotbot.commands.utility.*
-import me.aberrantfox.hotbot.database.*
+import me.aberrantfox.hotbot.services.database.setupDatabaseSchema
 import me.aberrantfox.hotbot.utility.timeToDifference
 import me.aberrantfox.kjdautils.api.annotation.Service
 import me.aberrantfox.kjdautils.api.dsl.*
@@ -11,12 +11,13 @@ import me.aberrantfox.kjdautils.internal.logging.BotLogger
 import net.dv8tion.jda.api.JDA
 
 @Service
-class InitializerService(manager: PermissionService,
-                         kjdaConfiguration: KConfiguration,
-                         discord: Discord,
-                         loggingService: LoggingService,
-                         config: Configuration,
-                         macros: Macros) {
+class InitializerService(val manager: PermissionService,
+                         val kjdaConfiguration: KConfiguration,
+                         val discord: Discord,
+                         val loggingService: LoggingService,
+                         val config: Configuration,
+                         val macros: Macros,
+                         val databaseService: DatabaseService) {
     init {
         kjdaConfiguration.visibilityPredicate = { cmd, user, chan, _ -> manager.canUseCommand(user, cmd.name) }
         LowerUserArg.manager = manager
@@ -28,19 +29,19 @@ class InitializerService(manager: PermissionService,
     }
 
     private fun loadPersistence(jda: JDA, logger: BotLogger, config: Configuration) {
-        forEachIgnoredID {
+        databaseService.ignores.forEachIgnoredID {
             config.security.ignoredIDs.add(it)
         }
 
-        forEachReminder {
+        databaseService.reminders.forEachReminder {
             val difference = timeToDifference(it.remindTime)
 
             jda.retrieveUserById(it.member).queue(
                     { user ->
-                        scheduleReminder(user, it.message, difference, logger)
+                        scheduleReminder(user, it.message, difference, logger, databaseService)
                     },
                     { error ->
-                        deleteReminder(it.member, it.message)
+                        databaseService.reminders.deleteReminder(it.member, it.message)
                     })
         }
     }

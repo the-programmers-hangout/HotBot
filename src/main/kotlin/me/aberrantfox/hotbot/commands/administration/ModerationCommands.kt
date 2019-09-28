@@ -1,14 +1,12 @@
 package me.aberrantfox.hotbot.commands.administration
 
 import me.aberrantfox.hotbot.arguments.*
-import me.aberrantfox.hotbot.database.*
 import me.aberrantfox.hotbot.extensions.safeDeleteMessages
 import me.aberrantfox.hotbot.services.*
 import me.aberrantfox.kjdautils.api.dsl.*
 import me.aberrantfox.kjdautils.extensions.jda.*
 import me.aberrantfox.kjdautils.extensions.stdlib.randomListItem
 import me.aberrantfox.kjdautils.internal.arguments.*
-import me.aberrantfox.kjdautils.internal.logging.BotLogger
 import net.dv8tion.jda.api.entities.*
 import java.text.SimpleDateFormat
 
@@ -17,7 +15,8 @@ import java.text.SimpleDateFormat
 fun moderationCommands(kConfig: KConfiguration,
                        config: Configuration,
                        messages: Messages,
-                       loggingService: LoggingService) = commands {
+                       loggingService: LoggingService,
+                       databaseService: DatabaseService) = commands {
     command("nuke") {
         description = "Delete 2 - 99 past messages in the given channel (default is the invoked channel). If users are given, only messages from those will be deleted."
         expect(arg(TextChannelArg, optional = true, default = { it.channel }),
@@ -68,11 +67,11 @@ fun moderationCommands(kConfig: KConfiguration,
 
             val removed = config.security.ignoredIDs.remove(target)
             if (removed) {
-                deleteIgnoredID(target)
+                databaseService.ignores.deleteIgnoredID(target)
                 it.respond("Unignored $name")
             } else {
                 config.security.ignoredIDs.add(target)
-                insertIgnoredID(target)
+                databaseService.ignores.insertIgnoredID(target)
                 it.respond("$name? Who? What? Don't know what that is. ;)")
             }
         }

@@ -1,11 +1,7 @@
 package me.aberrantfox.hotbot.commands.administration
 
 import me.aberrantfox.hotbot.arguments.LowerMemberArg
-import me.aberrantfox.hotbot.database.getUnmuteRecord
-import me.aberrantfox.hotbot.services.Configuration
-import me.aberrantfox.hotbot.services.LoggingService
-import me.aberrantfox.hotbot.services.Messages
-import me.aberrantfox.hotbot.services.MuteService
+import me.aberrantfox.hotbot.services.*
 import me.aberrantfox.hotbot.utility.removeMuteRole
 import me.aberrantfox.hotbot.utility.timeToString
 import me.aberrantfox.kjdautils.api.dsl.CommandSet
@@ -28,7 +24,8 @@ import kotlin.math.roundToLong
 fun createMuteCommands(config: Configuration,
                        loggingService: LoggingService,
                        muteService: MuteService,
-                       messages: Messages) = commands {
+                       messages: Messages,
+                       databaseService: DatabaseService) = commands {
     command("gag") {
         description = "Temporarily mute a user for 5 minutes so that you can deal with something."
         requiresGuild = true
@@ -158,7 +155,7 @@ fun createMuteCommands(config: Configuration,
         description="Return the remaining time of a mute"
         execute {
             try{
-                val unmuteTime = getUnmuteRecord(it.author.id, config.serverInformation.guildid) - DateTime().millis
+                val unmuteTime = databaseService.mutes.getUnmuteRecord(it.author.id, config.serverInformation.guildid) - DateTime().millis
                 it.respond(timeToString(unmuteTime))
             }catch (e: NoSuchElementException){
                 it.respond("You aren't currently muted...")

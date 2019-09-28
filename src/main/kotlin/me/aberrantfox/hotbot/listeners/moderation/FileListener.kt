@@ -1,7 +1,6 @@
 package me.aberrantfox.hotbot.listeners.moderation
 
 import com.google.common.eventbus.Subscribe
-import me.aberrantfox.kjdautils.internal.logging.BotLogger
 import me.aberrantfox.hotbot.services.PermissionService
 import me.aberrantfox.hotbot.services.Configuration
 import me.aberrantfox.hotbot.services.LoggingService

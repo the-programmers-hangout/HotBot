@@ -1,23 +1,16 @@
 package me.aberrantfox.hotbot.services
 
-import com.google.common.eventbus.Subscribe
-import me.aberrantfox.hotbot.database.deleteMutedMember
-import me.aberrantfox.hotbot.database.getAllMutedMembers
-import me.aberrantfox.hotbot.database.insertMutedMember
-import me.aberrantfox.hotbot.database.isMemberMuted
+
 import me.aberrantfox.hotbot.utility.*
 import me.aberrantfox.kjdautils.api.annotation.Service
 import me.aberrantfox.kjdautils.discord.Discord
-import me.aberrantfox.kjdautils.extensions.jda.fullName
 import me.aberrantfox.kjdautils.extensions.jda.getRoleByName
 import me.aberrantfox.kjdautils.extensions.jda.sendPrivateMessage
 import me.aberrantfox.kjdautils.extensions.stdlib.convertToTimeString
-import me.aberrantfox.kjdautils.internal.logging.BotLogger
 import net.dv8tion.jda.api.*
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.Member
 import net.dv8tion.jda.api.entities.User
-import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent
 import java.util.*
 
 private typealias GuildID = String
@@ -27,7 +20,8 @@ private typealias UserId = String
 @Service
 class MuteService(val discord: Discord,
                   val config: Configuration,
-                  val loggingService: LoggingService) {
+                  val loggingService: LoggingService,
+                  val databaseService: DatabaseService) {
     private val muteMap = hashMapOf<GuildID, MuteRoleID>()
     private val roleName = config.security.mutedRole
     private val timer = Timer()
@@ -56,7 +50,7 @@ class MuteService(val discord: Discord,
         if (key in unmuteTimerTaskMap) {
             unmuteTimerTaskMap[key]?.cancel()
             unmuteTimerTaskMap.remove(key)
-            deleteMutedMember(user.id, guild.id)
+            databaseService.mutes.deleteMutedMember(user.id, guild.id)
         }
 
         val timeString = time.convertToTimeString()
@@ -67,7 +61,7 @@ class MuteService(val discord: Discord,
 
         guild.addRoleToMember(member, getMutedRole(guild)).queue()
         user.sendPrivateMessage(muteEmbed, loggingService.logInstance)
-        insertMutedMember(record)
+        databaseService.mutes.insertMutedMember(record)
         scheduleUnmute(member, time)
         notifyMuteAction(guild, user, timeString, reason, config)
     }
@@ -78,7 +72,7 @@ class MuteService(val discord: Discord,
     }
 
     fun checkMuteState(member: Member) = when {
-        isMemberMuted(member.user.id, member.guild.id) -> MuteState.TrackedMute
+        databaseService.mutes.isMemberMuted(member.user.id, member.guild.id) -> MuteState.TrackedMute
         member.roles.contains(getMutedRole(member.guild)) -> MuteState.UntrackedMute
         else -> MuteState.None
     }
@@ -103,7 +97,7 @@ class MuteService(val discord: Discord,
     }
 
     private fun handleLTSMutes() {
-        getAllMutedMembers().forEach {
+        databaseService.mutes.getAllMutedMembers().forEach {
             val difference = timeToDifference(it.unmuteTime)
             val guild = discord.jda.getGuildById(it.guildId)
             if (guild == null) {
@@ -146,7 +140,7 @@ class MuteService(val discord: Discord,
             removeMuteRole(member, config, loggingService.logInstance)
         }
 
-        deleteMutedMember(user.id, guild.id)
+        databaseService.mutes.deleteMutedMember(user.id, guild.id)
         unmuteTimerTaskMap.remove(toKey(member))
     }
 }

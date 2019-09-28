@@ -34,11 +34,9 @@
         <gson-extra.version>0.2.1</gson-extra.version>
 
         <!-- Test Dependency Versions -->
-        <spek.version>1.1.5</spek.version>
-        <kluent.version>1.38</kluent.version>
-        <mockito.version>1.5.0</mockito.version>
-        <junit.version>5.2.0</junit.version>
-        <junitPlatformSurefire.version>1.2.0</junitPlatformSurefire.version>
+        <surefire.version>2.22.0</surefire.version>
+        <junit.version>5.4.0</junit.version>
+        <mockk.version>1.9.2</mockk.version>
     </properties>
 
     <dependencies>
@@ -127,13 +125,17 @@
             <artifactId>gson-extras</artifactId>
             <version>${gson-extra.version}</version>
         </dependency>
-
+        <dependency>
+            <groupId>org.apache.tika</groupId>
+            <artifactId>tika-core</artifactId>
+            <version>1.19.1</version>
+        </dependency>
 
         <!-- Test Dependencies -->
         <dependency>
-            <groupId>org.jetbrains.spek</groupId>
-            <artifactId>spek-api</artifactId>
-            <version>${spek.version}</version>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -143,28 +145,20 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.apache.tika</groupId>
-            <artifactId>tika-core</artifactId>
-            <version>1.19.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.amshove.kluent</groupId>
-            <artifactId>kluent</artifactId>
-            <version>${kluent.version}</version>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-params</artifactId>
+            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.nhaarman</groupId>
-            <artifactId>mockito-kotlin</artifactId>
-            <version>${mockito.version}</version>
+            <groupId>io.mockk</groupId>
+            <artifactId>mockk</artifactId>
+            <version>${mockk.version}</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.spek</groupId>
-            <artifactId>spek-junit-platform-engine</artifactId>
-            <version>${spek.version}</version>
         </dependency>
     </dependencies>
+
+
     <repositories>
         <repository>
             <id>jcenter</id>
@@ -271,21 +265,8 @@
 
             <!-- Testing-->
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.21.0</version>
-                <configuration>
-                    <includes>
-                        <include>**/*Spec.*</include>
-                    </includes>
-                </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.junit.platform</groupId>
-                        <artifactId>junit-platform-surefire-provider</artifactId>
-                        <version>${junitPlatformSurefire.version}</version>
-                    </dependency>
-                </dependencies>
+                <version>${surefire.version}</version>
             </plugin>
         </plugins>
     </build>

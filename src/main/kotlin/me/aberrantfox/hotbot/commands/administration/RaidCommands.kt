@@ -3,6 +3,7 @@ package me.aberrantfox.hotbot.commands.administration
 
 import me.aberrantfox.hotbot.listeners.antispam.Raiders
 import me.aberrantfox.hotbot.services.Configuration
+import me.aberrantfox.hotbot.services.DatabaseService
 import me.aberrantfox.hotbot.services.LoggingService
 import me.aberrantfox.hotbot.utility.removeMuteRole
 import me.aberrantfox.kjdautils.api.dsl.CommandSet
@@ -13,7 +14,9 @@ import me.aberrantfox.kjdautils.internal.arguments.UserArg
 import net.dv8tion.jda.api.entities.User
 
 @CommandSet("security")
-fun raidCommands(config: Configuration, loggingService: LoggingService, raiders: Raiders) = commands {
+fun raidCommands(config: Configuration,
+                 loggingService: LoggingService,
+                 raiders: Raiders) = commands {
     command("viewRaiders") {
         description = "See what raiders are in the raidView"
         execute {

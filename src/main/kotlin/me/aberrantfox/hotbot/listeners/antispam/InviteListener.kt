@@ -2,11 +2,9 @@ package me.aberrantfox.hotbot.listeners.antispam
 
 import com.google.common.eventbus.Subscribe
 import me.aberrantfox.hotbot.services.*
-import me.aberrantfox.hotbot.utility.types.PersistentSet
 import me.aberrantfox.kjdautils.api.annotation.Data
 import me.aberrantfox.kjdautils.extensions.jda.*
 import me.aberrantfox.kjdautils.extensions.stdlib.containsInvite
-import me.aberrantfox.kjdautils.internal.logging.BotLogger
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.entities.*
 import net.dv8tion.jda.api.events.message.guild.*
