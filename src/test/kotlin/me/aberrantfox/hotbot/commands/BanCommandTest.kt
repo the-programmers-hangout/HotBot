@@ -3,6 +3,8 @@ package me.aberrantfox.hotbot.commands
 
 import io.mockk.verify
 import me.aberrantfox.hotbot.commands.administration.createBanCommands
+import me.aberrantfox.hotbot.constants.sampleModeratorUserID
+import me.aberrantfox.hotbot.constants.sampleUserID
 import me.aberrantfox.hotbot.mocks.hotbot._databaseServiceMock
 import me.aberrantfox.hotbot.mocks.jda._moderatorUserMock
 import me.aberrantfox.hotbot.mocks.jda._userMock
@@ -15,12 +17,13 @@ class BanCommandTest {
     val cmds = createBanCommands(_databaseServiceMock)
 
     @Test
-    fun `The ban command should call Guild#ban`() {
+    fun `The ban command should call Guild#ban and log the ban in the DB`() {
 
         val event = createCommandEventMock(_moderatorUserMock, _userMock, 1, testReason)
         cmds["ban"]!!.execute(event)
 
         verify(exactly = 1) {
+            _databaseServiceMock.bans.updateOrSetReason(sampleUserID, testReason, sampleModeratorUserID)
             event.guild!!.ban(_userMock, 1, testReason)
         }
     }
