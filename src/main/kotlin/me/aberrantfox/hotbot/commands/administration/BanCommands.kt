@@ -53,7 +53,11 @@ fun createBanCommands(databaseService: DatabaseService) = commands {
             val record = databaseService.bans.getReason(target.id)
 
             if (record != null) {
-                it.respond("${target.fullName()} was banned by ${it.discord.jda.retrieveUserById(record.mod).complete().fullName()} for reason ${record.reason}")
+                it.discord.jda.retrieveUserById(record.mod).queue { mod ->
+                    val fullName = target.fullName()
+                    val modName = mod.fullName()
+                    it.respond("$fullName was banned by $modName for reason ${record.reason}")
+                }
             } else {
                 it.respond("That user does not have a record logged.")
             }
