@@ -2,6 +2,7 @@ package me.aberrantfox.hotbot.commands.utility
 
 import com.google.gson.Gson
 import khttp.post
+import me.aberrantfox.hotbot.extensions.sendImageToChannel
 import me.aberrantfox.hotbot.javautilities.UrlUtilities.sendImageToChannel
 import me.aberrantfox.hotbot.services.*
 import me.aberrantfox.hotbot.utility.timeToString
@@ -221,7 +222,7 @@ fun utilCommands(messages: Messages,
             val latex = URLEncoder.encode(input, "UTF-8")
 
             val url = "http://chart.apis.google.com/chart?cht=tx&chl=$latex"
-            sendImageToChannel(url, "latex-processed.png", "Could not process latex", it.channel)
+            it.channel.sendImageToChannel(url, "latex-processed.png", "Could not process latex", it.channel)
         }
     }
 
