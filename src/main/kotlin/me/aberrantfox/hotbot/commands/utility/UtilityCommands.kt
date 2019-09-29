@@ -3,7 +3,6 @@ package me.aberrantfox.hotbot.commands.utility
 import com.google.gson.Gson
 import khttp.post
 import me.aberrantfox.hotbot.extensions.sendImageToChannel
-import me.aberrantfox.hotbot.javautilities.UrlUtilities.sendImageToChannel
 import me.aberrantfox.hotbot.services.*
 import me.aberrantfox.hotbot.utility.timeToString
 import me.aberrantfox.kjdautils.api.dsl.*
