@@ -222,7 +222,7 @@ fun utilCommands(messages: Messages,
             val latex = URLEncoder.encode(input, "UTF-8")
 
             val url = "http://chart.apis.google.com/chart?cht=tx&chl=$latex"
-            it.channel.sendImageToChannel(url, "latex-processed.png", "Could not process latex", it.channel)
+            it.channel.sendImageToChannel(url, "latex-processed.png", "Could not process latex")
         }
     }
 
