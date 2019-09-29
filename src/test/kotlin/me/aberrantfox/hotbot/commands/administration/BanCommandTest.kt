@@ -1,8 +1,7 @@
-package me.aberrantfox.hotbot.commands
+package me.aberrantfox.hotbot.commands.administration
 
 
 import io.mockk.verify
-import me.aberrantfox.hotbot.commands.administration.createBanCommands
 import me.aberrantfox.hotbot.constants.sampleModeratorUserID
 import me.aberrantfox.hotbot.constants.sampleUserID
 import me.aberrantfox.hotbot.mocks.hotbot._databaseServiceMock
