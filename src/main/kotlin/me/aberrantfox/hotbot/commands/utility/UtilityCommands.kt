@@ -60,7 +60,7 @@ fun utilCommands(messageService: MessageService, manager: PermissionService, con
                 }
                 field {
                     name = "Technologies"
-                    value = "Built with Kotlin us KUtils and JDA"
+                    value = "Built with Kotlin using KUtils and JDA"
                     inline = false
                 }
                 field {
