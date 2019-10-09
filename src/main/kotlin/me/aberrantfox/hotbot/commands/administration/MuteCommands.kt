@@ -1,10 +1,7 @@
 package me.aberrantfox.hotbot.commands.administration
 
 import me.aberrantfox.hotbot.arguments.LowerMemberArg
-import me.aberrantfox.hotbot.database.getUnmuteRecord
-import me.aberrantfox.hotbot.services.Configuration
-import me.aberrantfox.hotbot.services.MessageService
-import me.aberrantfox.hotbot.services.MuteService
+import me.aberrantfox.hotbot.services.*
 import me.aberrantfox.hotbot.utility.removeMuteRole
 import me.aberrantfox.hotbot.utility.timeToString
 import me.aberrantfox.kjdautils.api.dsl.CommandSet
@@ -16,7 +13,6 @@ import me.aberrantfox.kjdautils.extensions.jda.sendPrivateMessage
 import me.aberrantfox.kjdautils.extensions.jda.toMember
 import me.aberrantfox.kjdautils.internal.arguments.SentenceArg
 import me.aberrantfox.kjdautils.internal.arguments.TimeStringArg
-import me.aberrantfox.kjdautils.internal.logging.BotLogger
 import net.dv8tion.jda.api.entities.Member
 import org.joda.time.DateTime
 import java.awt.Color
@@ -26,9 +22,10 @@ import kotlin.math.roundToLong
 
 @CommandSet("MuteCommands")
 fun createMuteCommands(config: Configuration,
-                       logger: BotLogger,
+                       loggingService: LoggingService,
                        muteService: MuteService,
-                       messageService: MessageService) = commands {
+                       messages: Messages,
+                       databaseService: DatabaseService) = commands {
     command("gag") {
         description = "Temporarily mute a user for 5 minutes so that you can deal with something."
         requiresGuild = true
@@ -41,7 +38,7 @@ fun createMuteCommands(config: Configuration,
                 return@execute
             }
 
-            muteService.muteMember(member, 5 * 1000 * 60, messageService.messages.gagResponse, it.author)
+            muteService.muteMember(member, 5 * 1000 * 60, messages.gagResponse, it.author)
         }
     }
 
@@ -89,7 +86,7 @@ fun createMuteCommands(config: Configuration,
 
             when (muteService.checkMuteState(member)) {
                 MuteService.MuteState.TrackedMute -> muteService.cancelMute(member)
-                MuteService.MuteState.UntrackedMute -> removeMuteRole(member, config, logger)
+                MuteService.MuteState.UntrackedMute -> removeMuteRole(member, config, loggingService.logInstance)
                 MuteService.MuteState.None -> {
                     it.respond("${member.descriptor()} isn't muted")
                     return@execute
@@ -118,12 +115,12 @@ fun createMuteCommands(config: Configuration,
 
             Timer().schedule(timeLimit) {
                 if(avatar == it.discord.jda.retrieveUserById(member.id).complete().effectiveAvatarUrl) {
-                    member.user.sendPrivateMessage("Hi, since you failed to change your profile picture, you are being banned.", logger)
+                    member.user.sendPrivateMessage("Hi, since you failed to change your profile picture, you are being banned.", loggingService.logInstance)
                     Timer().schedule(delay = 1000 * 10) {
                         it.guild!!.ban(member, 1, "Having a bad profile picture and refusing to change it.").queue()
                     }
                 } else {
-                    member.user.sendPrivateMessage("Thank you for changing your avatar. You will not be banned.", logger)
+                    member.user.sendPrivateMessage("Thank you for changing your avatar. You will not be banned.", loggingService.logInstance)
                 }
             }
         }
@@ -158,7 +155,7 @@ fun createMuteCommands(config: Configuration,
         description="Return the remaining time of a mute"
         execute {
             try{
-                val unmuteTime = getUnmuteRecord(it.author.id, config.serverInformation.guildid) - DateTime().millis
+                val unmuteTime = databaseService.mutes.getUnmuteRecord(it.author.id, config.serverInformation.guildid) - DateTime().millis
                 it.respond(timeToString(unmuteTime))
             }catch (e: NoSuchElementException){
                 it.respond("You aren't currently muted...")

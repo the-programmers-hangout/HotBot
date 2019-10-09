@@ -1,32 +1,22 @@
 package me.aberrantfox.hotbot.commands.administration
 
 import me.aberrantfox.hotbot.arguments.*
-import me.aberrantfox.hotbot.database.*
 import me.aberrantfox.hotbot.extensions.safeDeleteMessages
 import me.aberrantfox.hotbot.services.*
-import me.aberrantfox.hotbot.utility.removeMuteRole
 import me.aberrantfox.kjdautils.api.dsl.*
 import me.aberrantfox.kjdautils.extensions.jda.*
 import me.aberrantfox.kjdautils.extensions.stdlib.randomListItem
 import me.aberrantfox.kjdautils.internal.arguments.*
-import me.aberrantfox.kjdautils.internal.logging.BotLogger
 import net.dv8tion.jda.api.entities.*
-import java.awt.Color
-import java.io.File
 import java.text.SimpleDateFormat
-import java.util.Timer
-import kotlin.concurrent.schedule
-import kotlin.math.roundToLong
-import kotlin.system.exitProcess
 
-class ModerationCommands
 
 @CommandSet("moderation")
 fun moderationCommands(kConfig: KConfiguration,
                        config: Configuration,
-                       messageService: MessageService,
-                       manager: PermissionService,
-                       logger: BotLogger) = commands {
+                       messages: Messages,
+                       loggingService: LoggingService,
+                       databaseService: DatabaseService) = commands {
     command("nuke") {
         description = "Delete 2 - 99 past messages in the given channel (default is the invoked channel). If users are given, only messages from those will be deleted."
         expect(arg(TextChannelArg, optional = true, default = { it.channel }),
@@ -77,11 +67,11 @@ fun moderationCommands(kConfig: KConfiguration,
 
             val removed = config.security.ignoredIDs.remove(target)
             if (removed) {
-                deleteIgnoredID(target)
+                databaseService.ignores.deleteIgnoredID(target)
                 it.respond("Unignored $name")
             } else {
                 config.security.ignoredIDs.add(target)
-                insertIgnoredID(target)
+                databaseService.ignores.insertIgnoredID(target)
                 it.respond("$name? Who? What? Don't know what that is. ;)")
             }
         }
@@ -117,8 +107,8 @@ fun moderationCommands(kConfig: KConfiguration,
             val targetMember = it.args[0] as Member
             val reason = it.args[1] as String
 
-            it.guild!!.modifyNickname(targetMember, messageService.messages.names.randomListItem()).queue {
-                targetMember.user.sendPrivateMessage("Your name has been changed forcefully by a member of staff for reason: $reason", logger)
+            it.guild!!.modifyNickname(targetMember, messages.names.randomListItem()).queue {
+                targetMember.user.sendPrivateMessage("Your name has been changed forcefully by a member of staff for reason: $reason", loggingService.logInstance)
             }
         }
     }

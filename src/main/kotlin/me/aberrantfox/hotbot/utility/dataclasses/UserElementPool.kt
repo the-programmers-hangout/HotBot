@@ -3,7 +3,6 @@ package me.aberrantfox.hotbot.utility.dataclasses
 import com.fatboyindustrial.gsonjodatime.Converters
 import com.google.common.reflect.TypeToken
 import com.google.gson.GsonBuilder
-import me.aberrantfox.hotbot.services.configPath
 import net.dv8tion.jda.api.*
 import net.dv8tion.jda.api.entities.MessageEmbed
 import org.joda.time.DateTime
@@ -30,7 +29,7 @@ enum class AddResponse {
 }
 
 class UserElementPool(private val userLimit: Int = 3, private val poolLimit: Int = 20, val poolName: String) {
-    private val saveLocation = File(configPath("pools/$poolName.json"))
+    private val saveLocation = File("config/pools/$poolName.json")
     private val pool: Queue<PoolRecord> = LinkedList<PoolRecord>()
     private val gson = Converters.registerDateTime(GsonBuilder()).create()
 

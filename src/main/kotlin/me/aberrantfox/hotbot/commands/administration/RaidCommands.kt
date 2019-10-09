@@ -1,28 +1,31 @@
 package me.aberrantfox.hotbot.commands.administration
 
-import me.aberrantfox.hotbot.listeners.antispam.MutedRaiders
+
+import me.aberrantfox.hotbot.listeners.antispam.Raiders
 import me.aberrantfox.hotbot.services.Configuration
+import me.aberrantfox.hotbot.services.DatabaseService
+import me.aberrantfox.hotbot.services.LoggingService
 import me.aberrantfox.hotbot.utility.removeMuteRole
 import me.aberrantfox.kjdautils.api.dsl.CommandSet
 import me.aberrantfox.kjdautils.api.dsl.commands
 import me.aberrantfox.kjdautils.extensions.jda.fullName
 import me.aberrantfox.kjdautils.extensions.jda.toMember
-import me.aberrantfox.kjdautils.internal.arguments.IntegerArg
 import me.aberrantfox.kjdautils.internal.arguments.UserArg
-import me.aberrantfox.kjdautils.internal.logging.BotLogger
 import net.dv8tion.jda.api.entities.User
 
 @CommandSet("security")
-fun raidCommands(config: Configuration, logger: BotLogger) = commands {
+fun raidCommands(config: Configuration,
+                 loggingService: LoggingService,
+                 raiders: Raiders) = commands {
     command("viewRaiders") {
         description = "See what raiders are in the raidView"
         execute {
-            if (MutedRaiders.set.isEmpty()) {
+            if (raiders.set.isEmpty()) {
                 it.respond("No raiders... yay? (I hope that is a yay moment :D)")
                 return@execute
             }
 
-            it.respond("Raiders: " + MutedRaiders.set.reduce { a, b -> "$a, $b" })
+            it.respond("Raiders: " + raiders.set.reduce { a, b -> "$a, $b" })
         }
     }
 
@@ -31,21 +34,21 @@ fun raidCommands(config: Configuration, logger: BotLogger) = commands {
         requiresGuild = true
         expect(UserArg)
         execute {
-            if (MutedRaiders.set.isEmpty()) {
+            if (raiders.set.isEmpty()) {
                 it.respond("There are no raiders...")
                 return@execute
             }
 
             val user = it.args[0] as User
 
-            if (!(MutedRaiders.set.contains(user.id))) {
+            if (!(raiders.set.contains(user.id))) {
                 it.respond("That user is not a raider.")
                 return@execute
             }
 
-            MutedRaiders.set.remove(user.id)
+            raiders.set.remove(user.id)
 
-            user.toMember(it.guild!!)?.let { member -> removeMuteRole(member, config, logger) }
+            user.toMember(it.guild!!)?.let { member -> removeMuteRole(member, config, loggingService.logInstance) }
 
             it.respond("Removed ${user.fullName()} from the queue, and has been unmuted.")
         }
@@ -55,16 +58,16 @@ fun raidCommands(config: Configuration, logger: BotLogger) = commands {
         description = "For freeing all raiders from the raid queue, unmuting them as well."
         requiresGuild = true
         execute {
-            if (MutedRaiders.set.isEmpty()) {
+            if (raiders.set.isEmpty()) {
                 it.respond("There are no raiders...")
                 return@execute
             }
 
-            MutedRaiders.set
+            raiders.set
                     .mapNotNull { id -> it.discord.jda.retrieveUserById(id).complete()?.toMember(it.guild!!) }
-                    .forEach { member -> removeMuteRole(member, config, logger) }
+                    .forEach { member -> removeMuteRole(member, config, loggingService.logInstance) }
 
-            MutedRaiders.set.clear()
+            raiders.set.clear()
             it.respond("Raiders unmuted, be nice bois!")
         }
     }

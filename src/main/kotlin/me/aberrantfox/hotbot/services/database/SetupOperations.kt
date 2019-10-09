@@ -1,4 +1,4 @@
-package me.aberrantfox.hotbot.database
+package me.aberrantfox.hotbot.services.database
 
 import me.aberrantfox.hotbot.commands.utility.SuggestionStatus
 import me.aberrantfox.hotbot.services.Configuration
@@ -7,6 +7,8 @@ import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.StdOutSqlLogger
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.transactions.transaction
+
+class SetupOperations
 
 fun setupDatabaseSchema(config: Configuration) {
     val dbParams = listOf(

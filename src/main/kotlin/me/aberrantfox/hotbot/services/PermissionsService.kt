@@ -17,18 +17,18 @@ enum class PermissionLevel {
 data class PermissionsConfiguration(val permissions: ConcurrentHashMap<String, PermissionLevel> = ConcurrentHashMap(),
                                     val roleMappings: ConcurrentHashMap<String, PermissionLevel> = ConcurrentHashMap())
 @Service
-open class PermissionService(val discord: Discord, private val botConfig: Configuration) {
+open class PermissionService(val discord: Discord, private val botConfig: Configuration, val container: CommandsContainer) {
     private val gson = GsonBuilder().setPrettyPrinting().create()
     private val permissionsFile = File("config/permissions.json")
     private val permissionsConfig: PermissionsConfiguration
 
     init {
+        defaultAndPrunePermissions(container)
         permissionsConfig = if (permissionsFile.exists()) {
             gson.fromJson(permissionsFile.readText(), PermissionsConfiguration::class.java)
         } else {
             PermissionsConfiguration()
         }
-
         save()
     }
 

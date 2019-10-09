@@ -1,16 +1,18 @@
 package me.aberrantfox.hotbot.listeners.service
 
 import com.google.common.eventbus.Subscribe
-import me.aberrantfox.hotbot.database.*
 import me.aberrantfox.hotbot.services.*
 import me.aberrantfox.kjdautils.extensions.jda.fullName
-import me.aberrantfox.kjdautils.internal.logging.BotLogger
 import net.dv8tion.jda.api.events.guild.member.GuildMemberLeaveEvent
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
-class KarmaListener(private val messageService: MessageService, private val karmaService: KarmaService, val log: BotLogger, val config: Configuration) {
+class KarmaListener(val loggingService: LoggingService,
+                    val config: Configuration,
+                    val messages: Messages,
+                    val karmaService: KarmaService,
+                    val databaseService: DatabaseService) {
     private val waitingUsers = ConcurrentHashMap.newKeySet<String>()
 
     @Subscribe
@@ -28,10 +30,10 @@ class KarmaListener(private val messageService: MessageService, private val karm
 
 
         if(karmaResult is Positive) {
-            addKarma(karmaResult.member.user, 1)
-            log.info("${message.author.fullName()} gave ${karmaResult.member.fullName()} 1 karma")
+            databaseService.karma.addKarma(karmaResult.member.user, 1)
+            loggingService.logInstance.info("${message.author.fullName()} gave ${karmaResult.member.fullName()} 1 karma")
 
-            event.channel.sendMessage(messageService.messages.karmaMessage.replace("%mention%", karmaResult.member.asMention)).queue()
+            event.channel.sendMessage(messages.karmaMessage.replace("%mention%", karmaResult.member.asMention)).queue()
             waitingUsers.add(member.user.id)
 
             Timer().schedule(object : TimerTask(){
@@ -43,5 +45,5 @@ class KarmaListener(private val messageService: MessageService, private val karm
     }
 
     @Subscribe
-    fun leaveEvent(event: GuildMemberLeaveEvent) = removeKarma(event.user)
+    fun leaveEvent(event: GuildMemberLeaveEvent) = databaseService.karma.removeKarma(event.user)
 }

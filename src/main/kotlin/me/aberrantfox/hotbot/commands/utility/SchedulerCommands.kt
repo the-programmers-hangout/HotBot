@@ -1,7 +1,8 @@
 package me.aberrantfox.hotbot.commands.utility
 
-import me.aberrantfox.hotbot.database.deleteReminder
-import me.aberrantfox.hotbot.database.insertReminder
+
+import me.aberrantfox.hotbot.services.DatabaseService
+import me.aberrantfox.hotbot.services.LoggingService
 import me.aberrantfox.hotbot.utility.futureTime
 import me.aberrantfox.kjdautils.api.dsl.CommandSet
 import me.aberrantfox.kjdautils.api.dsl.commands
@@ -18,7 +19,8 @@ import kotlin.concurrent.schedule
 import kotlin.math.roundToLong
 
 @CommandSet("utility")
-fun schedulerCommands(log: BotLogger) = commands {
+fun schedulerCommands(loggingService: LoggingService,
+                      databaseService: DatabaseService) = commands {
     command("remindme") {
         description = "A command that'll remind you about something after the specified time."
         expect(TimeStringArg, SentenceArg("Reminder Message"))
@@ -28,15 +30,15 @@ fun schedulerCommands(log: BotLogger) = commands {
 
             it.respond("Got it, I'll remind you about that in ${timeMilliSecs.convertToTimeString()}")
 
-            insertReminder(it.author.id, title as String, futureTime(timeMilliSecs))
-            scheduleReminder(it.author, title, timeMilliSecs, log)
+            databaseService.reminders.insertReminder(it.author.id, title as String, futureTime(timeMilliSecs))
+            scheduleReminder(it.author, title, timeMilliSecs, loggingService.logInstance, databaseService)
         }
     }
 }
 
-fun scheduleReminder(user: User, message: String, timeMilli: Long, log: BotLogger) {
+fun scheduleReminder(user: User, message: String, timeMilli: Long, log: BotLogger, databaseService: DatabaseService) {
     fun remindTask() {
-        deleteReminder(user.id, message)
+        databaseService.reminders.deleteReminder(user.id, message)
         log.info("${user.fullName()} reminded themselves about: ${message.sanitiseMentions()}")
         user.sendPrivateMessage("Hi, you asked me to remind you about: $message", log)
     }

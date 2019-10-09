@@ -3,16 +3,15 @@ package me.aberrantfox.hotbot.listeners.antispam
 import com.google.common.eventbus.Subscribe
 import me.aberrantfox.hotbot.services.*
 import me.aberrantfox.hotbot.utility.permMuteMember
-import me.aberrantfox.hotbot.utility.types.PersistentSet
+import me.aberrantfox.kjdautils.api.annotation.Data
 import me.aberrantfox.kjdautils.extensions.jda.*
-import me.aberrantfox.kjdautils.internal.logging.BotLogger
 import net.dv8tion.jda.api.entities.Member
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent
 import org.joda.time.DateTime
 
-object MutedRaiders {
-    val set = PersistentSet(configPath("raiders.json"))
-}
+
+@Data("config/raiders.json")
+data class Raiders(val set: HashSet<String> = HashSet())
 
 object SecuritySettings {
     var matchCount = 6
@@ -21,8 +20,9 @@ object SecuritySettings {
 }
 
 class DuplicateMessageListener (val config: Configuration,
-                                val log: BotLogger,
-                                private val tracker: MessageTracker) {
+                                val loggingService: LoggingService,
+                                val raiders: Raiders,
+                                private val tracker: MessageCache) {
     @Subscribe
     fun onGuildMessageReceived(event: GuildMessageReceivedEvent) {
         if(event.message.isImagePost()) return
@@ -46,31 +46,31 @@ class DuplicateMessageListener (val config: Configuration,
         if(tracker.count(id) < SecuritySettings.waitPeriod)  return
         if(matches < SecuritySettings.matchCount) return
 
-        MutedRaiders.set.add(id)
+        raiders.set.add(id)
         val reason = "Automatic mute for duplicate-spam detection."
         punish(member, reason, id)
     }
 
     private fun checkSpeed(id: String, member: Member) {
-        if(MutedRaiders.set.contains(id)) return
+        if(raiders.set.contains(id)) return
 
         val amount = tracker.list(id)
             ?.count { it.time.isAfter(DateTime.now().minusSeconds(5)) }
             ?: return
 
         if(SecuritySettings.maxAmount <= amount) {
-            MutedRaiders.set.add(id)
+            raiders.set.add(id)
             val reason = "Automatic mute for repeat-spam detection."
             punish(member, reason, id)
         }
     }
 
     private fun punish(member: Member, reason: String, id: String) {
-        permMuteMember(member, reason, config, log)
+        permMuteMember(member, reason, config, loggingService.logInstance)
 
         tracker.list(id)?.forEach { it.message.delete().queue() }
 
-        log.alert("${member.descriptor()} was muted for $reason")
+        loggingService.logInstance.alert("${member.descriptor()} was muted for $reason")
         tracker.removeUser(id)
     }
 }

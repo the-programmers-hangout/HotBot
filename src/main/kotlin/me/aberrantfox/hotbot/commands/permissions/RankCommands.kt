@@ -1,6 +1,6 @@
 package me.aberrantfox.hotbot.commands.permissions
 
-import com.google.gson.Gson
+
 import me.aberrantfox.hotbot.arguments.LowerMemberArg
 import me.aberrantfox.hotbot.services.*
 import me.aberrantfox.kjdautils.api.dsl.*
@@ -8,51 +8,9 @@ import me.aberrantfox.kjdautils.extensions.jda.fullName
 import me.aberrantfox.kjdautils.internal.arguments.*
 import net.dv8tion.jda.api.entities.*
 import net.dv8tion.jda.api.exceptions.PermissionException
-import java.io.File
-
-private val rankConfigPath = configPath("rankconfig.json")
-
-internal data class RankConfiguration(val acceptableRanks: HashSet<String> = HashSet())
-
-object RankContainer {
-    private val config: RankConfiguration
-    private val file = File(rankConfigPath)
-    private val gson = Gson()
-
-    init {
-        config = if (!file.exists()) {
-            RankConfiguration()
-        } else {
-
-            gson.fromJson(file.readText(), RankConfiguration::class.java)
-        }
-    }
-
-
-    fun canUse(role: String) = config.acceptableRanks.contains(role.toLowerCase())
-
-    fun add(role: String) {
-        config.acceptableRanks.add(role.toLowerCase())
-        save()
-    }
-
-    fun remove(role: String) {
-        config.acceptableRanks.remove(role.toLowerCase())
-        save()
-    }
-
-    fun stringList() =
-        if (config.acceptableRanks.isNotEmpty()) {
-            config.acceptableRanks.reduce { a, b -> "$a, $b" }
-        } else {
-            "None."
-        }
-
-    private fun save() = file.writeText(gson.toJson(config))
-}
 
 @CommandSet("ranks")
-fun rankCommands(config: Configuration) = commands {
+fun rankCommands(rankContainer: RankContainer) = commands {
     command("grant") {
         description = "Grant a role to a user."
         requiresGuild = true
@@ -61,7 +19,7 @@ fun rankCommands(config: Configuration) = commands {
             val role = it.args.component1() as Role
             val member = it.args.component2() as Member
 
-            val result = handleGrant(role, member, true)
+            val result = handleGrant(role, member, true, rankContainer)
 
             it.respond(result)
         }
@@ -75,7 +33,7 @@ fun rankCommands(config: Configuration) = commands {
             val role = it.args.component1() as Role
             val member = it.args.component2() as Member
 
-            val result = handleGrant(role, member, false)
+            val result = handleGrant(role, member, false, rankContainer)
 
             it.respond(result)
         }
@@ -88,12 +46,12 @@ fun rankCommands(config: Configuration) = commands {
             val role = it.args.component1() as Role
             val roleName = role.name
 
-            if (RankContainer.canUse(roleName)) {
+            if (rankContainer.canUse(roleName)) {
                 it.respond("A role with that name is already grantable.")
                 return@execute
             }
 
-            RankContainer.add(roleName)
+            rankContainer.add(roleName)
             it.respond("The role: $roleName has been added to the role whitelist, and can now be assigned via the grant command.")
         }
     }
@@ -104,12 +62,12 @@ fun rankCommands(config: Configuration) = commands {
         execute {
             val roleName = (it.args.component1() as String).toLowerCase()
 
-            if (!RankContainer.canUse(roleName)) {
+            if (!rankContainer.canUse(roleName)) {
                 it.respond("Error: a role with that name hasn't been made grantable or doesn't exist")
                 return@execute
             }
 
-            RankContainer.remove(roleName)
+            rankContainer.remove(roleName)
             it.respond("The role: $roleName has been un-whitelisted, meaning it can no longer be granted. ")
         }
     }
@@ -117,16 +75,16 @@ fun rankCommands(config: Configuration) = commands {
     command("listgrantableroles") {
         description = "List grantable roles"
         execute {
-            it.respond("Currently whitelisted roles: ${RankContainer.stringList()}")
+            it.respond("Currently whitelisted roles: ${rankContainer.stringList()}")
         }
     }
 }
 
-private fun handleGrant(role: Role, member: Member, grant: Boolean): String {
+private fun handleGrant(role: Role, member: Member, grant: Boolean, rankContainer: RankContainer): String {
     val guild = member.guild
     val roleName = role.name
 
-    if (!RankContainer.canUse(roleName)) {
+    if (!rankContainer.canUse(roleName)) {
         return "That role cannot be granted or revoked."
     }
 

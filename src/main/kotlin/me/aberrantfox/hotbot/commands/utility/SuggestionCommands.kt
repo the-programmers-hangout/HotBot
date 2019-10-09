@@ -1,12 +1,13 @@
 package me.aberrantfox.hotbot.commands.utility
 
-import me.aberrantfox.hotbot.database.*
+import me.aberrantfox.hotbot.services.database.*
 import me.aberrantfox.hotbot.services.Configuration
+import me.aberrantfox.hotbot.services.DatabaseService
+import me.aberrantfox.hotbot.services.LoggingService
 import me.aberrantfox.hotbot.utility.dataclasses.*
 import me.aberrantfox.kjdautils.api.dsl.*
 import me.aberrantfox.kjdautils.extensions.jda.*
 import me.aberrantfox.kjdautils.internal.arguments.*
-import me.aberrantfox.kjdautils.internal.logging.BotLogger
 import net.dv8tion.jda.api.*
 import net.dv8tion.jda.api.entities.*
 import java.awt.Color
@@ -23,7 +24,9 @@ object Suggestions {
 }
 
 @CommandSet("suggestions")
-fun suggestionCommands(config: Configuration, log: BotLogger) = commands {
+fun suggestionCommands(config: Configuration,
+                       loggingService: LoggingService,
+                       databaseService: DatabaseService) = commands {
     command("suggest") {
         description = "Send a suggestion to the pre-lim pool. Suggestions are reviewed by a mod before they are reviewed by the community."
         expect(SentenceArg("Suggestion Message"))
@@ -83,7 +86,7 @@ fun suggestionCommands(config: Configuration, log: BotLogger) = commands {
                 }
 
                 channel?.sendMessage(buildSuggestionMessage(suggestion, it.discord.jda, SuggestionStatus.Review).build())?.queue {
-                    trackSuggestion(SuggestionRecord(it.id, SuggestionStatus.Review, suggestion))
+                    databaseService.suggestions.trackSuggestion(SuggestionRecord(it.id, SuggestionStatus.Review, suggestion))
 
                     it.addReaction("⬆").queue()
                     it.addReaction("⬇").queue()
@@ -116,13 +119,13 @@ fun suggestionCommands(config: Configuration, log: BotLogger) = commands {
             val suggestionChannel = fetchSuggestionChannel(it.guild!!, config)
                     ?: return@execute it.respond("Couldn't retrieve the suggestion channel!")
 
-            if (!isTracked(target)) {
+            if (!databaseService.suggestions.isTracked(target)) {
                 it.respond("That is not a valid message or a suggestion by the ID.")
                 return@execute
             }
 
             suggestionChannel.retrieveMessageById(target).queue({ msg ->
-                val suggestion = obtainSuggestion(target)
+                val suggestion = databaseService.suggestions.obtainSuggestion(target)
                 val message = buildArchiveMessage(suggestion.poolInfo, it.discord.jda, status, msg.reactions)
                 val reasonTitle = "Reason for Status"
 
@@ -130,12 +133,12 @@ fun suggestionCommands(config: Configuration, log: BotLogger) = commands {
 
                 try {
                     msg.jda.retrieveUserById(suggestion.member).complete()
-                            .sendPrivateMessage(suggestionUpdateMessage, log)
+                            .sendPrivateMessage(suggestionUpdateMessage, loggingService.logInstance)
                 }
                 finally {
                     message.fields.removeIf { it.name == reasonTitle }
                     message.addField(reasonTitle, reason, false)
-                    updateSuggestion(target, status)
+                    databaseService.suggestions.updateSuggestion(target, status)
 
                     val archiveChannel = fetchArchiveChannel(it.guild!!, config)
                             ?: return@queue it.respond("Couldn't retrieve the archive channel!")

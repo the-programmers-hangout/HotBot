@@ -1,5 +1,6 @@
 package me.aberrantfox.hotbot.commands.utility
 
+import me.aberrantfox.hotbot.services.LoggingService
 import me.aberrantfox.hotbot.utility.randomInt
 import me.aberrantfox.kjdautils.api.dsl.*
 import me.aberrantfox.kjdautils.extensions.stdlib.convertToTimeString
@@ -22,7 +23,7 @@ private const val giveawayEmbedTitle = "\uD83C\uDF89 GIVEAWAY! \uD83C\uDF89"
 private const val prizeFieldTitle = "Prize"
 
 @CommandSet("giveaway")
-fun giveawayCommands(log: BotLogger) = commands {
+fun giveawayCommands(loggingService: LoggingService) = commands {
     command("giveawaystart") {
         description = "Starts a giveaway in the channel it is invoked in."
         expect(TimeStringArg, SentenceArg("Giveaway Prize"))
@@ -57,7 +58,7 @@ fun giveawayCommands(log: BotLogger) = commands {
             announceWinner(message, prize)
             Giveaways.giveaways.remove(messageID)
 
-            log.info("Ended giveaway for $prize (Message ID: $messageID)")
+            loggingService.logInstance.info("Ended giveaway for $prize (Message ID: $messageID)")
         }
     }
 

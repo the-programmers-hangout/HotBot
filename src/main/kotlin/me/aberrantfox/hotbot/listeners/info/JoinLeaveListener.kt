@@ -2,14 +2,13 @@ package me.aberrantfox.hotbot.listeners.info
 
 import com.google.common.eventbus.Subscribe
 import me.aberrantfox.hotbot.commands.administration.sendWelcome
-import me.aberrantfox.hotbot.database.hasLeaveHistory
-import me.aberrantfox.hotbot.database.insertLeave
 import me.aberrantfox.hotbot.services.Configuration
-import me.aberrantfox.hotbot.services.MessageService
+import me.aberrantfox.hotbot.services.DatabaseService
+import me.aberrantfox.hotbot.services.LoggingService
+import me.aberrantfox.hotbot.services.Messages
 import me.aberrantfox.kjdautils.extensions.jda.fullName
 import me.aberrantfox.kjdautils.extensions.stdlib.formatJdaDate
 import me.aberrantfox.kjdautils.extensions.stdlib.randomListItem
-import me.aberrantfox.kjdautils.internal.logging.BotLogger
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent
 import net.dv8tion.jda.api.events.guild.member.GuildMemberLeaveEvent
@@ -23,7 +22,10 @@ import kotlin.concurrent.schedule
 typealias MessageID = String
 typealias UserID = String
 
-class MemberListener(val configuration: Configuration, private val logger: BotLogger, private val messageService: MessageService) {
+class MemberListener(val configuration: Configuration,
+                     val loggingService: LoggingService,
+                     val databaseService: DatabaseService,
+                     val messages: Messages) {
     private val welcomeMessages = ConcurrentHashMap<UserID, MessageID>()
 
     @Subscribe
@@ -33,17 +35,17 @@ class MemberListener(val configuration: Configuration, private val logger: BotLo
         val numOfDays = TimeUnit.DAYS.convert(secsSinceCreation, TimeUnit.SECONDS).toInt()
         val user = "${event.user.fullName()} :: ${event.user.asMention}"
         val date = event.user.timeCreated.toString().formatJdaDate()
-        val rejoin = hasLeaveHistory(event.user.id, event.guild.id)
+        val rejoin = databaseService.guildLeaves.hasLeaveHistory(event.user.id, event.guild.id)
         val newUserThreshold = 5
 
-        logger.info("$user created $numOfDays days ago ($date) -- ${if (rejoin) "re" else ""}joined the server")
+        loggingService.logInstance.info("$user created $numOfDays days ago ($date) -- ${if (rejoin) "re" else ""}joined the server")
 
         if (numOfDays <= newUserThreshold)
-            logger.alert("$user has joined the server but the account has only existed for $numOfDays day${if (numOfDays == 1) "" else "s"}. Potential action required.")
+            loggingService.logInstance.alert("$user has joined the server but the account has only existed for $numOfDays day${if (numOfDays == 1) "" else "s"}. Potential action required.")
         if(sendWelcome){
             //Build welcome message
             val target = event.guild.textChannels.findLast { it.id == configuration.messageChannels.welcomeChannel }
-            val response = messageService.messages.onJoin.randomListItem().replace("%name%", "${event.user.asMention}(${event.user.fullName()})")
+            val response = messages.onJoin.randomListItem().replace("%name%", "${event.user.asMention}(${event.user.fullName()})")
             val userImage = event.user.effectiveAvatarUrl
 
             target?.sendMessage(buildJoinMessage(response, userImage, if (rejoin) "Player Resumes!" else "Player Get!"))?.queue { msg ->
@@ -57,21 +59,20 @@ class MemberListener(val configuration: Configuration, private val logger: BotLo
         }
 
     }
-
     @Subscribe
     fun onGuildMemberLeave(e: GuildMemberLeaveEvent) {
-        logger.info("${e.user.fullName()} :: ${e.user.asMention} left the server")
+        loggingService.logInstance.info("${e.user.fullName()} :: ${e.user.asMention} left the server")
 
         val welcomeMessageID = welcomeMessages[e.user.id]
 
         if(configuration.serverInformation.deleteWelcomeOnLeave && welcomeMessageID != null) {
             e.jda.getTextChannelById(configuration.messageChannels.welcomeChannel)?.retrieveMessageById(welcomeMessageID)?.queue {
                 it.delete().queue()
-            } ?: logger.error("Couldn't retrieve welcome channel to delete welcome embed because of member leave.")
+            } ?: loggingService.logInstance.error("Couldn't retrieve welcome channel to delete welcome embed because of member leave.")
         }
 
         val now = DateTime.now()
-        insertLeave(e.user.id, DateTime(1000 * e.member.timeJoined.toEpochSecond()), now, e.guild.id)
+        databaseService.guildLeaves.insertLeave(e.user.id, DateTime(1000 * e.member.timeJoined.toEpochSecond()), now, e.guild.id)
     }
 
     private fun buildJoinMessage(response: String, image: String, title: String) =
@@ -80,7 +81,7 @@ class MemberListener(val configuration: Configuration, private val logger: BotLo
             .setDescription(response)
             .setColor(Color.red)
             .setThumbnail(image)
-            .addField("How do I start?", messageService.messages.welcomeDescription, false)
+            .addField("How do I start?", messages.welcomeDescription, false)
             .build()
 }
 
